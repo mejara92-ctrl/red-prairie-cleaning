@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Red Prairie Cleaning | Luxury Home Cleaning in Lawton, OK</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Red Prairie Cleaning - luxury home cleaning in Lawton, Elgin, and Fort Sill. Professional cleaners, transparent pricing, no contracts, and secure online checkout with Stripe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    :root {
+      --rp-red: #c0392b;
+      --rp-red-dark: #962d22;
+      --rp-bg: #f7f5f3;
+      --rp-bg-soft: #fcfaf8;
+      --rp-border-soft: #e5e1db;
+      --rp-text: #312e2a;
+      --rp-text-soft: #746f66;
+      --rp-pill-bg: #fff7f3;
+      --rp-green: #2ecc71;
+      --rp-shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+      --rp-radius-card: 26px;
+      --rp-radius-pill: 999px;
+      --rp-input-border: #ded7cc;
+      --rp-input-hover: #cfc3b6;
+      --rp-input-focus: #c0392b33;
+      --rp-badge-green-bg: #e8f8f0;
+      --rp-badge-green-border: #b7e4cc;
+      --rp-warning: #f39c12;
+      --rp-error-bg: #fff5f5;
+      --rp-error-border: #f5b7b1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #fef5f2 0, #f7f5f3 45%, #f0f2f5 100%);
+      color: var(--rp-text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 32px auto 48px;
+      padding: 0 20px 40px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 30% 20%, #ffcccb 0, #e74c3c 45%, #b83227 100%);
+      box-shadow: 0 10px 25px rgba(192, 57, 43, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .brand-text-title {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--rp-text-soft);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .call-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background-color: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .call-chip-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--rp-text-soft);
+    }
+
+    .call-chip-number {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .ghost-link {
+      font-size: 12px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 14px 32px rgba(148, 163, 184, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .ghost-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 22px;
+      align-items: flex-start;
+    }
+
+    .hero,
+    .booking-card {
+      border-radius: var(--rp-radius-card);
+      background: linear-gradient(135deg, #ffffff 0%, #fdfbf9 50%, #f7f3ee 100%);
+      box-shadow: var(--rp-shadow-soft);
+      padding: 26px 26px 24px;
+      border: 1px solid rgba(209, 213, 219, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at -5% -10%, rgba(248, 113, 113, 0.16) 0, transparent 45%),
+        radial-gradient(circle at 110% 100%, rgba(14, 116, 144, 0.18) 0, transparent 48%);
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--rp-text-soft);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.16;
+    }
+
+    .hero-highlight {
+      color: var(--rp-red);
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--rp-text-soft);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      max-width: 380px;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      border-radius: var(--rp-radius-pill);
+      background-color: var(--rp-pill-bg);
+      padding: 7px 12px;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(244, 130, 95, 0.32);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #f97316;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .primary-cta {
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--rp-red) 0%, #ff6b4a 50%, #f97316 100%);
+      color: #fff;
+      border: none;
+      padding: 11px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 14px 30px rgba(220, 38, 38, 0.4);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .primary-cta span {
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .timing-text {
+      font-size: 11px;
+      color: var(--rp-text-soft);
+    }
+
+    .hero-trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--rp-text-soft);
+    }
+
+    .hero-trust-label {
+      font-weight: 500;
+    }
+
+    .hero-trust-icon {
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      border: 2px solid #22c55e;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 6px;
+      position: relative;
+      top: 2px;
+    }
+
+    .hero-trust-icon::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background-color: #22c55e;
+    }
+
+    .hero-badge-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--rp-text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .booking-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fcfaf8 45%, #f7f3ee 100%);
+      padding: 22px 22px 20px;
+    }
+
+    .booking-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .booking-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .secure-badge {
+      border-radius: 999px;
+      background-color: var(--rp-badge-green-bg);
+      border: 1px solid var(--rp-badge-green-border);
+      padding: 6px 10px;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #166534;
+      white-space: nowrap;
+    }
+
+    .secure-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.9fr);
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .card-section {
+      background-color: var(--rp-bg-soft);
+      border-radius: 18px;
+      padding: 12px 14px 12px;
+      border: 1px solid rgba(229, 231, 235, 0.8);
+    }
+
+    .card-section + .card-section {
+      margin-top: 8px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--rp-text-soft);
+      margin-bottom: 8px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      font-size: 11px;
+      margin-bottom: 3px;
+      color: var(--rp-text-soft);
+    }
+
+    .input,
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid var(--rp-input-border);
+      background-color: #ffffff;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    textarea {
+      border-radius: 14px;
+      min-height: 38px;
+      resize: vertical;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    .input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: var(--rp-input-hover);
+      background-color: #fefcf9;
+    }
+
+    .input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--rp-red);
+      box-shadow: 0 0 0 1px var(--rp-input-focus);
+    }
+
+    .radio-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .radio-pill {
+      position: relative;
+    }
+
+    .radio-pill input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-pill-label {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      border: 1px solid var(--rp-input-border);
+      background-color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--rp-text-soft);
+    }
+
+    .radio-pill-label span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+    }
+
+    .radio-pill input:checked + .radio-pill-label {
+      border-color: var(--rp-red);
+      background: linear-gradient(135deg, #fff7f5 0%, #ffeae3 100%);
+      color: var(--rp-text);
+      box-shadow: 0 10px 20px rgba(220, 38, 38, 0.18);
+    }
+
+    .radio-pill input:checked + .radio-pill-label span.dot {
+      border-color: var(--rp-red);
+      background: var(--rp-red);
+    }
+
+    .addon-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .addon {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 6px 7px;
+      border-radius: 12px;
+      border: 1px dashed rgba(209, 213, 219, 0.8);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .addon input {
+      width: 13px;
+      height: 13px;
+      accent-color: var(--rp-red);
+    }
+
+    .addon-label-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .addon-label-main span:first-child {
+      font-size: 11px;
+    }
+
+    .addon-price {
+      font-weight: 500;
+      color: var(--rp-text);
+    }
+
+    .estimate-card {
+      border-radius: 18px;
+      padding: 12px 12px 10px;
+      background: #ffffff;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      font-size: 11px;
+    }
+
+    .estimate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .estimate-label {
+      color: var(--rp-text-soft);
+    }
+
+    .estimate-value {
+      font-weight: 600;
+    }
+
+    .estimate-total-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .estimate-total {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .estimate-note {
+      font-size: 10px;
+      color: var(--rp-text-soft);
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    .booking-footer {
+      margin-top: 10px;
+    }
+
+    .error-banner {
+      display: none;
+      margin-bottom: 8px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid var(--rp-error-border);
+      background-color: var(--rp-error-bg);
+      font-size: 11px;
+      color: #b71c1c;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .primary-pay-btn {
+      width: 100%;
+      border-radius: 999px;
+      padding: 9px 14px;
+      border: none;
+      background: linear-gradient(135deg, #f97316 0%, var(--rp-red) 50%, #7c2d12 100%);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 14px 32px rgba(220, 38, 38, 0.45);
+    }
+
+    .primary-pay-btn:disabled {
+      opacity: 0.8;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .secondary-call-text {
+      font-size: 10px;
+      color: var(--rp-text-soft);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .secondary-call-text span {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .legal-text {
+      margin-top: 6px;
+      font-size: 9px;
+      color: var(--rp-text-soft);
+      line-height: 1.5;
+    }
+
+    .steps-section {
+      margin-top: 26px;
+    }
+
+    .steps-heading {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--rp-text-soft);
+      margin-bottom: 10px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .step-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 12px 10px;
+      border: 1px solid rgba(209, 213, 219, 0.8);
+      font-size: 11px;
+      box-shadow: 0 12px 24px rgba(148, 163, 184, 0.16);
+    }
+
+    .step-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--rp-text-soft);
+      margin-bottom: 4px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-body {
+      color: var(--rp-text-soft);
+      line-height: 1.4;
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 10px;
+      color: var(--rp-text-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer a {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .booking-card {
+        order: -1;
+      }
+
+      .page {
+        margin-top: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero,
+      .booking-card {
+        padding: 18px 16px 16px;
+      }
+
+      .booking-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .steps-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <div class="brand">
+        <div class="brand-logo">RP</div>
+        <div>
+          <div class="brand-text-title">RED PRAIRIE CLEANING</div>
+          <div class="brand-text-sub">Home cleaning in Lawton · Fort Sill · Elgin</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="call-chip">
+          <div class="call-chip-label">Call or text</div>
+          <div class="call-chip-number">(580) 215-0915</div>
+        </div>
+        <button class="ghost-link" type="button">
+          <span class="ghost-dot"></span>
+          View instant pricing
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT: HERO / COPY -->
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="eyebrow">Luxury home cleaning • Locally owned</div>
+          <h1>
+            Your <span class="hero-highlight">home cleaned</span><br/>
+            like a luxury hotel.
+          </h1>
+          <div class="hero-sub">
+            Professional, background-checked cleaners serving Lawton, Elgin, and Fort Sill. Transparent pricing,
+            no contracts, and secure online checkout with Stripe.
+          </div>
+
+          <div class="hero-pills">
+            <div class="pill"><span class="pill-dot"></span> First-time deep cleans</div>
+            <div class="pill"><span class="pill-dot"></span> Weekly &amp; bi-weekly maintenance</div>
+            <div class="pill"><span class="pill-dot"></span> Move-in / move-out cleans</div>
+            <div class="pill"><span class="pill-dot"></span> Supplies &amp; equipment included</div>
+          </div>
+
+          <div class="hero-cta-row">
+            <button class="primary-cta" type="button" onclick="document.getElementById('cust-name').focus()">
+              Get instant price &amp; book
+              <span>takes about 60 seconds</span>
+            </button>
+            <div class="timing-text">You’ll see your estimated price before you pay. Final pricing is confirmed after a quick walk-through.</div>
+          </div>
+
+          <div class="hero-trust-row">
+            <div class="hero-trust-label">
+              <span class="hero-trust-icon"></span>
+              100% satisfaction promise
+            </div>
+            <div>We’ll fix anything you’re not happy with.</div>
+          </div>
+
+          <div class="hero-badge-row">
+            <div class="hero-badge">
+              <span class="hero-badge-dot"></span>
+              Stripe-secured checkout
+            </div>
+            <div class="hero-badge">
+              ✨ Locally owned, not a franchise
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: BOOKING / FORM -->
+      <section class="booking-card">
+        <div class="booking-header">
+          <div class="booking-title">Book your clean</div>
+          <div class="secure-badge">
+            <span class="secure-dot"></span>
+            Secure Stripe checkout
+          </div>
+        </div>
+
+        <div class="booking-grid">
+          <!-- FORM SIDE -->
+          <div>
+            <div class="card-section">
+              <div class="section-label">Your info</div>
+              <div class="field-grid">
+                <div class="field-full">
+                  <div class="field-label">Full name</div>
+                  <input id="cust-name" class="input" type="text" placeholder="Full name" autocomplete="name" />
+                </div>
+                <div>
+                  <div class="field-label">Email</div>
+                  <input id="cust-email" class="input" type="email" placeholder="you@example.com" autocomplete="email" />
+                </div>
+                <div>
+                  <div class="field-label">Mobile phone</div>
+                  <input id="cust-phone" class="input" type="tel" placeholder="(555) 555-5555" autocomplete="tel" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <div class="section-label">Service address</div>
+              <div class="field-grid">
+                <div class="field-full">
+                  <div class="field-label">Street address</div>
+                  <input id="cust-address" class="input" type="text" placeholder="Street address" autocomplete="address-line1" />
+                </div>
+                <div>
+                  <div class="field-label">City</div>
+                  <input id="cust-city" class="input" type="text" placeholder="Lawton" autocomplete="address-level2" />
+                </div>
+                <div>
+                  <div class="field-label">ZIP</div>
+                  <input id="cust-zip" class="input" type="text" placeholder="73501" autocomplete="postal-code" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <div class="section-label">Home details</div>
+              <div class="field-grid">
+                <div>
+                  <div class="field-label">Bedrooms</div>
+                  <select name="bedrooms" class="input">
+                    <option value="1">1 bedroom</option>
+                    <option value="2">2 bedrooms</option>
+                    <option value="3" selected>3 bedrooms</option>
+                    <option value="4">4 bedrooms</option>
+                    <option value="5">5+ bedrooms</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="field-label">Bathrooms</div>
+                  <select name="bathrooms" class="input">
+                    <option value="1">1 bath</option>
+                    <option value="2" selected>2 baths</option>
+                    <option value="3">3 baths</option>
+                    <option value="4">4+ baths</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <div class="section-label">Cleaning type</div>
+              <div class="radio-pill-row">
+                <label class="radio-pill">
+                  <input type="radio" name="cleaning-type" value="first-time" checked />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    First-time / Deep clean
+                  </span>
+                </label>
+
+                <label class="radio-pill">
+                  <input type="radio" name="cleaning-type" value="standard" />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    Standard maintenance
+                  </span>
+                </label>
+
+                <label class="radio-pill">
+                  <input type="radio" name="cleaning-type" value="move" />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    Move-in / Move-out
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <div class="section-label">Frequency</div>
+              <div class="radio-pill-row">
+                <label class="radio-pill">
+                  <input type="radio" name="frequency" value="one-time" checked />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    One-time visit
+                  </span>
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="frequency" value="weekly" />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    Weekly
+                  </span>
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="frequency" value="bi-weekly" />
+                  <span class="radio-pill-label">
+                    <span class="dot"></span>
+                    Bi-weekly
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <div class="section-label">Preferred date &amp; notes</div>
+              <div class="field-grid">
+                <div>
+                  <div class="field-label">Preferred date</div>
+                  <input id="preferred-date" class="input" type="date" />
+                </div>
+                <div class="field-full">
+                  <div class="field-label">Gate code, pets, special requests</div>
+                  <textarea id="notes" placeholder="Anything you'd like us to know."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESTIMATE / SUMMARY SIDE -->
+          <div>
+            <div class="estimate-card">
+              <div class="estimate-row">
+                <div class="estimate-label">Service</div>
+                <div id="summary-service" class="estimate-value">3 bed · 2 bath · First-time / Deep</div>
+              </div>
+              <div class="estimate-row">
+                <div class="estimate-label">Base rate</div>
+                <div id="summary-base" class="estimate-value">$230</div>
+              </div>
+              <div class="estimate-row">
+                <div class="estimate-label">Add-ons</div>
+                <div id="summary-addons" class="estimate-value">$0</div>
+              </div>
+              <div class="estimate-row">
+                <div class="estimate-label">Recurring discount</div>
+                <div id="summary-discount" class="estimate-value">$0</div>
+              </div>
+              <div class="estimate-row" style="margin-top: 6px;">
+                <div class="estimate-total-label">Estimated total</div>
+                <div id="summary-total" class="estimate-total">$230</div>
+              </div>
+              <div class="estimate-note">
+                Final price confirmed after quick walk-through. Up-front pricing includes standard supplies and equipment. Taxes &amp; fees (if any) are shown at checkout.
+              </div>
+            </div>
+
+            <div class="card-section" style="margin-top: 10px;">
+              <div class="section-label">Add-ons</div>
+              <div class="addon-list">
+                <label class="addon">
+                  <input type="checkbox" data-price="35" name="addon-inside-oven" />
+                  <div class="addon-label-main">
+                    <span>Inside oven</span>
+                    <span class="addon-price">$35</span>
+                  </div>
+                </label>
+
+                <label class="addon">
+                  <input type="checkbox" data-price="35" name="addon-inside-fridge" />
+                  <div class="addon-label-main">
+                    <span>Inside fridge</span>
+                    <span class="addon-price">$35</span>
+                  </div>
+                </label>
+
+                <label class="addon">
+                  <input type="checkbox" data-price="30" name="addon-baseboards" />
+                  <div class="addon-label-main">
+                    <span>Baseboards</span>
+                    <span class="addon-price">$30</span>
+                  </div>
+                </label>
+
+                <label class="addon">
+                  <input type="checkbox" data-price="40" name="addon-interior-windows" />
+                  <div class="addon-label-main">
+                    <span>Interior windows</span>
+                    <span class="addon-price">$40</span>
+                  </div>
+                </label>
+
+                <label class="addon">
+                  <input type="checkbox" data-price="25" name="addon-laundry" />
+                  <div class="addon-label-main">
+                    <span>Laundry &amp; fold (1 load)</span>
+                    <span class="addon-price">$25</span>
+                  </div>
+                </label>
+
+                <label class="addon">
+                  <input type="checkbox" data-price="25" name="addon-pet-hair" />
+                  <div class="addon-label-main">
+                    <span>Heavy pet hair</span>
+                    <span class="addon-price">$25</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-footer">
+          <div id="error-message" class="error-banner"></div>
+
+          <div class="cta-row">
+            <button id="book-button" class="primary-pay-btn" type="button">
+              Pay &amp; reserve with Stripe
+            </button>
+            <div class="secondary-call-text">
+              or call / text <span>(580) 215-0915</span> if you prefer to book by phone.
+            </div>
+          </div>
+
+          <div class="legal-text">
+            By booking, you agree to Red Prairie Cleaning’s standard policies for cancellations and rescheduling.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="steps-section">
+      <div class="steps-heading">What to expect with Red Prairie Cleaning</div>
+      <div class="steps-grid">
+        <article class="step-card">
+          <div class="step-label">Step 1</div>
+          <div class="step-title">Build your clean &amp; book online</div>
+          <div class="step-body">
+            Pick your home size, cleaning level, and any extras. You’ll see an estimated price before you enter payment details and complete checkout.
+          </div>
+        </article>
+        <article class="step-card">
+          <div class="step-label">Step 2</div>
+          <div class="step-title">We show up prepared</div>
+          <div class="step-body">
+            Your cleaner arrives with all supplies and equipment needed to complete the job. Quick walk-through to confirm priorities, then we get to work.
+          </div>
+        </article>
+        <article class="step-card">
+          <div class="step-label">Step 3</div>
+          <div class="step-title">Enjoy your Red Prairie clean</div>
+          <div class="step-body">
+            Come home to a space that feels like a boutique hotel. Love it? Set up weekly or bi-weekly maintenance so it stays that way—without lifting a finger.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>Local team, not a franchise. Professional, background-checked cleaners.</div>
+      <div class="footer-legal">
+        <span>&copy; <span id="year"></span> Red Prairie Cleaning.</span>
+        <a href="tel:+15802150915">Call or text (580) 215-0915</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Your publishable key (safe to be in front-end code)
+    const stripe = Stripe("pk_live_51SVGekRki8dFYdMhEQycWtkB7oIk7RLyUI8GeRNrErzWPzNDXfHBTX70fVvn84X0fiZmiBhpuyKsGrsiXeSUhJ6000mUxCnafd");
+
+    // Simple pricing model
+    const BASE_PRICING = {
+      "first-time": {
+        "1-1": 160,
+        "2-1": 180,
+        "2-2": 200,
+        "3-2": 230,
+        "3-3": 260,
+        "4-3": 290,
+        "4-4": 320,
+        "5-4": 360
+      },
+      standard: {
+        "1-1": 120,
+        "2-1": 140,
+        "2-2": 160,
+        "3-2": 190,
+        "3-3": 210,
+        "4-3": 240,
+        "4-4": 270,
+        "5-4": 300
+      },
+      move: {
+        "1-1": 190,
+        "2-1": 220,
+        "2-2": 250,
+        "3-2": 280,
+        "3-3": 310,
+        "4-3": 340,
+        "4-4": 380,
+        "5-4": 420
+      }
+    };
+
+    const RECURRING_DISCOUNTS = {
+      "one-time": 0,
+      weekly: 0.17,
+      "bi-weekly": 0.12
+    };
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function getSizeKey(beds, baths) {
+      const b = Math.min(Math.max(parseInt(beds, 10) || 3, 1), 5);
+      const ba = Math.min(Math.max(parseInt(baths, 10) || 2, 1), 4);
+      const normalizedBeds = b >= 5 ? 5 : b;
+      const normalizedBaths = ba >= 4 ? 4 : ba;
+      return `${normalizedBeds}-${normalizedBaths}`;
+    }
+
+    function updateSummary() {
+      const beds = document.querySelector('select[name="bedrooms"]').value;
+      const baths = document.querySelector('select[name="bathrooms"]').value;
+      const cleaningType = document.querySelector('input[name="cleaning-type"]:checked').value;
+      const frequency = document.querySelector('input[name="frequency"]:checked').value;
+      const addons = Array.from(document.querySelectorAll('.addon input[type="checkbox"]:checked'));
+
+      const sizeKey = getSizeKey(beds, baths);
+      const baseTable = BASE_PRICING[cleaningType] || BASE_PRICING["first-time"];
+      let base = baseTable[sizeKey] || baseTable["3-2"];
+
+      let addonsTotal = 0;
+      addons.forEach((addon) => {
+        addonsTotal += parseFloat(addon.getAttribute("data-price")) || 0;
+      });
+
+      const discountRate = RECURRING_DISCOUNTS[frequency] || 0;
+      const discountAmount = -(base * discountRate);
+      const total = base + addonsTotal + discountAmount;
+
+      const serviceLabelParts = [];
+      serviceLabelParts.push(beds + " bed");
+      serviceLabelParts.push(baths + " bath");
+
+      if (cleaningType === "first-time") {
+        serviceLabelParts.push("First-time / Deep");
+      } else if (cleaningType === "standard") {
+        serviceLabelParts.push("Standard");
+      } else if (cleaningType === "move") {
+        serviceLabelParts.push("Move-in / Move-out");
+      }
+
+      const serviceLabel = serviceLabelParts.join(" · ");
+
+      document.getElementById("summary-service").textContent = serviceLabel;
+      document.getElementById("summary-base").textContent = formatCurrency(base);
+      document.getElementById("summary-addons").textContent = addons.length ? formatCurrency(addonsTotal) : "$0";
+
+      const discountText = discountAmount < 0 ? formatCurrency(discountAmount) : "$0";
+      document.getElementById("summary-discount").textContent = discountText;
+
+      document.getElementById("summary-total").textContent = formatCurrency(total);
+
+      return {
+        base,
+        addonsTotal,
+        discountAmount,
+        total,
+        serviceLabel,
+        beds,
+        baths,
+        cleaningType,
+        frequency
+      };
+    }
+
+    document.querySelectorAll(
+      'select[name="bedrooms"], select[name="bathrooms"], input[name="cleaning-type"], input[name="frequency"], .addon input[type="checkbox"]'
+    ).forEach((el) => {
+      el.addEventListener("change", updateSummary);
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    updateSummary();
+
+    function showError(message) {
+      const errorEl = document.getElementById("error-message");
+      errorEl.textContent = message;
+      errorEl.style.display = "block";
+    }
+
+    function clearError() {
+      const errorEl = document.getElementById("error-message");
+      errorEl.textContent = "";
+      errorEl.style.display = "none";
+    }
+
+    async function handleBooking() {
+      clearError();
+      const bookButton = document.getElementById("book-button");
+      bookButton.disabled = true;
+      bookButton.textContent = "Creating secure checkout session...";
+
+      try {
+        const name = document.getElementById("cust-name").value.trim();
+        const email = document.getElementById("cust-email").value.trim();
+        const phone = document.getElementById("cust-phone").value.trim();
+        const address = document.getElementById("cust-address").value.trim();
+        const city = document.getElementById("cust-city").value.trim();
+        const zip = document.getElementById("cust-zip").value.trim();
+        const preferredDate = document.getElementById("preferred-date").value;
+        const notes = document.getElementById("notes").value.trim();
+
+        // Basic required fields
+        if (!name || !email || !phone || !address || !city || !zip) {
+          showError("Please fill in your name, email, phone, and full service address before booking.");
+          return;
+        }
+
+        // Light email / phone / ZIP validation to catch obvious typos
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+          showError("Please enter a valid email address so we can send your confirmation.");
+          return;
+        }
+
+        const phoneDigits = phone.replace(/\D/g, "");
+        if (phoneDigits.length < 10) {
+          showError("Please enter a valid phone number so your cleaner can reach you.");
+          return;
+        }
+
+        const zipDigits = zip.replace(/\D/g, "");
+        if (zipDigits.length < 5) {
+          showError("Please enter a valid ZIP code for accurate scheduling.");
+          return;
+        }
+
+        const summary = updateSummary();
+        if (summary.total <= 0) {
+          showError("We couldn't calculate a valid total for this booking. Please adjust your selections or contact us directly.");
+          return;
+        }
+
+        const bookingPayload = {
+          customer: {
+            name,
+            email,
+            phone,
+            address,
+            city,
+            zip,
+            preferredDate,
+            notes
+          },
+          booking: {
+            beds: document.querySelector('select[name="bedrooms"]').value,
+            baths: document.querySelector('select[name="bathrooms"]').value,
+            cleaningType: document.querySelector('input[name="cleaning-type"]:checked').value,
+            frequency: document.querySelector('input[name="frequency"]:checked').value,
+            serviceLabel: document.getElementById("summary-service").textContent,
+            total: summary.total
+          }
+        };
+
+        let response;
+        try {
+          response = await fetch("/.netlify/functions/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookingPayload)
+          });
+        } catch (networkError) {
+          console.error("Network error:", networkError);
+          throw new Error("We couldn't reach the payment server. Please check your connection and try again, or text/call us to book.");
+        }
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error("Failed to parse server response:", parseError);
+        }
+
+        if (!response.ok) {
+          const serverMessage =
+            (data && (data.error || (data.stripeError && data.stripeError.message))) ||
+            "Failed to create your secure checkout session. Please try again or contact us to book by phone.";
+          throw new Error(serverMessage);
+        }
+
+        if (!data || !data.sessionId) {
+          throw new Error("We couldn't start your Stripe payment session. Please contact us directly to complete your booking.");
+        }
+
+        const { error } = await stripe.redirectToCheckout({
+          sessionId: data.sessionId
+        });
+
+        if (error) {
+          throw error;
+        }
+      } catch (err) {
+        console.error(err);
+        showError(err.message || "Something went wrong starting your checkout. Please try again or contact us by phone.");
+      } finally {
+        bookButton.disabled = false;
+        bookButton.textContent = "Pay & reserve with Stripe";
+      }
+    }
+
+    document.getElementById("book-button").addEventListener("click", handleBooking);
+  </script>
+</body>
+</html>
