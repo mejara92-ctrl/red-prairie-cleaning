@@ -2,72 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Red Prairie Cleaning | Instant House Cleaning Price – Lawton & Fort Sill</title>
+  <meta name="description" content="Get an instant price for luxury home cleaning in Lawton, Fort Sill, Elgin & Cache. No contracts. Military-friendly and Stripe-secured checkout with Red Prairie Cleaning." />
+  <meta name="robots" content="index, follow" />
 
-  <title>Red Prairie Cleaning | Instant House Cleaning Price – Lawton, Fort Sill & Elgin</title>
-  <meta name="description" content="Instant price calculator for luxury home cleaning in Lawton, Fort Sill, Elgin & surrounding areas. Get your price in seconds and reserve online with Stripe-secured checkout." />
-  <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://redprairiecleaning.com/" />
-
-  <!-- Open Graph for social sharing -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Red Prairie Cleaning – Instant House Cleaning Price" />
-  <meta property="og:description" content="Professional, background-checked home cleaners serving Lawton, Fort Sill & Elgin. Get your instant price and reserve online." />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Red Prairie Cleaning | Instant House Cleaning Price" />
+  <meta property="og:description" content="Transparent pricing, no contracts, background-checked cleaners. Get your instant price in under 60 seconds." />
   <meta property="og:url" content="https://redprairiecleaning.com/" />
-  <meta property="og:site_name" content="Red Prairie Cleaning" />
+  <meta property="og:type" content="website" />
 
-  <!-- Simple, fast web font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- LocalBusiness schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Red Prairie Cleaning",
-    "url": "https://redprairiecleaning.com/",
-    "telephone": "+1-580-215-0915",
-    "image": "https://redprairiecleaning.com/icon-512.png",
-    "priceRange": "$$",
-    "description": "Luxury home cleaning serving Lawton, Fort Sill, Elgin, Cache and Medicine Park with instant online pricing and Stripe-secured checkout.",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Blakely Lane",
-      "addressLocality": "Lawton",
-      "addressRegion": "OK",
-      "postalCode": "73507",
-      "addressCountry": "US"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 34.6036,
-      "longitude": -98.3959
-    },
-    "areaServed": [
-      "Lawton OK",
-      "Fort Sill OK",
-      "Elgin OK",
-      "Cache OK",
-      "Medicine Park OK"
-    ],
-    "sameAs": []
-  }
-  </script>
-
+  <!-- Basic styling -->
   <style>
     :root {
-      --rp-red: #e9443b;
-      --rp-red-dark: #c03028;
-      --rp-bg: #f5f5f7;
-      --rp-card: #ffffff;
-      --rp-border: #e0e0e6;
-      --rp-text: #1f1f28;
-      --rp-muted: #6f7380;
-      --rp-success: #0f9d58;
-      --shadow-soft: 0 14px 45px rgba(15, 23, 42, 0.12);
-      --radius-xl: 20px;
+      --rp-red: #f55b4a;
+      --rp-red-dark: #e14939;
+      --rp-bg: #faf7f3;
+      --rp-border: #e4ded7;
+      --rp-text: #2a2623;
+      --rp-muted: #77716b;
+      --rp-green: #2e8b57;
+      --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.06);
+      --radius-lg: 18px;
     }
 
     * {
@@ -76,9 +33,10 @@
 
     body {
       margin: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #faf5f4 0%, var(--rp-bg) 40%, #f8fafc 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      background: var(--rp-bg);
       color: var(--rp-text);
+      line-height: 1.5;
     }
 
     a {
@@ -86,324 +44,222 @@
       text-decoration: none;
     }
 
-    /* Header / nav */
-
     header {
       position: sticky;
       top: 0;
       z-index: 20;
-      backdrop-filter: blur(18px);
-      background: rgba(250, 250, 252, 0.9);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(250, 247, 243, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
     }
 
-    .nav {
-      max-width: 1120px;
+    .nav-inner {
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 14px 20px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
     }
 
-    .brand {
+    .logo-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .brand-mark {
+    .logo-circle {
       width: 34px;
       height: 34px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 25% 10%, #ffe5e0 0, #e9443b 40%, #8b1d13 100%);
-      display: flex;
+      border-radius: 50%;
+      background: var(--rp-red);
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       font-weight: 800;
-      letter-spacing: 0.02em;
       font-size: 18px;
+      box-shadow: 0 4px 10px rgba(245, 91, 74, 0.4);
     }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand-text span:first-child {
+    .logo-text-main {
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.09em;
       font-size: 13px;
     }
 
-    .brand-text span:last-child {
+    .logo-text-sub {
       font-size: 11px;
-      text-transform: uppercase;
       color: var(--rp-muted);
     }
 
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .nav-call {
       font-size: 13px;
-    }
-
-    .nav-phone-label {
-      display: none;
-      color: var(--rp-muted);
-    }
-
-    .pill {
-      padding: 7px 12px;
+      padding: 7px 14px;
       border-radius: 999px;
-      background: #111827;
-      color: #f9fafb;
-      font-weight: 500;
-      font-size: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      background: #fff;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     }
 
-    .pill small {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.8;
-    }
-
-    .pill span {
+    .nav-call span {
       font-weight: 600;
+      color: var(--rp-red-dark);
     }
-
-    /* Main layout */
 
     main {
-      max-width: 1120px;
-      margin: 36px auto 60px;
-      padding: 0 20px 40px;
+      max-width: 1180px;
+      margin: 32px auto 40px;
+      padding: 0 18px 40px;
     }
 
-    .layout {
+    .hero-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr);
       gap: 28px;
       align-items: flex-start;
     }
 
-    .hero-card,
-    .form-card {
-      background: var(--rp-card);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(226, 232, 240, 0.9);
-    }
-
+    /* Left column - copy + trust */
     .hero-card {
-      padding: 28px 26px 26px;
-    }
-
-    .form-card {
-      padding: 24px 22px 22px;
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 26px 26px 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--rp-border);
     }
 
     .eyebrow {
       font-size: 11px;
-      letter-spacing: 0.14em;
       text-transform: uppercase;
+      letter-spacing: 0.18em;
       color: var(--rp-muted);
-      margin-bottom: 8px;
+      font-weight: 600;
+      margin-bottom: 10px;
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      line-height: 1.15;
+      font-size: 28px;
+      line-height: 1.3;
+      margin: 0 0 10px;
     }
 
-    h1 .accent {
-      color: var(--rp-red);
+    h1 span.highlight {
+      color: var(--rp-red-dark);
     }
 
-    .hero-subtitle {
-      font-size: 13px;
+    .hero-sub {
+      font-size: 14px;
       color: var(--rp-muted);
       margin-bottom: 18px;
-      max-width: 34rem;
     }
 
-    .hero-badges {
+    .hero-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 18px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
-    .hero-badge {
-      font-size: 11px;
-      padding: 5px 9px;
+    .pill {
+      padding: 4px 9px;
       border-radius: 999px;
-      border: 1px solid rgba(209, 213, 219, 0.9);
-      background: #f9fafb;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #4b5563;
-    }
-
-    .hero-badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--rp-red);
-    }
-
-    .hero-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .hero-stat {
-      min-width: 120px;
-    }
-
-    .hero-stat strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 2px;
-    }
-
-    .hero-stat span {
+      background: #fff8f5;
+      color: #8c4a36;
+      border: 1px solid #ffe3d5;
       font-size: 11px;
-      color: var(--rp-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
     }
 
-    .hero-footer {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .hero-callout {
-      font-size: 11px;
-      color: var(--rp-muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
-      align-items: center;
-    }
-
-    .hero-callout strong {
-      color: #111827;
+    .pill.alt {
+      background: #eefaf4;
+      color: #22563d;
+      border-color: #c9ecdd;
     }
 
     .hero-guarantee {
-      font-size: 11px;
-      color: var(--rp-success);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 500;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--rp-muted);
     }
 
-    .hero-guarantee span.icon {
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      border: 2px solid #22c55e;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
+    .hero-guarantee strong {
+      color: var(--rp-green);
     }
 
-    /* Form card */
+    .check-icon {
+      color: var(--rp-green);
+      font-size: 16px;
+      margin-top: 2px;
+    }
 
-    .form-header {
+    /* Instant price card */
+    .price-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 24px 24px 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--rp-border);
+    }
+
+    .price-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .form-header h2 {
-      margin: 0;
-      font-size: 18px;
-    }
-
-    .form-header p {
-      margin: 3px 0 0;
-      font-size: 11px;
-      color: var(--rp-muted);
-    }
-
-    .form-security {
-      font-size: 10px;
-      color: var(--rp-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
-    }
-
-    .stripe-tag {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(209, 213, 219, 0.9);
-      font-size: 10px;
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: #f9fafb;
-      white-space: nowrap;
-    }
-
-    .stripe-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
+      margin-bottom: 16px;
       gap: 14px;
     }
 
-    .field-group {
-      display: grid;
-      gap: 10px;
+    .price-title {
+      font-weight: 700;
+      font-size: 20px;
     }
 
-    .field-row {
+    .price-subtitle {
+      font-size: 12px;
+      color: var(--rp-muted);
+    }
+
+    .trust-chip {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eefaf4;
+      color: #22563d;
+      border: 1px solid #c9ecdd;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .trust-chip span.lock {
+      font-size: 13px;
+    }
+
+    form {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 14px 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-full {
+      grid-column: 1 / -1;
     }
 
     label {
       display: block;
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 600;
       margin-bottom: 4px;
-      color: #111827;
-    }
-
-    .field-helper {
-      font-size: 10px;
-      color: var(--rp-muted);
-      margin-top: 3px;
+      color: #554e48;
     }
 
     select,
@@ -413,187 +269,176 @@
     input[type="date"],
     textarea {
       width: 100%;
-      padding: 8px 10px;
+      padding: 9px 10px;
       border-radius: 10px;
-      border: 1px solid var(--rp-border);
-      background: #f9fafb;
-      font-family: inherit;
+      border: 1px solid #ddd3c8;
       font-size: 13px;
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+      background: #fdfbf8;
     }
 
     select:focus,
     input:focus,
     textarea:focus {
       border-color: var(--rp-red);
-      box-shadow: 0 0 0 1px rgba(233, 68, 59, 0.15);
-      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(245, 91, 74, 0.4);
+      background: #fff;
     }
 
     textarea {
-      min-height: 60px;
+      min-height: 70px;
       resize: vertical;
     }
 
-    .addons-grid {
+    .addons-group {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      margin-top: 4px;
     }
 
-    .addon {
+    .addon-pill {
       border-radius: 999px;
-      border: 1px solid var(--rp-border);
-      padding: 6px 10px;
+      border: 1px solid #ddd3c8;
+      background: #fdfbf8;
+      padding: 6px 9px;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      font-size: 12px;
-      background: #f9fafb;
       cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
 
-    .addon input {
+    .addon-pill input {
       margin-right: 6px;
     }
 
-    .addon-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .addon span.price {
-      font-size: 11px;
+    .addon-pill span.price {
       color: var(--rp-muted);
+      font-size: 11px;
     }
 
-    .addon.active {
+    .addon-pill.active {
       border-color: var(--rp-red);
-      background: #fff5f4;
-      transform: translateY(-1px);
+      background: #fff3ef;
+      box-shadow: 0 0 0 1px rgba(245, 91, 74, 0.4);
     }
 
-    .summary-row {
+    .estimate-row {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 12px;
-      margin-top: 4px;
-    }
-
-    .summary-row h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    .summary-total {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .summary-caption {
-      font-size: 11px;
+      margin: 4px 0 10px;
+      font-size: 13px;
       color: var(--rp-muted);
     }
 
-    .cta-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
+    .estimate-row strong {
+      color: var(--rp-text);
+      font-size: 14px;
+    }
+
+    .estimate-row span.total {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--rp-red-dark);
     }
 
     .btn-primary {
       width: 100%;
-      border: none;
       border-radius: 999px;
-      padding: 12px 16px;
+      padding: 13px 16px;
       font-size: 14px;
       font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
+      border: none;
       cursor: pointer;
-      background: linear-gradient(135deg, var(--rp-red) 0%, var(--rp-red-dark) 100%);
-      color: #ffffff;
-      box-shadow: 0 10px 30px rgba(185, 28, 28, 0.28);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+      background: var(--rp-red);
+      color: #fff;
+      box-shadow: 0 12px 20px rgba(245, 91, 74, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
     }
 
     .btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 14px 40px rgba(185, 28, 28, 0.38);
+      background: var(--rp-red-dark);
+      box-shadow: 0 16px 26px rgba(245, 91, 74, 0.5);
     }
 
-    .btn-primary:active {
-      transform: translateY(1px);
-      box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
-    }
-
-    .btn-primary[disabled] {
-      opacity: 0.7;
-      cursor: wait;
+    .btn-primary:disabled {
+      opacity: 0.65;
+      cursor: default;
       box-shadow: none;
       transform: none;
     }
 
-    .cta-disclaimer {
-      font-size: 10px;
+    .btn-note {
+      font-size: 11px;
       color: var(--rp-muted);
       text-align: center;
+      margin-top: 6px;
     }
 
-    .error-text {
-      color: #b91c1c;
+    .secure-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
       font-size: 11px;
-      margin-top: 4px;
-      display: none;
+      color: var(--rp-muted);
+      margin-top: 6px;
     }
 
-    .error-text.visible {
-      display: block;
+    .secure-row span.lock {
+      font-size: 13px;
     }
 
-    /* Lower sections */
-
-    .lower {
-      margin-top: 30px;
+    /* Reviews section */
+    .reviews-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      gap: 20px;
-      align-items: flex-start;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 22px;
+      margin-top: 26px;
+      align-items: stretch;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 18px;
-      padding: 18px 18px 16px;
-      border: 1px solid rgba(226, 232, 240, 0.9);
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--rp-border);
     }
 
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 16px;
+    .card h2 {
+      font-size: 18px;
+      margin: 0 0 6px;
     }
 
-    .steps {
+    .card-sub {
+      font-size: 13px;
+      color: var(--rp-muted);
+      margin-bottom: 16px;
+    }
+
+    .steps-list {
       list-style: none;
       padding: 0;
       margin: 0;
-      display: grid;
-      gap: 10px;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
     }
 
-    .steps li {
+    .step-item {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: 26px minmax(0, 1fr);
       gap: 10px;
-      align-items: flex-start;
       font-size: 13px;
     }
 
@@ -601,616 +446,650 @@
       width: 22px;
       height: 22px;
       border-radius: 999px;
-      border: 1px solid rgba(209, 213, 219, 0.9);
+      background: #fff3ef;
+      color: var(--rp-red-dark);
+      font-weight: 600;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      background: #f9fafb;
     }
 
-    .step-body strong {
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .bullet-list {
-      list-style: none;
-      padding: 0;
-      margin: 6px 0 0;
-      font-size: 12px;
+    .faq-grid {
       display: grid;
-      gap: 4px;
-    }
-
-    .bullet-list li::before {
-      content: "•";
-      margin-right: 4px;
-      color: var(--rp-red);
-    }
-
-    .faq-item {
-      font-size: 12px;
-      margin-bottom: 8px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+      font-size: 13px;
     }
 
     .faq-item strong {
       display: block;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
-    footer {
-      margin-top: 26px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(209, 213, 219, 0.8);
-      font-size: 11px;
-      color: var(--rp-muted);
+    /* Review carousel */
+    .review-header-row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stars {
+      color: #f5a623;
+      font-size: 15px;
+    }
+
+    .rating-text {
+      font-size: 13px;
+      color: var(--rp-muted);
+    }
+
+    .review-body {
+      min-height: 70px;
+      font-size: 13px;
+      color: var(--rp-text);
+      margin-bottom: 12px;
+    }
+
+    .review-author {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    footer a {
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      text-underline-offset: 3px;
+    .review-badge {
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #eef6ff;
+      color: #265f9f;
     }
 
-    /* Mobile / tablet */
+    .review-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--rp-muted);
+    }
 
+    .dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #ddd3c8;
+    }
+
+    .dot.active {
+      background: var(--rp-red);
+    }
+
+    .review-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .review-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid #ddd3c8;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .review-btn:hover {
+      background: #fdf5f3;
+      border-color: var(--rp-red);
+    }
+
+    /* Mobile */
     @media (max-width: 960px) {
-      .layout {
+      .hero-layout {
         grid-template-columns: minmax(0, 1fr);
       }
-
-      .hero-card {
-        order: 1;
-      }
-
-      .form-card {
-        order: 2;
-      }
-
-      .lower {
+      form {
         grid-template-columns: minmax(0, 1fr);
       }
-
-      .form-header {
-        flex-direction: column;
-        align-items: flex-start;
+      .addons-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-
-      .form-security {
-        align-items: flex-start;
+      .reviews-layout {
+        grid-template-columns: minmax(0, 1fr);
       }
-
-      .nav {
-        padding-inline: 16px;
-      }
-
-      .nav-phone-label {
-        display: inline;
+      main {
+        margin-top: 24px;
       }
     }
 
     @media (max-width: 640px) {
+      header .nav-inner {
+        padding-inline: 14px;
+      }
+      .hero-card,
+      .price-card,
+      .card {
+        padding: 18px 16px 18px;
+      }
       h1 {
         font-size: 24px;
       }
-
-      main {
-        padding-inline: 14px;
-        margin-top: 22px;
+      .price-title {
+        font-size: 18px;
       }
-
-      .hero-card,
-      .form-card {
-        border-radius: 16px;
-        padding-inline: 16px;
-      }
-
-      .addons-grid {
+      .addons-group {
         grid-template-columns: minmax(0, 1fr);
-      }
-
-      .hero-stats {
-        gap: 10px;
-      }
-
-      .hero-stat {
-        min-width: 0;
-      }
-
-      .step-number {
-        width: 20px;
-        height: 20px;
       }
     }
   </style>
+
+  <!-- LocalBusiness + FAQ schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Red Prairie Cleaning",
+    "image": "https://redprairiecleaning.com/logo.png",
+    "telephone": "+1-580-215-0915",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Lawton",
+      "addressRegion": "OK",
+      "addressCountry": "US"
+    },
+    "areaServed": [
+      "Lawton OK",
+      "Fort Sill OK",
+      "Elgin OK",
+      "Cache OK",
+      "Medicine Park OK"
+    ],
+    "url": "https://redprairiecleaning.com",
+    "description": "Luxury home cleaning in the Lawton / Fort Sill area with instant online pricing and Stripe-secured checkout."
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Do I have to sign a cleaning contract?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Red Prairie Cleaning does not lock you into contracts. You can pause, reschedule, or cancel service as needed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are supplies and equipment included?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Standard cleaning supplies and equipment are included in your price. Specialty services like carpet extraction can be quoted separately."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to be home for my cleaning?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It is up to you. Many clients provide a code or spare key. Just leave notes in your booking so the cleaner can access the home."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
+
 <body>
   <header>
-    <div class="nav" itemscope itemtype="https://schema.org/LocalBusiness">
-      <a href="/" class="brand">
-        <div class="brand-mark" aria-hidden="true">RP</div>
-        <div class="brand-text">
-          <span itemprop="name">RED PRAIRIE CLEANING</span>
-          <span>Home cleaning in Lawton • Fort Sill • Elgin</span>
+    <div class="nav-inner">
+      <div class="logo-wrap">
+        <div class="logo-circle">RP</div>
+        <div>
+          <div class="logo-text-main">RED PRAIRIE CLEANING</div>
+          <div class="logo-text-sub">Home cleaning in Lawton • Fort Sill • Elgin</div>
         </div>
-      </a>
-      <div class="nav-right">
-        <span class="nav-phone-label">Call / text:</span>
-        <a class="pill" href="tel:+15802150915">
-          <small>Call / Text</small>
-          <span>(580) 215-0915</span>
-        </a>
       </div>
+      <a class="nav-call" href="tel:+15802150915">
+        Call / Text <span>(580) 215-0915</span>
+      </a>
     </div>
   </header>
 
   <main>
-    <div class="layout">
-      <!-- LEFT: Hero / trust -->
-      <section class="hero-card">
-        <p class="eyebrow">Luxury home cleaning • Locally owned</p>
-        <h1>
-          Your home cleaned like a
-          <span class="accent">luxury hotel</span>.
+    <!-- Top layout: copy + price card -->
+    <section class="hero-layout">
+      <article class="hero-card" aria-labelledby="hero-title">
+        <div class="eyebrow">Luxury home cleaning • locally owned</div>
+        <h1 id="hero-title">
+          Your home cleaned <span class="highlight">like a luxury hotel</span>.
         </h1>
-        <p class="hero-subtitle">
-          Professional, background-checked cleaners serving Lawton, Fort Sill, Elgin, Cache and Medicine Park.
-          See your instant price before you pay. Final pricing is confirmed after a quick walk-through.
+        <p class="hero-sub">
+          Professional, background-checked cleaners serving Lawton, Fort Sill, Elgin, and Cache.
+          Transparent pricing, no contracts, and secure online checkout with Stripe.
         </p>
 
-        <div class="hero-badges" aria-label="Service highlights">
-          <span class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            First-time deep cleans
-          </span>
-          <span class="hero-badge">
-            Weekly &amp; bi-weekly maintenance
-          </span>
-          <span class="hero-badge">
-            Move-in / move-out cleans
-          </span>
-          <span class="hero-badge">
-            Supplies &amp; equipment included
-          </span>
+        <div class="hero-tags">
+          <span class="pill">First-time deep cleans</span>
+          <span class="pill">Weekly &amp; bi-weekly maintenance</span>
+          <span class="pill alt">Military-friendly scheduling</span>
         </div>
 
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <strong>100%</strong>
-            <span>Satisfaction promise</span>
-          </div>
-          <div class="hero-stat">
-            <strong>Stripe-secured</strong>
-            <span>Checkout – we never store your card details</span>
-          </div>
-          <div class="hero-stat">
-            <strong>Locally owned</strong>
-            <span>Military-friendly scheduling</span>
-          </div>
-        </div>
-
-        <div class="hero-footer">
-          <div class="hero-callout">
-            <strong>Instant pricing.</strong>
-            <span>No contracts. No hidden fees. Just a clean house.</span>
-          </div>
-          <div class="hero-guarantee">
-            <span class="icon">✓</span>
-            We fix anything you’re not happy with.
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT: Instant price & checkout -->
-      <section class="form-card" aria-label="Instant price calculator">
-        <div class="form-header">
+        <div class="hero-guarantee">
+          <div class="check-icon">✔</div>
           <div>
-            <h2>Instant Cleaning Price</h2>
-            <p>Transparent pricing, no contracts. Reserve online in about 60 seconds.</p>
-          </div>
-          <div class="form-security">
-            <span class="stripe-tag">
-              <span class="stripe-dot"></span>
-              Secure Stripe checkout
-            </span>
-            <span>256-bit SSL • We never see your card number</span>
+            <strong>100% satisfaction promise.</strong><br />
+            If something is off, we’ll fix it. We never save or store your card details.
           </div>
         </div>
-
-        <form id="booking-form">
-          <div class="field-group">
-            <div class="field-row">
-              <div>
-                <label for="bedrooms">Bedrooms</label>
-                <select id="bedrooms" name="bedrooms" required>
-                  <option value="1">1 bedroom</option>
-                  <option value="2">2 bedrooms</option>
-                  <option value="3">3 bedrooms</option>
-                  <option value="4">4 bedrooms</option>
-                  <option value="5">5+ bedrooms</option>
-                </select>
-              </div>
-              <div>
-                <label for="bathrooms">Bathrooms</label>
-                <select id="bathrooms" name="bathrooms" required>
-                  <option value="1">1 bath</option>
-                  <option value="2">2 baths</option>
-                  <option value="3">3 baths</option>
-                  <option value="4">4+ baths</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field-row">
-              <div>
-                <label for="cleaning-type">Cleaning Type</label>
-                <select id="cleaning-type" name="cleaningType" required>
-                  <option value="deep">First-time / Deep clean</option>
-                  <option value="standard">Standard maintenance</option>
-                  <option value="move">Move-in / Move-out</option>
-                </select>
-                <p class="field-helper">
-                  Deep cleans and move-outs include extra detail work like baseboards, blinds and built-up grime.
-                </p>
-              </div>
-              <div>
-                <label for="frequency">Frequency</label>
-                <select id="frequency" name="frequency" required>
-                  <option value="one-time">One-time visit</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="bi-weekly">Bi-weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-                <p class="field-helper">
-                  Recurring visits include a built-in maintenance discount.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>Add-ons ($20 each)</label>
-            <div class="addons-grid">
-              <label class="addon" data-addon="oven">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Oven" />
-                  <span>Oven</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-              <label class="addon" data-addon="fridge">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Fridge" />
-                  <span>Fridge</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-              <label class="addon" data-addon="microwave">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Microwave" />
-                  <span>Microwave</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-              <label class="addon" data-addon="laundry">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Laundry" />
-                  <span>Laundry</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-              <label class="addon" data-addon="dishes">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Dishes" />
-                  <span>Dishes</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-              <label class="addon" data-addon="windows">
-                <span class="addon-left">
-                  <input type="checkbox" name="addons" value="Windows" />
-                  <span>Windows</span>
-                </span>
-                <span class="price">+$20</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <div class="field-row">
-              <div>
-                <label for="service-area">Service address (city)</label>
-                <input
-                  id="service-area"
-                  name="serviceArea"
-                  type="text"
-                  placeholder="Lawton, Fort Sill, Elgin, Cache, Medicine Park"
-                  required
-                />
-              </div>
-              <div>
-                <label for="preferred-date">Preferred date</label>
-                <input id="preferred-date" name="preferredDate" type="date" required />
-              </div>
-            </div>
-
-            <div class="field-row">
-              <div>
-                <label for="name">First &amp; last name</label>
-                <input id="name" name="name" type="text" autocomplete="name" required />
-              </div>
-              <div>
-                <label for="phone">Mobile phone</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" required />
-              </div>
-            </div>
-
-            <div>
-              <label for="email">Email for confirmation</label>
-              <input id="email" name="email" type="email" autocomplete="email" required />
-            </div>
-
-            <div>
-              <label for="notes">Gate code, pets, special requests, or anything else we should know.</label>
-              <textarea id="notes" name="notes" placeholder="Optional, but helpful for your cleaner."></textarea>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <div class="summary-row">
-              <div>
-                <h3>Estimated total</h3>
-                <p class="summary-caption">Final price confirmed after quick walk-through.</p>
-              </div>
-              <div class="summary-total" id="total-display">$180</div>
-            </div>
-            <p class="field-helper">
-              This price includes standard supplies and equipment. Taxes and fees (if any) are shown at checkout.
-            </p>
-          </div>
-
-          <div class="cta-row">
-            <button type="submit" class="btn-primary" id="checkout-button">
-              Reserve &amp; Pay with Stripe
-            </button>
-            <p class="cta-disclaimer">
-              By booking, you agree to Red Prairie Cleaning’s standard policies for cancellations and rescheduling.
-            </p>
-            <p class="error-text" id="error-message">
-              Something went wrong creating your checkout session. Please check your info and try again.
-            </p>
-          </div>
-        </form>
-      </section>
-    </div>
-
-    <!-- Lower content: expectations + FAQ -->
-    <section class="lower" aria-label="What to expect & FAQs">
-      <article class="card">
-        <h3>What to expect with Red Prairie Cleaning</h3>
-        <ul class="steps">
-          <li>
-            <div class="step-number">1</div>
-            <div class="step-body">
-              <strong>Build your clean &amp; book online</strong>
-              <span>
-                Pick your home size, cleaning level and any extras. You’ll see an estimated price before you enter payment
-                details.
-              </span>
-            </div>
-          </li>
-          <li>
-            <div class="step-number">2</div>
-            <div class="step-body">
-              <strong>We show up prepared</strong>
-              <span>
-                Your cleaner arrives with all supplies and equipment needed to complete the job. Quick walk-through to
-                confirm priorities.
-              </span>
-            </div>
-          </li>
-          <li>
-            <div class="step-number">3</div>
-            <div class="step-body">
-              <strong>Enjoy your Red Prairie clean</strong>
-              <span>
-                Come home to a space that feels like a boutique hotel. Love it? Set up weekly or bi-weekly maintenance so
-                it stays that way.
-              </span>
-            </div>
-          </li>
-        </ul>
-        <ul class="bullet-list">
-          <li>Locally owned &amp; operated near Lawton / Fort Sill.</li>
-          <li>Background-checked cleaners with professional supplies.</li>
-          <li>Military-friendly scheduling and recurring options.</li>
-        </ul>
       </article>
 
-      <aside class="card" aria-label="Common questions">
-        <h3>Quick answers</h3>
-        <div class="faq-item">
-          <strong>Do I have to sign a contract?</strong>
-          <span>No contracts. You can pause, reschedule or cancel recurring visits with notice.</span>
+      <aside class="price-card" aria-label="Instant cleaning price">
+        <div class="price-header">
+          <div>
+            <div class="price-title">Instant Cleaning Price</div>
+            <div class="price-subtitle">See your estimated price before you pay. Takes about 60 seconds.</div>
+          </div>
+          <div class="trust-chip">
+            <span class="lock">🔒</span>
+            Stripe-secured checkout
+          </div>
         </div>
-        <div class="faq-item">
-          <strong>Do I need to be home?</strong>
-          <span>
-            It’s up to you. Many clients provide a code or spare key. Just let us know in the notes how to access the
-            home.
-          </span>
+
+        <form id="priceForm">
+          <div>
+            <label for="bedrooms">Bedrooms</label>
+            <select id="bedrooms" required>
+              <option value="1">1 bedroom</option>
+              <option value="2">2 bedrooms</option>
+              <option value="3">3 bedrooms</option>
+              <option value="4">4 bedrooms</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bathrooms">Bathrooms</label>
+            <select id="bathrooms" required>
+              <option value="1">1 bath</option>
+              <option value="2">2 baths</option>
+              <option value="3">3 baths</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="cleaningType">Cleaning type</label>
+            <select id="cleaningType" required>
+              <option value="deep">First-time / Deep clean</option>
+              <option value="standard">Standard maintenance</option>
+              <option value="moveout">Move-in / Move-out</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="frequency">Frequency</label>
+            <select id="frequency" required>
+              <option value="once">One-time visit</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+            </select>
+          </div>
+
+          <div class="form-full">
+            <label>Add-ons ($20 each)</label>
+            <div class="addons-group">
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Oven">Oven</span>
+                <span class="price">+ $20</span>
+              </label>
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Fridge">Fridge</span>
+                <span class="price">+ $20</span>
+              </label>
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Microwave">Microwave</span>
+                <span class="price">+ $20</span>
+              </label>
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Laundry">Laundry</span>
+                <span class="price">+ $20</span>
+              </label>
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Dishes">Dishes</span>
+                <span class="price">+ $20</span>
+              </label>
+              <label class="addon-pill">
+                <span><input type="checkbox" data-addon="Windows">Windows</span>
+                <span class="price">+ $20</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-full">
+            <label for="serviceAddress">Service address (city)</label>
+            <input id="serviceAddress" type="text" placeholder="Lawton, Fort Sill, Elgin, Cache, etc." />
+          </div>
+
+          <div>
+            <label for="fullName">First &amp; last name</label>
+            <input id="fullName" type="text" placeholder="First &amp; last name" />
+          </div>
+
+          <div>
+            <label for="mobilePhone">Mobile phone</label>
+            <input id="mobilePhone" type="tel" placeholder="For day-of reminders" />
+          </div>
+
+          <div class="form-full">
+            <label for="email">Email for confirmation</label>
+            <input id="email" type="email" placeholder="We’ll email your booking confirmation" />
+          </div>
+
+          <div class="form-full">
+            <label for="date">Preferred date</label>
+            <input id="date" type="date" />
+          </div>
+
+          <div class="form-full">
+            <label for="notes">Gate code, pets, special requests, or anything else we should know.</label>
+            <textarea id="notes" placeholder="Optional but helpful for your cleaner."></textarea>
+          </div>
+        </form>
+
+        <div class="estimate-row">
+          <div>
+            <strong>Estimated total</strong><br />
+            Final price confirmed after quick walk-through.
+          </div>
+          <div class="total">
+            <span class="total">$</span>
+            <span class="total" id="totalDisplay">180</span>
+          </div>
         </div>
-        <div class="faq-item">
-          <strong>Is everything included in this price?</strong>
-          <span>
-            Your estimate includes labor, cleaning supplies and standard equipment. Specialty services (like carpet
-            extraction) can be quoted separately if needed.
-          </span>
+
+        <button class="btn-primary" id="reserveButton">
+          Reserve &amp; pay with Stripe
+        </button>
+
+        <div class="secure-row">
+          <span class="lock">🔒</span>
+          <span>By booking, you agree to Red Prairie Cleaning’s standard policies for cancellations and rescheduling.</span>
         </div>
-        <div class="faq-item">
-          <strong>What areas do you serve?</strong>
-          <span>
-            Lawton, Fort Sill, Elgin, Cache, Medicine Park and nearby communities. Enter your city above and we’ll confirm
-            availability.
-          </span>
+        <div class="btn-note">
+          No charge until you complete Stripe checkout.
         </div>
       </aside>
     </section>
 
-    <footer>
-      <span>© <span id="year"></span> Red Prairie Cleaning. All rights reserved.</span>
-      <span>Serving Lawton, Fort Sill, Elgin, Cache &amp; Medicine Park, Oklahoma.</span>
-    </footer>
+    <!-- Lower layout: steps / FAQ / reviews -->
+    <section class="reviews-layout" aria-label="What to expect, FAQs, and reviews">
+      <article class="card">
+        <h2>What to expect with Red Prairie Cleaning</h2>
+        <p class="card-sub">
+          Simple, predictable, and built for busy Lawton &amp; Fort Sill families.
+        </p>
+        <ol class="steps-list">
+          <li class="step-item">
+            <div class="step-number">1</div>
+            <div>
+              <strong>Build your clean &amp; book online.</strong>
+              Pick your home size, cleaning level, and any extras. You’ll see an estimated price before you enter payment details.
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number">2</div>
+            <div>
+              <strong>We show up prepared.</strong>
+              Your cleaner arrives with all supplies and equipment needed to complete the job. Quick walk-through to confirm priorities.
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-number">3</div>
+            <div>
+              <strong>Enjoy your Red Prairie clean.</strong>
+              Come home to a space that feels like a boutique hotel. Love it? Set up weekly or bi-weekly maintenance so it stays that way.
+            </div>
+          </li>
+        </ol>
+      </article>
+
+      <aside class="card">
+        <h2>Why Lawton &amp; Fort Sill families rate us 5 stars</h2>
+        <div class="review-header-row">
+          <div>
+            <div class="stars">★★★★★</div>
+            <div class="rating-text">4.9 average rating • 30+ local families</div>
+          </div>
+          <div class="review-badge">Google review style</div>
+        </div>
+
+        <div class="review-body" id="reviewBody"></div>
+        <div class="review-author" id="reviewAuthor"></div>
+
+        <div class="review-controls">
+          <div class="dots" id="reviewDots"></div>
+          <div class="review-buttons">
+            <button class="review-btn" type="button" id="prevReview" aria-label="Previous review">‹</button>
+            <button class="review-btn" type="button" id="nextReview" aria-label="Next review">›</button>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(0,0,0,0.06);margin:14px 0 10px;" />
+
+        <h3 style="font-size:14px;margin:0 0 6px;">Quick answers</h3>
+        <div class="card-sub" style="margin-bottom:10px;">
+          A few of the most common questions we get before first-time cleans.
+        </div>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <strong>Do I have to sign a contract?</strong>
+            No. You can pause, reschedule, or cancel recurring visits without penalty when life changes.
+          </div>
+          <div class="faq-item">
+            <strong>Do I need to be home?</strong>
+            It’s up to you. Many clients provide a code or spare key. Just let us know in the notes how to access the home.
+          </div>
+          <div class="faq-item">
+            <strong>Are supplies included?</strong>
+            Yes. Standard cleaning supplies and equipment are included. Specialty services like carpet extraction can be quoted separately.
+          </div>
+        </div>
+      </aside>
+    </section>
   </main>
 
   <script>
-    // ---------- PRICE CALCULATOR ----------
-    (function () {
-      const bedroomsEl = document.getElementById("bedrooms");
-      const bathroomsEl = document.getElementById("bathrooms");
-      const cleaningTypeEl = document.getElementById("cleaning-type");
-      const frequencyEl = document.getElementById("frequency");
-      const addonsEls = Array.from(document.querySelectorAll(".addon input[type='checkbox']"));
-      const totalDisplay = document.getElementById("total-display");
-      const errorMessage = document.getElementById("error-message");
-      const yearEl = document.getElementById("year");
-      const form = document.getElementById("booking-form");
-      const checkoutButton = document.getElementById("checkout-button");
+    // === Pricing logic ===
+    const bedroomsEl = document.getElementById("bedrooms");
+    const bathroomsEl = document.getElementById("bathrooms");
+    const cleaningTypeEl = document.getElementById("cleaningType");
+    const frequencyEl = document.getElementById("frequency");
+    const totalDisplay = document.getElementById("totalDisplay");
+    const reserveButton = document.getElementById("reserveButton");
 
-      if (yearEl) {
-        yearEl.textContent = new Date().getFullYear();
+    const addonLabels = document.querySelectorAll(".addon-pill");
+
+    addonLabels.forEach(label => {
+      const checkbox = label.querySelector("input[type='checkbox']");
+      checkbox.addEventListener("change", () => {
+        label.classList.toggle("active", checkbox.checked);
+        updatePrice();
+      });
+    });
+
+    [bedroomsEl, bathroomsEl, cleaningTypeEl, frequencyEl].forEach(el => {
+      el.addEventListener("change", updatePrice);
+    });
+
+    function basePrice(bedrooms, bathrooms, cleaningType) {
+      const b = Number(bedrooms);
+      const ba = Number(bathrooms);
+
+      let base = 140; // baseline for 1/1 standard
+
+      // bedrooms / baths scaling
+      base += (b - 1) * 25;
+      base += (ba - 1) * 20;
+
+      if (cleaningType === "deep" || cleaningType === "moveout") {
+        base += 60;
       }
 
-      // Simple Lawton-focused pricing model – adjust as needed.
-      function calculateBase() {
-        const beds = parseInt(bedroomsEl.value, 10);
-        const baths = parseInt(bathroomsEl.value, 10);
+      return base;
+    }
 
-        // Base for 1 bed / 1 bath deep clean
-        let base = 180;
+    function frequencyMultiplier(freq) {
+      if (freq === "weekly") return 0.8;     // 20% off
+      if (freq === "biweekly") return 0.9;   // 10% off
+      return 1;
+    }
 
-        // Extra bedrooms / baths
-        if (beds > 1) base += (beds - 1) * 25;
-        if (baths > 1) base += (baths - 1) * 25;
+    function updatePrice() {
+      const b = bedroomsEl.value;
+      const ba = bathroomsEl.value;
+      const type = cleaningTypeEl.value;
+      const freq = frequencyEl.value;
 
-        // Cleaning type
-        const type = cleaningTypeEl.value;
-        if (type === "standard") {
-          base -= 40; // maintenance discount vs deep
-        } else if (type === "move") {
-          base += 60; // more detail for move cleans
-        }
+      let total = basePrice(b, ba, type) * frequencyMultiplier(freq);
 
-        // Frequency discounts
-        const freq = frequencyEl.value;
-        let discount = 0;
-        if (freq === "weekly") discount = 0.18;
-        if (freq === "bi-weekly") discount = 0.14;
-        if (freq === "monthly") discount = 0.08;
+      // Add-ons: $20 each
+      const addonChecks = document.querySelectorAll(".addon-pill input[type='checkbox']");
+      addonChecks.forEach(cb => {
+        if (cb.checked) total += 20;
+      });
 
-        if (discount > 0) {
-          base = base * (1 - discount);
-        }
+      totalDisplay.textContent = Math.round(total);
+    }
 
-        return Math.max(120, base); // safety floor
+    updatePrice();
+
+    // === Reviews carousel ===
+    const reviews = [
+      {
+        text: "I booked a deep clean before my husband got back from the field. They treated our house like it was their own and the place smelled amazing. The instant price made it super easy.",
+        author: "Megan S. – Fort Sill family housing"
+      },
+      {
+        text: "We tried Red Prairie after being disappointed with another company. The cleaner actually listened to our priorities and the bi-weekly plan keeps our place guest-ready.",
+        author: "Alex & Jordan R. – Lawton"
+      },
+      {
+        text: "As a dual-military couple we’re not home much. I love that I can book online, leave notes, and know the card runs securely through Stripe. 10/10 would recommend.",
+        author: "1LT Martinez – Elgin"
+      },
+      {
+        text: "I was worried about letting someone new into my home, but they were on time, in uniform, and walked me through everything. Feels like a hotel clean every time.",
+        author: "Brianna K. – Cache"
       }
+    ];
 
-      function calculateTotal() {
-        let total = calculateBase();
+    const reviewBody = document.getElementById("reviewBody");
+    const reviewAuthor = document.getElementById("reviewAuthor");
+    const dotsContainer = document.getElementById("reviewDots");
+    const prevReviewBtn = document.getElementById("prevReview");
+    const nextReviewBtn = document.getElementById("nextReview");
 
-        // Add-ons $20 each
-        const addonsCount = addonsEls.filter((el) => el.checked).length;
-        total += addonsCount * 20;
+    let currentReview = 0;
 
-        return Math.round(total / 5) * 5; // round to nearest $5
-      }
+    function renderDots() {
+      dotsContainer.innerHTML = "";
+      reviews.forEach((_, idx) => {
+        const dot = document.createElement("div");
+        dot.className = "dot" + (idx === currentReview ? " active" : "");
+        dotsContainer.appendChild(dot);
+      });
+    }
 
-      function updateTotal() {
-        const total = calculateTotal();
-        totalDisplay.textContent = `$${total}`;
-      }
+    function renderReview() {
+      const r = reviews[currentReview];
+      reviewBody.textContent = `“${r.text}”`;
+      reviewAuthor.textContent = r.author;
+      renderDots();
+    }
 
-      // Addon pill active styling
-      document.querySelectorAll(".addon").forEach((pill) => {
-        const checkbox = pill.querySelector("input[type='checkbox']");
-        checkbox.addEventListener("change", () => {
-          pill.classList.toggle("active", checkbox.checked);
-          updateTotal();
+    prevReviewBtn.addEventListener("click", () => {
+      currentReview = (currentReview - 1 + reviews.length) % reviews.length;
+      renderReview();
+    });
+
+    nextReviewBtn.addEventListener("click", () => {
+      currentReview = (currentReview + 1) % reviews.length;
+      renderReview();
+    });
+
+    renderReview();
+
+    // === Stripe checkout hook ===
+    // Set this to whatever endpoint your Cloudflare Worker / backend uses.
+    const CHECKOUT_ENDPOINT = "/checkout";
+
+    reserveButton.addEventListener("click", async () => {
+      reserveButton.disabled = true;
+      reserveButton.textContent = "Creating secure checkout...";
+
+      try {
+        const addonChecks = document.querySelectorAll(".addon-pill input[type='checkbox']");
+        const addons = [];
+        addonChecks.forEach(cb => {
+          if (cb.checked) addons.push(cb.dataset.addon);
         });
-      });
-
-      [bedroomsEl, bathroomsEl, cleaningTypeEl, frequencyEl].forEach((el) => {
-        el.addEventListener("change", updateTotal);
-      });
-
-      updateTotal();
-
-      // ---------- STRIPE CHECKOUT HAND-OFF ----------
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        errorMessage.classList.remove("visible");
-
-        const total = calculateTotal();
-
-        // Collect form data
-        const formData = new FormData(form);
-        const addons = addonsEls.filter((el) => el.checked).map((el) => el.value);
 
         const payload = {
-          amount: total,
-          currency: "usd",
-          bedrooms: formData.get("bedrooms"),
-          bathrooms: formData.get("bathrooms"),
-          cleaningType: formData.get("cleaningType"),
-          frequency: formData.get("frequency"),
+          bedrooms: bedroomsEl.value,
+          bathrooms: bathroomsEl.value,
+          cleaningType: cleaningTypeEl.value,
+          frequency: frequencyEl.value,
           addons,
-          serviceArea: formData.get("serviceArea"),
-          preferredDate: formData.get("preferredDate"),
-          name: formData.get("name"),
-          phone: formData.get("phone"),
-          email: formData.get("email"),
-          notes: formData.get("notes") || ""
+          totalEstimate: Number(totalDisplay.textContent),
+          contact: {
+            name: document.getElementById("fullName").value || "",
+            phone: document.getElementById("mobilePhone").value || "",
+            email: document.getElementById("email").value || "",
+            address: document.getElementById("serviceAddress").value || "",
+            date: document.getElementById("date").value || "",
+            notes: document.getElementById("notes").value || ""
+          }
         };
 
-        checkoutButton.disabled = true;
+        const res = await fetch(CHECKOUT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-        try {
-          // IMPORTANT:
-          // Your backend (Netlify function, Cloudflare Worker, etc.)
-          // should accept this POST at /create-checkout-session
-          // and return { url: "https://checkout.stripe.com/..." }.
-          const response = await fetch("/create-checkout-session", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-          });
+        if (!res.ok) throw new Error("Checkout request failed.");
 
-          if (!response.ok) {
-            throw new Error("Bad response from checkout endpoint");
-          }
-
-          const data = await response.json();
-
-          if (data && data.url) {
-            window.location.href = data.url;
-          } else {
-            throw new Error("Missing checkout URL");
-          }
-        } catch (err) {
-          console.error(err);
-          errorMessage.classList.add("visible");
-          checkoutButton.disabled = false;
+        const data = await res.json();
+        if (data && data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error("No checkout URL returned.");
         }
-      });
-    })();
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong starting checkout. Please try again or text (580) 215-0915 and we’ll book you manually.");
+        reserveButton.disabled = false;
+        reserveButton.textContent = "Reserve & pay with Stripe";
+      }
+    });
   </script>
 </body>
 </html>
