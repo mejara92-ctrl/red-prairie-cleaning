@@ -111,7 +111,11 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
-      align-items: flex-start;
+      align-items: stretch;
+    }
+
+    .top-layout > * {
+      height: 100%;
     }
 
     .left-column {
@@ -216,10 +220,22 @@
       font-size: 14px;
     }
 
-    /* Steps card */
+    /* Steps / What to expect */
+
+    .steps-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
     .steps-card h3 {
       font-size: 15px;
+      margin: 0 0 8px;
+    }
+
+    .steps-intro {
+      font-size: 12px;
+      color: var(--text-muted);
       margin: 0 0 8px;
     }
 
@@ -229,25 +245,45 @@
       margin: 0;
       font-size: 13px;
       color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .steps-list li {
       display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      gap: 10px;
     }
 
-    .steps-badge {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent-dark);
-      background: var(--accent-soft);
+    .steps-num {
+      width: 22px;
+      height: 22px;
       border-radius: 999px;
-      padding: 2px 8px;
-      white-space: nowrap;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .steps-text strong {
+      display: block;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 1px;
     }
 
     /* Pricing/form card */
+
+    .pricing-card {
+      display: flex;
+      flex-direction: column;
+    }
 
     .pricing-card h2 {
       font-size: 16px;
@@ -342,11 +378,57 @@
       height: 13px;
     }
 
+    /* Gift card section */
+
+    .gift-card {
+      border-radius: 14px;
+      border: 1px dashed var(--border-subtle);
+      padding: 10px 12px;
+      margin: 8px 0 10px;
+      background: #fff9f3;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .gift-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .gift-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .gift-row label {
+      font-size: 11px;
+    }
+
+    .gift-row select {
+      min-width: 110px;
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+
+    .gift-note {
+      margin: 0;
+      font-size: 10px;
+    }
+
+    /* Price display */
+
     .estimate-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 8px 0 10px;
+      margin: 8px 0 6px;
       font-size: 13px;
     }
 
@@ -355,10 +437,41 @@
       color: var(--text-muted);
     }
 
-    .estimate-amount {
+    .price-stack {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-end;
+    }
+
+    .original-price {
+      font-size: 13px;
+      color: #888;
+      text-decoration: line-through;
+    }
+
+    .sale-price-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sale-price {
       font-size: 20px;
       font-weight: 700;
       color: var(--accent-dark);
+    }
+
+    .sale-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: #b33b1f;
+      background: var(--accent-soft);
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .estimate-note {
@@ -437,15 +550,6 @@
       font-size: 13px;
     }
 
-    .google-badge {
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      background: #fafafa;
-    }
-
     .reviews-text {
       font-size: 12px;
       color: var(--text-muted);
@@ -514,6 +618,10 @@
     @media (max-width: 900px) {
       .top-layout {
         grid-template-columns: 1fr;
+      }
+
+      .top-layout > * {
+        height: auto;
       }
 
       .bottom-card {
@@ -587,27 +695,30 @@
         <!-- Steps card -->
         <article class="card steps-card">
           <h3>What to expect with Red Prairie Cleaning</h3>
+          <p class="steps-intro">
+            Simple, predictable, and built for busy Lawton & Fort Sill families.
+          </p>
           <ul class="steps-list">
             <li>
-              <div class="steps-badge">STEP 1</div>
-              <div>
-                <strong>Build your clean &amp; book online.</strong><br />
+              <div class="steps-num">1</div>
+              <div class="steps-text">
+                <strong>Build your clean &amp; book online.</strong>
                 Pick your home size, cleaning level, and any extras. You’ll see an
                 estimated price before you enter payment details.
               </div>
             </li>
             <li>
-              <div class="steps-badge">STEP 2</div>
-              <div>
-                <strong>We show up prepared.</strong><br />
+              <div class="steps-num">2</div>
+              <div class="steps-text">
+                <strong>We show up prepared.</strong>
                 Your cleaner arrives with all supplies and equipment needed to
                 complete the job. Quick walk-through to confirm priorities.
               </div>
             </li>
             <li>
-              <div class="steps-badge">STEP 3</div>
-              <div>
-                <strong>Enjoy your Red Prairie clean.</strong><br />
+              <div class="steps-num">3</div>
+              <div class="steps-text">
+                <strong>Enjoy your Red Prairie clean.</strong>
                 Come home to a space that feels like a boutique hotel. Love it?
                 Set up weekly or bi-weekly maintenance so it stays that way.
               </div>
@@ -755,13 +866,40 @@
             </div>
           </div>
 
+          <!-- Gift card option -->
+          <div class="gift-card">
+            <label class="gift-toggle">
+              <input type="checkbox" id="is-gift" />
+              Buying this as a gift card?
+            </label>
+            <div class="gift-row">
+              <label for="gift-amount">Suggested gift card amount</label>
+              <select id="gift-amount" name="giftAmount">
+                <option value="0">Match this cleaning</option>
+                <option value="150">$150</option>
+                <option value="200">$200</option>
+                <option value="250">$250</option>
+              </select>
+            </div>
+            <p class="gift-note">
+              We’ll email you a simple, printable gift card after checkout that
+              your recipient can use to schedule their clean.
+            </p>
+          </div>
+
           <div class="estimate-row">
             <div class="estimate-label">Estimated total</div>
-            <div class="estimate-amount" id="total-amount">$180</div>
+            <div class="price-stack">
+              <div class="original-price" id="original-amount">$240</div>
+              <div class="sale-price-row">
+                <span class="sale-price" id="sale-amount">$120</span>
+                <span class="sale-badge">Holiday 50% off</span>
+              </div>
+            </div>
           </div>
           <div class="estimate-note">
-            Final price confirmed after quick walk-through. No charge until you
-            complete Stripe checkout.
+            Holiday sale applied automatically. Final price confirmed after quick
+            walk-through. No charge until you complete Stripe checkout.
           </div>
 
           <button type="submit" class="cta-button">
@@ -787,7 +925,6 @@
             <span>4.9 average rating • 30+ local families</span>
           </div>
         </div>
-        <div class="google-badge">Mock Google review style</div>
       </div>
 
       <p class="reviews-text">
@@ -879,7 +1016,7 @@
   </main>
 
   <script>
-    // Simple pricing logic – tweak numbers to match your backend if needed
+    // Simple pricing logic – base + frequency discount + 50% holiday sale
     const basePrices = {
       deep: { 1: 160, 2: 190, 3: 220, 4: 250, 5: 280 },
       standard: { 1: 130, 2: 160, 3: 190, 4: 220, 5: 250 },
@@ -893,9 +1030,11 @@
     };
 
     const ADDON_PRICE = 20;
+    const HOLIDAY_DISCOUNT = 0.5; // 50% off
 
     const form = document.getElementById("booking-form");
-    const totalEl = document.getElementById("total-amount");
+    const originalEl = document.getElementById("original-amount");
+    const saleEl = document.getElementById("sale-amount");
 
     function getBedroomKey(value) {
       const num = parseInt(value, 10);
@@ -916,12 +1055,17 @@
       const addons = Array.from(document.querySelectorAll(".addon:checked"));
       base += addons.length * ADDON_PRICE;
 
-      // frequency discount
-      const discount = frequencyDiscount[frequency] || 0;
-      const total = Math.round(base * (1 - discount));
+      // frequency discount first
+      const freqDisc = frequencyDiscount[frequency] || 0;
+      const beforeHoliday = Math.round(base * (1 - freqDisc));
 
-      totalEl.textContent = `$${total}`;
-      return total;
+      // holiday discount
+      const saleTotal = Math.round(beforeHoliday * (1 - HOLIDAY_DISCOUNT));
+
+      originalEl.textContent = `$${beforeHoliday}`;
+      saleEl.textContent = `$${saleTotal}`;
+
+      return saleTotal;
     }
 
     document
@@ -938,7 +1082,6 @@
       e.preventDefault();
       const total = calculateTotal();
 
-      // Collect a few key fields (adjust if your Netlify function expects more)
       const payload = {
         amount: total,
         bedrooms: form.bedrooms.value,
@@ -949,6 +1092,8 @@
         email: form.email.value,
         phone: form.phone.value,
         notes: form.notes.value,
+        isGift: document.getElementById("is-gift").checked,
+        giftAmount: form.giftAmount.value,
         addons: Array.from(
           document.querySelectorAll(".addon:checked"),
           (a) => a.value
