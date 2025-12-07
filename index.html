@@ -647,6 +647,12 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 600px) {
+      .addon-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
 <body>
@@ -828,6 +834,17 @@
             </div>
 
             <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="address">Street address</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                placeholder="Street address and unit #"
+                required
+              />
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
               <label for="city">Service address (city)</label>
               <select id="city" name="city">
                 <option>Lawton, Fort Sill, Elgin, Cache, etc.</option>
@@ -893,27 +910,27 @@
             <div class="addon-grid">
               <label class="addon-check">
                 <input type="checkbox" value="inside oven" class="addon" />
-                Inside oven
+                Oven
               </label>
               <label class="addon-check">
                 <input type="checkbox" value="inside refrigerator" class="addon" />
-                Inside refrigerator
+                Fridge
               </label>
               <label class="addon-check">
                 <input type="checkbox" value="inside microwave" class="addon" />
-                Inside microwave
+                Microwave
               </label>
               <label class="addon-check">
                 <input type="checkbox" value="one load of laundry" class="addon" />
-                One load of laundry
+                Laundry
               </label>
               <label class="addon-check">
                 <input type="checkbox" value="dishes in sink" class="addon" />
-                Dishes in sink
+                Dishes
               </label>
               <label class="addon-check">
                 <input type="checkbox" value="interior windows" class="addon" />
-                Interior windows
+                Windows
               </label>
             </div>
           </div>
@@ -1140,6 +1157,8 @@
         bathrooms: form.bathrooms.value,
         cleanType: form.cleanType.value,
         frequency: form.frequency.value,
+        address: form.address.value,
+        city: form.city.value,
         name: form.name.value,
         email: form.email.value,
         phone: form.phone.value,
