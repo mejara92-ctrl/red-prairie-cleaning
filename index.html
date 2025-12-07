@@ -135,18 +135,24 @@
     .hero-card h1 {
       font-size: 26px;
       line-height: 1.25;
-      margin: 4px 0 10px;
+      margin: 4px 0 8px;
     }
 
     .hero-card h1 span {
       color: var(--accent);
     }
 
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 0 10px;
+    }
+
     .hero-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -191,7 +197,7 @@
       flex-wrap: wrap;
       gap: 8px;
       font-size: 11px;
-      margin-top: 10px;
+      margin-top: 6px;
       color: var(--text-muted);
     }
 
@@ -445,33 +451,10 @@
       align-items: flex-end;
     }
 
-    .original-price {
-      font-size: 13px;
-      color: #888;
-      text-decoration: line-through;
-    }
-
-    .sale-price-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .sale-price {
+    .estimate-price {
       font-size: 20px;
       font-weight: 700;
       color: var(--accent-dark);
-    }
-
-    .sale-badge {
-      font-size: 10px;
-      font-weight: 600;
-      color: #b33b1f;
-      background: var(--accent-soft);
-      padding: 3px 8px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
 
     .estimate-note {
@@ -543,11 +526,6 @@
       gap: 8px;
       font-size: 11px;
       color: var(--text-muted);
-    }
-
-    .stars {
-      color: #f39c12;
-      font-size: 13px;
     }
 
     .reviews-text {
@@ -664,7 +642,7 @@
           <div>
             RED PRAIRIE CLEANING
             <div class="brand-subline">
-              Luxury home cleaning • Lawton • Fort Sill • Elgin • Cache
+              Professional home cleaning • Lawton • Fort Sill • Elgin • Cache
             </div>
           </div>
         </div>
@@ -682,18 +660,21 @@
         <!-- Hero card -->
         <article class="card hero-card">
           <div class="hero-tags">
-            <span>LUXURY HOME CLEANING</span>
+            <span>HOUSE CLEANING</span>
             <span>LOCALLY OWNED</span>
           </div>
           <h1>
-            Your home cleaned
-            <span>like a luxury hotel.</span>
+            Professional house cleaning
+            <span>for busy Lawton families.</span>
           </h1>
+          <p class="hero-subtitle">
+            Get a flat-rate price for your home, pick a date, and we handle the rest. No contracts, no surprise add-ons at the door.
+          </p>
 
           <ul class="hero-bullets">
             <li>Background-checked cleaners serving Lawton, Fort Sill, Elgin & Cache.</li>
-            <li>Instant pricing before you pay. No contracts, no surprises.</li>
-            <li>Stripe-secured online checkout — we never see your card details.</li>
+            <li>Instant pricing before you pay. You’ll see your total before checkout.</li>
+            <li>Stripe-secured checkout — we never see or store your card details.</li>
           </ul>
 
           <div class="hero-flags">
@@ -704,44 +685,43 @@
             <span class="hero-flag">
               <strong>Weekly &amp; bi-weekly maintenance</strong>
             </span>
+            <span class="hero-flag">
+              <strong>Move-in / Move-out</strong>
+            </span>
           </div>
 
           <div class="hero-guarantee">
             <span>✔</span>
-            100% satisfaction promise. If something is off, we’ll fix it. We never
-            save or store your card details.
+            100% satisfaction promise. If something feels off, reach out within 24 hours and we’ll make it right.
           </div>
         </article>
 
         <!-- Steps + what's included card -->
         <article class="card steps-card">
-          <h3>What to expect with Red Prairie Cleaning</h3>
+          <h3>How Red Prairie Cleaning works</h3>
           <p class="steps-intro">
-            Simple, predictable, and built for busy Lawton & Fort Sill families.
+            Simple, predictable, and built around real Lawton & Fort Sill schedules.
           </p>
           <ul class="steps-list">
             <li>
               <div class="steps-num">1</div>
               <div class="steps-text">
-                <strong>Build your clean &amp; book online.</strong>
-                Pick your home size, cleaning level, and any extras. You’ll see an
-                estimated price before you enter payment details.
+                <strong>Check your price.</strong>
+                Pick your home size, cleaning type, and any extras. You’ll see an estimated total before you enter payment details.
               </div>
             </li>
             <li>
               <div class="steps-num">2</div>
               <div class="steps-text">
-                <strong>We show up prepared.</strong>
-                Your cleaner arrives with all supplies and equipment needed to
-                complete the job. Quick walk-through to confirm priorities.
+                <strong>Reserve your spot.</strong>
+                Choose a preferred date and enter your contact details. We’ll confirm by text or email and lock you into the schedule.
               </div>
             </li>
             <li>
               <div class="steps-num">3</div>
               <div class="steps-text">
-                <strong>Enjoy your Red Prairie clean.</strong>
-                Come home to a space that feels like a boutique hotel. Love it?
-                Set up weekly or bi-weekly maintenance so it stays that way.
+                <strong>Come home to a reset house.</strong>
+                We bring all supplies and equipment. After a quick walk-through, you’ll know exactly what’s included before we start.
               </div>
             </li>
           </ul>
@@ -752,7 +732,7 @@
               <strong style="font-size:12px;color:var(--text-main);display:block;margin-bottom:4px;">First-time and deep cleans</strong>
               <ul style="margin:0;padding-left:18px;">
                 <li>Detailed dusting of high and low surfaces in every room</li>
-                <li>Thorough wipe of kitchen counters, backsplash and exterior of appliances</li>
+                <li>Wipe of kitchen counters, backsplash and exterior of appliances</li>
                 <li>Scrub of sinks, tubs, showers, toilets and bathroom counters</li>
                 <li>Wipe of baseboards, door frames and light switch plates in main areas</li>
                 <li>Vacuum and mop all hard floors</li>
@@ -775,8 +755,8 @@
               <ul style="margin:0;padding-left:18px;">
                 <li>Top to bottom dusting of empty rooms, shelves and ledges</li>
                 <li>Inside cabinet fronts, doors and drawers in kitchen and bathrooms</li>
-                <li>Thorough cleaning of kitchen counters, sinks and exterior of appliances</li>
-                <li>Extra attention to bathrooms so they are ready to use on day one</li>
+                <li>Cleaning of kitchen counters, sinks and exterior of appliances</li>
+                <li>Extra attention to bathrooms so they’re ready to use on day one</li>
                 <li>Baseboards, doors and light switches wiped where accessible</li>
                 <li>Final sweep, vacuum and mop of all accessible floors</li>
               </ul>
@@ -789,7 +769,7 @@
       <article class="card pricing-card">
         <h2>Instant Cleaning Price</h2>
         <p class="pricing-sub">
-          Transparent pricing. No contracts. Stripe-secured checkout.
+          Answer a few quick questions to see your estimated total and reserve a spot.
         </p>
 
         <form id="booking-form">
@@ -905,7 +885,7 @@
           <div class="addons">
             <div class="addons-title">
               <span>Add-ons ($20 each)</span>
-              <span>Make it sparkle.</span>
+              <span>Optional extras.</span>
             </div>
             <div class="addon-grid">
               <label class="addon-check">
@@ -959,24 +939,18 @@
           <div class="estimate-row">
             <div class="estimate-label">Estimated total</div>
             <div class="price-stack">
-              <div class="original-price" id="original-amount">$240</div>
-              <div class="sale-price-row">
-                <span class="sale-price" id="sale-amount">$120</span>
-                <span class="sale-badge">Holiday 50% off</span>
-              </div>
+              <div class="estimate-price" id="estimate-amount">$240</div>
             </div>
           </div>
           <div class="estimate-note">
-            Holiday sale applied automatically. Final price confirmed after quick
-            walk-through. No charge until you complete Stripe checkout.
+            This is your estimated total based on the details above. Final price is confirmed after a quick walk-through before we begin cleaning.
           </div>
 
           <button type="submit" class="cta-button">
             Reserve &amp; pay with Stripe
           </button>
           <div class="cta-subtext">
-            By booking, you agree to Red Prairie Cleaning’s standard policies
-            for cancellations and rescheduling. No contracts, ever.
+            All payments go through Stripe. No contracts — you can pause or reschedule with notice.
           </div>
         </form>
       </article>
@@ -987,18 +961,16 @@
       <div class="bottom-card-header">
         <div>
           <h3 class="bottom-title">
-            Why Lawton &amp; Fort Sill families rate us 5 stars
+            What local families get with a Red Prairie clean
           </h3>
           <div class="rating-row">
-            <span class="stars">★★★★★</span>
-            <span>4.9 average rating • 30+ local families</span>
+            <span>Locally owned • Serving Lawton, Fort Sill, Elgin & Cache</span>
           </div>
         </div>
       </div>
 
       <p class="reviews-text">
-        Here’s what local families say about Red Prairie Cleaning when they get
-        back from the field or a long work day.
+        Most clients book a deep clean first to “reset” the house, then keep it that way with standard maintenance visits.
       </p>
 
       <div class="review-highlight">
@@ -1017,8 +989,7 @@
             <span class="faq-icon">?</span>Do I have to sign a contract?
           </summary>
           <p>
-            Nope. You can pause, reschedule, or cancel recurring visits with 24
-            hours notice. No long-term commitments.
+            No. You can pause, reschedule, or cancel recurring visits with notice. There are no long-term contracts.
           </p>
         </details>
 
@@ -1028,9 +999,7 @@
             included?
           </summary>
           <p>
-            Yes. Standard cleaning supplies and equipment are included.
-            Specialty services like carpet extraction can be quoted separately
-            if needed.
+            Yes. We bring standard cleaning products and equipment. If you have special requests (like certain products), just mention it in the notes.
           </p>
         </details>
 
@@ -1059,8 +1028,8 @@
             <span class="faq-icon">?</span>How does payment work?
           </summary>
           <p>
-            All payments go through Stripe. Your card is only charged after the
-            clean, and we never see or store your card details on our side.
+            All payments go through Stripe. Your card is only charged when you
+            complete checkout, and we never see or store your card details on our side.
           </p>
         </details>
 
@@ -1070,22 +1039,21 @@
           </summary>
           <p>
             Reach out within 24 hours and we’ll come back to make it right.
-            Your clean should feel like a luxury hotel, not a chore you paid
-            for.
+            Your clean should feel like a reset, not another chore you paid for.
           </p>
         </details>
       </div>
     </section>
 
     <footer class="footer">
-      <div><strong>Red Prairie Cleaning</strong> • Luxury home cleaning for Lawton, Fort Sill, Elgin &amp; Cache</div>
+      <div><strong>Red Prairie Cleaning</strong> • Professional home cleaning for Lawton, Fort Sill, Elgin &amp; Cache</div>
       <div>Call or text (580) 215-0915 • Stripe-secured online checkout</div>
       <div style="margin-top:4px;">&copy; 2025 Red Prairie Cleaning. All rights reserved.</div>
     </footer>
   </main>
 
   <script>
-    // Simple pricing logic – base + frequency discount + 50% holiday sale
+    // Simple pricing logic – base + frequency discount
     const basePrices = {
       deep: { 1: 160, 2: 190, 3: 220, 4: 250, 5: 280 },
       standard: { 1: 130, 2: 160, 3: 190, 4: 220, 5: 250 },
@@ -1099,11 +1067,9 @@
     };
 
     const ADDON_PRICE = 20;
-    const HOLIDAY_DISCOUNT = 0.5; // 50% off
 
     const form = document.getElementById("booking-form");
-    const originalEl = document.getElementById("original-amount");
-    const saleEl = document.getElementById("sale-amount");
+    const estimateEl = document.getElementById("estimate-amount");
 
     function getBedroomKey(value) {
       const num = parseInt(value, 10);
@@ -1124,17 +1090,12 @@
       const addons = Array.from(document.querySelectorAll(".addon:checked"));
       base += addons.length * ADDON_PRICE;
 
-      // frequency discount first
+      // frequency discount
       const freqDisc = frequencyDiscount[frequency] || 0;
-      const beforeHoliday = Math.round(base * (1 - freqDisc));
+      const total = Math.round(base * (1 - freqDisc));
 
-      // holiday discount
-      const saleTotal = Math.round(beforeHoliday * (1 - HOLIDAY_DISCOUNT));
-
-      originalEl.textContent = `$${beforeHoliday}`;
-      saleEl.textContent = `$${saleTotal}`;
-
-      return saleTotal;
+      estimateEl.textContent = `$${total}`;
+      return total;
     }
 
     document
