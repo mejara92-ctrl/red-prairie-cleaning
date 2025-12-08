@@ -9,6 +9,33 @@
     content="Instant home cleaning price for Lawton, Fort Sill, Elgin and Cache. Book Red Prairie Cleaning online with transparent pricing and Stripe-secured checkout."
   />
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17734105967');
+  </script>
+
+  <!-- Event snippet for Click to call conversion page -->
+  <script>
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') {
+        window.location = url;
+      }
+    };
+    gtag('event', 'conversion', {
+        'send_to': 'AW-17734105967/gojqCKmsis4bEO_2o4hC',
+        'value': 1.0,
+        'currency': 'USD',
+        'event_callback': callback
+    });
+    return false;
+  }
+  </script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -98,6 +125,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      cursor: pointer;
     }
 
     .call-chip span {
@@ -669,10 +697,15 @@
           </div>
         </div>
       </div>
-      <div class="call-chip">
+      <!-- click-to-call tracked -->
+      <a
+        class="call-chip"
+        href="tel:15802150915"
+        onclick="return gtag_report_conversion('tel:15802150915');"
+      >
         Call / Text
         <span>(580) 215-0915</span>
-      </div>
+      </a>
     </header>
 
     <!-- TOP GRID: hero + steps (left) / form (right) -->
@@ -1196,4 +1229,3 @@
   </script>
 </body>
 </html>
-
