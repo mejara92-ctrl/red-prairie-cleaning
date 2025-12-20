@@ -849,7 +849,7 @@
               <div class="original-price" id="original-amount">$240</div>
               <div class="sale-price-row">
                 <span class="sale-price" id="sale-amount">$120</span>
-                <span class="sale-badge">Holiday 50% off</span>
+                <span class="sale-badge">Holiday 30% off</span>
               </div>
             </div>
           </div>
@@ -935,7 +935,7 @@
   </main>
 
   <script>
-    // Simple pricing logic – base + frequency discount + 50% holiday sale
+    // Simple pricing logic – base + frequency discount + 30% holiday sale
     const basePrices = {
       deep: { 1: 160, 2: 190, 3: 220, 4: 250, 5: 280 },
       standard: { 1: 130, 2: 160, 3: 190, 4: 220, 5: 250 },
@@ -949,7 +949,7 @@
     };
 
     const ADDON_PRICE = 20;
-    const HOLIDAY_DISCOUNT = 0.5; // 50% off
+    const HOLIDAY_DISCOUNT = 0.3; // 30% off
 
     const form = document.getElementById("booking-form");
     const originalEl = document.getElementById("original-amount");
