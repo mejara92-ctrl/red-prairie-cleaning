@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -58,9 +58,7 @@
       --success: #27ae60;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -70,10 +68,7 @@
       color: var(--text-main);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
     .page {
       max-width: 1120px;
@@ -133,8 +128,6 @@
       color: var(--accent);
     }
 
-    /* Layout */
-
     .top-layout {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -142,9 +135,7 @@
       align-items: stretch;
     }
 
-    .top-layout > * {
-      height: 100%;
-    }
+    .top-layout > * { height: 100%; }
 
     .left-column {
       display: flex;
@@ -166,9 +157,7 @@
       margin: 4px 0 10px;
     }
 
-    .hero-card h1 span {
-      color: var(--accent);
-    }
+    .hero-card h1 span { color: var(--accent); }
 
     .hero-tags {
       display: flex;
@@ -248,8 +237,6 @@
       font-size: 14px;
     }
 
-    /* Steps / What to expect */
-
     .steps-card {
       flex: 1;
       display: flex;
@@ -306,17 +293,9 @@
       margin-bottom: 1px;
     }
 
-    /* Pricing/form card */
+    .pricing-card { display: flex; flex-direction: column; }
 
-    .pricing-card {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pricing-card h2 {
-      font-size: 16px;
-      margin: 0 0 6px;
-    }
+    .pricing-card h2 { font-size: 16px; margin: 0 0 6px; }
 
     .pricing-sub {
       font-size: 12px;
@@ -338,10 +317,7 @@
       font-size: 11px;
     }
 
-    label {
-      font-weight: 500;
-      color: var(--text-muted);
-    }
+    label { font-weight: 500; color: var(--text-muted); }
 
     select,
     input[type="text"],
@@ -366,10 +342,7 @@
       box-shadow: 0 0 0 1px rgba(255, 107, 74, 0.12);
     }
 
-    textarea {
-      min-height: 56px;
-      resize: vertical;
-    }
+    textarea { min-height: 56px; resize: vertical; }
 
     .addons {
       border-radius: 14px;
@@ -401,12 +374,7 @@
       white-space: nowrap;
     }
 
-    .addon-check input {
-      width: 13px;
-      height: 13px;
-    }
-
-    /* Gift card section */
+    .addon-check input { width: 13px; height: 13px; }
 
     .gift-card {
       border-radius: 14px;
@@ -435,9 +403,7 @@
       flex-wrap: wrap;
     }
 
-    .gift-row label {
-      font-size: 11px;
-    }
+    .gift-row label { font-size: 11px; }
 
     .gift-row select {
       min-width: 110px;
@@ -445,12 +411,7 @@
       font-size: 11px;
     }
 
-    .gift-note {
-      margin: 0;
-      font-size: 10px;
-    }
-
-    /* Price display */
+    .gift-note { margin: 0; font-size: 10px; }
 
     .estimate-row {
       display: flex;
@@ -460,10 +421,7 @@
       font-size: 13px;
     }
 
-    .estimate-label {
-      font-weight: 500;
-      color: var(--text-muted);
-    }
+    .estimate-label { font-weight: 500; color: var(--text-muted); }
 
     .price-stack {
       text-align: right;
@@ -479,11 +437,7 @@
       text-decoration: line-through;
     }
 
-    .sale-price-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .sale-price-row { display: flex; align-items: center; gap: 6px; }
 
     .sale-price {
       font-size: 20px;
@@ -523,8 +477,7 @@
       justify-content: center;
       gap: 6px;
       box-shadow: 0 14px 35px rgba(255, 107, 74, 0.45);
-      transition: background 0.15s ease, transform 0.05s ease,
-        box-shadow 0.15s ease;
+      transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
     }
 
     .cta-button:hover {
@@ -545,11 +498,7 @@
       text-align: center;
     }
 
-    /* Bottom card (reviews + FAQ) */
-
-    .bottom-card {
-      margin-top: 26px;
-    }
+    .bottom-card { margin-top: 26px; }
 
     .bottom-card-header {
       display: flex;
@@ -573,10 +522,7 @@
       color: var(--text-muted);
     }
 
-    .stars {
-      color: #f39c12;
-      font-size: 13px;
-    }
+    .stars { color: #f39c12; font-size: 13px; }
 
     .reviews-text {
       font-size: 12px;
@@ -593,15 +539,9 @@
       margin-bottom: 12px;
     }
 
-    .review-name {
-      font-weight: 600;
-      color: var(--text-main);
-    }
+    .review-name { font-weight: 600; color: var(--text-main); }
 
-    .review-tag {
-      font-size: 10px;
-      color: var(--accent-dark);
-    }
+    .review-tag { font-size: 10px; color: var(--accent-dark); }
 
     .faq-grid {
       display: grid;
@@ -625,9 +565,7 @@
       color: #444;
     }
 
-    details summary::-webkit-details-marker {
-      display: none;
-    }
+    details summary::-webkit-details-marker { display: none; }
 
     details p {
       margin: 6px 0 2px;
@@ -635,13 +573,7 @@
       font-weight: 400;
     }
 
-    .faq-icon {
-      color: var(--accent);
-      margin-right: 4px;
-      font-size: 12px;
-    }
-
-    /* Footer */
+    .faq-icon { color: var(--accent); margin-right: 4px; font-size: 12px; }
 
     .footer {
       margin-top: 32px;
@@ -652,34 +584,17 @@
       border-top: 1px solid #f0dfcf;
     }
 
-    .footer strong {
-      color: var(--accent-dark);
-    }
-
-    /* Responsive */
+    .footer strong { color: var(--accent-dark); }
 
     @media (max-width: 900px) {
-      .top-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .top-layout > * {
-        height: auto;
-      }
-
-      .bottom-card {
-        margin-top: 22px;
-      }
-
-      .faq-grid {
-        grid-template-columns: 1fr;
-      }
+      .top-layout { grid-template-columns: 1fr; }
+      .top-layout > * { height: auto; }
+      .bottom-card { margin-top: 22px; }
+      .faq-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
-      .addon-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .addon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -708,11 +623,8 @@
       </a>
     </header>
 
-    <!-- TOP GRID: hero + steps (left) / form (right) -->
     <section class="top-layout">
-      <!-- LEFT COLUMN -->
       <div class="left-column">
-        <!-- Hero card -->
         <article class="card hero-card">
           <div class="hero-tags">
             <span>LUXURY HOME CLEANING</span>
@@ -731,12 +643,8 @@
 
           <div class="hero-flags">
             <span class="hero-pill">Military-friendly scheduling</span>
-            <span class="hero-flag">
-              <strong>First-time deep cleans</strong>
-            </span>
-            <span class="hero-flag">
-              <strong>Weekly &amp; bi-weekly maintenance</strong>
-            </span>
+            <span class="hero-flag"><strong>First-time deep cleans</strong></span>
+            <span class="hero-flag"><strong>Weekly &amp; bi-weekly maintenance</strong></span>
           </div>
 
           <div class="hero-guarantee">
@@ -746,7 +654,6 @@
           </div>
         </article>
 
-        <!-- Steps + what's included card -->
         <article class="card steps-card">
           <h3>What to expect with Red Prairie Cleaning</h3>
           <p class="steps-intro">
@@ -818,12 +725,9 @@
         </article>
       </div>
 
-      <!-- RIGHT COLUMN – pricing / form -->
       <article class="card pricing-card">
         <h2>Instant Cleaning Price</h2>
-        <p class="pricing-sub">
-          Transparent pricing. No contracts. Stripe-secured checkout.
-        </p>
+        <p class="pricing-sub">Transparent pricing. No contracts. Stripe-secured checkout.</p>
 
         <form id="booking-form">
           <div class="form-grid">
@@ -868,13 +772,7 @@
 
             <div class="form-group" style="grid-column: 1 / -1;">
               <label for="address">Street address</label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                placeholder="Street address and unit #"
-                required
-              />
+              <input type="text" id="address" name="address" placeholder="Street address and unit #" required />
             </div>
 
             <div class="form-group" style="grid-column: 1 / -1;">
@@ -886,35 +784,17 @@
 
             <div class="form-group">
               <label for="name">First &amp; last name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="First & last name"
-                required
-              />
+              <input type="text" id="name" name="name" placeholder="First & last name" required />
             </div>
 
             <div class="form-group">
               <label for="phone">Mobile phone</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="For day-of reminders"
-                required
-              />
+              <input type="tel" id="phone" name="phone" placeholder="For day-of reminders" required />
             </div>
 
             <div class="form-group">
               <label for="email">Email for confirmation</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="We’ll email your booking confirmation"
-                required
-              />
+              <input type="email" id="email" name="email" placeholder="We’ll email your booking confirmation" required />
             </div>
 
             <div class="form-group">
@@ -924,15 +804,8 @@
           </div>
 
           <div class="form-group" style="margin-top: 4px;">
-            <label for="notes"
-              >Gate code, pets, special requests, or anything else we should
-              know.</label
-            >
-            <textarea
-              id="notes"
-              name="notes"
-              placeholder="Optional but helpful for your cleaner."
-            ></textarea>
+            <label for="notes">Gate code, pets, special requests, or anything else we should know.</label>
+            <textarea id="notes" name="notes" placeholder="Optional but helpful for your cleaner."></textarea>
           </div>
 
           <div class="addons">
@@ -941,34 +814,15 @@
               <span>Make it sparkle.</span>
             </div>
             <div class="addon-grid">
-              <label class="addon-check">
-                <input type="checkbox" value="inside oven" class="addon" />
-                Oven
-              </label>
-              <label class="addon-check">
-                <input type="checkbox" value="inside refrigerator" class="addon" />
-                Fridge
-              </label>
-              <label class="addon-check">
-                <input type="checkbox" value="inside microwave" class="addon" />
-                Microwave
-              </label>
-              <label class="addon-check">
-                <input type="checkbox" value="one load of laundry" class="addon" />
-                Laundry
-              </label>
-              <label class="addon-check">
-                <input type="checkbox" value="dishes in sink" class="addon" />
-                Dishes
-              </label>
-              <label class="addon-check">
-                <input type="checkbox" value="interior windows" class="addon" />
-                Windows
-              </label>
+              <label class="addon-check"><input type="checkbox" value="inside oven" class="addon" /> Oven</label>
+              <label class="addon-check"><input type="checkbox" value="inside refrigerator" class="addon" /> Fridge</label>
+              <label class="addon-check"><input type="checkbox" value="inside microwave" class="addon" /> Microwave</label>
+              <label class="addon-check"><input type="checkbox" value="one load of laundry" class="addon" /> Laundry</label>
+              <label class="addon-check"><input type="checkbox" value="dishes in sink" class="addon" /> Dishes</label>
+              <label class="addon-check"><input type="checkbox" value="interior windows" class="addon" /> Windows</label>
             </div>
           </div>
 
-          <!-- Gift card option -->
           <div class="gift-card">
             <label class="gift-toggle">
               <input type="checkbox" id="is-gift" />
@@ -999,14 +853,13 @@
               </div>
             </div>
           </div>
+
           <div class="estimate-note">
             Holiday sale applied automatically. Final price confirmed after quick
             walk-through. No charge until you complete Stripe checkout.
           </div>
 
-          <button type="submit" class="cta-button">
-            Reserve &amp; pay with Stripe
-          </button>
+          <button type="submit" class="cta-button">Reserve &amp; pay with Stripe</button>
           <div class="cta-subtext">
             By booking, you agree to Red Prairie Cleaning’s standard policies
             for cancellations and rescheduling. No contracts, ever.
@@ -1015,13 +868,10 @@
       </article>
     </section>
 
-    <!-- BOTTOM CARD: reviews + FAQ -->
     <section class="card bottom-card">
       <div class="bottom-card-header">
         <div>
-          <h3 class="bottom-title">
-            Why Lawton &amp; Fort Sill families rate us 5 stars
-          </h3>
+          <h3 class="bottom-title">Why Lawton &amp; Fort Sill families rate us 5 stars</h3>
           <div class="rating-row">
             <span class="stars">★★★★★</span>
             <span>4.9 average rating • 30+ local families</span>
@@ -1046,66 +896,33 @@
 
       <div class="faq-grid">
         <details>
-          <summary>
-            <span class="faq-icon">?</span>Do I have to sign a contract?
-          </summary>
-          <p>
-            Nope. You can pause, reschedule, or cancel recurring visits with 24
-            hours notice. No long-term commitments.
-          </p>
+          <summary><span class="faq-icon">?</span>Do I have to sign a contract?</summary>
+          <p>Nope. You can pause, reschedule, or cancel recurring visits with 24 hours notice. No long-term commitments.</p>
         </details>
 
         <details>
-          <summary>
-            <span class="faq-icon">?</span>Are supplies &amp; equipment
-            included?
-          </summary>
-          <p>
-            Yes. Standard cleaning supplies and equipment are included.
-            Specialty services like carpet extraction can be quoted separately
-            if needed.
-          </p>
+          <summary><span class="faq-icon">?</span>Are supplies &amp; equipment included?</summary>
+          <p>Yes. Standard cleaning supplies and equipment are included. Specialty services like carpet extraction can be quoted separately if needed.</p>
         </details>
 
         <details>
-          <summary>
-            <span class="faq-icon">?</span>Do I need to be home?
-          </summary>
-          <p>
-            It’s up to you. Many clients provide a code or spare key. Just let
-            us know the access plan in your notes so we can get into the home.
-          </p>
+          <summary><span class="faq-icon">?</span>Do I need to be home?</summary>
+          <p>It’s up to you. Many clients provide a code or spare key. Just let us know the access plan in your notes so we can get into the home.</p>
         </details>
 
         <details>
-          <summary>
-            <span class="faq-icon">?</span>What areas do you serve?
-          </summary>
-          <p>
-            Lawton, Fort Sill, Elgin, Cache, and nearby communities. If you’re
-            a little outside the map, ask and we’ll see if we can make it work.
-          </p>
+          <summary><span class="faq-icon">?</span>What areas do you serve?</summary>
+          <p>Lawton, Fort Sill, Elgin, Cache, and nearby communities. If you’re a little outside the map, ask and we’ll see if we can make it work.</p>
         </details>
 
         <details>
-          <summary>
-            <span class="faq-icon">?</span>How does payment work?
-          </summary>
-          <p>
-            All payments go through Stripe. Your card is only charged after the
-            clean, and we never see or store your card details on our side.
-          </p>
+          <summary><span class="faq-icon">?</span>How does payment work?</summary>
+          <p>All payments go through Stripe. Your card is only charged after the clean, and we never see or store your card details on our side.</p>
         </details>
 
         <details>
-          <summary>
-            <span class="faq-icon">?</span>What if something isn’t right?
-          </summary>
-          <p>
-            Reach out within 24 hours and we’ll come back to make it right.
-            Your clean should feel like a luxury hotel, not a chore you paid
-            for.
-          </p>
+          <summary><span class="faq-icon">?</span>What if something isn’t right?</summary>
+          <p>Reach out within 24 hours and we’ll come back to make it right. Your clean should feel like a luxury hotel, not a chore you paid for.</p>
         </details>
       </div>
     </section>
@@ -1153,15 +970,12 @@
       const bedroomKey = getBedroomKey(bedrooms);
       let base = basePrices[cleanType][bedroomKey] || 180;
 
-      // add-ons
       const addons = Array.from(document.querySelectorAll(".addon:checked"));
       base += addons.length * ADDON_PRICE;
 
-      // frequency discount first
       const freqDisc = frequencyDiscount[frequency] || 0;
       const beforeHoliday = Math.round(base * (1 - freqDisc));
 
-      // holiday discount
       const saleTotal = Math.round(beforeHoliday * (1 - HOLIDAY_DISCOUNT));
 
       originalEl.textContent = `$${beforeHoliday}`;
@@ -1171,9 +985,7 @@
     }
 
     document
-      .querySelectorAll(
-        "#bedrooms, #bathrooms, #clean-type, #frequency, .addon"
-      )
+      .querySelectorAll("#bedrooms, #bathrooms, #clean-type, #frequency, .addon")
       .forEach((el) => {
         el.addEventListener("change", calculateTotal);
       });
@@ -1198,15 +1010,12 @@
         notes: form.notes.value,
         isGift: document.getElementById("is-gift").checked,
         giftAmount: form.giftAmount.value,
-        addons: Array.from(
-          document.querySelectorAll(".addon:checked"),
-          (a) => a.value
-        ),
+        addons: Array.from(document.querySelectorAll(".addon:checked"), (a) => a.value),
       };
 
       try {
         const res = await fetch(
-          "https://checkout-worker.aged-breeze-c9a5.workers.dev/",
+          "https://checkout-worker.aged-breeze-c9a5.workers.dev/create-checkout-session",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
