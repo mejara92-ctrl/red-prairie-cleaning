@@ -4,21 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Red Prairie Cleaning | Luxury Home & Professional Carpet Cleaning</title>
-  <meta name="description" content="Luxury home cleaning + professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, and Cache. Text to book." />
+  <meta name="description" content="Modern luxury home cleaning + professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, and Cache. Text to book." />
 
   <style>
     :root{
-      /* Luxury palette: rich prairie red + warm cream + charcoal */
-      --red: #8B1E2D;          /* rich red */
-      --red-2: #6F1623;        /* deeper red for hover */
-      --cream: #FBF4E9;        /* warm luxe cream */
-      --cream-2: #F3E8D8;      /* slightly darker cream */
-      --ink: #171315;          /* near-black */
-      --ink-2: #2A2326;        /* softer ink */
-      --muted: #6B5D62;        /* muted text */
-      --line: rgba(23,19,21,.10);
-      --shadow: 0 20px 50px rgba(23,19,21,.12);
-      --shadow2: 0 10px 25px rgba(23,19,21,.10);
+      /* Modern palette: crisp white + rich red + charcoal */
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #fbfbfc;
+      --ink: #0b0b10;
+      --ink-2: #1c1c26;
+      --muted: #5b5b6a;
+      --line: rgba(11,11,16,.10);
+      --line-2: rgba(11,11,16,.14);
+
+      --red: #B11226;     /* modern rich red */
+      --red-2: #8F0E1F;   /* hover */
+      --red-3: rgba(177,18,38,.10);
+
+      --shadow: 0 18px 50px rgba(11,11,16,.08);
+      --shadow2: 0 10px 28px rgba(11,11,16,.08);
+
       --radius-xl: 22px;
       --radius-lg: 18px;
       --radius-md: 14px;
@@ -30,7 +36,7 @@
     body{
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color: var(--ink);
-      background: radial-gradient(1200px 700px at 10% 10%, #ffffff 0%, var(--cream) 55%, var(--cream-2) 100%);
+      background: var(--bg);
       line-height: 1.45;
     }
     a{ color: inherit; text-decoration: none; }
@@ -42,7 +48,7 @@
       top: 0;
       z-index: 50;
       backdrop-filter: blur(10px);
-      background: rgba(251,244,233,.75);
+      background: rgba(255,255,255,.86);
       border-bottom: 1px solid var(--line);
     }
     .nav{
@@ -54,71 +60,71 @@
     }
     .brand{
       display:flex; align-items:center; gap: 10px;
-      font-weight: 800;
-      letter-spacing: .4px;
+      font-weight: 900;
+      letter-spacing: .2px;
     }
     .logo{
       width: 38px; height: 38px; border-radius: 12px;
       display:grid; place-items:center;
-      background: linear-gradient(135deg, var(--red) 0%, #B43A4A 55%, #D07B85 100%);
-      box-shadow: 0 10px 22px rgba(139,30,45,.22);
+      background: var(--red);
+      box-shadow: 0 14px 26px rgba(177,18,38,.22);
       color: white;
-      font-weight: 900;
+      font-weight: 950;
     }
-    .brand small{ display:block; font-weight:600; color: var(--muted); letter-spacing: .2px; }
+    .brand small{ display:block; font-weight:650; color: var(--muted); letter-spacing: .1px; }
+
     .navlinks{
       display:flex; align-items:center; gap: 18px;
       color: var(--ink-2);
-      font-weight: 650;
+      font-weight: 700;
     }
-    .navlinks a{ opacity:.85; }
+    .navlinks a{ opacity:.8; }
     .navlinks a:hover{ opacity:1; }
-    .navcta{
-      display:flex; align-items:center; gap: 10px;
-    }
+
+    .navcta{ display:flex; align-items:center; gap: 10px; }
     .pill{
       border: 1px solid var(--line);
       padding: 10px 12px;
       border-radius: 999px;
-      background: rgba(255,255,255,.7);
-      box-shadow: 0 8px 18px rgba(23,19,21,.06);
-      font-weight: 750;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 10px 20px rgba(11,11,16,.06);
+      font-weight: 800;
       color: var(--ink);
       white-space: nowrap;
     }
+
     .btn{
       border: 0;
       cursor: pointer;
       border-radius: 999px;
       padding: 11px 14px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .2px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap: 10px;
-      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
       user-select:none;
       white-space: nowrap;
     }
     .btn-primary{
-      background: linear-gradient(135deg, var(--red) 0%, #A82A3A 100%);
+      background: var(--red);
       color: white;
-      box-shadow: 0 14px 30px rgba(139,30,45,.25);
+      box-shadow: 0 16px 34px rgba(177,18,38,.22);
     }
-    .btn-primary:hover{ background: linear-gradient(135deg, var(--red-2) 0%, #8F2230 100%); transform: translateY(-1px); }
+    .btn-primary:hover{ background: var(--red-2); transform: translateY(-1px); }
+
     .btn-ghost{
-      background: rgba(255,255,255,.7);
+      background: #fff;
       border: 1px solid var(--line);
       color: var(--ink);
-      box-shadow: 0 10px 22px rgba(23,19,21,.06);
+      box-shadow: 0 10px 22px rgba(11,11,16,.06);
     }
-    .btn-ghost:hover{ transform: translateY(-1px); }
+    .btn-ghost:hover{ transform: translateY(-1px); border-color: var(--line-2); }
 
     /* Hero */
-    .hero{
-      padding: 44px 0 26px;
-    }
+    .hero{ padding: 44px 0 26px; }
     .heroGrid{
       display:grid;
       grid-template-columns: 1.1fr .9fr;
@@ -128,30 +134,27 @@
     .card{
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
-      background: rgba(255,255,255,.75);
+      background: var(--surface);
       box-shadow: var(--shadow);
     }
-    .heroCard{
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-    }
+    .heroCard{ padding: 28px; }
+
     .kicker{
       display:inline-flex;
       align-items:center;
       gap: 10px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(139,30,45,.08);
+      background: var(--red-3);
       color: var(--red);
-      font-weight: 850;
+      font-weight: 900;
       letter-spacing: .2px;
-      border: 1px solid rgba(139,30,45,.18);
+      border: 1px solid rgba(177,18,38,.18);
     }
     .dot{
       width: 10px; height: 10px; border-radius: 50%;
       background: var(--red);
-      box-shadow: 0 0 0 5px rgba(139,30,45,.12);
+      box-shadow: 0 0 0 5px rgba(177,18,38,.16);
     }
     h1{
       margin: 14px 0 10px;
@@ -177,6 +180,7 @@
       color: var(--muted);
       margin-top: 8px;
     }
+
     .trustbar{
       display:grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -187,19 +191,19 @@
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 10px 12px;
-      background: rgba(251,244,233,.7);
+      background: var(--surface-2);
       display:flex;
       gap: 10px;
       align-items:flex-start;
-      box-shadow: 0 10px 20px rgba(23,19,21,.05);
+      box-shadow: 0 10px 18px rgba(11,11,16,.05);
     }
     .check{
       width: 18px; height: 18px;
       border-radius: 6px;
       display:grid; place-items:center;
-      background: rgba(139,30,45,.12);
+      background: var(--red-3);
       color: var(--red);
-      font-weight: 900;
+      font-weight: 950;
       flex: 0 0 auto;
       margin-top: 2px;
     }
@@ -212,29 +216,27 @@
       display:flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
-      overflow:hidden;
+      gap: 14px;
       background:
-        radial-gradient(800px 500px at 20% 0%, rgba(139,30,45,.22) 0%, rgba(139,30,45,.05) 40%, rgba(255,255,255,.0) 70%),
-        linear-gradient(135deg, rgba(255,255,255,.9) 0%, rgba(251,244,233,.9) 60%, rgba(243,232,216,.9) 100%);
+        radial-gradient(900px 420px at 20% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
+        #fff;
+      overflow:hidden;
     }
     .visual .img{
       border-radius: var(--radius-lg);
       border: 1px solid var(--line);
       background:
-        radial-gradient(700px 500px at 20% 20%, rgba(139,30,45,.20) 0%, rgba(139,30,45,.06) 35%, rgba(255,255,255,.0) 70%),
-        linear-gradient(180deg, rgba(23,19,21,.08) 0%, rgba(23,19,21,.02) 70%),
-        url("https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=1400&q=70") center/cover no-repeat;
+        linear-gradient(180deg, rgba(11,11,16,.06) 0%, rgba(11,11,16,.02) 70%),
+        url("https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=75") center/cover no-repeat;
       min-height: 255px;
       box-shadow: var(--shadow2);
     }
     .visual .note{
-      margin-top: 14px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--line);
-      padding: 14px 14px;
-      background: rgba(255,255,255,.72);
-      box-shadow: 0 12px 25px rgba(23,19,21,.07);
+      padding: 14px;
+      background: #fff;
+      box-shadow: 0 10px 20px rgba(11,11,16,.06);
     }
     .note b{ display:block; }
     .note p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
@@ -265,14 +267,14 @@
       gap: 8px;
       padding: 7px 11px;
       border-radius: 999px;
-      border: 1px solid rgba(139,30,45,.18);
-      background: rgba(139,30,45,.08);
+      border: 1px solid rgba(177,18,38,.18);
+      background: var(--red-3);
       color: var(--red);
-      font-weight: 850;
+      font-weight: 900;
       font-size: 12.5px;
     }
 
-    /* Pricing cards */
+    /* Pricing */
     .grid3{
       display:grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -281,24 +283,23 @@
     .priceCard{
       padding: 18px;
       border-radius: var(--radius-xl);
-      background: rgba(255,255,255,.78);
+      background: #fff;
       border: 1px solid var(--line);
-      box-shadow: var(--shadow2);
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
       position: relative;
-      overflow:hidden;
     }
     .priceCard.featured{
-      border-color: rgba(139,30,45,.28);
-      box-shadow: 0 22px 55px rgba(139,30,45,.16);
+      border-color: rgba(177,18,38,.22);
+      box-shadow: 0 22px 55px rgba(177,18,38,.12);
     }
     .priceTop{
       display:flex; align-items: baseline; justify-content: space-between; gap: 10px;
       margin-bottom: 10px;
     }
-    .plan{ font-weight: 900; letter-spacing: .2px; }
-    .from{ color: var(--muted); font-weight: 800; font-size: 12px; }
+    .plan{ font-weight: 950; letter-spacing: .2px; }
+    .from{ color: var(--muted); font-weight: 850; font-size: 12px; }
     .price{
-      font-size: 34px; font-weight: 950; letter-spacing: -1px;
+      font-size: 34px; font-weight: 980; letter-spacing: -1px;
       margin: 6px 0 10px;
     }
     .sub{
@@ -306,11 +307,9 @@
       color: var(--muted);
       font-size: 13.5px;
     }
-    ul{
-      margin: 0; padding-left: 18px;
-      color: var(--ink-2);
-    }
+    ul{ margin: 0; padding-left: 18px; color: var(--ink-2); }
     li{ margin: 7px 0; }
+
     .cardActions{
       display:flex;
       gap: 10px;
@@ -319,7 +318,7 @@
     }
     .btn-sm{ padding: 10px 12px; font-size: 13px; }
 
-    /* Carpet section */
+    /* Split panels */
     .split{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -330,11 +329,12 @@
       padding: 18px;
       border-radius: var(--radius-xl);
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow2);
+      background: #fff;
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
     }
     .panel h3{ margin: 0 0 6px; font-size: 20px; }
     .panel p{ margin: 0 0 10px; color: var(--muted); font-size: 13.5px; }
+
     .miniGrid{
       display:grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -345,7 +345,7 @@
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 12px;
-      background: rgba(251,244,233,.65);
+      background: var(--surface-2);
     }
     .mini b{ display:block; }
     .mini span{ display:block; color: var(--muted); font-size: 12.5px; margin-top: 4px; }
@@ -354,14 +354,13 @@
     .faqWrap{
       border-radius: var(--radius-xl);
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.72);
-      box-shadow: var(--shadow2);
+      background: #fff;
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
       overflow:hidden;
     }
-    .faqItem{
-      border-top: 1px solid var(--line);
-    }
+    .faqItem{ border-top: 1px solid var(--line); }
     .faqItem:first-child{ border-top:0; }
+
     .faqQ{
       width: 100%;
       text-align: left;
@@ -373,18 +372,19 @@
       align-items:center;
       justify-content: space-between;
       gap: 12px;
-      font-weight: 850;
+      font-weight: 900;
       color: var(--ink);
     }
-    .faqQ:hover{ background: rgba(139,30,45,.04); }
+    .faqQ:hover{ background: rgba(11,11,16,.02); }
     .chev{
       width: 34px; height: 34px;
       border-radius: 12px;
       border: 1px solid var(--line);
-      background: rgba(251,244,233,.65);
+      background: var(--surface-2);
       display:grid; place-items:center;
       flex: 0 0 auto;
       transition: transform .16s ease;
+      color: var(--muted);
     }
     .faqA{
       display:none;
@@ -400,11 +400,11 @@
     .cta{
       padding: 22px;
       border-radius: var(--radius-xl);
-      border: 1px solid rgba(139,30,45,.22);
+      border: 1px solid rgba(177,18,38,.18);
       background:
-        radial-gradient(900px 400px at 10% 20%, rgba(139,30,45,.20) 0%, rgba(139,30,45,.06) 35%, rgba(255,255,255,.0) 70%),
-        rgba(255,255,255,.78);
-      box-shadow: 0 24px 60px rgba(139,30,45,.12);
+        radial-gradient(900px 420px at 10% 20%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
+        #fff;
+      box-shadow: 0 22px 55px rgba(177,18,38,.10);
       display:flex;
       align-items: center;
       justify-content: space-between;
@@ -413,11 +413,9 @@
     }
     .cta h3{ margin: 0 0 4px; font-size: 22px; }
     .cta p{ margin: 0; color: var(--muted); font-size: 13.5px; }
-    .footer{
-      padding: 22px 0 34px;
-      color: var(--muted);
-      font-size: 12.5px;
-    }
+
+    /* Footer */
+    .footer{ padding: 22px 0 34px; color: var(--muted); font-size: 12.5px; }
     .footerGrid{
       display:grid;
       grid-template-columns: 1.2fr .8fr;
@@ -480,7 +478,8 @@
           <div class="kicker"><span class="dot"></span> Locally owned • Lawton & Fort Sill</div>
 
           <h1>
-            Your home cleaned <span class="accent">like it’s</span><br/>
+            Your home cleaned<br/>
+            <span class="accent">like it’s</span><br/>
             <span class="accent">boutique-hotel ready.</span>
           </h1>
 
@@ -490,9 +489,7 @@
           </p>
 
           <div class="heroActions">
-            <!-- Text to book (SMS) -->
             <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20to%20book%20a%20cleaning.%20My%20city%20is%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20I%27m%20interested%20in%3A%20%5BStandard%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to book</a>
-
             <a class="btn btn-ghost" href="tel:+15802150915">Call now</a>
             <a class="btn btn-ghost" href="#carpet">Add carpet cleaning</a>
           </div>
@@ -522,7 +519,7 @@
         </div>
 
         <div class="card visual">
-          <div class="img" aria-label="Luxury cleaning visual"></div>
+          <div class="img" aria-label="Modern cleaning visual"></div>
           <div class="note">
             <b>Service area</b>
             <p>Lawton • Fort Sill • Elgin • Cache</p>
@@ -614,10 +611,10 @@
       <div class="sectionHead">
         <div>
           <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> Professional carpet cleaning</div>
-          <h2>Real extraction — not a rental machine.</h2>
+          <h2>Hot-water extraction with real results.</h2>
         </div>
         <p>
-          Hot-water extraction designed to lift dirt, oils, and odors from the carpet, not just the surface.
+          Designed to lift dirt, oils, and odors from the carpet — not just the surface.
           We set honest expectations before starting.
         </p>
       </div>
@@ -625,23 +622,23 @@
       <div class="split">
         <div class="panel">
           <h3>What you get</h3>
-          <p>Professional equipment, measured process, and visible results.</p>
+          <p>Professional equipment, measured process, and visible improvement.</p>
           <div class="miniGrid">
             <div class="mini">
-              <b>Hot-water extraction</b>
-              <span>Deep rinse + recovery for noticeable improvement.</span>
+              <b>Deep extraction</b>
+              <span>Rinse + recovery for noticeable results.</span>
             </div>
             <div class="mini">
-              <b>Edges & traffic lanes</b>
-              <span>Focused passes where dirt actually builds up.</span>
+              <b>Traffic lane focus</b>
+              <span>Extra passes where buildup lives.</span>
             </div>
             <div class="mini">
               <b>Faster dry times</b>
-              <span>Proper recovery reduces over-wetting.</span>
+              <span>Good recovery reduces over-wetting.</span>
             </div>
             <div class="mini">
               <b>Pet considerations</b>
-              <span>Odor/stain evaluation and straightforward options.</span>
+              <span>Clear options for odor & stains.</span>
             </div>
           </div>
 
@@ -651,7 +648,7 @@
           </div>
 
           <div class="fineprint">
-            Note: Some stains/discoloration depend on carpet age, prior treatment, and wear. We’ll tell you what’s realistic.
+            Some stains/discoloration depend on carpet age, wear, and prior treatment. We’ll tell you what’s realistic.
           </div>
         </div>
 
@@ -678,9 +675,9 @@
             </div>
           </div>
 
-          <div class="panel" style="margin-top:12px; background: rgba(251,244,233,.7);">
+          <div class="panel" style="margin-top:12px; background: var(--surface-2);">
             <h3 style="margin-bottom:6px;">Combine & save time</h3>
-            <p style="margin:0;">Book a deep clean + carpet extraction together for the fastest “reset” result.</p>
+            <p style="margin:0;">Book a deep clean + carpet extraction together for the fastest reset.</p>
           </div>
 
           <div class="cardActions" style="margin-top:14px;">
@@ -720,10 +717,10 @@
         <div class="panel">
           <h3>Deep / First-Time Clean</h3>
           <ul>
-            <li>More detailed dusting of edges, ledges, and build-up areas</li>
+            <li>More detailed dusting of edges, ledges, and buildup areas</li>
             <li>Baseboards/doors/frames wiped (as accessible)</li>
             <li>Kitchen detail: backsplash, cabinet faces, appliance exteriors</li>
-            <li>Bathroom detail: showers/tubs scrubbed, hard-water attention where possible</li>
+            <li>Bathroom detail: showers/tubs scrubbed</li>
             <li>Extra time on high-touch and problem spots</li>
           </ul>
         </div>
@@ -760,8 +757,8 @@
             <span class="chev">⌄</span>
           </button>
           <div class="faqA">
-            Carpet extraction is an <b>optional add-on</b> that you can book with any home cleaning. We use
-            professional hot-water extraction equipment designed for real results.
+            Carpet extraction is an <b>optional add-on</b> you can book with any home cleaning.
+            We use professional hot-water extraction equipment designed for real results.
           </div>
         </div>
 
@@ -771,7 +768,7 @@
             <span class="chev">⌄</span>
           </button>
           <div class="faqA">
-            Prices are starting ranges. We confirm the exact scope after a quick walk-through so you’ll know the final price
+            Prices are starting ranges. We confirm the exact scope after a quick walk-through so you know the final price
             <b>before</b> we start. No surprise add-ons.
           </div>
         </div>
@@ -804,7 +801,7 @@
             <span class="chev">⌄</span>
           </button>
           <div class="faqA">
-            Often within a few days depending on demand. The fastest way is to <b>text to book</b> with your city, bedrooms/baths,
+            Often within a few days depending on demand. Fastest is to <b>text to book</b> with your city, bedrooms/baths,
             and preferred date.
           </div>
         </div>
@@ -824,7 +821,7 @@
         <div class="cta">
           <div>
             <h3>Ready to book or want a real quote?</h3>
-            <p>Text photos + your bedrooms/baths and we’ll respond fast.</p>
+            <p>Text photos + bedrooms/baths and we’ll respond fast.</p>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BStandard%2FDeep%2FMove-out%5D.%20Carpet%20rooms%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to book</a>
@@ -843,21 +840,21 @@
           <div style="display:flex;align-items:center;gap:10px;">
             <div class="logo" style="width:34px;height:34px;border-radius:12px;">RP</div>
             <div>
-              <div style="font-weight:900;color:var(--ink);">RED PRAIRIE CLEANING</div>
-              <div style="margin-top:2px;">Call/Text: <a href="tel:+15802150915" style="font-weight:900;color:var(--red);">(580) 215-0915</a></div>
+              <div style="font-weight:950;color:var(--ink);">RED PRAIRIE CLEANING</div>
+              <div style="margin-top:2px;">Call/Text: <a href="tel:+15802150915" style="font-weight:950;color:var(--red);">(580) 215-0915</a></div>
             </div>
           </div>
           <div style="margin-top:10px;">
             Service area: Lawton • Fort Sill • Elgin • Cache
           </div>
           <div style="margin-top:8px;">
-            Professional home cleaning + carpet extraction with honest expectations and clear scope.
+            Professional home cleaning + carpet extraction with clear scope and honest expectations.
           </div>
         </div>
 
         <div class="legal">
-          <div style="font-weight:850;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
-          We provide cleaning services only. Results vary based on home condition, prior treatments, surface materials,
+          <div style="font-weight:900;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
+          We provide cleaning services only. Results vary based on home condition, surface materials,
           and carpet age/wear. Final pricing confirmed after walk-through and scope agreement.
         </div>
       </div>
@@ -871,7 +868,7 @@
         const item = btn.closest('.faqItem');
         const wrap = item.parentElement;
 
-        // Optional: keep one open at a time
+        // keep one open at a time
         wrap.querySelectorAll('.faqItem').forEach(i => {
           if (i !== item) i.classList.remove('open');
         });
