@@ -843,4 +843,43 @@
   <!-- FOOTER -->
   <div class="footer">
     <div class="container">
-      <div class="fo
+      <div class="footerGrid">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="logo" style="width:34px;height:34px;border-radius:12px;">RP</div>
+            <div>
+              <div style="font-weight:980;color:var(--ink);">RED PRAIRIE CLEANING</div>
+              <div style="margin-top:2px;">Text: <a href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote." style="font-weight:980;color:var(--red);">(580) 215-0915</a></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;">Service area: Lawton • Fort Sill • Elgin • Cache</div>
+          <div style="margin-top:8px;">Modern home cleaning + professional carpet cleaning with simple text quotes.</div>
+        </div>
+
+        <div class="legal">
+          <div style="font-weight:950;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
+          We provide cleaning services only. Pricing depends on home size, condition, scope, and requested add-ons.
+          Results vary based on surface materials and carpet age/wear.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // FAQ accordion
+    document.querySelectorAll('.faqItem .faqQ').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faqItem');
+        const wrap = item.parentElement;
+
+        // Keep one open at a time
+        wrap.querySelectorAll('.faqItem').forEach(i => {
+          if (i !== item) i.classList.remove('open');
+        });
+
+        item.classList.toggle('open');
+      });
+    });
+  </script>
+</body>
+</html>
