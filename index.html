@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Red Prairie Cleaning | Modern Home & Carpet Cleaning</title>
+<meta name="description" content="Modern home cleaning + professional carpet cleaning. Maintenance starting at $149 + tax. Deep cleaning starting at $249 + tax. Text to quote." />
 
 <style>
 :root{
@@ -14,7 +15,7 @@
   --line:#e5e7eb;
   --bg:#ffffff;
   --card:#ffffff;
-  --radius:14px;
+  --radius:16px;
   --shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
@@ -23,9 +24,8 @@ body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
   color:var(--ink);
-  background:#fff;
+  background:var(--bg);
 }
-
 a{text-decoration:none;color:inherit}
 
 .container{
@@ -38,7 +38,8 @@ a{text-decoration:none;color:inherit}
 header{
   position:sticky;
   top:0;
-  background:#fff;
+  background:rgba(255,255,255,.92);
+  backdrop-filter: blur(10px);
   border-bottom:1px solid var(--line);
   z-index:20;
 }
@@ -52,7 +53,7 @@ header{
   display:flex;
   align-items:center;
   gap:10px;
-  font-weight:800;
+  font-weight:900;
 }
 .logo{
   width:38px;height:38px;
@@ -61,35 +62,43 @@ header{
   color:#fff;
   display:grid;
   place-items:center;
-  font-weight:900;
+  font-weight:950;
 }
-.nav a{font-weight:600;color:#111}
 .navActions{
   display:flex;
   gap:10px;
+  align-items:center;
 }
 .btn{
   border-radius:999px;
   padding:10px 16px;
-  font-weight:700;
+  font-weight:800;
   border:1px solid transparent;
   cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:42px;
+  white-space:nowrap;
 }
 .btn.primary{
   background:var(--red);
   color:#fff;
+  box-shadow:0 14px 28px rgba(177,18,38,.22);
 }
 .btn.primary:hover{background:var(--red-dark)}
 .btn.ghost{
   border:1px solid var(--line);
+  background:#fff;
 }
 
 /* ---------- HERO ---------- */
 .hero{
   display:grid;
   grid-template-columns:1.1fr .9fr;
-  gap:28px;
+  gap:22px;
   margin-top:32px;
+  align-items:stretch;
 }
 .card{
   background:var(--card);
@@ -98,7 +107,7 @@ header{
   border:1px solid var(--line);
 }
 .heroLeft{
-  padding:36px;
+  padding:34px;
   display:flex;
   flex-direction:column;
 }
@@ -111,108 +120,126 @@ header{
   border:1px solid #f3c1c8;
   background:#fff5f6;
   color:var(--red);
-  font-weight:700;
+  font-weight:850;
   font-size:13px;
   width:max-content;
 }
 .hero h1{
   font-size:44px;
   line-height:1.05;
-  margin:18px 0 12px;
+  margin:16px 0 10px;
 }
 .hero h1 span{color:var(--red)}
 .hero p{
-  color:#444;
-  max-width:520px;
+  color:#333;
+  max-width:560px;
+  margin:0 0 14px;
 }
 .heroActions{
   display:flex;
   gap:12px;
-  margin:18px 0 10px;
+  flex-wrap:wrap;
+  margin:6px 0 10px;
 }
-.heroFoot{
-  font-size:13px;
-  color:var(--muted);
-}
-
 .features{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:12px;
-  margin-top:20px;
+  margin-top:14px;
 }
 .feature{
   border:1px solid var(--line);
   border-radius:12px;
   padding:12px;
   font-size:14px;
+  background:#fff;
 }
 
-/* ---------- HERO IMAGE ---------- */
-.heroImage{
+/* ---------- HERO IMAGE (upper right) ---------- */
+.heroRight{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.heroImageFrame{
+  border-radius:14px;
+  border:1px solid var(--line);
+  overflow:hidden;
+  background:linear-gradient(180deg,#fff, #f3f4f6);
   min-height:320px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.05)),
-    url("images/luxury-kitchen.jpg") center/cover no-repeat;
+  position:relative;
 }
-
-/* ---------- SECTION ---------- */
-.section{
-  margin-top:60px;
+.heroImageFrame img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
-.section h2{
-  font-size:32px;
-}
-.section p.sub{
+.imageFallback{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
   color:var(--muted);
+  font-weight:800;
+  text-align:center;
 }
+.serviceArea{
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  padding:14px;
+}
+.serviceArea b{display:block;margin-bottom:6px}
+.serviceArea p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+
+/* ---------- SECTIONS ---------- */
+.section{ margin-top:56px; }
+.section h2{ font-size:32px; margin:0 0 6px; }
+.section .sub{ color:var(--muted); margin:0; }
 
 /* ---------- PRICING ---------- */
 .pricing{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:22px;
-  margin-top:28px;
+  gap:18px;
+  margin-top:22px;
 }
 .priceCard{
-  padding:26px;
+  padding:22px;
   display:flex;
   flex-direction:column;
 }
-.priceCard h3{
-  margin:0 0 6px;
-}
+.priceCard h3{margin:0 0 6px}
 .price{
   font-size:36px;
-  font-weight:900;
+  font-weight:950;
+  margin:0 0 4px;
 }
-.price small{
-  font-size:14px;
-  color:var(--muted);
-}
-.priceCard ul{
-  padding-left:18px;
-  margin:16px 0;
-  color:#333;
-}
+.price small{font-size:14px;color:var(--muted);font-weight:800}
+.smallLine{color:var(--muted);font-size:13px;margin:0 0 10px}
+.priceCard ul{padding-left:18px;margin:10px 0 12px;color:#222}
 .priceCard li{margin:6px 0}
-.cardActions{
-  margin-top:auto;
-}
+.cardActions{ margin-top:auto; padding-top:12px; }
 
-/* ---------- CARPET ---------- */
+/* ---------- CARPET SPLIT ---------- */
 .split{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:22px;
-  margin-top:26px;
+  gap:18px;
+  margin-top:18px;
+  align-items:stretch;
 }
 .panel{
-  padding:24px;
+  padding:22px;
   display:flex;
   flex-direction:column;
 }
-.panel h3{margin-top:0}
+.panel h3{margin:0 0 6px}
+.panel p{margin:0 0 10px;color:var(--muted);font-size:14px}
 .miniGrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -222,26 +249,33 @@ header{
   border:1px solid var(--line);
   border-radius:12px;
   padding:12px;
+  background:#fafafa;
   font-size:14px;
 }
 .miniBanner{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
   margin-top:12px;
 }
+.miniBanner b{display:block;margin-bottom:4px}
 
 /* ---------- FOOTER ---------- */
 footer{
-  margin-top:80px;
+  margin-top:70px;
   border-top:1px solid var(--line);
-  padding:24px;
+  padding:22px 0 34px;
   color:var(--muted);
-  font-size:14px;
+  font-size:13px;
 }
 
 /* ---------- RESPONSIVE ---------- */
-@media(max-width:900px){
+@media(max-width:960px){
   .hero{grid-template-columns:1fr}
   .pricing{grid-template-columns:1fr}
   .split{grid-template-columns:1fr}
+  .features{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -255,8 +289,8 @@ footer{
       Red Prairie Cleaning
     </div>
     <div class="navActions">
-      <a class="btn ghost" href="tel:15802150915">Call / Text (580) 215-0915</a>
-      <a class="btn primary" href="sms:15802150915">Text to quote</a>
+      <a class="btn ghost" href="tel:+15802150915">Call / Text (580) 215-0915</a>
+      <a class="btn primary" href="sms:+15802150915">Text to quote</a>
     </div>
   </div>
 </header>
@@ -274,8 +308,8 @@ footer{
       </p>
 
       <div class="heroActions">
-        <a class="btn primary" href="sms:15802150915">Text to quote</a>
-        <a class="btn ghost" href="sms:15802150915">Carpet quote</a>
+        <a class="btn primary" href="sms:+15802150915">Text to quote</a>
+        <a class="btn ghost" href="sms:+15802150915">Carpet quote</a>
       </div>
 
       <div class="features">
@@ -286,7 +320,24 @@ footer{
       </div>
     </div>
 
-    <div class="card heroImage" aria-label="Luxury white kitchen"></div>
+    <!-- UPPER RIGHT IMAGE -->
+    <div class="card heroRight">
+      <div class="heroImageFrame">
+        <!-- CHANGE THIS PATH if needed -->
+        <img src="images/kitchen.jpg" alt="Bright white luxury kitchen" loading="eager"
+             onerror="document.getElementById('imgFallback').style.display='flex'; this.style.display='none';" />
+        <div class="imageFallback" id="imgFallback">
+          Image not found.<br/>
+          Put your file at <b>/images/kitchen.jpg</b> (case sensitive).
+        </div>
+      </div>
+
+      <div class="serviceArea">
+        <b>Service area</b>
+        <p>Lawton • Fort Sill • Elgin • Cache</p>
+        <p style="margin-top:8px;"><b>Good fit for:</b> busy families, military households, and anyone who wants it done right.</p>
+      </div>
+    </div>
   </section>
 
   <!-- PRICING -->
@@ -298,7 +349,7 @@ footer{
       <div class="card priceCard">
         <h3>Maintenance Cleaning</h3>
         <div class="price">$149 <small>+ tax</small></div>
-        <small>Depending on size • up to 6 hours</small>
+        <div class="smallLine">Depending on size • up to 6 hours</div>
         <ul>
           <li>Kitchen counters & exterior appliances</li>
           <li>Bathrooms cleaned & sanitized</li>
@@ -306,14 +357,14 @@ footer{
           <li>Dusting of reachable surfaces</li>
         </ul>
         <div class="cardActions">
-          <a class="btn primary" href="sms:15802150915">Text to quote</a>
+          <a class="btn primary" href="sms:+15802150915">Text to quote</a>
         </div>
       </div>
 
       <div class="card priceCard">
         <h3>Deep Cleaning</h3>
         <div class="price">$249 <small>+ tax</small></div>
-        <small>Depending on size • up to 10 hours</small>
+        <div class="smallLine">Depending on size • up to 10 hours</div>
         <ul>
           <li>Detailing of edges, ledges, buildup</li>
           <li>Baseboards / doors / frames wiped</li>
@@ -321,21 +372,21 @@ footer{
           <li>Extra focus on problem areas</li>
         </ul>
         <div class="cardActions">
-          <a class="btn primary" href="sms:15802150915">Text to quote</a>
+          <a class="btn primary" href="sms:+15802150915">Text to quote</a>
         </div>
       </div>
 
       <div class="card priceCard">
         <h3>Move-Out / Reset</h3>
         <div class="price">Custom</div>
-        <small>Best for rentals & listings</small>
+        <div class="smallLine">Best for rentals & listings</div>
         <ul>
           <li>Top-to-bottom turnover clean</li>
           <li>Interior detail based on scope</li>
           <li>Carpet extraction recommended</li>
         </ul>
         <div class="cardActions">
-          <a class="btn primary" href="sms:15802150915">Text to quote</a>
+          <a class="btn primary" href="sms:+15802150915">Text to quote</a>
         </div>
       </div>
     </div>
@@ -349,6 +400,7 @@ footer{
     <div class="split">
       <div class="card panel">
         <h3>What you get</h3>
+        <p>Real extraction — not just surface cleaning.</p>
         <div class="miniGrid">
           <div class="mini">Deep hot-water extraction</div>
           <div class="mini">Traffic lane focus</div>
@@ -356,12 +408,13 @@ footer{
           <div class="mini">Pet odor options</div>
         </div>
         <div class="cardActions">
-          <a class="btn primary" href="sms:15802150915">Text to quote</a>
+          <a class="btn primary" href="sms:+15802150915">Text to quote</a>
         </div>
       </div>
 
       <div class="card panel">
         <h3>Common add-ons</h3>
+        <p>Keep it simple — add only what you need.</p>
         <div class="miniGrid">
           <div class="mini">Pet odor treatment</div>
           <div class="mini">Spot treatment focus</div>
@@ -369,13 +422,13 @@ footer{
           <div class="mini">Deep clean + carpet combo</div>
         </div>
 
-        <div class="mini miniBanner">
-          <b>Want the full reset?</b><br>
+        <div class="miniBanner">
+          <b>Want the full reset?</b>
           Text us for a Deep Cleaning + Carpet quote and we’ll price it together.
         </div>
 
         <div class="cardActions">
-          <a class="btn primary" href="sms:15802150915">Text to quote</a>
+          <a class="btn primary" href="sms:+15802150915">Text to quote</a>
         </div>
       </div>
     </div>
@@ -383,8 +436,10 @@ footer{
 
 </main>
 
-<footer class="container">
-  © Red Prairie Cleaning • Lawton & Fort Sill • Text (580) 215-0915
+<footer>
+  <div class="container">
+    © Red Prairie Cleaning • Lawton & Fort Sill • Text (580) 215-0915
+  </div>
 </footer>
 
 </body>
