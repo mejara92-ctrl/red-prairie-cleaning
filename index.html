@@ -157,6 +157,15 @@
     .btn-ghost:hover{ transform: translateY(-1px); border-color: var(--line-2); }
     .btn-sm{ padding: 10px 12px; height: 40px; }
 
+    /* ✅ NEW: Desktop vs Mobile CTAs */
+    .cta-desktop{ display:flex; gap:10px; align-items:center; }
+    .cta-mobile{ display:none; gap:10px; align-items:center; flex-wrap:wrap; }
+
+    @media (max-width: 960px){
+      .cta-desktop{ display:none !important; }
+      .cta-mobile{ display:flex !important; }
+    }
+
     /* Card */
     .card{
       border:1px solid var(--line);
@@ -544,9 +553,18 @@
           <a href="#faq">FAQ</a>
         </div>
 
+        <!-- ✅ UPDATED CTAs -->
         <div class="navcta">
-          <a class="pill" href="tel:+15802150915">Call / Text (580) 215-0915</a>
-          <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+          <!-- Desktop: call + click to quote -->
+          <div class="cta-desktop">
+            <a class="pill" href="tel:+15802150915">Call (580) 215-0915</a>
+            <a class="btn btn-primary" href="/quote.html">Click to quote</a>
+          </div>
+
+          <!-- Mobile: text only -->
+          <div class="cta-mobile">
+            <a class="pill" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+          </div>
         </div>
       </div>
     </div>
@@ -569,10 +587,21 @@
             Text us for a quote — fast, simple, accurate.
           </p>
 
+          <!-- ✅ UPDATED HERO ACTIONS -->
           <div class="heroActions">
-            <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Quote%20request.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
-            <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
-            <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Carpet%20quote%20please.%20City%3A%20%5B%5D.%20Rooms%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Carpet quote</a>
+            <!-- Desktop: call buttons + click to quote -->
+            <div class="cta-desktop">
+              <a class="btn btn-ghost" href="tel:+15802150915">Call now</a>
+              <a class="btn btn-ghost" href="tel:+15802150915">Call for carpet</a>
+              <a class="btn btn-primary" href="/quote.html">Click to quote</a>
+            </div>
+
+            <!-- Mobile: text buttons only -->
+            <div class="cta-mobile">
+              <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Quote%20request.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
+              <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
+              <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Carpet%20quote%20please.%20City%3A%20%5B%5D.%20Rooms%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Carpet quote</a>
+            </div>
           </div>
 
           <div class="fineprint">
