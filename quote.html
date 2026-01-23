@@ -2,63 +2,112 @@
 <html lang="en">
 <head>
   <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-P47BCBHF');</script>
-  <!-- End Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-P47BCBHF');
+  </script>
+  <!-- End GTM -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Request a Quote | Red Prairie Cleaning</title>
+
+  <style>
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:#fff;
+      color:#111;
+      padding:40px;
+    }
+    h1{ margin-bottom:20px; }
+    label{
+      display:block;
+      margin-top:14px;
+      font-weight:600;
+    }
+    input, select, textarea{
+      width:100%;
+      max-width:420px;
+      padding:8px;
+      margin-top:4px;
+      font-size:14px;
+    }
+    textarea{ min-height:80px; }
+    button{
+      margin-top:20px;
+      padding:10px 16px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .back{
+      display:inline-block;
+      margin-top:16px;
+      font-size:13px;
+    }
+  </style>
 </head>
+
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P47BCBHF"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
+  <!-- GTM noscript -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P47BCBHF"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
 
   <h1>Request a Quote</h1>
 
-  <!-- NOTE: This form does NOT email you by itself. It only redirects to the thank-you page.
-       That's perfect for conversion tracking. Later we can wire it to email/CRM if you want. -->
-  <form action="/quote-thank-you.html" method="GET">
-    <p>
-      <label>Name<br>
-        <input name="name" required>
-      </label>
-    </p>
-    <p>
-      <label>Phone<br>
-        <input name="phone" required>
-      </label>
-    </p>
-    <p>
-      <label>Service<br>
-        <select name="service" required>
-          <option value="">Select…</option>
-          <option>Maintenance Cleaning</option>
-          <option>Deep Cleaning</option>
-          <option>Move-Out / Reset</option>
-          <option>Carpet Cleaning</option>
-        </select>
-      </label>
-    </p>
-    <p>
-      <label>Bedrooms / Baths<br>
-        <input name="size" placeholder="e.g., 3 bed / 2 bath">
-      </label>
-    </p>
-    <p>
-      <label>Notes<br>
-        <textarea name="notes" rows="4" placeholder="Anything important? Pets? Priority areas?"></textarea>
-      </label>
-    </p>
+  <form onsubmit="handleQuoteSubmit(event)">
+    <label>
+      Name
+      <input type="text" required>
+    </label>
+
+    <label>
+      Phone
+      <input type="tel" required>
+    </label>
+
+    <label>
+      Service
+      <select required>
+        <option value="">Select…</option>
+        <option>Maintenance Cleaning</option>
+        <option>Deep Cleaning</option>
+        <option>Move-Out Cleaning</option>
+        <option>Carpet Cleaning</option>
+      </select>
+    </label>
+
+    <label>
+      Bedrooms / Baths
+      <input type="text" placeholder="e.g. 3 bed / 2 bath">
+    </label>
+
+    <label>
+      Notes
+      <textarea placeholder="Pets? priorities? timing?"></textarea>
+    </label>
 
     <button type="submit">Submit Quote Request</button>
   </form>
 
-  <p><a href="/">← Back to home</a></p>
+  <a class="back" href="/">← Back to home</a>
+
+  <script>
+    function handleQuoteSubmit(e) {
+      e.preventDefault();
+
+      // optional GTM event (safe even if unused)
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "quote_submitted" });
+
+      // THIS is the conversion trigger
+      window.location.href = "/quote-thank-you.html";
+    }
+  </script>
 </body>
 </html>
