@@ -1,418 +1,200 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Google Tag Manager -->
-  <script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-P47BCBHF');
-  </script>
-  <!-- End GTM -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Request a Quote | Red Prairie Cleaning</title>
-  <meta name="description" content="Request a quote for home cleaning or carpet cleaning in Lawton, Fort Sill, Elgin, and Cache." />
+
+  <meta name="description" content="Request a cleaning or carpet cleaning quote from Red Prairie Cleaning. Serving Lawton, Fort Sill, Elgin, and Cache." />
 
   <style>
     :root{
+      --red:#B11226;
+      --red-dark:#8F0E1F;
       --bg:#ffffff;
-      --surface:#ffffff;
-      --surface2:#fbfbfd;
+      --surface:#f9fafb;
       --ink:#0b0b10;
       --muted:#6b7280;
-      --line: rgba(11,11,16,.10);
-      --shadow: 0 18px 55px rgba(11,11,16,.08);
-      --shadow2: 0 10px 28px rgba(11,11,16,.07);
-
-      --red:#B11226;
-      --red2:#8F0E1F;
-      --redSoft: rgba(177,18,38,.10);
-      --radius: 22px;
-      --radius2: 16px;
-      --max: 980px;
+      --line:rgba(0,0,0,.12);
+      --radius:18px;
+      --shadow:0 18px 40px rgba(0,0,0,.08);
+      --max:720px;
     }
 
     *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; }
     body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color: var(--ink);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
-        #fff;
-      line-height: 1.45;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      padding: 36px 18px;
-    }
-    a{ color:inherit; text-decoration:none; }
-    .container{
-      width: min(var(--max), 100%);
-      margin: 0 auto;
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(900px 400px at 10% 0%, rgba(177,18,38,.08), transparent 55%), #fff;
+      color:var(--ink);
     }
 
-    /* Header */
-    .top{
+    .wrap{
+      min-height:100vh;
       display:flex;
       align-items:center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
+      justify-content:center;
+      padding:32px 20px;
     }
+
+    .card{
+      width:100%;
+      max-width:var(--max);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+
     .brand{
       display:flex;
       align-items:center;
-      gap: 12px;
-      min-width: 220px;
+      gap:12px;
+      margin-bottom:18px;
     }
     .logo{
-      width:44px; height:44px;
-      border-radius: 14px;
-      display:grid; place-items:center;
-      background: var(--red);
+      width:44px;height:44px;
+      border-radius:14px;
+      background:var(--red);
       color:#fff;
-      font-weight: 950;
-      letter-spacing:.3px;
-      box-shadow: 0 16px 30px rgba(177,18,38,.22);
-      flex:0 0 auto;
+      font-weight:900;
+      display:grid;
+      place-items:center;
     }
-    .brandText b{
-      display:block;
-      font-size: 14px;
-      letter-spacing: .6px;
-    }
-    .brandText span{
-      display:block;
-      color: var(--muted);
-      font-size: 12.5px;
-      margin-top: 2px;
-    }
-    .headerActions{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .pill{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.9);
-      padding: 10px 12px;
-      border-radius: 999px;
-      box-shadow: 0 10px 22px rgba(11,11,16,.06);
-      font-weight: 850;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .pill strong{ color: var(--red); }
+    .brand b{ font-size:18px; }
+    .brand span{ display:block; font-size:13px; color:var(--muted); }
 
-    /* Card */
-    .card{
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .cardHead{
-      padding: 20px 20px 14px;
-      border-bottom: 1px solid var(--line);
-      background:
-        radial-gradient(900px 420px at 10% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
-        #fff;
-    }
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      background: var(--redSoft);
-      color: var(--red);
-      border: 1px solid rgba(177,18,38,.18);
-      font-weight: 900;
-      font-size: 12.5px;
-      letter-spacing: .15px;
-    }
-    .dot{
-      width:9px; height:9px;
-      border-radius: 50%;
-      background: var(--red);
-      box-shadow: 0 0 0 5px rgba(177,18,38,.12);
-    }
     h1{
-      margin: 12px 0 6px;
-      font-size: clamp(26px, 3.2vw, 36px);
-      letter-spacing: -0.6px;
-      line-height: 1.1;
+      margin:6px 0 6px;
+      font-size:32px;
+      letter-spacing:-.5px;
     }
-    .sub{
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      max-width: 70ch;
+    .lead{
+      margin:0 0 22px;
+      color:var(--muted);
+      font-size:15px;
     }
 
-    .grid{
+    form{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 0;
-    }
-    .formCol{ padding: 18px 20px 20px; }
-    .sideCol{
-      padding: 18px 20px 20px;
-      border-left: 1px solid var(--line);
-      background: var(--surface2);
+      gap:14px;
     }
 
-    /* Inputs */
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
     label{
-      display:block;
-      font-weight: 850;
-      font-size: 12.5px;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-    .field{
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background:#fff;
-      padding: 10px 12px;
-      font-size: 14px;
-      width: 100%;
-      outline: none;
-      transition: border-color .12s ease, box-shadow .12s ease;
-    }
-    .field:focus{
-      border-color: rgba(177,18,38,.35);
-      box-shadow: 0 0 0 4px rgba(177,18,38,.10);
-    }
-    textarea.field{ min-height: 110px; resize: vertical; }
-
-    .hint{
-      margin-top: 10px;
-      font-size: 12.5px;
-      color: var(--muted);
+      font-weight:700;
+      font-size:13px;
     }
 
-    /* Buttons */
-    .actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-      align-items:center;
+    input, select, textarea{
+      width:100%;
+      margin-top:6px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-size:14px;
+      font-family:inherit;
     }
-    .btn{
+
+    textarea{ resize:vertical; }
+
+    button{
+      margin-top:10px;
+      height:46px;
+      border-radius:999px;
       border:0;
-      cursor:pointer;
-      border-radius: 999px;
-      padding: 11px 14px;
-      font-weight: 950;
-      letter-spacing: .15px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      user-select:none;
-      transition: transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
-      white-space: nowrap;
-      height: 42px;
-      font-size: 13px;
-    }
-    .btnPrimary{
-      background: var(--red);
+      background:var(--red);
       color:#fff;
-      box-shadow: 0 16px 34px rgba(177,18,38,.22);
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 14px 30px rgba(177,18,38,.25);
     }
-    .btnPrimary:hover{ background: var(--red2); transform: translateY(-1px); }
-    .btnGhost{
-      background:#fff;
-      border: 1px solid var(--line);
-      color: var(--ink);
-      box-shadow: 0 10px 22px rgba(11,11,16,.06);
-    }
-    .btnGhost:hover{ transform: translateY(-1px); border-color: rgba(11,11,16,.16); }
+    button:hover{ background:var(--red-dark); }
 
-    /* Sidebar */
-    .sideCard{
-      border: 1px solid var(--line);
-      border-radius: var(--radius2);
-      background:#fff;
-      padding: 14px;
-      box-shadow: var(--shadow2);
-      margin-bottom: 12px;
+    .fine{
+      margin-top:14px;
+      font-size:12.5px;
+      color:var(--muted);
     }
-    .sideCard b{ display:block; margin-bottom: 6px; }
-    .sideCard p{ margin:0; color: var(--muted); font-size: 13px; }
-    .miniList{
-      margin: 10px 0 0;
-      padding-left: 16px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .miniList li{ margin: 6px 0; }
 
-    .backLink{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      margin-top: 14px;
-      color: var(--muted);
-      font-weight: 850;
-      font-size: 13px;
-    }
-    .backLink:hover{ color: var(--ink); }
-
-    @media (max-width: 900px){
-      body{ padding: 20px 14px; }
-      .grid{ grid-template-columns: 1fr; }
-      .sideCol{ border-left: 0; border-top: 1px solid var(--line); }
-      .row{ grid-template-columns: 1fr; }
-      .top{ flex-direction: column; align-items:flex-start; }
-      .headerActions{ justify-content:flex-start; }
+    .back{
+      margin-top:10px;
+      display:inline-block;
+      font-size:13px;
+      font-weight:800;
+      color:var(--red);
+      text-decoration:none;
     }
   </style>
 </head>
 
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P47BCBHF"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe>
-  </noscript>
-  <!-- End GTM (noscript) -->
+  <div class="wrap">
+    <div class="card">
 
-  <div class="container">
-    <div class="top">
       <div class="brand">
         <div class="logo">RP</div>
-        <div class="brandText">
-          <b>RED PRAIRIE CLEANING</b>
+        <div>
+          <b>Red Prairie Cleaning</b>
           <span>Lawton • Fort Sill • Elgin • Cache</span>
         </div>
       </div>
 
-      <div class="headerActions">
-        <a class="pill" href="tel:+15802150915">Call / Text: <strong>(580) 215-0915</strong></a>
-        <a class="pill" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Prefer texting? Tap here</a>
+      <h1>Request a Quote</h1>
+      <p class="lead">
+        Fill this out and we’ll follow up by text or call to confirm details and pricing.
+      </p>
+
+      <!-- FORM -->
+      <form
+        action="https://formspree.io/f/maqebnjg"
+        method="POST"
+      >
+        <input type="hidden" name="_redirect" value="https://redprairiecleaning.com/quote-thank-you.html">
+        <input type="hidden" name="source" value="Website Quote Form">
+
+        <label>
+          Name
+          <input type="text" name="name" required>
+        </label>
+
+        <label>
+          Phone
+          <input type="tel" name="phone" required>
+        </label>
+
+        <label>
+          Service
+          <select name="service" required>
+            <option value="" disabled selected>Select a service</option>
+            <option>Maintenance Cleaning</option>
+            <option>Deep Cleaning</option>
+            <option>Move-out / Reset</option>
+            <option>Carpet Cleaning</option>
+          </select>
+        </label>
+
+        <label>
+          Bedrooms / Baths
+          <input type="text" name="bed_bath" placeholder="e.g. 3 bed / 2 bath">
+        </label>
+
+        <label>
+          Notes
+          <textarea name="notes" rows="5" placeholder="Pets? priority areas? heavy buildup? preferred date?"></textarea>
+        </label>
+
+        <button type="submit">Submit Quote Request</button>
+      </form>
+
+      <div class="fine">
+        This form sends directly to Red Prairie Cleaning. No spam.
       </div>
-    </div>
 
-    <div class="card">
-      <div class="cardHead">
-        <div class="kicker"><span class="dot"></span> Fast quote request</div>
-        <h1>Request a Quote</h1>
-        <p class="sub">Fill this out and hit submit.</p>
-      </div>
+      <a class="back" href="/">← Back to home</a>
 
-      <div class="grid">
-        <!-- FORM -->
-        <div class="formCol">
-          <form onsubmit="handleQuoteSubmit(event)" autocomplete="on">
-            <div class="row">
-              <div>
-                <label for="name">Name</label>
-                <input id="name" class="field" type="text" placeholder="Your name" required />
-              </div>
-              <div>
-                <label for="phone">Phone</label>
-                <input id="phone" class="field" type="tel" placeholder="(580) 555-1234" required />
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="city">City</label>
-                <select id="city" class="field" required>
-                  <option value="">Select…</option>
-                  <option>Lawton</option>
-                  <option>Fort Sill</option>
-                  <option>Elgin</option>
-                  <option>Cache</option>
-                  <option>Other / Nearby</option>
-                </select>
-              </div>
-              <div>
-                <label for="service">Service</label>
-                <select id="service" class="field" required>
-                  <option value="">Select…</option>
-                  <option>Maintenance Cleaning</option>
-                  <option>Deep Cleaning</option>
-                  <option>Move-Out / Reset</option>
-                  <option>Carpet Cleaning</option>
-                  <option>Deep + Carpet Combo</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="beds">Bedrooms / Baths</label>
-                <input id="beds" class="field" type="text" placeholder="e.g. 3 bed / 2 bath" />
-              </div>
-              <div>
-                <label for="date">Preferred Date</label>
-                <input id="date" class="field" type="text" placeholder="e.g. Friday afternoon" />
-              </div>
-            </div>
-
-            <div style="margin-top:12px;">
-              <label for="notes">Notes (pets, priorities, heavy buildup, etc.)</label>
-              <textarea id="notes" class="field" placeholder="Tell us what matters most…"></textarea>
-            </div>
-
-            <div class="hint">Submitting will redirect to <b>/quote-thank-you.html</b> for tracking.</div>
-
-            <div class="actions">
-              <button class="btn btnPrimary" type="submit">Submit Quote Request</button>
-              <a class="btn btnGhost" href="/">Back to home</a>
-            </div>
-          </form>
-        </div>
-
-        <!-- SIDEBAR -->
-        <div class="sideCol">
-          <div class="sideCard">
-            <b>What happens next?</b>
-            <p>We’ll review your request and follow up by text or call to confirm details and pricing.</p>
-            <ul class="miniList">
-              <li>Fast response during normal hours</li>
-              <li>Photos help for heavy buildup or pet issues</li>
-              <li>We’ll set expectations on stains/odor upfront</li>
-            </ul>
-          </div>
-
-          <div class="sideCard">
-            <b>Quick tip</b>
-            <p>If you’re doing carpet cleaning: include rooms + whether there’s pet odor/stains.</p>
-          </div>
-
-          <a class="backLink" href="/">← Back to home</a>
-        </div>
-      </div>
     </div>
   </div>
-
-  <script>
-    function handleQuoteSubmit(e) {
-      e.preventDefault();
-
-      // GTM event (optional, but useful later if you want a custom trigger)
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: "quote_submitted" });
-
-      // Conversion trigger: redirect to thank-you page
-      window.location.href = "/quote-thank-you.html";
-    }
-  </script>
 </body>
 </html>
