@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <title>Quote Request Received | Red Prairie Cleaning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <!-- Google Tag Manager -->
   <script>
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -11,303 +15,54 @@
   </script>
   <!-- End GTM -->
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quote Request Received | Red Prairie Cleaning</title>
-  <meta name="description" content="Thanks! Your quote request was received. Red Prairie Cleaning will follow up by text or call." />
-
   <style>
-    :root{
-      --bg:#ffffff;
-      --surface:#ffffff;
-      --surface2:#fbfbfd;
-      --ink:#0b0b10;
-      --muted:#6b7280;
-      --line: rgba(11,11,16,.10);
-      --shadow: 0 18px 55px rgba(11,11,16,.08);
-      --shadow2: 0 10px 28px rgba(11,11,16,.07);
-
-      --red:#B11226;
-      --red2:#8F0E1F;
-      --redSoft: rgba(177,18,38,.10);
-      --radius: 22px;
-      --radius2: 16px;
-      --max: 980px;
-    }
-
-    *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; }
     body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color: var(--ink);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
-        #fff;
-      line-height: 1.45;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      padding: 36px 18px;
-    }
-    a{ color:inherit; text-decoration:none; }
-    .container{
-      width: min(var(--max), 100%);
-      margin: 0 auto;
-    }
-
-    .top{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:#ffffff;
       display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      min-width: 220px;
-    }
-    .logo{
-      width:44px; height:44px;
-      border-radius: 14px;
-      display:grid; place-items:center;
-      background: var(--red);
-      color:#fff;
-      font-weight: 950;
-      letter-spacing:.3px;
-      box-shadow: 0 16px 30px rgba(177,18,38,.22);
-      flex:0 0 auto;
-    }
-    .brandText b{
-      display:block;
-      font-size: 14px;
-      letter-spacing: .6px;
-    }
-    .brandText span{
-      display:block;
-      color: var(--muted);
-      font-size: 12.5px;
-      margin-top: 2px;
-    }
-
-    .pill{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.9);
-      padding: 10px 12px;
-      border-radius: 999px;
-      box-shadow: 0 10px 22px rgba(11,11,16,.06);
-      font-weight: 850;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .pill strong{ color: var(--red); }
-
-    .card{
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .cardHead{
-      padding: 20px 20px 14px;
-      border-bottom: 1px solid var(--line);
-      background:
-        radial-gradient(900px 420px at 10% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
-        #fff;
-    }
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      background: var(--redSoft);
-      color: var(--red);
-      border: 1px solid rgba(177,18,38,.18);
-      font-weight: 900;
-      font-size: 12.5px;
-      letter-spacing: .15px;
-    }
-    .dot{
-      width:9px; height:9px;
-      border-radius: 50%;
-      background: var(--red);
-      box-shadow: 0 0 0 5px rgba(177,18,38,.12);
-    }
-    h1{
-      margin: 12px 0 6px;
-      font-size: clamp(26px, 3.2vw, 40px);
-      letter-spacing: -0.6px;
-      line-height: 1.1;
-    }
-    .sub{
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      max-width: 70ch;
-    }
-
-    .body{
-      padding: 18px 20px 22px;
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 14px;
-      align-items:start;
-    }
-
-    .success{
-      border: 1px solid rgba(177,18,38,.20);
-      background: rgba(177,18,38,.06);
-      border-radius: var(--radius2);
-      padding: 14px;
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-    }
-    .check{
-      width:36px; height:36px;
-      border-radius: 14px;
-      background: var(--red);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-weight: 950;
-      flex:0 0 auto;
-      box-shadow: 0 16px 30px rgba(177,18,38,.20);
-    }
-    .success b{ display:block; }
-    .success p{ margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
-
-    .sideCard{
-      border: 1px solid var(--line);
-      border-radius: var(--radius2);
-      background:#fff;
-      padding: 14px;
-      box-shadow: var(--shadow2);
-    }
-    .sideCard b{ display:block; margin-bottom: 6px; }
-    .sideCard p{ margin:0; color: var(--muted); font-size: 13px; }
-    .miniList{
-      margin: 10px 0 0;
-      padding-left: 16px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .miniList li{ margin: 6px 0; }
-
-    .actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-    .btn{
-      border:0;
-      cursor:pointer;
-      border-radius: 999px;
-      padding: 11px 14px;
-      font-weight: 950;
-      letter-spacing: .15px;
-      display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap: 10px;
-      user-select:none;
-      transition: transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
-      white-space: nowrap;
-      height: 42px;
-      font-size: 13px;
+      height:100vh;
+      margin:0;
     }
-    .btnPrimary{
-      background: var(--red);
+    .card{
+      max-width:520px;
+      border:1px solid #eee;
+      border-radius:18px;
+      padding:28px;
+      text-align:center;
+      box-shadow:0 20px 40px rgba(0,0,0,.08);
+    }
+    h1{ margin:0 0 10px; }
+    p{ color:#555; }
+    a{
+      display:inline-block;
+      margin-top:18px;
+      padding:12px 18px;
+      border-radius:999px;
+      background:#B11226;
       color:#fff;
-      box-shadow: 0 16px 34px rgba(177,18,38,.22);
-    }
-    .btnPrimary:hover{ background: var(--red2); transform: translateY(-1px); }
-    .btnGhost{
-      background:#fff;
-      border: 1px solid var(--line);
-      color: var(--ink);
-      box-shadow: 0 10px 22px rgba(11,11,16,.06);
-    }
-    .btnGhost:hover{ transform: translateY(-1px); border-color: rgba(11,11,16,.16); }
-
-    .fine{
-      margin-top: 10px;
-      font-size: 12.5px;
-      color: var(--muted);
-    }
-
-    @media (max-width: 900px){
-      body{ padding: 20px 14px; }
-      .top{ flex-direction: column; align-items:flex-start; }
-      .body{ grid-template-columns: 1fr; }
+      text-decoration:none;
+      font-weight:700;
     }
   </style>
 </head>
 
 <body>
-  <!-- Google Tag Manager (noscript) -->
+  <!-- GTM noscript -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P47BCBHF"
     height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
-  <!-- End GTM (noscript) -->
 
-  <div class="container">
-    <div class="top">
-      <div class="brand">
-        <div class="logo">RP</div>
-        <div class="brandText">
-          <b>RED PRAIRIE CLEANING</b>
-          <span>Lawton • Fort Sill • Elgin • Cache</span>
-        </div>
-      </div>
+  <div class="card">
+    <h1>✅ Quote received</h1>
+    <p>
+      Thanks — we got your request.<br>
+      We’ll text or call you shortly to confirm details and pricing.
+    </p>
 
-      <a class="pill" href="tel:+15802150915">Call / Text: <strong>(580) 215-0915</strong></a>
-    </div>
-
-    <div class="card">
-      <div class="cardHead">
-        <div class="kicker"><span class="dot"></span> Quote request submitted</div>
-        <h1>✅ Thanks — we got it.</h1>
-        <p class="sub">We’ll follow up by text or call shortly to confirm details and pricing.</p>
-      </div>
-
-      <div class="body">
-        <div>
-          <div class="success">
-            <div class="check">✓</div>
-            <div>
-              <b>Next steps</b>
-              <p>If you have photos (heavy buildup, pet issues, specific rooms), texting them helps us quote faster.</p>
-            </div>
-          </div>
-
-          <div class="actions">
-            <a class="btn btnPrimary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20my%20quote.%20Address%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text photos</a>
-            <a class="btn btnGhost" href="/quote.html">Submit another quote</a>
-            <a class="btn btnGhost" href="/">Back to home</a>
-          </div>
-
-          <div class="fine">
-            If this was time-sensitive, call or text us now: (580) 215-0915
-          </div>
-        </div>
-
-        <div class="sideCard">
-          <b>What we may ask</b>
-          <p>Quick details so your quote is accurate.</p>
-          <ul class="miniList">
-            <li>Bedrooms / baths + overall condition</li>
-            <li>Any priority areas or heavy buildup</li>
-            <li>Carpet rooms + pet odor/stains (if applicable)</li>
-            <li>Preferred day/time window</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <a href="/index.html">Back to home</a>
   </div>
 </body>
 </html>
