@@ -15,6 +15,31 @@
   </script>
   <!-- End GTM -->
 
+  <!-- Google tag (gtag.js) for Google Ads -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    // Configure Google Ads
+    gtag('config', 'AW-17734105967');
+
+    // Fire conversion ONLY once per session to reduce accidental double-counting on refresh
+    (function () {
+      try {
+        var key = 'rp_quote_conversion_fired';
+        if (!sessionStorage.getItem(key)) {
+          gtag('event', 'conversion', {'send_to': 'AW-17734105967/1iOSCM_yoesbEO_2o4hC'});
+          sessionStorage.setItem(key, '1');
+        }
+      } catch (e) {
+        // If storage is blocked, still attempt to fire conversion
+        gtag('event', 'conversion', {'send_to': 'AW-17734105967/1iOSCM_yoesbEO_2o4hC'});
+      }
+    })();
+  </script>
+
   <style>
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -34,7 +59,7 @@
       box-shadow:0 20px 40px rgba(0,0,0,.08);
     }
     h1{ margin:0 0 10px; }
-    p{ color:#555; }
+    p{ color:#555; line-height:1.45; }
     a{
       display:inline-block;
       margin-top:18px;
