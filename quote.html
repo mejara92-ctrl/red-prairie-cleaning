@@ -1,200 +1,549 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-P47BCBHF');</script>
+  <!-- End Google Tag Manager -->
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Request a Quote | Red Prairie Cleaning</title>
-
-  <meta name="description" content="Request a cleaning or carpet cleaning quote from Red Prairie Cleaning. Serving Lawton, Fort Sill, Elgin, and Cache." />
+  <meta name="description" content="Request a cleaning or carpet quote from Red Prairie Cleaning. Serving Lawton, Fort Sill, Elgin, Cache." />
 
   <style>
     :root{
-      --red:#B11226;
-      --red-dark:#8F0E1F;
       --bg:#ffffff;
-      --surface:#f9fafb;
+      --surface:#ffffff;
+      --surface2:#fbfbfd;
       --ink:#0b0b10;
+      --ink2:#171722;
       --muted:#6b7280;
-      --line:rgba(0,0,0,.12);
-      --radius:18px;
-      --shadow:0 18px 40px rgba(0,0,0,.08);
-      --max:720px;
+      --line: rgba(11,11,16,.10);
+      --line2: rgba(11,11,16,.16);
+
+      --red:#B11226;
+      --red2:#8F0E1F;
+      --redSoft: rgba(177,18,38,.10);
+      --redSoft2: rgba(177,18,38,.16);
+
+      --shadow: 0 18px 55px rgba(11,11,16,.08);
+      --shadow2: 0 10px 28px rgba(11,11,16,.07);
+
+      --rXL: 22px;
+      --rLG: 18px;
+      --rMD: 14px;
+
+      --max: 980px;
     }
 
     *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; }
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(900px 400px at 10% 0%, rgba(177,18,38,.08), transparent 55%), #fff;
-      color:var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 480px at 20% 0%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
+        var(--bg);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a{ color:inherit; }
+
+    .container{
+      width:min(var(--max), calc(100% - 40px));
+      margin:0 auto;
     }
 
-    .wrap{
-      min-height:100vh;
+    /* Top bar */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav{
       display:flex;
       align-items:center;
-      justify-content:center;
-      padding:32px 20px;
+      justify-content:space-between;
+      gap:14px;
+      padding: 14px 0;
     }
-
-    .card{
-      width:100%;
-      max-width:var(--max);
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:28px;
-    }
-
     .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:18px;
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none;
+      font-weight: 950;
+      letter-spacing: .2px;
     }
     .logo{
-      width:44px;height:44px;
-      border-radius:14px;
-      background:var(--red);
+      width:36px; height:36px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: var(--red);
       color:#fff;
-      font-weight:900;
-      display:grid;
-      place-items:center;
+      font-weight: 980;
+      box-shadow: 0 14px 26px rgba(177,18,38,.22);
+      flex:0 0 auto;
     }
-    .brand b{ font-size:18px; }
-    .brand span{ display:block; font-size:13px; color:var(--muted); }
-
-    h1{
-      margin:6px 0 6px;
-      font-size:32px;
-      letter-spacing:-.5px;
-    }
-    .lead{
-      margin:0 0 22px;
-      color:var(--muted);
-      font-size:15px;
-    }
-
-    form{
-      display:grid;
-      gap:14px;
-    }
-
-    label{
+    .brand small{
+      display:block;
       font-weight:700;
-      font-size:13px;
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-top: 2px;
+      letter-spacing: .1px;
+    }
+    .pill{
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 20px rgba(11,11,16,.06);
+      font-weight: 900;
+      white-space: nowrap;
+      font-size: 13px;
+      text-decoration:none;
     }
 
+    /* Main card */
+    .wrap{
+      padding: 34px 0 56px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--rXL);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .header{
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(11,11,16,.02) 100%),
+        var(--surface);
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--redSoft);
+      color: var(--red);
+      border: 1px solid rgba(177,18,38,.18);
+      font-weight: 950;
+      letter-spacing: .15px;
+      font-size: 12.5px;
+    }
+    .dot{
+      width:10px; height:10px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 0 5px var(--redSoft2);
+    }
+    h1{
+      margin: 12px 0 6px;
+      font-size: clamp(26px, 3vw, 34px);
+      letter-spacing: -.6px;
+      line-height: 1.1;
+    }
+    .sub{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13.5px;
+      max-width: 80ch;
+    }
+
+    .content{
+      padding: 18px 22px 22px;
+      display:grid;
+      grid-template-columns: 1fr .92fr;
+      gap: 16px;
+      align-items:start;
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius: var(--rLG);
+      background: #fff;
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
+      padding: 16px;
+    }
+    .panel h2{
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing: -.2px;
+    }
+    .panel p{
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Form */
+    form{ margin:0; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .field{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label{
+      font-size: 12.5px;
+      color: var(--ink2);
+      font-weight: 900;
+      letter-spacing: .1px;
+    }
     input, select, textarea{
       width:100%;
-      margin-top:6px;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      font-size:14px;
-      font-family:inherit;
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      transition: border-color .12s ease, box-shadow .12s ease;
     }
+    textarea{ min-height: 110px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(177,18,38,.45);
+      box-shadow: 0 0 0 4px rgba(177,18,38,.12);
+    }
+    .full{ grid-column: 1 / -1; }
 
-    textarea{ resize:vertical; }
-
-    button{
-      margin-top:10px;
-      height:46px;
-      border-radius:999px;
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .btn{
       border:0;
-      background:var(--red);
-      color:#fff;
-      font-weight:900;
-      font-size:14px;
       cursor:pointer;
-      box-shadow:0 14px 30px rgba(177,18,38,.25);
-    }
-    button:hover{ background:var(--red-dark); }
-
-    .fine{
-      margin-top:14px;
-      font-size:12.5px;
-      color:var(--muted);
-    }
-
-    .back{
-      margin-top:10px;
-      display:inline-block;
-      font-size:13px;
-      font-weight:800;
-      color:var(--red);
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 950;
+      letter-spacing: .15px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
+      white-space: nowrap;
+      height: 42px;
+      font-size: 13px;
       text-decoration:none;
+    }
+    .btn-primary{
+      background: var(--red);
+      color:#fff;
+      box-shadow: 0 16px 34px rgba(177,18,38,.22);
+    }
+    .btn-primary:hover{ background: var(--red2); transform: translateY(-1px); }
+    .btn-ghost{
+      background:#fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      box-shadow: 0 10px 22px rgba(11,11,16,.06);
+    }
+    .btn-ghost:hover{ transform: translateY(-1px); border-color: var(--line2); }
+
+    .fineprint{
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    /* Status */
+    .status{
+      display:none;
+      margin-top: 10px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: var(--surface2);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .status.show{ display:block; }
+    .status.ok{
+      border-color: rgba(16,185,129,.25);
+      background: rgba(16,185,129,.08);
+      color: #065f46;
+    }
+    .status.err{
+      border-color: rgba(239,68,68,.25);
+      background: rgba(239,68,68,.08);
+      color: #7f1d1d;
+    }
+
+    /* Right column info cards */
+    .mini{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--surface2);
+      margin-top: 10px;
+    }
+    .mini b{ display:block; font-size: 13px; }
+    .mini span{ display:block; color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+    ul{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12.8px;
+    }
+    li{ margin: 6px 0; }
+
+    /* Footer row */
+    .foot{
+      padding: 14px 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 880px){
+      .content{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="card">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P47BCBHF"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
-      <div class="brand">
-        <div class="logo">RP</div>
-        <div>
-          <b>Red Prairie Cleaning</b>
-          <span>Lawton • Fort Sill • Elgin • Cache</span>
-        </div>
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="/index.html">
+          <div class="logo">RP</div>
+          <div>
+            RED PRAIRIE CLEANING
+            <small>Lawton • Fort Sill • Elgin • Cache</small>
+          </div>
+        </a>
+
+        <a class="pill" href="tel:+15802150915">Call / Text: (580) 215-0915</a>
       </div>
-
-      <h1>Request a Quote</h1>
-      <p class="lead">
-        Fill this out and we’ll follow up by text or call to confirm details and pricing.
-      </p>
-
-      <!-- FORM -->
-      <form
-        action="https://formspree.io/f/maqebnjg"
-        method="POST"
-      >
-        <input type="hidden" name="_redirect" value="https://redprairiecleaning.com/quote-thank-you.html">
-        <input type="hidden" name="source" value="Website Quote Form">
-
-        <label>
-          Name
-          <input type="text" name="name" required>
-        </label>
-
-        <label>
-          Phone
-          <input type="tel" name="phone" required>
-        </label>
-
-        <label>
-          Service
-          <select name="service" required>
-            <option value="" disabled selected>Select a service</option>
-            <option>Maintenance Cleaning</option>
-            <option>Deep Cleaning</option>
-            <option>Move-out / Reset</option>
-            <option>Carpet Cleaning</option>
-          </select>
-        </label>
-
-        <label>
-          Bedrooms / Baths
-          <input type="text" name="bed_bath" placeholder="e.g. 3 bed / 2 bath">
-        </label>
-
-        <label>
-          Notes
-          <textarea name="notes" rows="5" placeholder="Pets? priority areas? heavy buildup? preferred date?"></textarea>
-        </label>
-
-        <button type="submit">Submit Quote Request</button>
-      </form>
-
-      <div class="fine">
-        This form sends directly to Red Prairie Cleaning. No spam.
-      </div>
-
-      <a class="back" href="/">← Back to home</a>
-
     </div>
   </div>
+
+  <div class="wrap">
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <div class="kicker"><span class="dot"></span> Quote request</div>
+          <h1>Request a Quote</h1>
+          <p class="sub">
+            Fill this out and we’ll text you back with pricing and next steps. (Fastest.)
+          </p>
+        </div>
+
+        <div class="content">
+          <!-- LEFT: FORM -->
+          <div class="panel">
+            <h2>Your details</h2>
+            <p>Quick info so we can price it accurately.</p>
+
+            <!-- IMPORTANT: Formspree endpoint -->
+            <form id="quoteForm" action="https://formspree.io/f/maqebnjg" method="POST" novalidate>
+              <!-- Helps Formspree build a nice email subject -->
+              <input type="hidden" name="_subject" value="New Quote Request — Red Prairie Cleaning" />
+
+              <div class="grid">
+                <div class="field">
+                  <label for="name">Name</label>
+                  <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required />
+                </div>
+
+                <div class="field">
+                  <label for="phone">Phone</label>
+                  <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(580) 555-1234" required />
+                </div>
+
+                <div class="field">
+                  <label for="service">Service</label>
+                  <select id="service" name="service" required>
+                    <option value="" selected disabled>Select…</option>
+                    <option>Maintenance Cleaning</option>
+                    <option>Deep Cleaning</option>
+                    <option>Move-Out / Reset</option>
+                    <option>Carpet Cleaning</option>
+                    <option>Deep + Carpet Combo</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="city">City</label>
+                  <select id="city" name="city" required>
+                    <option value="" selected disabled>Select…</option>
+                    <option>Lawton</option>
+                    <option>Fort Sill</option>
+                    <option>Elgin</option>
+                    <option>Cache</option>
+                    <option>Other / Nearby</option>
+                  </select>
+                </div>
+
+                <div class="field full">
+                  <label for="bedsBaths">Bedrooms / Baths</label>
+                  <input id="bedsBaths" name="beds_baths" type="text" placeholder="e.g., 3 bed / 2 bath" />
+                </div>
+
+                <div class="field full">
+                  <label for="preferredDate">Preferred date / time window</label>
+                  <input id="preferredDate" name="preferred_date" type="text" placeholder="e.g., Saturday morning / next week anytime" />
+                </div>
+
+                <div class="field full">
+                  <label for="notes">Notes (pets, priorities, condition, carpet rooms, odors/stains)</label>
+                  <textarea id="notes" name="notes" placeholder="Anything important? Pets? Priority areas? Heavy buildup? Carpet rooms? Pet odor/stains?"></textarea>
+                </div>
+
+                <!-- Honeypot (spam prevention). Keep hidden visually. -->
+                <div class="field full" style="display:none;">
+                  <label for="company">Company</label>
+                  <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btn btn-primary" id="submitBtn" type="submit">Submit Quote Request</button>
+                <a class="btn btn-ghost" href="/index.html">Back to home</a>
+              </div>
+
+              <div class="fineprint">
+                By submitting, you agree we may contact you by text/call about this request.
+              </div>
+
+              <div id="status" class="status" aria-live="polite"></div>
+            </form>
+          </div>
+
+          <!-- RIGHT: INFO -->
+          <div class="panel">
+            <h2>What we may ask</h2>
+            <p>These details make your quote faster and more accurate.</p>
+
+            <div class="mini">
+              <b>Helpful details</b>
+              <ul>
+                <li>Bedrooms/baths + overall condition</li>
+                <li>Top priority areas (kitchen, bathrooms, baseboards)</li>
+                <li>Any heavy buildup / pet issues</li>
+                <li>Carpet rooms + odor/stains (if applicable)</li>
+                <li>Preferred date/time window</li>
+              </ul>
+            </div>
+
+            <div class="mini">
+              <b>Prefer texting?</b>
+              <span>
+                You can always text us instead:
+                <a href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%2FCarpet%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D."
+                   style="color:var(--red); font-weight:950;">(580) 215-0915</a>
+              </span>
+            </div>
+
+            <div class="mini">
+              <b>Service area</b>
+              <span>Lawton • Fort Sill • Elgin • Cache</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">
+          <span>Red Prairie Cleaning — Quote Request</span>
+          <span>Call/Text: <a href="tel:+15802150915" style="color:var(--red);font-weight:950;">(580) 215-0915</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // FREE Formspree flow: submit via fetch, then redirect to YOUR thank-you page.
+    // This avoids Formspree paid redirect features.
+    (function () {
+      const form = document.getElementById('quoteForm');
+      const status = document.getElementById('status');
+      const btn = document.getElementById('submitBtn');
+
+      function setStatus(message, kind) {
+        status.textContent = message;
+        status.className = 'status show' + (kind ? ' ' + kind : '');
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Basic required checks (keeps it simple)
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const service = document.getElementById('service').value;
+        const city = document.getElementById('city').value;
+
+        if (!name || !phone || !service || !city) {
+          setStatus('Please fill out Name, Phone, Service, and City.', 'err');
+          return;
+        }
+
+        btn.disabled = true;
+        btn.style.opacity = '0.75';
+        setStatus('Submitting…', '');
+
+        try {
+          const formData = new FormData(form);
+
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (res.ok) {
+            // IMPORTANT: send to your website thank-you page for Google Ads tracking
+            window.location.href = '/quote-thank-you.html';
+            return;
+          }
+
+          // If Formspree returns JSON with errors
+          let data = null;
+          try { data = await res.json(); } catch (_) {}
+          const msg = (data && data.errors && data.errors.length)
+            ? data.errors.map(e => e.message).join(' ')
+            : 'Something went wrong. Please text us at (580) 215-0915.';
+          setStatus(msg, 'err');
+
+        } catch (err) {
+          setStatus('Network error. Please try again or text us at (580) 215-0915.', 'err');
+        } finally {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
