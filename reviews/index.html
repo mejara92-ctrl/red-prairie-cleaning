@@ -13,13 +13,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Reviews | Red Prairie Cleaning (Lawton, OK)</title>
-  <meta name="description" content="See what customers say about Red Prairie Cleaning in Lawton, OK. House cleaning, deep cleaning, move-out cleaning, and carpet cleaning. Text for a quote." />
+
+  <!-- OG / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Red Prairie Cleaning" />
+  <meta property="og:title" content="Reviews | Red Prairie Cleaning (Lawton, OK)" />
+  <meta property="og:description" content="See what customers say about Red Prairie Cleaning in Lawton, OK. House cleaning, deep cleaning, move-out cleaning, and carpet cleaning. Text for a fast quote." />
+  <meta property="og:url" content="https://redprairiecleaning.com/reviews/" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Reviews | Red Prairie Cleaning (Lawton, OK)" />
+  <meta name="twitter:description" content="See what customers say about Red Prairie Cleaning in Lawton, OK. House cleaning, deep cleaning, move-out cleaning, and carpet cleaning. Text for a fast quote." />
+
+  <meta name="description" content="See what customers say about Red Prairie Cleaning in Lawton, OK. House cleaning, deep cleaning, move-out cleaning, and carpet cleaning. Text for a fast quote." />
 
   <link rel="canonical" href="https://redprairiecleaning.com/reviews/" />
 
-  <!-- ✅ Schema: LocalBusiness + FAQ
-       NOTE: Do NOT add numeric star ratings here unless you have verified aggregate rating data displayed on-page.
-  -->
+  <!-- ✅ Schema: LocalBusiness + FAQ (no numeric star ratings unless verified + displayed) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -30,13 +40,13 @@
         "name":"Red Prairie Cleaning",
         "url":"https://redprairiecleaning.com/",
         "telephone":"+1-580-215-0915",
-        "description":"Modern home cleaning and professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, and Cache, Oklahoma.",
+        "description":"Modern home cleaning and professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, and Cache, Oklahoma. Quotes handled by text.",
         "foundingDate":"2025",
         "areaServed":[
-          {"@type":"City","name":"Lawton"},
-          {"@type":"City","name":"Fort Sill"},
-          {"@type":"City","name":"Elgin"},
-          {"@type":"City","name":"Cache"}
+          {"@type":"City","name":"Lawton","address":{"@type":"PostalAddress","addressRegion":"OK","addressCountry":"US"}},
+          {"@type":"City","name":"Fort Sill","address":{"@type":"PostalAddress","addressRegion":"OK","addressCountry":"US"}},
+          {"@type":"City","name":"Elgin","address":{"@type":"PostalAddress","addressRegion":"OK","addressCountry":"US"}},
+          {"@type":"City","name":"Cache","address":{"@type":"PostalAddress","addressRegion":"OK","addressCountry":"US"}}
         ],
         "openingHoursSpecification":[
           {
@@ -56,7 +66,7 @@
             "name":"How do I leave a review for Red Prairie Cleaning?",
             "acceptedAnswer":{
               "@type":"Answer",
-              "text":"The easiest way is to leave a Google review after your service. If you need the link, text us and we’ll send it."
+              "text":"Use the “Leave a Google review” button on this page. If you need the link, text us and we’ll send it."
             }
           },
           {
@@ -84,160 +94,258 @@
   <style>
     :root{
       --bg:#ffffff;
+      --surface:#ffffff;
+      --surface-2:#fbfbfd;
+
       --ink:#0b0b10;
       --ink-2:#171722;
       --muted:#6b7280;
+
       --line: rgba(11,11,16,.10);
+      --line-2: rgba(11,11,16,.16);
+
       --red:#B11226;
       --red-2:#8F0E1F;
       --red-soft: rgba(177,18,38,.10);
+      --red-soft2: rgba(177,18,38,.16);
+
       --shadow: 0 18px 55px rgba(11,11,16,.08);
+      --shadow2: 0 10px 28px rgba(11,11,16,.07);
+
       --r-xl: 22px;
+      --r-lg: 18px;
+      --r-md: 14px;
+
       --max: 1120px;
     }
     *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; }
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.55;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
     a{ color:inherit; text-decoration:none; }
     .container{ width:min(var(--max), calc(100% - 40px)); margin:0 auto; }
 
     .topbar{
-      position:sticky; top:0; z-index:50;
-      background:rgba(255,255,255,.95);
-      border-bottom:1px solid var(--line);
+      position: sticky; top:0; z-index:50;
       backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--line);
     }
     .nav{
       display:flex; align-items:center; justify-content:space-between;
-      padding:14px 0; gap:16px;
+      gap:16px; padding: 14px 0;
     }
     .brand{
       display:flex; align-items:center; gap:10px;
-      font-weight:950;
+      font-weight: 950; letter-spacing:.2px;
     }
     .logo{
       width:38px; height:38px; border-radius:12px;
       display:grid; place-items:center;
-      background:var(--red); color:#fff; font-weight:980;
+      background: var(--red); color:#fff; font-weight:980;
+      box-shadow: 0 14px 26px rgba(177,18,38,.22);
+      flex:0 0 auto;
     }
-    .navlinks{ display:flex; gap:16px; font-weight:750; }
+    .brand small{ display:block; color:var(--muted); font-weight:700; font-size:12.5px; margin-top:1px; }
+
+    .navlinks{ display:flex; align-items:center; gap:16px; color:var(--ink-2); font-weight:750; }
     .navlinks a{ opacity:.82; }
     .navlinks a:hover{ opacity:1; }
 
-    .btn{
-      border:0; border-radius:999px;
-      padding:11px 14px;
-      font-weight:950;
-      cursor:pointer;
-      display:inline-flex; align-items:center; gap:8px;
-      white-space:nowrap;
+    .navcta{ display:flex; align-items:center; gap:10px; }
+    .pill{
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 20px rgba(11,11,16,.06);
+      font-weight: 850;
+      white-space: nowrap;
+      font-size: 13px;
     }
-    .btn-primary{ background:var(--red); color:#fff; }
-    .btn-primary:hover{ background:var(--red-2); }
-    .btn-ghost{ background:#fff; border:1px solid var(--line); }
+    .btn{
+      border:0; cursor:pointer;
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 950;
+      letter-spacing: .15px;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      transition: transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
+      white-space: nowrap; height: 42px; font-size: 13px;
+    }
+    .btn-primary{
+      background: var(--red);
+      color:#fff;
+      box-shadow: 0 16px 34px rgba(177,18,38,.22);
+    }
+    .btn-primary:hover{ background: var(--red-2); transform: translateY(-1px); }
+    .btn-ghost{
+      background:#fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      box-shadow: 0 10px 22px rgba(11,11,16,.06);
+    }
+    .btn-ghost:hover{ transform: translateY(-1px); border-color: var(--line-2); }
 
-    @media(max-width:900px){
+    .cta-desktop{ display:flex; gap:10px; align-items:center; }
+    .cta-mobile{ display:none; gap:10px; align-items:center; flex-wrap:wrap; }
+    @media (max-width: 960px){
+      .cta-desktop{ display:none !important; }
+      .cta-mobile{ display:flex !important; }
       .navlinks{ display:none; }
     }
 
-    .hero{ padding:44px 0 18px; }
+    .hero{ padding: 44px 0 18px; }
     .card{
-      background:#fff;
       border:1px solid var(--line);
-      border-radius:var(--r-xl);
-      box-shadow:var(--shadow);
-      padding:28px;
+      border-radius: var(--r-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
+    .heroCard{ padding: 28px; }
     .kicker{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background:var(--red-soft);
-      color:var(--red);
-      font-weight:950;
-      font-size:12.5px;
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 8px 12px; border-radius: 999px;
+      background: var(--red-soft);
+      color: var(--red);
+      border: 1px solid rgba(177,18,38,.18);
+      font-weight: 950;
+      font-size: 12.5px;
     }
+    .dot{ width:10px; height:10px; border-radius:50%; background:var(--red); box-shadow:0 0 0 5px var(--red-soft2); }
+
     h1{
-      margin:14px 0 10px;
+      margin: 14px 0 10px;
       font-size: clamp(34px, 4vw, 54px);
-      letter-spacing:-1px;
+      line-height: 1.05;
+      letter-spacing: -1px;
     }
-    .lead{ color:var(--ink-2); max-width:78ch; }
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .lead{ margin: 0 0 16px; color: var(--ink-2); max-width: 78ch; font-size:16px; }
+    .heroActions{ display:flex; flex-wrap:wrap; gap:10px; margin: 14px 0 6px; }
+    .fine{ color:var(--muted); font-size:12.5px; margin-top:6px; }
 
-    section{ padding:22px 0; }
-    .sectionHead{
-      display:flex; justify-content:space-between; align-items:flex-end;
-      gap:16px; margin-bottom:12px;
-    }
-    .sectionHead h2{ margin:0; font-size:26px; }
-    .sectionHead p{ margin:0; color:var(--muted); max-width:72ch; }
+    section{ padding: 22px 0; }
+    .sectionHead{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:12px; }
+    .sectionHead h2{ margin:0; font-size:26px; letter-spacing:-.4px; }
+    .sectionHead p{ margin:0; color:var(--muted); max-width:70ch; font-size:14px; }
 
-    .grid3{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+    .grid3{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
     .quoteCard{
+      padding: 16px;
+      border-radius: var(--r-xl);
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
       background:#fff;
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
+      height: 100%;
     }
     .quoteCard b{ display:block; }
-    .quoteCard p{ margin:6px 0 0; color:var(--muted); font-size:13.5px; }
-    .quoteMeta{ margin-top:8px; color:var(--ink-2); font-weight:850; font-size:12.5px; }
+    .quoteCard p{ margin: 8px 0 0; color:var(--muted); font-size:13.5px; }
+    .quoteMeta{ margin-top: 10px; color: var(--ink-2); font-weight: 850; font-size: 12.5px; }
 
-    @media(max-width:900px){
-      .grid3{ grid-template-columns:1fr; }
+    @media (max-width: 960px){
+      .grid3{ grid-template-columns: 1fr; }
     }
 
-    .cta{
-      display:flex; justify-content:space-between; align-items:center;
-      gap:14px; flex-wrap:wrap;
-      border:1px solid rgba(177,18,38,.2);
-      border-radius:var(--r-xl);
-      padding:18px;
-      background:#fff;
+    .ctaBox{
+      padding: 18px;
+      border-radius: var(--r-xl);
+      border: 1px solid rgba(177,18,38,.18);
+      background:
+        radial-gradient(900px 420px at 10% 20%, rgba(177,18,38,.10) 0%, rgba(177,18,38,0) 55%),
+        #fff;
+      box-shadow: 0 22px 55px rgba(177,18,38,.10);
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 14px; flex-wrap:wrap;
     }
-    .cta h3{ margin:0 0 4px; }
-    .cta p{ margin:0; color:var(--muted); }
+    .ctaBox h3{ margin:0 0 4px; font-size:22px; }
+    .ctaBox p{ margin:0; color:var(--muted); font-size:13.5px; }
 
-    .faq{
+    .faqWrap{
+      border-radius: var(--r-xl);
       border:1px solid var(--line);
-      border-radius:var(--r-xl);
       background:#fff;
+      box-shadow: 0 12px 26px rgba(11,11,16,.06);
       overflow:hidden;
     }
     .faqItem{ border-top:1px solid var(--line); }
     .faqItem:first-child{ border-top:0; }
     .faqQ{
-      width:100%;
-      text-align:left;
-      background:transparent;
-      border:0;
-      padding:14px 16px;
+      width:100%; text-align:left;
+      background:transparent; border:0;
+      padding: 14px 16px;
       cursor:pointer;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      font-weight:950;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      font-weight:950; color:var(--ink); font-size:14px;
     }
-    .faqA{
-      display:none;
-      padding:0 16px 14px 16px;
-      color:var(--muted);
-      font-size:13.5px;
-      max-width:90ch;
+    .faqQ:hover{ background: rgba(11,11,16,.02); }
+    .chev{
+      width:34px; height:34px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: var(--surface-2);
+      display:grid; place-items:center;
+      color: var(--muted);
+      transition: transform .16s ease;
+      flex:0 0 auto;
     }
+    .faqA{ display:none; padding: 0 16px 14px 16px; color:var(--muted); font-size:13.5px; max-width: 92ch; }
     .faqItem.open .faqA{ display:block; }
+    .faqItem.open .chev{ transform: rotate(180deg); }
 
     .footer{
-      padding:22px 0 34px;
-      font-size:12.5px;
-      color:var(--muted);
+      padding: 22px 0 34px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+    .footer3{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 18px;
+      align-items:start;
       border-top:1px solid var(--line);
+      padding-top: 18px;
+    }
+    .footTitle{
+      font-weight:950;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .footLinks{
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-size:13.5px;
+    }
+    .footLinks li{ margin: 8px 0; }
+    .footLinks a{ opacity:.86; }
+    .footLinks a:hover{ opacity:1; }
+
+    .footLegal{
+      margin-top: 14px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .footBottom{
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top:1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    @media (max-width: 960px){
+      .footer3{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -253,20 +361,29 @@
       <div class="nav">
         <a class="brand" href="/">
           <div class="logo">RP</div>
-          <div>RED PRAIRIE CLEANING</div>
+          <div>
+            RED PRAIRIE CLEANING
+            <small>Modern home cleaning + professional carpet cleaning</small>
+          </div>
         </a>
 
         <div class="navlinks">
-          <a href="/house-cleaning-lawton-ok/">House</a>
-          <a href="/deep-cleaning-lawton-ok/">Deep</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="/house-cleaning-lawton-ok/">House Cleaning</a>
+          <a href="/deep-cleaning-lawton-ok/">Deep Cleaning</a>
           <a href="/move-out-cleaning-lawton-ok/">Move-Out</a>
           <a href="/carpet-cleaning-lawton-ok/">Carpet</a>
-          <a href="/service-area/">Service Area</a>
         </div>
 
-        <div class="actions">
-          <a class="btn btn-ghost" href="tel:+15802150915">Call</a>
-          <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BHouse%2FDeep%2FMove-out%2FCarpet%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+        <div class="navcta">
+          <div class="cta-desktop">
+            <a class="pill" href="tel:+15802150915">Call (580) 215-0915</a>
+            <a class="btn btn-primary" href="/quote.html">Click to quote</a>
+          </div>
+
+          <div class="cta-mobile">
+            <a class="pill" href="sms:+15802150915?body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BHouse%2FDeep%2FMove-out%2FCarpet%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+          </div>
         </div>
       </div>
     </div>
@@ -274,32 +391,36 @@
 
   <div class="hero">
     <div class="container">
-      <div class="card">
-        <div class="kicker">Reviews & Social Proof</div>
+      <div class="card heroCard">
+        <div class="kicker"><span class="dot"></span> Reviews • Lawton, OK • Fort Sill • Elgin • Cache</div>
+
         <h1>What Customers Say</h1>
+
         <p class="lead">
           We’re built for consistent results, respectful service, and simple quoting by text.
-          If you’re deciding between companies in Lawton or Fort Sill, reviews are the fastest way to see what you’re getting.
+          If you’re deciding between companies in the Lawton / Fort Sill area, reviews are the fastest way
+          to see what you’re getting.
         </p>
 
-        <div class="actions">
-          <!-- ✅ Replace the # with your real Google review link when you have it -->
-          <a class="btn btn-primary" href="#" rel="nofollow noopener">Leave a Google review</a>
-          <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20PraIRIE%20Cleaning%20-%20Can%20you%20send%20me%20your%20Google%20review%20link%3F">Text for review link</a>
+        <div class="heroActions">
+          <!-- ✅ Replace YOUR_GOOGLE_REVIEW_LINK with your real GBP review URL -->
+          <a class="btn btn-primary" href="YOUR_GOOGLE_REVIEW_LINK" rel="nofollow noopener">Leave a Google review</a>
+          <a class="btn btn-ghost" href="sms:+15802150915?body=Hi%20Red%20Prairie%20Cleaning%20-%20Can%20you%20send%20me%20your%20Google%20review%20link%3F">Text for review link</a>
+          <a class="btn btn-ghost" href="/quote.html">Click to quote</a>
         </div>
 
-        <div style="margin-top:10px;color:var(--muted);font-size:12.5px;">
-          Tip: once you paste your real Google review link, this page becomes a conversion machine.
+        <div class="fine">
+          Tip: After you paste your real Google review link above, this page becomes a conversion machine.
         </div>
       </div>
     </div>
   </div>
 
-  <section>
+  <section id="snippets">
     <div class="container">
       <div class="sectionHead">
         <div><h2>Recent customer notes</h2></div>
-        <p>Paste your real review snippets here over time. Keep them short and believable.</p>
+        <p>Replace these placeholders with real review snippets over time.</p>
       </div>
 
       <div class="grid3">
@@ -308,30 +429,36 @@
           <p>Great attention to detail. Easy quote process.</p>
           <div class="quoteMeta">— Lawton homeowner</div>
         </div>
+
         <div class="quoteCard">
           <b>“Move-out clean passed inspection.”</b>
           <p>They hit all the spots landlords care about.</p>
           <div class="quoteMeta">— Fort Sill / PCS</div>
         </div>
+
         <div class="quoteCard">
           <b>“Carpets looked way better after extraction.”</b>
           <p>Traffic lanes improved and it dried fast.</p>
           <div class="quoteMeta">— Elgin client</div>
         </div>
       </div>
+
+      <div class="fine" style="margin-top:12px;">
+        Pro move: add 6–12 real snippets here over time. Keep them short, specific, and believable.
+      </div>
     </div>
   </section>
 
-  <section>
+  <section id="cta">
     <div class="container">
-      <div class="cta">
+      <div class="ctaBox">
         <div>
           <h3>Want a fast quote?</h3>
-          <p>Text your city + bedrooms/baths + service type. Photos welcome.</p>
+          <p>Text city + bedrooms/baths + service type. Photos welcome for accuracy.</p>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="sms:+15802150915?&body=Quote%20request.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BHouse%2FDeep%2FMove-out%2FCarpet%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
-          <a class="btn btn-ghost" href="/quote.html">Click to quote</a>
+          <a class="btn btn-primary" href="sms:+15802150915?body=Quote%20request.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BHouse%2FDeep%2FMove-out%2FCarpet%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
+          <a class="btn btn-ghost" href="tel:+15802150915">Call now</a>
         </div>
       </div>
     </div>
@@ -340,44 +467,135 @@
   <section id="faq">
     <div class="container">
       <div class="sectionHead">
-        <div><h2>FAQ</h2></div>
+        <div><h2>Reviews FAQ</h2></div>
         <p>Quick answers before you book.</p>
       </div>
 
-      <div class="faq">
+      <div class="faqWrap">
         <div class="faqItem open">
-          <button class="faqQ" type="button">How do I leave a review? <span>⌄</span></button>
-          <div class="faqA">Use the “Leave a Google review” button above. If you need the link, text us and we’ll send it.</div>
+          <button class="faqQ" type="button" aria-expanded="true">
+            How do I leave a review?
+            <span class="chev" aria-hidden="true">⌄</span>
+          </button>
+          <div class="faqA">
+            Use the “Leave a Google review” button above. If you need the link, text us and we’ll send it.
+          </div>
         </div>
+
         <div class="faqItem">
-          <button class="faqQ" type="button">Do reviews help local SEO? <span>⌄</span></button>
-          <div class="faqA">Yes. Consistent Google reviews are one of the strongest signals for ranking in local map results.</div>
+          <button class="faqQ" type="button" aria-expanded="false">
+            What services do you offer?
+            <span class="chev" aria-hidden="true">⌄</span>
+          </button>
+          <div class="faqA">
+            House cleaning, deep cleaning, move-out cleaning, and professional carpet cleaning (hot-water extraction).
+          </div>
         </div>
+
         <div class="faqItem">
-          <button class="faqQ" type="button">What areas do you serve? <span>⌄</span></button>
-          <div class="faqA">Lawton, Fort Sill, Elgin, and Cache. If you’re nearby, text us and we’ll confirm.</div>
+          <button class="faqQ" type="button" aria-expanded="false">
+            How does quoting work?
+            <span class="chev" aria-hidden="true">⌄</span>
+          </button>
+          <div class="faqA">
+            Text your city, bedrooms/baths, the service type, and your preferred date. Photos are welcome for accuracy.
+          </div>
         </div>
+      </div>
+
+      <div style="margin-top:14px;" class="fine">
+        Related pages:
+        <a href="/house-cleaning-lawton-ok/" style="color:var(--red); font-weight:950;">House Cleaning</a> •
+        <a href="/deep-cleaning-lawton-ok/" style="color:var(--red); font-weight:950;">Deep Cleaning</a> •
+        <a href="/move-out-cleaning-lawton-ok/" style="color:var(--red); font-weight:950;">Move-Out Cleaning</a> •
+        <a href="/carpet-cleaning-lawton-ok/" style="color:var(--red); font-weight:950;">Carpet Cleaning</a>
       </div>
     </div>
   </section>
 
   <div class="footer">
     <div class="container">
-      <b>Red Prairie Cleaning</b><br>
-      Text: <a href="sms:+15802150915">(580) 215-0915</a><br>
-      Service area: Lawton • Fort Sill • Elgin • Cache<br>
-      Hours: 8am–8pm • Founded 2025
+
+      <div class="footer3">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="logo" style="width:34px;height:34px;border-radius:12px;" aria-hidden="true">RP</div>
+            <div>
+              <div style="font-weight:980;color:var(--ink);">RED PRAIRIE CLEANING</div>
+              <div style="margin-top:2px;">
+                Text:
+                <a href="sms:+15802150915?body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote."
+                   style="font-weight:980;color:var(--red);">(580) 215-0915</a>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">Service area: Lawton • Fort Sill • Elgin • Cache</div>
+          <div style="margin-top:8px;">Modern home cleaning + professional carpet cleaning with simple text quotes.</div>
+        </div>
+
+        <div>
+          <div class="footTitle">Cleaning Services</div>
+          <ul class="footLinks">
+            <li><a href="/house-cleaning-lawton-ok/">House Cleaning</a></li>
+            <li><a href="/deep-cleaning-lawton-ok/">Deep Cleaning</a></li>
+            <li><a href="/move-out-cleaning-lawton-ok/">Move-Out Cleaning</a></li>
+            <li><a href="/carpet-cleaning-lawton-ok/">Carpet Cleaning</a></li>
+          </ul>
+
+          <div style="margin-top:14px;" class="footTitle">Service Area</div>
+          <ul class="footLinks">
+            <li><a href="/service-area/">Lawton, OK</a></li>
+            <li><a href="/service-area/">Fort Sill, OK</a></li>
+            <li><a href="/service-area/">Elgin, OK</a></li>
+            <li><a href="/service-area/">Cache, OK</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footTitle">Why Red Prairie</div>
+          <ul class="footLinks">
+            <li><a href="/reviews/">Customer Reviews</a></li>
+            <li><a href="/service-area/">Locally Owned & Operated</a></li>
+            <li><a href="/move-out-cleaning-lawton-ok/">Rental & PCS Specialists</a></li>
+          </ul>
+
+          <div class="footLegal">
+            <div style="font-weight:950;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
+            We provide cleaning services only. Pricing depends on home size, condition, scope, and requested add-ons.
+            Results vary based on surface materials and prior wear/usage.
+          </div>
+        </div>
+      </div>
+
+      <div class="footBottom">
+        © <span id="year"></span> Red Prairie Cleaning • Lawton, OK
+      </div>
+
     </div>
   </div>
 
   <script>
+    // Footer year
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+
     // FAQ accordion (one open at a time)
     document.querySelectorAll('.faqItem .faqQ').forEach((btn) => {
       btn.addEventListener('click', () => {
         const item = btn.closest('.faqItem');
         const wrap = item.parentElement;
-        wrap.querySelectorAll('.faqItem').forEach(i => { if(i !== item) i.classList.remove('open'); });
-        item.classList.toggle('open');
+
+        wrap.querySelectorAll('.faqItem').forEach(i => {
+          if (i !== item) {
+            i.classList.remove('open');
+            const b = i.querySelector('.faqQ');
+            if (b) b.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        const isOpen = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
     });
   </script>
