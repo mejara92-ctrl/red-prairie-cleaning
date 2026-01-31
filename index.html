@@ -627,15 +627,48 @@
       color: var(--muted);
       font-size: 12.5px;
     }
-    .footerGrid{
+
+    /* ✅ Balanced 3-column footer (Option 1) */
+    .footer3{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 12px;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 18px;
       align-items:start;
       border-top:1px solid var(--line);
       padding-top: 18px;
     }
-    .legal{ border-left:1px solid var(--line); padding-left: 14px; }
+    .footTitle{
+      font-weight:950;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .footLinks{
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-size:13.5px;
+    }
+    .footLinks li{ margin: 8px 0; }
+    .footLinks a{ opacity:.86; }
+    .footLinks a:hover{ opacity:1; }
+
+    .footLegal{
+      margin-top: 14px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .footBottom{
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top:1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+    }
 
     @media (max-width: 960px){
       .heroGrid{ grid-template-columns: 1fr; }
@@ -643,8 +676,8 @@
       .split{ grid-template-columns: 1fr; }
       .navlinks{ display:none; }
       .trustbar{ grid-template-columns: 1fr; }
-      .footerGrid{ grid-template-columns: 1fr; }
-      .legal{ border-left:0; padding-left:0; border-top:1px solid var(--line); padding-top: 12px; }
+
+      .footer3{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1025,67 +1058,76 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- ✅ FOOTER (balanced) -->
   <div class="footer">
     <div class="container">
-      <div class="footerGrid">
+
+      <div class="footer3">
+        <!-- Col 1: Brand -->
         <div>
           <div style="display:flex;align-items:center;gap:10px;">
             <div class="logo" style="width:34px;height:34px;border-radius:12px;" aria-hidden="true">RP</div>
             <div>
               <div style="font-weight:980;color:var(--ink);">RED PRAIRIE CLEANING</div>
-              <div style="margin-top:2px;">Text: <a href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote." style="font-weight:980;color:var(--red);">(580) 215-0915</a></div>
+              <div style="margin-top:2px;">
+                Text:
+                <a href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote."
+                   style="font-weight:980;color:var(--red);">(580) 215-0915</a>
+              </div>
             </div>
           </div>
+
           <div style="margin-top:10px;">Service area: Lawton • Fort Sill • Elgin • Cache</div>
           <div style="margin-top:8px;">Modern home cleaning + professional carpet cleaning with simple text quotes.</div>
-
-          <!-- INTERNAL SEO LINKS -->
-          <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(11,11,16,.1);">
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
-              <div>
-                <div style="font-weight:950; margin-bottom:6px;">Cleaning Services</div>
-                <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
-                  <li><a href="/house-cleaning-lawton-ok/">House Cleaning</a></li>
-                  <li><a href="/deep-cleaning-lawton-ok/">Deep Cleaning</a></li>
-                  <li><a href="/move-out-cleaning-lawton-ok/">Move-Out Cleaning</a></li>
-                  <li><a href="/carpet-cleaning-lawton-ok/">Carpet Cleaning</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <div style="font-weight:950; margin-bottom:6px;">Service Area</div>
-                <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
-                  <li><a href="/service-area/">Lawton, OK</a></li>
-                  <li><a href="/service-area/">Fort Sill, OK</a></li>
-                  <li><a href="/service-area/">Elgin, OK</a></li>
-                  <li><a href="/service-area/">Cache, OK</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <div style="font-weight:950; margin-bottom:6px;">Why Red Prairie</div>
-                <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
-                  <li><a href="/reviews/">Customer Reviews</a></li>
-                  <li><a href="/service-area/">Locally Owned & Operated</a></li>
-                  <li><a href="/move-out-cleaning-lawton-ok/">Rental & PCS Specialists</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <!-- END INTERNAL SEO LINKS -->
         </div>
 
-        <div class="legal">
-          <div style="font-weight:950;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
-          We provide cleaning services only. Pricing depends on home size, condition, scope, and requested add-ons.
-          Results vary based on surface materials and carpet age/wear.
+        <!-- Col 2: Links -->
+        <div>
+          <div class="footTitle">Cleaning Services</div>
+          <ul class="footLinks">
+            <li><a href="/house-cleaning-lawton-ok/">House Cleaning</a></li>
+            <li><a href="/deep-cleaning-lawton-ok/">Deep Cleaning</a></li>
+            <li><a href="/move-out-cleaning-lawton-ok/">Move-Out Cleaning</a></li>
+            <li><a href="/carpet-cleaning-lawton-ok/">Carpet Cleaning</a></li>
+          </ul>
+
+          <div style="margin-top:14px;" class="footTitle">Service Area</div>
+          <ul class="footLinks">
+            <li><a href="/service-area/">Lawton, OK</a></li>
+            <li><a href="/service-area/">Fort Sill, OK</a></li>
+            <li><a href="/service-area/">Elgin, OK</a></li>
+            <li><a href="/service-area/">Cache, OK</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Trust + Legal -->
+        <div>
+          <div class="footTitle">Why Red Prairie</div>
+          <ul class="footLinks">
+            <li><a href="/reviews/">Customer Reviews</a></li>
+            <li><a href="/service-area/">Locally Owned & Operated</a></li>
+            <li><a href="/move-out-cleaning-lawton-ok/">Rental & PCS Specialists</a></li>
+          </ul>
+
+          <div class="footLegal">
+            <div style="font-weight:950;color:var(--ink);margin-bottom:6px;">Disclaimer</div>
+            We provide cleaning services only. Pricing depends on home size, condition, scope, and requested add-ons.
+            Results vary based on surface materials and carpet age/wear.
+          </div>
         </div>
       </div>
+
+      <div class="footBottom">
+        © <span id="year"></span> Red Prairie Cleaning • Lawton, OK
+      </div>
+
     </div>
   </div>
 
   <script>
+    // year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
     // FAQ accordion (one open at a time)
     document.querySelectorAll('.faqItem .faqQ').forEach((btn) => {
       btn.addEventListener('click', () => {
