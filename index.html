@@ -2,23 +2,57 @@
 <html lang="en">
 <head>
   <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-P47BCBHF');</script>
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-P47BCBHF');
+  </script>
   <!-- End Google Tag Manager -->
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Red Prairie Cleaning | Modern Home + Professional Carpet Cleaning</title>
   <meta name="description" content="Maintenance cleaning from $149 + tax. Deep cleaning from $249 + tax. Professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, Cache. Text to quote." />
+
+  <!-- Indexing -->
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <link rel="canonical" href="https://redprairiecleaning.com/" />
+
+  <!-- Social (Open Graph / Twitter) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Red Prairie Cleaning" />
+  <meta property="og:title" content="Red Prairie Cleaning | Modern Home + Professional Carpet Cleaning" />
+  <meta property="og:description" content="Maintenance cleaning from $149 + tax. Deep cleaning from $249 + tax. Professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, Cache. Text to quote." />
+  <meta property="og:url" content="https://redprairiecleaning.com/" />
+  <!-- OPTIONAL: set this if you have a real share image -->
+  <!-- <meta property="og:image" content="https://redprairiecleaning.com/images/og.jpg" /> -->
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Red Prairie Cleaning | Modern Home + Professional Carpet Cleaning" />
+  <meta name="twitter:description" content="Maintenance cleaning from $149 + tax. Deep cleaning from $249 + tax. Professional carpet cleaning (hot-water extraction). Serving Lawton, Fort Sill, Elgin, Cache. Text to quote." />
+
+  <!-- Optional niceties -->
+  <meta name="theme-color" content="#B11226" />
+  <!-- OPTIONAL favicon placeholders -->
+  <!-- <link rel="icon" href="/favicon.ico" /> -->
+  <!-- <link rel="apple-touch-icon" href="/apple-touch-icon.png" /> -->
+
+  <!-- Performance: preload hero image -->
+  <link rel="preload" as="image" href="/images/kitchen.jpg" imagesizes="100vw" />
 
   <!-- ✅ LocalBusiness schema (ServiceArea only — no public address) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "ProfessionalService",
     "@id": "https://redprairiecleaning.com/#business",
     "name": "Red Prairie Cleaning",
     "url": "https://redprairiecleaning.com/",
@@ -66,47 +100,22 @@
     "openingHoursSpecification": [
       {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
-        ],
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "08:00",
         "closes": "20:00"
       }
     ],
     "serviceOffered": [
-      {
-        "@type": "Service",
-        "name": "Maintenance House Cleaning",
-        "serviceType": "Residential Cleaning"
-      },
-      {
-        "@type": "Service",
-        "name": "Deep House Cleaning",
-        "serviceType": "Residential Cleaning"
-      },
-      {
-        "@type": "Service",
-        "name": "Move-Out Cleaning",
-        "serviceType": "Rental Turnover Cleaning"
-      },
-      {
-        "@type": "Service",
-        "name": "Professional Carpet Cleaning",
-        "serviceType": "Hot-Water Extraction Carpet Cleaning"
-      }
+      { "@type": "Service", "name": "Maintenance House Cleaning", "serviceType": "Residential Cleaning" },
+      { "@type": "Service", "name": "Deep House Cleaning", "serviceType": "Residential Cleaning" },
+      { "@type": "Service", "name": "Move-Out Cleaning", "serviceType": "Rental Turnover Cleaning" },
+      { "@type": "Service", "name": "Professional Carpet Cleaning", "serviceType": "Hot-Water Extraction Carpet Cleaning" }
     ]
   }
   </script>
 
   <style>
     :root{
-      /* Modern luxury white + red */
       --bg:#ffffff;
       --surface:#ffffff;
       --surface-2:#fbfbfd;
@@ -148,6 +157,28 @@
     .container{
       width:min(var(--max), calc(100% - 40px));
       margin:0 auto;
+    }
+
+    /* a11y */
+    .skip-link{
+      position:absolute;
+      left:-9999px;
+      top:auto;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+    }
+    .skip-link:focus{
+      left:16px;
+      top:16px;
+      width:auto;
+      height:auto;
+      padding:10px 12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:999px;
+      z-index:9999;
+      box-shadow: 0 10px 22px rgba(11,11,16,.10);
     }
 
     /* Topbar */
@@ -247,7 +278,7 @@
     .btn-ghost:hover{ transform: translateY(-1px); border-color: var(--line-2); }
     .btn-sm{ padding: 10px 12px; height: 40px; }
 
-    /* ✅ NEW: Desktop vs Mobile CTAs */
+    /* Desktop vs Mobile CTAs */
     .cta-desktop{ display:flex; gap:10px; align-items:center; }
     .cta-mobile{ display:none; gap:10px; align-items:center; flex-wrap:wrap; }
 
@@ -515,7 +546,7 @@
     .mini b{ display:block; font-size: 13px; }
     .mini span{ display:block; color: var(--muted); font-size: 12.5px; margin-top: 4px; }
 
-    /* Standalone banner (prevents weird stretching) */
+    /* Standalone banner */
     .miniBanner{
       border:1px solid var(--line);
       border-radius: 14px;
@@ -624,34 +655,33 @@
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
 
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="container">
       <div class="nav">
-        <a class="brand" href="#top">
-          <div class="logo">RP</div>
+        <a class="brand" href="#top" aria-label="Go to top">
+          <div class="logo" aria-hidden="true">RP</div>
           <div>
             RED PRAIRIE CLEANING
             <small>Modern home cleaning + professional carpet cleaning</small>
           </div>
         </a>
 
-        <div class="navlinks">
+        <nav class="navlinks" aria-label="Primary">
           <a href="#pricing">Pricing</a>
           <a href="#carpet">Carpet</a>
           <a href="#included">What’s included</a>
           <a href="#faq">FAQ</a>
-        </div>
+        </nav>
 
-        <!-- ✅ UPDATED CTAs -->
         <div class="navcta">
-          <!-- Desktop: call + click to quote -->
           <div class="cta-desktop">
             <a class="pill" href="tel:+15802150915">Call (580) 215-0915</a>
             <a class="btn btn-primary" href="/quote.html">Click to quote</a>
           </div>
 
-          <!-- Mobile: text only -->
           <div class="cta-mobile">
             <a class="pill" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5BLawton%2FFort%20Sill%2FElgin%2FCache%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
           </div>
@@ -660,342 +690,340 @@
     </div>
   </div>
 
-  <!-- HERO -->
-  <div id="top" class="hero">
-    <div class="container">
-      <div class="heroGrid">
-        <div class="card heroCard">
-          <div class="kicker"><span class="dot"></span> Locally owned • Lawton & Fort Sill</div>
+  <main id="main">
+    <!-- HERO -->
+    <div id="top" class="hero">
+      <div class="container">
+        <div class="heroGrid">
+          <div class="card heroCard">
+            <div class="kicker"><span class="dot"></span> Locally owned • Lawton & Fort Sill</div>
 
-          <h1>
-            Modern cleaning.<br>
-            <span class="accent">Luxury results.</span>
-          </h1>
+            <h1>
+              Modern cleaning.<br>
+              <span class="accent">Luxury results.</span>
+            </h1>
 
-          <p class="lead">
-            Premium home cleaning plus <b>professional carpet cleaning (hot-water extraction)</b>.
-            Text us for a quote — fast, simple, accurate.
-          </p>
+            <p class="lead">
+              Premium home cleaning plus <b>professional carpet cleaning (hot-water extraction)</b>.
+              Text us for a quote — fast, simple, accurate.
+            </p>
 
-          <!-- ✅ UPDATED HERO ACTIONS -->
-          <div class="heroActions">
-            <!-- Desktop: call buttons + click to quote -->
-            <div class="cta-desktop">
-              <a class="btn btn-ghost" href="tel:+15802150915">Call now</a>
-              <a class="btn btn-ghost" href="tel:+15802150915">Call for carpet</a>
-              <a class="btn btn-primary" href="/quote.html">Click to quote</a>
-            </div>
+            <div class="heroActions">
+              <div class="cta-desktop">
+                <a class="btn btn-ghost" href="tel:+15802150915">Call now</a>
+                <a class="btn btn-ghost" href="tel:+15802150915">Call for carpet</a>
+                <a class="btn btn-primary" href="/quote.html">Click to quote</a>
+              </div>
 
-            <!-- Mobile: text buttons only -->
-            <div class="cta-mobile">
-              <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Quote%20request.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
-              <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
-              <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Carpet%20quote%20please.%20City%3A%20%5B%5D.%20Rooms%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Carpet quote</a>
-            </div>
-          </div>
-
-          <div class="fineprint">
-            Starting prices below. Final quote depends on home size + condition and requested add-ons.
-          </div>
-
-          <div class="trustbar">
-            <div class="trust"><div class="check">✓</div><div><b>Background-checked pros</b><span>Reliable, respectful, detail-focused.</span></div></div>
-            <div class="trust"><div class="check">✓</div><div><b>Professional equipment</b><span>Supplies + tools included on every visit.</span></div></div>
-            <div class="trust"><div class="check">✓</div><div><b>Carpet extraction available</b><span>Hot-water extraction for real results.</span></div></div>
-            <div class="trust"><div class="check">✓</div><div><b>Simple scheduling</b><span>Text to quote. Weekly/bi-weekly available.</span></div></div>
-          </div>
-        </div>
-
-        <div class="card visual">
-          <div class="heroImgFrame">
-            <!-- CHANGE ONLY THIS filename if needed (example: kitchen.webp) -->
-            <img src="images/kitchen.jpg" alt="Bright white luxury kitchen" loading="eager">
-          </div>
-
-          <div class="note">
-            <b>Service area</b>
-            <p>Lawton • Fort Sill • Elgin • Cache</p>
-            <p style="margin-top:8px;"><b>Good fit for:</b> busy families, military households, professionals, and anyone who wants it done right.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- PRICING -->
-  <section id="pricing">
-    <div class="container">
-      <div class="sectionHead">
-        <div>
-          <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> Pricing</div>
-          <h2>Simple options. Clear starting points.</h2>
-        </div>
-        <p>Quotes are handled over text — no complicated steps.</p>
-      </div>
-
-      <div class="grid3">
-        <div class="priceCard">
-          <div>
-            <div class="priceTop">
-              <div class="plan">Maintenance Cleaning</div>
-              <div class="from">starting</div>
-            </div>
-            <div class="price">$149 <span style="font-size:14px;font-weight:950;color:var(--muted);">+ tax</span></div>
-            <div class="smallcaps">Depending on size • up to 6 hours</div>
-            <ul>
-              <li>Kitchen counters, sink, exterior appliances wiped</li>
-              <li>Bathrooms cleaned & sanitized (toilet, sink, mirrors)</li>
-              <li>Floors vacuumed + mopped</li>
-              <li>Dusting of reachable surfaces</li>
-              <li>Quick tidy + reset of main areas</li>
-            </ul>
-          </div>
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Maintenance%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Frequency%3A%20%5BWeekly%2FBi-weekly%2FOne-time%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
-          </div>
-        </div>
-
-        <div class="priceCard featured">
-          <div>
-            <div class="priceTop">
-              <div class="plan">Deep Cleaning</div>
-              <div class="from">starting</div>
-            </div>
-            <div class="price">$249 <span style="font-size:14px;font-weight:950;color:var(--muted);">+ tax</span></div>
-            <div class="smallcaps">Depending on size • up to 10 hours</div>
-            <ul>
-              <li>More detailed dusting of edges, ledges, and buildup areas</li>
-              <li>Baseboards/doors/frames wiped (as accessible)</li>
-              <li>Kitchen detail: backsplash + cabinet faces + appliance exteriors</li>
-              <li>Bathroom detail: showers/tubs scrubbed</li>
-              <li>Extra time on high-touch and problem spots</li>
-            </ul>
-          </div>
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Priorities%3A%20%5B%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
-          </div>
-        </div>
-
-        <div class="priceCard">
-          <div>
-            <div class="priceTop">
-              <div class="plan">Move-Out / Reset</div>
-              <div class="from">quote</div>
-            </div>
-            <div class="price">Custom</div>
-            <div class="smallcaps">Best for rentals + listings</div>
-            <ul>
-              <li>Top-to-bottom clean for turnovers</li>
-              <li>Appliance/interior detail based on scope</li>
-              <li>Cabinet/interior detail based on scope</li>
-              <li>Carpet extraction recommended</li>
-            </ul>
-          </div>
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Move-Out%20%2F%20Reset.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Empty%3F%20%5BYes%2FNo%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Target%20date%3A%20%5B%5D.">Text to quote</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CARPET -->
-  <section id="carpet">
-    <div class="container">
-      <div class="sectionHead">
-        <div>
-          <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> Carpet</div>
-          <h2>Professional carpet cleaning (hot-water extraction).</h2>
-        </div>
-        <p>Designed to lift dirt, oils, and odors from the carpet — not just the surface. Quotes are handled by text.</p>
-      </div>
-
-      <div class="split">
-        <div class="panel">
-          <div>
-            <h3>What you get</h3>
-            <p>Professional equipment + a consistent process for visible improvement.</p>
-
-            <div class="miniGrid">
-              <div class="mini"><b>Deep extraction</b><span>Hot-water rinse + strong recovery.</span></div>
-              <div class="mini"><b>Traffic lane focus</b><span>Extra passes where buildup lives.</span></div>
-              <div class="mini"><b>Better dry times</b><span>Good recovery reduces over-wetting.</span></div>
-              <div class="mini"><b>Pet odor options</b><span>Quoted based on severity/area.</span></div>
+              <div class="cta-mobile">
+                <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Quote%20request.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Preferred%20date%3A%20%5B%5D.%20Notes%3A%20%5B%5D.">Text to quote</a>
+                <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
+                <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Carpet%20quote%20please.%20City%3A%20%5B%5D.%20Rooms%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Carpet quote</a>
+              </div>
             </div>
 
             <div class="fineprint">
-              Some stains/discoloration depend on carpet age, wear, and prior treatment. We’ll set expectations over text.
+              Starting prices below. Final quote depends on home size + condition and requested add-ons.
+            </div>
+
+            <div class="trustbar">
+              <div class="trust"><div class="check">✓</div><div><b>Background-checked pros</b><span>Reliable, respectful, detail-focused.</span></div></div>
+              <div class="trust"><div class="check">✓</div><div><b>Professional equipment</b><span>Supplies + tools included on every visit.</span></div></div>
+              <div class="trust"><div class="check">✓</div><div><b>Carpet extraction available</b><span>Hot-water extraction for real results.</span></div></div>
+              <div class="trust"><div class="check">✓</div><div><b>Simple scheduling</b><span>Text to quote. Weekly/bi-weekly available.</span></div></div>
             </div>
           </div>
 
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Carpet%20Cleaning.%20City%3A%20%5B%5D.%20Rooms%20to%20clean%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.%20(Photos%20optional.)">Text to quote</a>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div>
-            <h3>Common add-ons</h3>
-            <p>Keep it simple — add what you need.</p>
-
-            <div class="miniGrid">
-              <div class="mini"><b>Pet odor treatment</b><span>Quoted based on severity/area.</span></div>
-              <div class="mini"><b>Spot treatment focus</b><span>Targeted attention on problem areas.</span></div>
-              <div class="mini"><b>Move-out carpet reset</b><span>Great for inspections and turnovers.</span></div>
-              <div class="mini"><b>Deep clean + carpet combo</b><span>Fastest “reset” result.</span></div>
+          <div class="card visual">
+            <div class="heroImgFrame">
+              <img src="images/kitchen.jpg" alt="Bright white luxury kitchen" loading="eager" width="1200" height="800">
             </div>
 
-            <div class="miniBanner">
-              <b>Want the full reset?</b>
-              <span>Text for a Deep Cleaning + Carpet quote and we’ll price it together.</span>
+            <div class="note">
+              <b>Service area</b>
+              <p>Lawton • Fort Sill • Elgin • Cache</p>
+              <p style="margin-top:8px;"><b>Good fit for:</b> busy families, military households, professionals, and anyone who wants it done right.</p>
             </div>
           </div>
 
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning%20%2B%20Carpet%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Carpet%20rooms%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
-          </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- INCLUDED -->
-  <section id="included">
-    <div class="container">
-      <div class="sectionHead">
-        <div>
-          <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> What’s included</div>
-          <h2>Clear coverage. Straightforward quotes.</h2>
-        </div>
-        <p>Tell us bedrooms/baths + condition + priorities. We’ll quote it over text.</p>
-      </div>
-
-      <div class="split">
-        <div class="panel">
+    <!-- PRICING -->
+    <section id="pricing">
+      <div class="container">
+        <div class="sectionHead">
           <div>
-            <h3>Maintenance Cleaning (up to 6 hours)</h3>
-            <ul>
-              <li>Kitchen counters, sink, exterior appliances wiped</li>
-              <li>Bathrooms cleaned & sanitized (toilet, sink, mirrors)</li>
-              <li>Floors vacuumed + mopped</li>
-              <li>Dusting of reachable surfaces</li>
-              <li>Quick tidy + reset of main areas</li>
-            </ul>
+            <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> Pricing</div>
+            <h2>Simple options. Clear starting points.</h2>
+          </div>
+          <p>Quotes are handled over text — no complicated steps.</p>
+        </div>
 
-            <div class="miniBanner">
-              <b>Common requests</b>
-              <span>Weekly / bi-weekly maintenance • busy family resets • post-travel refresh.</span>
+        <div class="grid3">
+          <div class="priceCard">
+            <div>
+              <div class="priceTop">
+                <div class="plan">Maintenance Cleaning</div>
+                <div class="from">starting</div>
+              </div>
+              <div class="price">$149 <span style="font-size:14px;font-weight:950;color:var(--muted);">+ tax</span></div>
+              <div class="smallcaps">Depending on size • up to 6 hours</div>
+              <ul>
+                <li>Kitchen counters, sink, exterior appliances wiped</li>
+                <li>Bathrooms cleaned & sanitized (toilet, sink, mirrors)</li>
+                <li>Floors vacuumed + mopped</li>
+                <li>Dusting of reachable surfaces</li>
+                <li>Quick tidy + reset of main areas</li>
+              </ul>
+            </div>
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Maintenance%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Frequency%3A%20%5BWeekly%2FBi-weekly%2FOne-time%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
             </div>
           </div>
 
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Maintenance%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div>
-            <h3>Deep Cleaning (up to 10 hours)</h3>
-            <ul>
-              <li>More detailed dusting of edges, ledges, and buildup areas</li>
-              <li>Baseboards/doors/frames wiped (as accessible)</li>
-              <li>Kitchen detail: backsplash + cabinet faces + appliance exteriors</li>
-              <li>Bathroom detail: showers/tubs scrubbed</li>
-              <li>Extra time on high-touch and problem spots</li>
-            </ul>
-
-            <div class="miniBanner">
-              <b>Best for</b>
-              <span>First-time cleans • seasonal resets • move-in prep • “it’s gotten away from us” homes.</span>
+          <div class="priceCard featured">
+            <div>
+              <div class="priceTop">
+                <div class="plan">Deep Cleaning</div>
+                <div class="from">starting</div>
+              </div>
+              <div class="price">$249 <span style="font-size:14px;font-weight:950;color:var(--muted);">+ tax</span></div>
+              <div class="smallcaps">Depending on size • up to 10 hours</div>
+              <ul>
+                <li>More detailed dusting of edges, ledges, and buildup areas</li>
+                <li>Baseboards/doors/frames wiped (as accessible)</li>
+                <li>Kitchen detail: backsplash + cabinet faces + appliance exteriors</li>
+                <li>Bathroom detail: showers/tubs scrubbed</li>
+                <li>Extra time on high-touch and problem spots</li>
+              </ul>
+            </div>
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Priorities%3A%20%5B%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
             </div>
           </div>
 
-          <div class="cardActions">
-            <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Top%203%20priorities%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+          <div class="priceCard">
+            <div>
+              <div class="priceTop">
+                <div class="plan">Move-Out / Reset</div>
+                <div class="from">quote</div>
+              </div>
+              <div class="price">Custom</div>
+              <div class="smallcaps">Best for rentals + listings</div>
+              <ul>
+                <li>Top-to-bottom clean for turnovers</li>
+                <li>Appliance/interior detail based on scope</li>
+                <li>Cabinet/interior detail based on scope</li>
+                <li>Carpet extraction recommended</li>
+              </ul>
+            </div>
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Move-Out%20%2F%20Reset.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Empty%3F%20%5BYes%2FNo%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Target%20date%3A%20%5B%5D.">Text to quote</a>
+            </div>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="cta" style="margin-top:14px;">
-        <div>
-          <h3>Ready for a quote?</h3>
-          <p>Text bedrooms/baths + service type. Photos welcome.</p>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
-          <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="container">
-      <div class="sectionHead">
-        <div>
-          <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> FAQ</div>
-          <h2>Quick answers before you text</h2>
-        </div>
-        <p>Fastest way to book is to text for a quote.</p>
-      </div>
-
-      <div class="faqWrap">
-        <div class="faqItem open">
-          <button class="faqQ" type="button">
-            How does quoting work?
-            <span class="chev">⌄</span>
-          </button>
-          <div class="faqA">
-            Text your <b>city</b>, <b>bedrooms/baths</b>, the service you want (Maintenance/Deep/Move-out),
-            and any priorities. Photos help for heavy buildup or specific problem areas.
+    <!-- CARPET -->
+    <section id="carpet">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> Carpet</div>
+            <h2>Professional carpet cleaning (hot-water extraction).</h2>
           </div>
+          <p>Designed to lift dirt, oils, and odors from the carpet — not just the surface. Quotes are handled by text.</p>
         </div>
 
-        <div class="faqItem">
-          <button class="faqQ" type="button">
-            Are supplies and equipment included?
-            <span class="chev">⌄</span>
-          </button>
-          <div class="faqA">
-            Yes — we arrive with the supplies and tools needed. If you have kids/pets or sensitivities, tell us when you text.
+        <div class="split">
+          <div class="panel">
+            <div>
+              <h3>What you get</h3>
+              <p>Professional equipment + a consistent process for visible improvement.</p>
+
+              <div class="miniGrid">
+                <div class="mini"><b>Deep extraction</b><span>Hot-water rinse + strong recovery.</span></div>
+                <div class="mini"><b>Traffic lane focus</b><span>Extra passes where buildup lives.</span></div>
+                <div class="mini"><b>Better dry times</b><span>Good recovery reduces over-wetting.</span></div>
+                <div class="mini"><b>Pet odor options</b><span>Quoted based on severity/area.</span></div>
+              </div>
+
+              <div class="fineprint">
+                Some stains/discoloration depend on carpet age, wear, and prior treatment. We’ll set expectations over text.
+              </div>
+            </div>
+
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Carpet%20Cleaning.%20City%3A%20%5B%5D.%20Rooms%20to%20clean%3A%20%5B%5D.%20Pet%20odor%2Fstains%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.%20(Photos%20optional.)">Text to quote</a>
+            </div>
           </div>
-        </div>
 
-        <div class="faqItem">
-          <button class="faqQ" type="button">
-            What’s the difference between Maintenance and Deep Cleaning?
-            <span class="chev">⌄</span>
-          </button>
-          <div class="faqA">
-            Maintenance is a consistent reset of the home. Deep Cleaning adds time for edges/ledges/buildup and detail work.
-            Both depend on size and condition — we’ll quote based on your home.
-          </div>
-        </div>
+          <div class="panel">
+            <div>
+              <h3>Common add-ons</h3>
+              <p>Keep it simple — add what you need.</p>
 
-        <div class="faqItem">
-          <button class="faqQ" type="button">
-            Is carpet cleaning included?
-            <span class="chev">⌄</span>
-          </button>
-          <div class="faqA">
-            Carpet cleaning is an optional add-on. We use hot-water extraction and can quote based on number of rooms and any pet odor/stains.
-          </div>
-        </div>
+              <div class="miniGrid">
+                <div class="mini"><b>Pet odor treatment</b><span>Quoted based on severity/area.</span></div>
+                <div class="mini"><b>Spot treatment focus</b><span>Targeted attention on problem areas.</span></div>
+                <div class="mini"><b>Move-out carpet reset</b><span>Great for inspections and turnovers.</span></div>
+                <div class="mini"><b>Deep clean + carpet combo</b><span>Fastest “reset” result.</span></div>
+              </div>
 
-        <div class="faqItem">
-          <button class="faqQ" type="button">
-            What areas do you serve?
-            <span class="chev">⌄</span>
-          </button>
-          <div class="faqA">
-            Lawton, Fort Sill, Elgin, and Cache. If you’re nearby, text us — we may be able to accommodate.
+              <div class="miniBanner">
+                <b>Want the full reset?</b>
+                <span>Text for a Deep Cleaning + Carpet quote and we’ll price it together.</span>
+              </div>
+            </div>
+
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning%20%2B%20Carpet%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Carpet%20rooms%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <!-- INCLUDED -->
+    <section id="included">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> What’s included</div>
+            <h2>Clear coverage. Straightforward quotes.</h2>
+          </div>
+          <p>Tell us bedrooms/baths + condition + priorities. We’ll quote it over text.</p>
+        </div>
+
+        <div class="split">
+          <div class="panel">
+            <div>
+              <h3>Maintenance Cleaning (up to 6 hours)</h3>
+              <ul>
+                <li>Kitchen counters, sink, exterior appliances wiped</li>
+                <li>Bathrooms cleaned & sanitized (toilet, sink, mirrors)</li>
+                <li>Floors vacuumed + mopped</li>
+                <li>Dusting of reachable surfaces</li>
+                <li>Quick tidy + reset of main areas</li>
+              </ul>
+
+              <div class="miniBanner">
+                <b>Common requests</b>
+                <span>Weekly / bi-weekly maintenance • busy family resets • post-travel refresh.</span>
+              </div>
+            </div>
+
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Maintenance%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div>
+              <h3>Deep Cleaning (up to 10 hours)</h3>
+              <ul>
+                <li>More detailed dusting of edges, ledges, and buildup areas</li>
+                <li>Baseboards/doors/frames wiped (as accessible)</li>
+                <li>Kitchen detail: backsplash + cabinet faces + appliance exteriors</li>
+                <li>Bathroom detail: showers/tubs scrubbed</li>
+                <li>Extra time on high-touch and problem spots</li>
+              </ul>
+
+              <div class="miniBanner">
+                <b>Best for</b>
+                <span>First-time cleans • seasonal resets • move-in prep • “it’s gotten away from us” homes.</span>
+              </div>
+            </div>
+
+            <div class="cardActions">
+              <a class="btn btn-primary btn-sm" href="sms:+15802150915?&body=Quote%20request%3A%20Deep%20Cleaning.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Top%203%20priorities%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta" style="margin-top:14px;">
+          <div>
+            <h3>Ready for a quote?</h3>
+            <p>Text bedrooms/baths + service type. Photos welcome.</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Service%3A%20%5BMaintenance%2FDeep%2FMove-out%5D.%20Carpet%3A%20%5BYes%2FNo%5D.%20Preferred%20date%3A%20%5B%5D.">Text to quote</a>
+            <a class="btn btn-ghost" href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20Here%20are%20photos%20for%20a%20quote.%20City%3A%20%5B%5D.%20Bedrooms%2FBaths%3A%20%5B%5D.%20Preferred%20date%3A%20%5B%5D.">Text photos</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <div class="badge"><span class="dot" style="width:8px;height:8px;box-shadow:none;"></span> FAQ</div>
+            <h2>Quick answers before you text</h2>
+          </div>
+          <p>Fastest way to book is to text for a quote.</p>
+        </div>
+
+        <div class="faqWrap">
+          <div class="faqItem open">
+            <button class="faqQ" type="button" aria-expanded="true">
+              How does quoting work?
+              <span class="chev" aria-hidden="true">⌄</span>
+            </button>
+            <div class="faqA">
+              Text your <b>city</b>, <b>bedrooms/baths</b>, the service you want (Maintenance/Deep/Move-out),
+              and any priorities. Photos help for heavy buildup or specific problem areas.
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqQ" type="button" aria-expanded="false">
+              Are supplies and equipment included?
+              <span class="chev" aria-hidden="true">⌄</span>
+            </button>
+            <div class="faqA">
+              Yes — we arrive with the supplies and tools needed. If you have kids/pets or sensitivities, tell us when you text.
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqQ" type="button" aria-expanded="false">
+              What’s the difference between Maintenance and Deep Cleaning?
+              <span class="chev" aria-hidden="true">⌄</span>
+            </button>
+            <div class="faqA">
+              Maintenance is a consistent reset of the home. Deep Cleaning adds time for edges/ledges/buildup and detail work.
+              Both depend on size and condition — we’ll quote based on your home.
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqQ" type="button" aria-expanded="false">
+              Is carpet cleaning included?
+              <span class="chev" aria-hidden="true">⌄</span>
+            </button>
+            <div class="faqA">
+              Carpet cleaning is an optional add-on. We use hot-water extraction and can quote based on number of rooms and any pet odor/stains.
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqQ" type="button" aria-expanded="false">
+              What areas do you serve?
+              <span class="chev" aria-hidden="true">⌄</span>
+            </button>
+            <div class="faqA">
+              Lawton, Fort Sill, Elgin, and Cache. If you’re nearby, text us — we may be able to accommodate.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <!-- FOOTER -->
   <div class="footer">
@@ -1003,7 +1031,7 @@
       <div class="footerGrid">
         <div>
           <div style="display:flex;align-items:center;gap:10px;">
-            <div class="logo" style="width:34px;height:34px;border-radius:12px;">RP</div>
+            <div class="logo" style="width:34px;height:34px;border-radius:12px;" aria-hidden="true">RP</div>
             <div>
               <div style="font-weight:980;color:var(--ink);">RED PRAIRIE CLEANING</div>
               <div style="margin-top:2px;">Text: <a href="sms:+15802150915?&body=Hi%20Red%20Prairie%20Cleaning%20-%20I%27d%20like%20a%20quote." style="font-weight:980;color:var(--red);">(580) 215-0915</a></div>
@@ -1012,11 +1040,9 @@
           <div style="margin-top:10px;">Service area: Lawton • Fort Sill • Elgin • Cache</div>
           <div style="margin-top:8px;">Modern home cleaning + professional carpet cleaning with simple text quotes.</div>
 
-          <!-- ✅ INTERNAL SEO LINKS -->
+          <!-- INTERNAL SEO LINKS -->
           <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(11,11,16,.1);">
             <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
-
-              <!-- Services -->
               <div>
                 <div style="font-weight:950; margin-bottom:6px;">Cleaning Services</div>
                 <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
@@ -1027,7 +1053,6 @@
                 </ul>
               </div>
 
-              <!-- Service Area -->
               <div>
                 <div style="font-weight:950; margin-bottom:6px;">Service Area</div>
                 <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
@@ -1038,7 +1063,6 @@
                 </ul>
               </div>
 
-              <!-- Trust -->
               <div>
                 <div style="font-weight:950; margin-bottom:6px;">Why Red Prairie</div>
                 <ul style="list-style:none; padding:0; margin:0; font-size:13.5px;">
@@ -1047,11 +1071,9 @@
                   <li><a href="/move-out-cleaning-lawton-ok/">Rental & PCS Specialists</a></li>
                 </ul>
               </div>
-
             </div>
           </div>
-          <!-- ✅ END INTERNAL SEO LINKS -->
-
+          <!-- END INTERNAL SEO LINKS -->
         </div>
 
         <div class="legal">
@@ -1071,10 +1093,15 @@
         const wrap = item.parentElement;
 
         wrap.querySelectorAll('.faqItem').forEach(i => {
-          if (i !== item) i.classList.remove('open');
+          if (i !== item) {
+            i.classList.remove('open');
+            const b = i.querySelector('.faqQ');
+            if (b) b.setAttribute('aria-expanded', 'false');
+          }
         });
 
-        item.classList.toggle('open');
+        const isOpen = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
     });
   </script>
