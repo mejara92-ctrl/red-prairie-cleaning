@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -25,111 +24,123 @@ a {
     text-decoration: none;
 }
 
-/* NAVBAR */
+/* =========================
+   NAVBAR
+========================= */
 
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 999;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 8%;
+    padding: 14px 7%;
     box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    min-height: 78px;
 }
 
 .logo img {
-    max-width: 190px;
+    width: 185px;
+    max-width: 185px;
+    height: auto;
+    object-fit: contain;
 }
 
 .nav-links {
     display: flex;
-    gap: 30px;
+    gap: 28px;
     list-style: none;
 }
 
 .nav-links a {
     color: #111;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 15px;
 }
 
 .nav-links a:hover {
-    color: #b70000;
+    color: #c40000;
 }
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
 
 .book-btn,
 .quote-btn {
-    background: #b70000;
+    background: #c40000;
     color: #fff;
-    padding: 14px 26px;
+    padding: 13px 24px;
     border-radius: 999px;
-    font-weight: 700;
+    font-weight: 800;
     display: inline-block;
-    box-shadow: 0 10px 25px rgba(183,0,0,0.25);
+    box-shadow: 0 10px 25px rgba(196,0,0,0.25);
 }
 
 .secondary-btn {
     background: #fff;
-    color: #b70000;
-    padding: 14px 26px;
+    color: #c40000;
+    padding: 13px 24px;
     border-radius: 999px;
-    font-weight: 700;
+    font-weight: 800;
     display: inline-block;
-    border: 2px solid #fff;
 }
 
 .book-btn:hover,
 .quote-btn:hover {
-    background: #8e0000;
+    background: #990000;
 }
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero {
-    min-height: 100vh;
+    min-height: 92vh;
     background:
-        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.6)),
-        url("../images/hero/hero-cleaning-team.jpg") center/cover no-repeat;
+        linear-gradient(90deg, rgba(0,0,0,0.72), rgba(0,0,0,0.42), rgba(0,0,0,0.25)),
+        url("../images/hero/hero-cleaning-team.jpg") center right/cover no-repeat;
     display: flex;
     align-items: center;
-    padding: 120px 8% 80px;
+    padding: 135px 7% 80px;
 }
 
 .hero-overlay {
-    max-width: 760px;
+    max-width: 690px;
     color: white;
 }
 
 .hero h1 {
-    font-size: clamp(42px, 6vw, 76px);
-    line-height: 1.05;
+    font-size: clamp(42px, 5vw, 68px);
+    line-height: 1.08;
     margin-bottom: 24px;
+    font-weight: 800;
 }
 
 .hero p {
-    font-size: 20px;
+    font-size: 19px;
     max-width: 620px;
     margin-bottom: 30px;
 }
 
 .hero-trust {
     display: flex;
-    gap: 18px;
+    gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 .hero-trust span {
-    background: rgba(255,255,255,0.15);
-    padding: 10px 16px;
+    background: rgba(255,255,255,0.18);
+    padding: 9px 15px;
     border-radius: 999px;
     backdrop-filter: blur(8px);
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 14px;
 }
 
 .hero-trust i,
@@ -143,7 +154,9 @@ a {
     flex-wrap: wrap;
 }
 
-/* TRUST BAR */
+/* =========================
+   TRUST BAR
+========================= */
 
 .trust-bar {
     display: grid;
@@ -163,7 +176,7 @@ a {
 
 .trust-card i {
     font-size: 34px;
-    color: #b70000;
+    color: #c40000;
     margin-bottom: 14px;
 }
 
@@ -172,7 +185,9 @@ a {
     margin-bottom: 6px;
 }
 
-/* SECTIONS */
+/* =========================
+   GENERAL SECTIONS
+========================= */
 
 section {
     padding: 90px 8%;
@@ -195,7 +210,9 @@ section h2 {
     color: #555;
 }
 
-/* SERVICES */
+/* =========================
+   SERVICES
+========================= */
 
 .service-grid {
     display: grid;
@@ -235,11 +252,13 @@ section h2 {
 }
 
 .service-content a {
-    color: #b70000;
+    color: #c40000;
     font-weight: 800;
 }
 
-/* CALCULATOR */
+/* =========================
+   CALCULATOR
+========================= */
 
 .calculator {
     background: #111;
@@ -277,6 +296,7 @@ select {
 }
 
 .checkbox-group label {
+    display: block;
     margin-bottom: 8px;
 }
 
@@ -291,10 +311,12 @@ select {
 #price {
     font-size: 48px;
     font-weight: 800;
-    color: #b70000;
+    color: #c40000;
 }
 
-/* BEFORE AFTER */
+/* =========================
+   BEFORE AFTER
+========================= */
 
 .gallery {
     display: grid;
@@ -318,14 +340,16 @@ select {
     position: absolute;
     bottom: 16px;
     left: 16px;
-    background: #b70000;
+    background: #c40000;
     color: white;
     padding: 8px 14px;
     border-radius: 999px;
     font-weight: 700;
 }
 
-/* TEAM */
+/* =========================
+   TEAM / EQUIPMENT
+========================= */
 
 .team,
 .equipment {
@@ -365,7 +389,9 @@ select {
     font-weight: 600;
 }
 
-/* REVIEWS */
+/* =========================
+   REVIEWS
+========================= */
 
 .review-grid {
     display: grid;
@@ -385,7 +411,9 @@ select {
     color: #444;
 }
 
-/* BOOKING */
+/* =========================
+   BOOKING
+========================= */
 
 .booking {
     background: #111;
@@ -404,16 +432,18 @@ select {
 
 .calendar-placeholder i {
     font-size: 52px;
-    color: #b70000;
+    color: #c40000;
     margin-bottom: 20px;
 }
 
-/* CTA */
+/* =========================
+   CTA
+========================= */
 
 .contact-cta,
 .final-cta {
     text-align: center;
-    background: #b70000;
+    background: #c40000;
     color: white;
 }
 
@@ -425,7 +455,9 @@ select {
     margin-top: 26px;
 }
 
-/* SERVICE AREA */
+/* =========================
+   SERVICE AREA
+========================= */
 
 .areas {
     display: grid;
@@ -441,12 +473,14 @@ select {
 }
 
 .area-card i {
-    color: #b70000;
+    color: #c40000;
     font-size: 28px;
     margin-bottom: 10px;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 footer {
     background: #070707;
@@ -486,7 +520,28 @@ footer p {
     padding-top: 20px;
 }
 
-/* MOBILE */
+/* =========================
+   ANIMATIONS
+========================= */
+
+.hidden {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.6s ease;
+}
+
+.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.navbar-scrolled {
+    box-shadow: 0 8px 35px rgba(0,0,0,0.14);
+}
+
+/* =========================
+   TABLET
+========================= */
 
 @media (max-width: 950px) {
     .nav-links {
@@ -515,28 +570,72 @@ footer p {
     }
 }
 
-@media (max-width: 600px) {
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
     .navbar {
-        padding: 14px 5%;
+        position: fixed;
+        padding: 12px 5%;
+        min-height: 70px;
     }
 
     .logo img {
+        width: 150px;
         max-width: 150px;
     }
 
-    .book-btn {
-        padding: 10px 16px;
-        font-size: 14px;
+    .nav-links {
+        display: none;
+    }
+
+    .navbar .book-btn {
+        padding: 10px 15px;
+        font-size: 13px;
     }
 
     .hero {
-        padding: 120px 5% 70px;
+        min-height: 88vh;
+        padding: 120px 5% 60px;
+        background:
+            linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.65)),
+            url("../images/hero/hero-cleaning-team.jpg") center center/cover no-repeat;
+    }
+
+    .hero-overlay {
+        max-width: 100%;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+        line-height: 1.08;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .hero-buttons a {
+        text-align: center;
+        width: 100%;
+    }
+
+    .hero-trust span {
+        font-size: 13px;
     }
 
     section {
         padding: 70px 5%;
     }
+}
 
+@media (max-width: 600px) {
     .trust-bar,
     .service-grid,
     .gallery,
@@ -545,13 +644,36 @@ footer p {
         grid-template-columns: 1fr;
     }
 
-    .hero-buttons,
-    .cta-buttons {
-        flex-direction: column;
+    .footer-content {
+        grid-template-columns: 1fr;
     }
 
-    .hero-buttons a,
-    .cta-buttons a {
-        text-align: center;
+    .calculator-box {
+        padding: 26px;
+    }
+
+    .gallery-item img,
+    .service-card img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        width: 130px;
+        max-width: 130px;
+    }
+
+    .navbar .book-btn {
+        padding: 9px 13px;
+        font-size: 12px;
+    }
+
+    .hero h1 {
+        font-size: 34px;
+    }
+
+    .hero p {
+        font-size: 15px;
     }
 }
