@@ -4,110 +4,283 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Online | Red Prairie Cleaning</title>
+
   <style>
+    :root {
+      --bg: #0d0d0d;
+      --card: #171717;
+      --card2: #202020;
+      --border: #333;
+      --red: #c62828;
+      --red2: #ff4545;
+      --text: #ffffff;
+      --muted: #bdbdbd;
+      --soft: #2a1515;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.85)),
+        radial-gradient(circle at top, #3a1111, #0d0d0d 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      max-width: 1000px;
+      margin: auto;
+      padding: 22px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: .5px;
+    }
+
+    .phone {
+      color: white;
+      text-decoration: none;
+      border: 1px solid #555;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
     }
 
     .wrap {
-      max-width: 760px;
+      max-width: 860px;
       margin: auto;
-      padding: 40px 20px;
+      padding: 20px;
     }
 
     .card {
-      background: #181818;
-      border: 1px solid #333;
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+      background: rgba(23,23,23,.96);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
     }
 
-    h1, h2 {
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #292929;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, var(--red), var(--red2));
+      transition: width .25s ease;
+    }
+
+    h1, h2, h3 {
       margin-top: 0;
     }
 
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
     .sub {
-      color: #bbb;
-      line-height: 1.5;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 24px;
     }
 
     .grid {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
-      margin: 24px 0;
+      margin: 22px 0;
+    }
+
+    @media (max-width: 650px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 22px;
+      }
     }
 
     .option {
-      background: #222;
-      border: 1px solid #444;
-      color: #fff;
-      padding: 16px;
-      border-radius: 14px;
+      background: var(--card2);
+      border: 1px solid #404040;
+      color: white;
+      padding: 18px;
+      border-radius: 18px;
       cursor: pointer;
       text-align: left;
       font-size: 16px;
+      transition: .18s ease;
+      min-height: 92px;
     }
 
-    .option:hover, .option.selected {
-      border-color: #c62828;
-      background: #2b1515;
+    .option:hover {
+      border-color: var(--red2);
+      background: var(--soft);
+      transform: translateY(-2px);
+    }
+
+    .option strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .option span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 650px) {
+      .pill-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .pill {
+      background: #222;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 999px;
+      padding: 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .pill:hover {
+      border-color: var(--red2);
+      background: var(--soft);
+    }
+
+    .included {
+      background: #121212;
+      border: 1px solid #333;
+      border-radius: 18px;
+      padding: 18px;
+      margin: 20px 0;
+    }
+
+    .included-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    @media (max-width: 650px) {
+      .checklist {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label.addon {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: #202020;
+      border: 1px solid #383838;
+      padding: 15px;
+      border-radius: 14px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+
+    label.addon:hover {
+      border-color: var(--red2);
+      background: #251717;
+    }
+
+    label.addon input {
+      transform: scale(1.2);
+      margin-right: 10px;
+    }
+
+    .addon-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .price {
+      color: var(--red2);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .invoice {
+      background: #111;
+      border: 1px solid #343434;
+      border-radius: 18px;
+      padding: 20px;
+      margin-top: 20px;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #333;
-      padding: 10px 0;
+      gap: 12px;
+      border-bottom: 1px solid #292929;
+      padding: 12px 0;
+      color: #ddd;
+    }
+
+    .row strong {
+      color: white;
     }
 
     .total {
-      font-size: 28px;
-      font-weight: bold;
-      color: #ff4b4b;
-      margin-top: 20px;
-    }
-
-    .btns {
       display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-
-    button.primary {
-      background: #c62828;
-      color: white;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 999px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: transparent;
-      color: white;
-      border: 1px solid #555;
-      padding: 14px 22px;
-      border-radius: 999px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    label {
-      display: block;
-      margin: 12px 0;
-      cursor: pointer;
-    }
-
-    input[type="checkbox"] {
-      transform: scale(1.2);
-      margin-right: 10px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--red2);
+      padding-top: 18px;
     }
 
     .notice {
@@ -118,16 +291,69 @@
       color: #ddd;
       margin-top: 20px;
       font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button.primary,
+    button.secondary {
+      border-radius: 999px;
+      font-size: 16px;
+      padding: 15px 22px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--red);
+      color: white;
+      border: none;
+      font-weight: 900;
+    }
+
+    button.primary:hover {
+      background: #e63333;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: white;
+      border: 1px solid #555;
+    }
+
+    .fineprint {
+      color: #888;
+      font-size: 13px;
+      margin-top: 18px;
+      line-height: 1.45;
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <div class="topbar">
+    <div class="brand">RED PRAIRIE CLEANING</div>
+    <a class="phone" href="tel:5802150915">Call/Text: (580) 215-0915</a>
+  </div>
+
+  <main class="wrap">
     <div class="card">
+      <div class="progress-label">
+        <span id="stepText">Step 1 of 6</span>
+        <span>Instant Price & Booking</span>
+      </div>
+      <div class="progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
       <div id="app"></div>
     </div>
-  </div>
+  </main>
 
 <script>
 const state = {
@@ -143,27 +369,37 @@ const services = {
   standard: {
     name: "Standard House Cleaning",
     emoji: "🏠",
-    base: 149
+    base: 149,
+    desc: "Best for recurring or maintained homes.",
+    includes: ["Kitchen wipe-down", "Bathrooms", "Dusting", "Floors", "Trash removal", "General tidy-up"]
   },
   deep: {
     name: "Deep Cleaning",
     emoji: "💎",
-    base: 249
+    base: 249,
+    desc: "Best for first-time cleans, seasonal resets, and detailed work.",
+    includes: ["Baseboards included", "Detailed bathrooms", "Kitchen detail", "Detailed dusting", "Floors", "High-touch surfaces"]
   },
   carpet: {
     name: "Carpet Cleaning",
     emoji: "🧼",
-    base: 149
+    base: 149,
+    desc: "Professional carpet cleaning with commercial equipment.",
+    includes: ["Hot-water extraction", "Pre-spray", "Rake/grooming", "Basic spot attention", "Fresh finish"]
   },
   moveout: {
     name: "Move-Out Cleaning",
     emoji: "📦",
-    base: 399
+    base: 399,
+    desc: "For empty homes, apartments, PCS moves, and deposit recovery.",
+    includes: ["Kitchen", "Bathrooms", "Cabinets exterior", "Baseboards", "Floors", "Move-out detail"]
   },
   upholstery: {
     name: "Upholstery Cleaning",
     emoji: "🛋️",
-    base: 99
+    base: 99,
+    desc: "For couches, chairs, sectionals, and fabric furniture.",
+    includes: ["Fabric pre-spray", "Extraction cleaning", "Basic spot treatment", "Freshened finish"]
   }
 };
 
@@ -171,43 +407,58 @@ const addonsByService = {
   standard: [
     ["Inside oven", 25],
     ["Inside refrigerator", 25],
+    ["Inside microwave", 10],
     ["Interior windows", 40],
     ["Window tracks & sills", 25],
     ["Baseboard detailing", 35],
     ["Pet hair removal", 35],
     ["Change bed sheets", 15],
-    ["Laundry folding", 20]
+    ["Laundry folding", 20],
+    ["Inside empty cabinets", 40]
   ],
   deep: [
     ["Inside oven", 25],
     ["Inside refrigerator", 25],
+    ["Inside microwave", 10],
     ["Interior windows", 40],
     ["Window tracks & sills", 25],
     ["Inside empty cabinets", 40],
     ["Pet hair removal", 35],
     ["Odor treatment", 40],
+    ["Change bed sheets", 15],
     ["Laundry folding", 20]
   ],
   carpet: [
     ["Pet stain treatment", 30],
     ["Deodorizer", 25],
     ["Heavy traffic lane treatment", 25],
-    ["Carpet protector", 50]
+    ["Carpet protector", 50],
+    ["Area rug cleaning", 35],
+    ["Stair cleaning", 40]
   ],
   moveout: [
     ["Appliance deep clean package", 40],
     ["Interior windows", 40],
+    ["Window tracks & sills", 25],
     ["Garage sweep-out", 50],
     ["Wall scuff removal", 30],
-    ["Small trash removal", 50]
+    ["Small trash removal", 50],
+    ["Inside empty cabinets/drawers", 50]
   ],
   upholstery: [
     ["Deodorizer", 20],
     ["Pet hair removal", 25],
     ["Stain treatment", 25],
-    ["Fabric protector", 35]
+    ["Fabric protector", 35],
+    ["Extra large sectional", 50]
   ]
 };
+
+function updateProgress() {
+  const maxSteps = 6;
+  document.getElementById("stepText").innerText = `Step ${state.step} of ${maxSteps}`;
+  document.getElementById("progressFill").style.width = `${(state.step / maxSteps) * 100}%`;
+}
 
 function calculatePrice() {
   let total = services[state.service]?.base || 0;
@@ -224,45 +475,65 @@ function calculatePrice() {
     total += (Number(state.bedrooms) - 1) * 35;
   }
 
+  if (state.service === "upholstery") {
+    total += (Number(state.bedrooms) - 1) * 40;
+  }
+
   state.addons.forEach(addon => total += addon.price);
 
   return Math.max(total, 99);
 }
 
+function includedBox(serviceKey) {
+  const s = services[serviceKey];
+  return `
+    <div class="included">
+      <div class="included-title">Included with ${s.name}</div>
+      <div class="checklist">
+        ${s.includes.map(item => `<div>✓ ${item}</div>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function render() {
+  updateProgress();
   const app = document.getElementById("app");
 
   if (state.step === 1) {
     app.innerHTML = `
       <h1>Get Your Instant Price</h1>
-      <p class="sub">Choose your cleaning service, see your price, then book online.</p>
+      <p class="sub">Choose your cleaning service, see your estimate, then book with Red Prairie Cleaning.</p>
+
       <div class="grid">
         ${Object.entries(services).map(([key, s]) => `
           <button class="option" onclick="selectService('${key}')">
-            ${s.emoji} ${s.name}
+            <strong>${s.emoji} ${s.name}</strong>
+            <span>${s.desc}</span>
           </button>
         `).join("")}
       </div>
+
+      <p class="fineprint">Serving Lawton, Fort Sill, Cache, Elgin, and nearby Southwest Oklahoma areas.</p>
     `;
   }
 
   if (state.step === 2) {
-    const isHome = ["standard", "deep", "moveout"].includes(state.service);
-    app.innerHTML = `
-      <h2>${services[state.service].name}</h2>
-      <p class="sub">Answer a few quick questions.</p>
+    const wording = ["carpet", "upholstery"].includes(state.service)
+      ? "How many rooms/items?"
+      : "How many bedrooms?";
 
-      ${isHome ? `
-        <h3>Bedrooms</h3>
-        <div class="grid">
-          ${[1,2,3,4,5].map(n => `<button class="option" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
-        </div>
-      ` : `
-        <h3>How many rooms/items?</h3>
-        <div class="grid">
-          ${[1,2,3,4,5].map(n => `<button class="option" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
-        </div>
-      `}
+    app.innerHTML = `
+      <h2>${services[state.service].emoji} ${services[state.service].name}</h2>
+      <p class="sub">${services[state.service].desc}</p>
+      ${includedBox(state.service)}
+
+      <h3>${wording}</h3>
+      <div class="pill-grid">
+        ${[1,2,3,4,5].map(n => `
+          <button class="pill" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>
+        `).join("")}
+      </div>
 
       <div class="btns">
         <button class="secondary" onclick="back()">Back</button>
@@ -273,10 +544,14 @@ function render() {
   if (state.step === 3) {
     app.innerHTML = `
       <h2>Bathrooms</h2>
-      <p class="sub">How many bathrooms?</p>
-      <div class="grid">
-        ${[1,2,3,4].map(n => `<button class="option" onclick="selectBathrooms(${n})">${n}${n === 4 ? "+" : ""}</button>`).join("")}
+      <p class="sub">How many bathrooms should we account for?</p>
+
+      <div class="pill-grid">
+        ${[1,2,3,4].map(n => `
+          <button class="pill" onclick="selectBathrooms(${n})">${n}${n === 4 ? "+" : ""}</button>
+        `).join("")}
       </div>
+
       <div class="btns">
         <button class="secondary" onclick="back()">Back</button>
       </div>
@@ -286,12 +561,25 @@ function render() {
   if (state.step === 4) {
     app.innerHTML = `
       <h2>Home Condition</h2>
-      <p class="sub">This helps us price the job fairly.</p>
+      <p class="sub">This helps price the job fairly and prevents surprises.</p>
+
       <div class="grid">
-        ${["Well maintained", "Average", "Heavy buildup"].map(c => `
-          <button class="option" onclick="selectCondition('${c}')">${c}</button>
-        `).join("")}
+        <button class="option" onclick="selectCondition('Well maintained')">
+          <strong>Well maintained</strong>
+          <span>Already kept up, just needs professional attention.</span>
+        </button>
+
+        <button class="option" onclick="selectCondition('Average')">
+          <strong>Average</strong>
+          <span>Normal lived-in home. This is the default.</span>
+        </button>
+
+        <button class="option" onclick="selectCondition('Heavy buildup')">
+          <strong>Heavy buildup</strong>
+          <span>Extra grime, heavy dust, neglected areas, or extra time needed.</span>
+        </button>
       </div>
+
       <div class="btns">
         <button class="secondary" onclick="back()">Back</button>
       </div>
@@ -300,14 +588,18 @@ function render() {
 
   if (state.step === 5) {
     const addons = addonsByService[state.service] || [];
+
     app.innerHTML = `
       <h2>✨ Make It Shine Even More</h2>
       <p class="sub">Optional upgrades while we're already there.</p>
 
-      ${addons.map(([name, price], i) => `
-        <label>
-          <input type="checkbox" onchange="toggleAddon('${name}', ${price}, this.checked)">
-          ${name} +$${price}
+      ${addons.map(([name, price]) => `
+        <label class="addon">
+          <span class="addon-left">
+            <input type="checkbox" onchange="toggleAddon('${name}', ${price}, this.checked)">
+            ${name}
+          </span>
+          <span class="price">+$${price}</span>
         </label>
       `).join("")}
 
@@ -320,30 +612,39 @@ function render() {
 
   if (state.step === 6) {
     const total = calculatePrice();
+
     app.innerHTML = `
-      <h2>Your Instant Price</h2>
+      <h2>Your Instant Estimate</h2>
+      <p class="sub">Here is your estimated price based on your selections.</p>
 
-      <div class="row"><span>Service</span><strong>${services[state.service].name}</strong></div>
-      <div class="row"><span>Base price</span><strong>$${services[state.service].base}</strong></div>
+      <div class="invoice">
+        <div class="row"><span>Service</span><strong>${services[state.service].name}</strong></div>
+        <div class="row"><span>Base price</span><strong>$${services[state.service].base}</strong></div>
 
-      ${state.bedrooms ? `<div class="row"><span>Bedrooms / rooms</span><strong>${state.bedrooms}</strong></div>` : ""}
-      ${state.bathrooms ? `<div class="row"><span>Bathrooms</span><strong>${state.bathrooms}</strong></div>` : ""}
-      ${state.condition ? `<div class="row"><span>Condition</span><strong>${state.condition}</strong></div>` : ""}
+        ${state.bedrooms ? `<div class="row"><span>${["carpet", "upholstery"].includes(state.service) ? "Rooms/items" : "Bedrooms"}</span><strong>${state.bedrooms}${state.bedrooms === 5 ? "+" : ""}</strong></div>` : ""}
+        ${state.bathrooms ? `<div class="row"><span>Bathrooms</span><strong>${state.bathrooms}${state.bathrooms === 4 ? "+" : ""}</strong></div>` : ""}
+        ${["standard", "deep", "moveout"].includes(state.service) ? `<div class="row"><span>Condition</span><strong>${state.condition}</strong></div>` : ""}
 
-      ${state.addons.map(a => `
-        <div class="row"><span>${a.name}</span><strong>+$${a.price}</strong></div>
-      `).join("")}
+        ${state.addons.map(a => `
+          <div class="row"><span>${a.name}</span><strong>+$${a.price}</strong></div>
+        `).join("")}
 
-      <div class="total">Total Estimate: $${total}</div>
+        <div class="total">
+          <span>Total</span>
+          <span>$${total}</span>
+        </div>
+      </div>
 
       <div class="notice">
-        Final price may be adjusted if the home is significantly larger, heavily soiled, or outside normal service conditions.
+        This is an instant estimate. Final price may be adjusted if the home is significantly larger, heavily soiled, not empty for move-outs, or outside normal service conditions.
       </div>
 
       <div class="btns">
         <button class="secondary" onclick="back()">Edit</button>
-        <button class="primary" onclick="bookNow()">Book This Cleaning</button>
+        <button class="primary" onclick="bookNow()">Book This Cleaning →</button>
       </div>
+
+      <p class="fineprint">Next upgrade: this button will connect to your GoHighLevel calendar and deposit checkout.</p>
     `;
   }
 }
@@ -396,15 +697,21 @@ function next() {
 }
 
 function back() {
-  state.step--;
-  render();
+  if (state.step > 1) {
+    if (state.step === 5 && ["carpet", "upholstery"].includes(state.service)) {
+      state.step = 2;
+    } else {
+      state.step--;
+    }
+    render();
+  }
 }
 
 function bookNow() {
   const total = calculatePrice();
 
   const summary = encodeURIComponent(
-    `I want to book ${services[state.service].name}. Estimated price: $${total}. Bedrooms/rooms: ${state.bedrooms || "N/A"}. Bathrooms: ${state.bathrooms || "N/A"}. Condition: ${state.condition}. Add-ons: ${state.addons.map(a => a.name).join(", ") || "None"}.`
+    `Hi Red Prairie Cleaning, I want to book ${services[state.service].name}. Estimated price: $${total}. Bedrooms/rooms/items: ${state.bedrooms || "N/A"}. Bathrooms: ${state.bathrooms || "N/A"}. Condition: ${state.condition || "N/A"}. Add-ons: ${state.addons.map(a => a.name).join(", ") || "None"}.`
   );
 
   window.location.href = `sms:5802150915?body=${summary}`;
