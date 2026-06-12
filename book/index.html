@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Online | Red Prairie Cleaning</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    .sub {
+      color: #bbb;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .option {
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .option:hover, .option.selected {
+      border-color: #c62828;
+      background: #2b1515;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+      padding: 10px 0;
+    }
+
+    .total {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ff4b4b;
+      margin-top: 20px;
+    }
+
+    .btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button.primary {
+      background: #c62828;
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: white;
+      border: 1px solid #555;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 10px;
+    }
+
+    .notice {
+      background: #241818;
+      border: 1px solid #5a2525;
+      padding: 14px;
+      border-radius: 12px;
+      color: #ddd;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div id="app"></div>
+    </div>
+  </div>
+
+<script>
+const state = {
+  step: 1,
+  service: null,
+  bedrooms: null,
+  bathrooms: null,
+  condition: "Average",
+  addons: []
+};
+
+const services = {
+  standard: {
+    name: "Standard House Cleaning",
+    emoji: "🏠",
+    base: 149
+  },
+  deep: {
+    name: "Deep Cleaning",
+    emoji: "💎",
+    base: 249
+  },
+  carpet: {
+    name: "Carpet Cleaning",
+    emoji: "🧼",
+    base: 149
+  },
+  moveout: {
+    name: "Move-Out Cleaning",
+    emoji: "📦",
+    base: 399
+  },
+  upholstery: {
+    name: "Upholstery Cleaning",
+    emoji: "🛋️",
+    base: 99
+  }
+};
+
+const addonsByService = {
+  standard: [
+    ["Inside oven", 25],
+    ["Inside refrigerator", 25],
+    ["Interior windows", 40],
+    ["Window tracks & sills", 25],
+    ["Baseboard detailing", 35],
+    ["Pet hair removal", 35],
+    ["Change bed sheets", 15],
+    ["Laundry folding", 20]
+  ],
+  deep: [
+    ["Inside oven", 25],
+    ["Inside refrigerator", 25],
+    ["Interior windows", 40],
+    ["Window tracks & sills", 25],
+    ["Inside empty cabinets", 40],
+    ["Pet hair removal", 35],
+    ["Odor treatment", 40],
+    ["Laundry folding", 20]
+  ],
+  carpet: [
+    ["Pet stain treatment", 30],
+    ["Deodorizer", 25],
+    ["Heavy traffic lane treatment", 25],
+    ["Carpet protector", 50]
+  ],
+  moveout: [
+    ["Appliance deep clean package", 40],
+    ["Interior windows", 40],
+    ["Garage sweep-out", 50],
+    ["Wall scuff removal", 30],
+    ["Small trash removal", 50]
+  ],
+  upholstery: [
+    ["Deodorizer", 20],
+    ["Pet hair removal", 25],
+    ["Stain treatment", 25],
+    ["Fabric protector", 35]
+  ]
+};
+
+function calculatePrice() {
+  let total = services[state.service]?.base || 0;
+
+  if (["standard", "deep", "moveout"].includes(state.service)) {
+    total += (Number(state.bedrooms) - 1) * 25;
+    total += (Number(state.bathrooms) - 1) * 30;
+
+    if (state.condition === "Heavy buildup") total += 50;
+    if (state.condition === "Well maintained") total -= 20;
+  }
+
+  if (state.service === "carpet") {
+    total += (Number(state.bedrooms) - 1) * 35;
+  }
+
+  state.addons.forEach(addon => total += addon.price);
+
+  return Math.max(total, 99);
+}
+
+function render() {
+  const app = document.getElementById("app");
+
+  if (state.step === 1) {
+    app.innerHTML = `
+      <h1>Get Your Instant Price</h1>
+      <p class="sub">Choose your cleaning service, see your price, then book online.</p>
+      <div class="grid">
+        ${Object.entries(services).map(([key, s]) => `
+          <button class="option" onclick="selectService('${key}')">
+            ${s.emoji} ${s.name}
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  if (state.step === 2) {
+    const isHome = ["standard", "deep", "moveout"].includes(state.service);
+    app.innerHTML = `
+      <h2>${services[state.service].name}</h2>
+      <p class="sub">Answer a few quick questions.</p>
+
+      ${isHome ? `
+        <h3>Bedrooms</h3>
+        <div class="grid">
+          ${[1,2,3,4,5].map(n => `<button class="option" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
+        </div>
+      ` : `
+        <h3>How many rooms/items?</h3>
+        <div class="grid">
+          ${[1,2,3,4,5].map(n => `<button class="option" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
+        </div>
+      `}
+
+      <div class="btns">
+        <button class="secondary" onclick="back()">Back</button>
+      </div>
+    `;
+  }
+
+  if (state.step === 3) {
+    app.innerHTML = `
+      <h2>Bathrooms</h2>
+      <p class="sub">How many bathrooms?</p>
+      <div class="grid">
+        ${[1,2,3,4].map(n => `<button class="option" onclick="selectBathrooms(${n})">${n}${n === 4 ? "+" : ""}</button>`).join("")}
+      </div>
+      <div class="btns">
+        <button class="secondary" onclick="back()">Back</button>
+      </div>
+    `;
+  }
+
+  if (state.step === 4) {
+    app.innerHTML = `
+      <h2>Home Condition</h2>
+      <p class="sub">This helps us price the job fairly.</p>
+      <div class="grid">
+        ${["Well maintained", "Average", "Heavy buildup"].map(c => `
+          <button class="option" onclick="selectCondition('${c}')">${c}</button>
+        `).join("")}
+      </div>
+      <div class="btns">
+        <button class="secondary" onclick="back()">Back</button>
+      </div>
+    `;
+  }
+
+  if (state.step === 5) {
+    const addons = addonsByService[state.service] || [];
+    app.innerHTML = `
+      <h2>✨ Make It Shine Even More</h2>
+      <p class="sub">Optional upgrades while we're already there.</p>
+
+      ${addons.map(([name, price], i) => `
+        <label>
+          <input type="checkbox" onchange="toggleAddon('${name}', ${price}, this.checked)">
+          ${name} +$${price}
+        </label>
+      `).join("")}
+
+      <div class="btns">
+        <button class="secondary" onclick="back()">Back</button>
+        <button class="primary" onclick="next()">See My Price</button>
+      </div>
+    `;
+  }
+
+  if (state.step === 6) {
+    const total = calculatePrice();
+    app.innerHTML = `
+      <h2>Your Instant Price</h2>
+
+      <div class="row"><span>Service</span><strong>${services[state.service].name}</strong></div>
+      <div class="row"><span>Base price</span><strong>$${services[state.service].base}</strong></div>
+
+      ${state.bedrooms ? `<div class="row"><span>Bedrooms / rooms</span><strong>${state.bedrooms}</strong></div>` : ""}
+      ${state.bathrooms ? `<div class="row"><span>Bathrooms</span><strong>${state.bathrooms}</strong></div>` : ""}
+      ${state.condition ? `<div class="row"><span>Condition</span><strong>${state.condition}</strong></div>` : ""}
+
+      ${state.addons.map(a => `
+        <div class="row"><span>${a.name}</span><strong>+$${a.price}</strong></div>
+      `).join("")}
+
+      <div class="total">Total Estimate: $${total}</div>
+
+      <div class="notice">
+        Final price may be adjusted if the home is significantly larger, heavily soiled, or outside normal service conditions.
+      </div>
+
+      <div class="btns">
+        <button class="secondary" onclick="back()">Edit</button>
+        <button class="primary" onclick="bookNow()">Book This Cleaning</button>
+      </div>
+    `;
+  }
+}
+
+function selectService(service) {
+  state.service = service;
+  state.addons = [];
+  state.bedrooms = null;
+  state.bathrooms = null;
+  state.condition = "Average";
+  state.step = 2;
+  render();
+}
+
+function selectBedrooms(n) {
+  state.bedrooms = n;
+
+  if (["carpet", "upholstery"].includes(state.service)) {
+    state.step = 5;
+  } else {
+    state.step = 3;
+  }
+
+  render();
+}
+
+function selectBathrooms(n) {
+  state.bathrooms = n;
+  state.step = 4;
+  render();
+}
+
+function selectCondition(condition) {
+  state.condition = condition;
+  state.step = 5;
+  render();
+}
+
+function toggleAddon(name, price, checked) {
+  if (checked) {
+    state.addons.push({ name, price });
+  } else {
+    state.addons = state.addons.filter(a => a.name !== name);
+  }
+}
+
+function next() {
+  state.step++;
+  render();
+}
+
+function back() {
+  state.step--;
+  render();
+}
+
+function bookNow() {
+  const total = calculatePrice();
+
+  const summary = encodeURIComponent(
+    `I want to book ${services[state.service].name}. Estimated price: $${total}. Bedrooms/rooms: ${state.bedrooms || "N/A"}. Bathrooms: ${state.bathrooms || "N/A"}. Condition: ${state.condition}. Add-ons: ${state.addons.map(a => a.name).join(", ") || "None"}.`
+  );
+
+  window.location.href = `sms:5802150915?body=${summary}`;
+}
+
+render();
+</script>
+</body>
+</html>
