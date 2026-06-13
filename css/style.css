@@ -578,28 +578,25 @@ Mobile-First Main Stylesheet
             .footer-content { grid-template-columns: repeat(3, 1fr); gap: 30px; }
             .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; }
         }
-/* ==============================
-   MOBILE CHAT WIDGET FIX
-============================== */
-
 @media (max-width: 768px) {
+  body {
+    padding-bottom: 130px !important;
+  }
 
-    /* Prevent chat from covering buttons */
-    body {
-        padding-bottom: 120px;
-    }
+  .rp-mobile-sticky {
+    z-index: 2147483000 !important;
+  }
 
-    /* Move GoHighLevel chat bubble upward */
-    iframe[src*="leadconnector"],
-    iframe[src*="widget"],
-    .lc-chat-widget,
-    #chat-widget {
-        bottom: 100px !important;
-    }
-
-    /* Give buttons more room on mobile */
-    .hero-buttons,
-    .cta-buttons {
-        margin-bottom: 40px;
-    }
+  iframe[title*="chat" i],
+  iframe[id*="chat" i],
+  iframe[class*="chat" i],
+  iframe[src*="leadconnector" i],
+  iframe[src*="msgsndr" i],
+  iframe[src*="widget" i],
+  div[id*="chat" i],
+  div[class*="chat" i],
+  div[class*="lc" i] {
+    bottom: 95px !important;
+    z-index: 2147482999 !important;
+  }
 }
