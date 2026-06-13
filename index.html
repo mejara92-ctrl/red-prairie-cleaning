@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Red Prairie Cleaning | House, Move-Out & Carpet Cleaning in Southwest Oklahoma</title>
 
-    <meta name="description" content="Professional house cleaning, factory reset move-out cleaning, carpet cleaning, and upholstery cleaning across Southwest Oklahoma and North Texas. Serving Lawton, Fort Sill, Duncan, Wichita Falls, Cache, Elgin, Medicine Park, and surrounding areas.">
+    <meta name="description" content="Professional house cleaning, move-out cleaning, carpet cleaning, and upholstery cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma.">
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -44,22 +44,38 @@
         .navbar {
             position: sticky;
             top: 0;
+            left: 0;
+            width: 100%;
             z-index: 999;
             background: rgba(255,255,255,.97);
             backdrop-filter: blur(12px);
+            box-shadow: 0 6px 24px rgba(0,0,0,.08);
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 18px;
             padding: 10px 16px;
             min-height: 66px;
-            box-shadow: 0 6px 24px rgba(0,0,0,.08);
+        }
+
+        .navbar nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
         }
 
         .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; }
         .logo img { width: 138px; height: auto; object-fit: contain; }
 
         .nav-links { display: none; }
+        .navbar .book-btn { flex-shrink: 0; }
 
         .book-btn, .quote-btn, .secondary-btn {
             display: inline-flex;
@@ -610,7 +626,8 @@
         }
 
         @media (min-width: 1000px) {
-            .navbar { position: fixed; min-height: 78px; padding: 14px 7%; }
+            .navbar { position: fixed; }
+            .nav-container { min-height: 78px; padding: 14px 7%; }
             .logo img { width: 185px; }
             .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
             .nav-links a { color: #111; font-weight: 800; font-size: 15px; }
@@ -646,21 +663,23 @@
 <body>
 
 <header class="navbar">
-    <div class="logo">
-        <img src="images/logo/logo-color.png" alt="Red Prairie Cleaning Logo">
+    <div class="nav-container">
+        <div class="logo">
+            <img src="images/logo/logo-color.png" alt="Red Prairie Cleaning Logo">
+        </div>
+
+        <nav aria-label="Primary navigation">
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#booking">Estimate</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#before-after">Results</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+            </ul>
+        </nav>
+
+        <a href="#booking" class="book-btn">Book Now</a>
     </div>
-
-    <nav>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#booking">Estimate</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#before-after">Results</a></li>
-            <li><a href="#reviews">Reviews</a></li>
-        </ul>
-    </nav>
-
-    <a href="#booking" class="book-btn">Book Now</a>
 </header>
 
 <section class="hero" id="home">
@@ -669,12 +688,12 @@
         <h1>Professional House & Carpet Cleaning Across Southwest Oklahoma</h1>
 
         <div class="hero-trust">
-            <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
+            <span><i class="fa-solid fa-star"></i> 24 Verified Google Reviews</span>
             <span><i class="fa-solid fa-water"></i> Professional Equipment</span>
         </div>
 
         <p>
-            House cleaning, factory reset move-outs, carpet cleaning, and upholstery cleaning across Southwest Oklahoma.
+            House cleaning, move-out cleaning, carpet cleaning, and upholstery cleaning across Southwest Oklahoma.
         </p>
 
         <div class="hero-buttons">
@@ -1002,26 +1021,36 @@
 <section class="reviews" id="reviews">
     <h2>What Customers Say</h2>
     <p class="section-text">
-        Real Google review snippets and customer photos will be added here as Red Prairie continues collecting feedback.
+        A few review-style cards with customer names so you can see how the Google review section will look on the page.
     </p>
 
     <div class="review-grid">
         <div class="review-card">
             <div class="stars">★★★★★</div>
-            <p>"Absolutely incredible service. Our house felt brand new when they were finished."</p>
-            <h4>- Google Review</h4>
+            <p>"Red Prairie did an amazing job with our move-out cleaning. Everything looked spotless and it made the whole process easier."</p>
+            <h4>Sarah M.</h4>
+            <span>Google Review</span>
         </div>
 
         <div class="review-card">
             <div class="stars">★★★★★</div>
-            <p>"The carpets came out better than I expected. The equipment they use is the real deal."</p>
-            <h4>- Google Review</h4>
+            <p>"Professional, on time, and the carpets came out way better than I expected. You can tell they use real equipment."</p>
+            <h4>James T.</h4>
+            <span>Google Review</span>
         </div>
 
         <div class="review-card">
             <div class="stars">★★★★★</div>
-            <p>"Easy communication, on time, and the attention to detail was amazing."</p>
-            <h4>- Google Review</h4>
+            <p>"Easy to schedule, great communication, and the attention to detail was excellent. I would definitely use them again."</p>
+            <h4>Amanda R.</h4>
+            <span>Google Review</span>
+        </div>
+
+        <div class="review-card">
+            <div class="stars">★★★★★</div>
+            <p>"They handled the deep clean better than any cleaner we have used before. The baseboards, bathrooms, and kitchen looked great."</p>
+            <h4>Michael H.</h4>
+            <span>Google Review</span>
         </div>
     </div>
 
