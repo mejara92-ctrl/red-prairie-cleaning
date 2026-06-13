@@ -18,9 +18,7 @@
       --soft: #2a1515;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -39,6 +37,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 14px;
     }
 
     .brand {
@@ -53,10 +52,11 @@
       padding: 10px 14px;
       border-radius: 999px;
       font-size: 14px;
+      white-space: nowrap;
     }
 
     .wrap {
-      max-width: 860px;
+      max-width: 900px;
       margin: auto;
       padding: 20px;
     }
@@ -75,6 +75,7 @@
       color: var(--muted);
       font-size: 14px;
       margin-bottom: 10px;
+      gap: 12px;
     }
 
     .progress {
@@ -88,14 +89,12 @@
 
     .progress-fill {
       height: 100%;
-      width: 20%;
+      width: 14%;
       background: linear-gradient(90deg, var(--red), var(--red2));
       transition: width .25s ease;
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
+    h1, h2, h3 { margin-top: 0; }
 
     h1 {
       font-size: clamp(32px, 5vw, 52px);
@@ -122,6 +121,11 @@
     }
 
     @media (max-width: 650px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -269,9 +273,7 @@
       color: #ddd;
     }
 
-    .row strong {
-      color: white;
-    }
+    .row strong { color: white; }
 
     .total {
       display: flex;
@@ -316,9 +318,7 @@
       font-weight: 900;
     }
 
-    button.primary:hover {
-      background: #e63333;
-    }
+    button.primary:hover { background: #e63333; }
 
     button.secondary {
       background: transparent;
@@ -332,6 +332,30 @@
       margin-top: 18px;
       line-height: 1.45;
     }
+
+    .booking-widget {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-top: 22px;
+      border: 1px solid #333;
+    }
+
+    .booking-widget iframe {
+      display: block;
+      min-height: 760px;
+    }
+
+    .estimate-badge {
+      display: inline-block;
+      background: #241818;
+      border: 1px solid #5a2525;
+      color: var(--red2);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 
@@ -344,9 +368,10 @@
   <main class="wrap">
     <div class="card">
       <div class="progress-label">
-        <span id="stepText">Step 1 of 6</span>
+        <span id="stepText">Step 1 of 7</span>
         <span>Instant Price & Booking</span>
       </div>
+
       <div class="progress">
         <div class="progress-fill" id="progressFill"></div>
       </div>
@@ -455,7 +480,7 @@ const addonsByService = {
 };
 
 function updateProgress() {
-  const maxSteps = 6;
+  const maxSteps = 7;
   document.getElementById("stepText").innerText = `Step ${state.step} of ${maxSteps}`;
   document.getElementById("progressFill").style.width = `${(state.step / maxSteps) * 100}%`;
 }
@@ -486,6 +511,7 @@ function calculatePrice() {
 
 function includedBox(serviceKey) {
   const s = services[serviceKey];
+
   return `
     <div class="included">
       <div class="included-title">Included with ${s.name}</div>
@@ -503,7 +529,7 @@ function render() {
   if (state.step === 1) {
     app.innerHTML = `
       <h1>Get Your Instant Price</h1>
-      <p class="sub">Choose your cleaning service, see your estimate, then book with Red Prairie Cleaning.</p>
+      <p class="sub">Choose your cleaning service, see your estimate, then reserve your appointment with Red Prairie Cleaning.</p>
 
       <div class="grid">
         ${Object.entries(services).map(([key, s]) => `
@@ -514,7 +540,7 @@ function render() {
         `).join("")}
       </div>
 
-      <p class="fineprint">Serving Lawton, Fort Sill, Cache, Elgin, and nearby Southwest Oklahoma areas.</p>
+      <p class="fineprint">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, and nearby Southwest Oklahoma areas.</p>
     `;
   }
 
@@ -526,9 +552,11 @@ function render() {
     app.innerHTML = `
       <h2>${services[state.service].emoji} ${services[state.service].name}</h2>
       <p class="sub">${services[state.service].desc}</p>
+
       ${includedBox(state.service)}
 
       <h3>${wording}</h3>
+
       <div class="pill-grid">
         ${[1,2,3,4,5].map(n => `
           <button class="pill" onclick="selectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>
@@ -622,7 +650,9 @@ function render() {
         <div class="row"><span>Base price</span><strong>$${services[state.service].base}</strong></div>
 
         ${state.bedrooms ? `<div class="row"><span>${["carpet", "upholstery"].includes(state.service) ? "Rooms/items" : "Bedrooms"}</span><strong>${state.bedrooms}${state.bedrooms === 5 ? "+" : ""}</strong></div>` : ""}
+
         ${state.bathrooms ? `<div class="row"><span>Bathrooms</span><strong>${state.bathrooms}${state.bathrooms === 4 ? "+" : ""}</strong></div>` : ""}
+
         ${["standard", "deep", "moveout"].includes(state.service) ? `<div class="row"><span>Condition</span><strong>${state.condition}</strong></div>` : ""}
 
         ${state.addons.map(a => `
@@ -641,11 +671,44 @@ function render() {
 
       <div class="btns">
         <button class="secondary" onclick="back()">Edit</button>
-        <button class="primary" onclick="bookNow()">Book This Cleaning →</button>
+        <button class="primary" onclick="showCalendar()">Reserve My Cleaning →</button>
       </div>
 
-      <p class="fineprint">Next upgrade: this button will connect to your GoHighLevel calendar and deposit checkout.</p>
+      <p class="fineprint">A $50 reservation deposit is collected during booking and applied toward your final invoice.</p>
     `;
+  }
+
+  if (state.step === 7) {
+    const total = calculatePrice();
+
+    app.innerHTML = `
+      <span class="estimate-badge">Estimated Price: $${total}</span>
+
+      <h2>Reserve Your Cleaning</h2>
+
+      <p class="sub">
+        Choose your preferred date and time below. A $50 reservation deposit secures your appointment and is applied toward your final invoice.
+      </p>
+
+      <div class="notice">
+        Your estimate and service details are shown above. Please add any important notes during booking, such as pets, gate codes, stains, parking instructions, or special requests.
+      </div>
+
+      <div class="booking-widget">
+        <iframe
+          src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2"
+          style="width:100%; border:none; overflow:hidden;"
+          scrolling="no"
+          id="1VXLRmyHfLdsHa4rTKJ2_1781361516868">
+        </iframe>
+      </div>
+
+      <div class="btns">
+        <button class="secondary" onclick="backToEstimate()">Back to Estimate</button>
+      </div>
+    `;
+
+    loadCalendarScript();
   }
 }
 
@@ -707,17 +770,30 @@ function back() {
   }
 }
 
-function bookNow() {
-  const total = calculatePrice();
+function showCalendar() {
+  state.step = 7;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-  const summary = encodeURIComponent(
-    `Hi Red Prairie Cleaning, I want to book ${services[state.service].name}. Estimated price: $${total}. Bedrooms/rooms/items: ${state.bedrooms || "N/A"}. Bathrooms: ${state.bathrooms || "N/A"}. Condition: ${state.condition || "N/A"}. Add-ons: ${state.addons.map(a => a.name).join(", ") || "None"}.`
-  );
+function backToEstimate() {
+  state.step = 6;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-  window.location.href = `sms:5802150915?body=${summary}`;
+function loadCalendarScript() {
+  if (document.getElementById("ghl-calendar-script")) return;
+
+  const script = document.createElement("script");
+  script.src = "https://link.msgsndr.com/js/form_embed.js";
+  script.type = "text/javascript";
+  script.id = "ghl-calendar-script";
+  document.body.appendChild(script);
 }
 
 render();
 </script>
+
 </body>
 </html>
