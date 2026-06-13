@@ -43,25 +43,17 @@ a {
     min-height: 78px;
 }
 
-/* Logo crop fix for large padded PNG */
 .logo {
-    width: 220px;
-    height: 58px;
-    overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     flex-shrink: 0;
-    position: relative;
 }
 
 .logo img {
-    width: 650px;
-    max-width: none;
+    width: 185px;
+    max-width: 185px;
     height: auto;
-    position: absolute;
-    left: -215px;
-    top: -185px;
+    object-fit: contain;
 }
 
 .nav-links {
@@ -595,16 +587,9 @@ footer p {
         min-height: 70px;
     }
 
-    .logo {
-        width: 170px;
-        height: 48px;
-    }
-
     .logo img {
-        width: 520px;
-        max-width: none;
-        left: -173px;
-        top: -148px;
+        width: 150px;
+        max-width: 150px;
     }
 
     .nav-links {
@@ -680,16 +665,9 @@ footer p {
 }
 
 @media (max-width: 480px) {
-    .logo {
-        width: 145px;
-        height: 42px;
-    }
-
     .logo img {
-        width: 455px;
-        max-width: none;
-        left: -151px;
-        top: -129px;
+        width: 130px;
+        max-width: 130px;
     }
 
     .navbar .book-btn {
