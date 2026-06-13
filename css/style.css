@@ -43,12 +43,6 @@ a {
     min-height: 78px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-
 .logo img {
     width: 185px;
     max-width: 185px;
