@@ -43,6 +43,12 @@ a {
     min-height: 78px;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .logo img {
     width: 185px;
     max-width: 185px;
@@ -411,6 +417,12 @@ select {
     color: #444;
 }
 
+.review-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 34px;
+}
+
 /* =========================
    BOOKING
 ========================= */
@@ -460,8 +472,9 @@ select {
 ========================= */
 
 .areas {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 18px;
 }
 
@@ -470,6 +483,7 @@ select {
     border-radius: 18px;
     padding: 24px;
     text-align: center;
+    width: min(100%, 285px);
 }
 
 .area-card i {
@@ -539,6 +553,128 @@ footer p {
     box-shadow: 0 8px 35px rgba(0,0,0,0.14);
 }
 
+
+/* =========================
+   POLISHED INDEX ADDITIONS
+========================= */
+
+.rp-package-card,
+.rp-package-card p,
+.rp-package-card li,
+.rp-package-card strong {
+    color: #111;
+}
+
+.rp-package-badge {
+    display: inline-block;
+    background: #fff0f0;
+    color: #d00000;
+    border: 1px solid #f0caca;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 900;
+    margin-bottom: 14px;
+}
+
+.rp-package-lead {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #333 !important;
+}
+
+.rp-package-list {
+    margin: 18px 0 24px 20px;
+    color: #222;
+}
+
+.rp-package-list li {
+    margin-bottom: 9px;
+    font-weight: 600;
+}
+
+.rp-inclusion-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 34px 0 26px;
+    text-align: left;
+}
+
+.rp-inclusion-card {
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.07);
+}
+
+.rp-inclusion-card.featured {
+    border-color: #d00000;
+    box-shadow: 0 16px 38px rgba(208,0,0,.12);
+}
+
+.rp-inclusion-card h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #111;
+}
+
+.rp-inclusion-card p {
+    color: #555;
+    margin-bottom: 14px;
+    line-height: 1.55;
+}
+
+.rp-inclusion-card ul {
+    margin-left: 18px;
+    color: #222;
+}
+
+.rp-inclusion-card li {
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.review-carousel {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 8px 8% 18px;
+    margin-top: 28px;
+}
+
+.review-carousel .review-card {
+    min-width: 320px;
+    max-width: 380px;
+    scroll-snap-align: start;
+}
+
+.review-card span {
+    display: inline-block;
+    margin-top: 6px;
+    color: #d00000;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.rp-compare-table .yes,
+.rp-compare-table .no,
+.rp-compare-table .addon {
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .rp-inclusion-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .review-carousel {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+}
+
 /* =========================
    TABLET
 ========================= */
@@ -551,8 +687,7 @@ footer p {
     .trust-bar,
     .service-grid,
     .gallery,
-    .review-grid,
-    .areas {
+    .review-grid {
         grid-template-columns: 1fr 1fr;
     }
 
@@ -639,8 +774,7 @@ footer p {
     .trust-bar,
     .service-grid,
     .gallery,
-    .review-grid,
-    .areas {
+    .review-grid {
         grid-template-columns: 1fr;
     }
 
