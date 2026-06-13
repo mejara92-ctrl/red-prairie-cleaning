@@ -89,7 +89,7 @@
 
     .progress-fill {
       height: 100%;
-      width: 14%;
+      width: 12.5%;
       background: linear-gradient(90deg, var(--red), var(--red2));
       transition: width .25s ease;
     }
@@ -361,6 +361,44 @@
       font-weight: 900;
       margin-bottom: 16px;
     }
+
+    .lead-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .lead-field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .lead-field input {
+      width: 100%;
+      background: #111;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 16px;
+    }
+
+    .lead-field input:focus {
+      outline: none;
+      border-color: var(--red2);
+    }
+
+    .error {
+      display: none;
+      background: #2b1111;
+      border: 1px solid #7a2b2b;
+      color: #ffd0d0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -373,7 +411,7 @@
   <main class="wrap">
     <div class="card">
       <div class="progress-label">
-        <span id="stepText">Step 1 of 7</span>
+        <span id="stepText">Step 1 of 8</span>
         <span>Instant Price & Booking</span>
       </div>
 
@@ -395,6 +433,9 @@ const state = {
   bathrooms: null,
   condition: "Average",
   addons: [],
+  fullName: "",
+  phone: "",
+  email: "",
   estimateSent: false
 };
 
@@ -488,7 +529,7 @@ const addonsByService = {
 };
 
 function updateProgress() {
-  const maxSteps = 7;
+  const maxSteps = 8;
   document.getElementById("stepText").innerText = `Step ${state.step} of ${maxSteps}`;
   document.getElementById("progressFill").style.width = `${(state.step / maxSteps) * 100}%`;
 }
@@ -538,6 +579,9 @@ function getEstimatePayload() {
   return {
     source: "Red Prairie Website Calculator",
     business: "Red Prairie Cleaning",
+    full_name: state.fullName,
+    phone: state.phone,
+    email: state.email,
     service: serviceName,
     service_key: state.service,
     estimated_price: `$${total}`,
@@ -716,14 +760,58 @@ function render() {
 
       <div class="btns">
         <button class="secondary" onclick="back()">Edit</button>
-        <button id="reserveBtn" class="primary" onclick="reserveCleaning()">Reserve My Cleaning →</button>
+        <button class="primary" onclick="goToLeadCapture()">Continue →</button>
       </div>
 
-      <p class="fineprint">A $50 reservation deposit is collected during booking and applied toward your final invoice.</p>
+      <p class="fineprint">Next step: enter your contact info, then choose your appointment time and pay your $50 reservation deposit.</p>
     `;
   }
 
   if (state.step === 7) {
+    const total = calculatePrice();
+
+    app.innerHTML = `
+      <span class="estimate-badge">Estimated Price: $${total}</span>
+
+      <h2>Where should we send your estimate?</h2>
+
+      <p class="sub">
+        Enter your contact information below. Then you'll choose your appointment time and reserve your cleaning with a $50 deposit.
+      </p>
+
+      <div class="lead-form">
+        <div class="lead-field">
+          <label for="fullName">Full Name *</label>
+          <input id="fullName" type="text" value="${state.fullName}" placeholder="Your full name">
+        </div>
+
+        <div class="lead-field">
+          <label for="phone">Phone Number *</label>
+          <input id="phone" type="tel" value="${state.phone}" placeholder="(580) 000-0000">
+        </div>
+
+        <div class="lead-field">
+          <label for="email">Email Address *</label>
+          <input id="email" type="email" value="${state.email}" placeholder="you@email.com">
+        </div>
+      </div>
+
+      <div id="formError" class="error">
+        Please enter your name, phone number, and a valid email address.
+      </div>
+
+      <div class="btns">
+        <button class="secondary" onclick="backToEstimate()">Back to Estimate</button>
+        <button id="reserveBtn" class="primary" onclick="submitLeadAndShowCalendar()">Continue to Scheduling →</button>
+      </div>
+
+      <p class="fineprint">
+        By continuing, you agree that Red Prairie Cleaning may contact you about your estimate and appointment by call, text, or email.
+      </p>
+    `;
+  }
+
+  if (state.step === 8) {
     const total = calculatePrice();
 
     app.innerHTML = `
@@ -749,7 +837,7 @@ function render() {
       </div>
 
       <div class="btns">
-        <button class="secondary" onclick="backToEstimate()">Back to Estimate</button>
+        <button class="secondary" onclick="backToLeadCapture()">Back</button>
       </div>
     `;
 
@@ -818,7 +906,40 @@ function back() {
   }
 }
 
-function reserveCleaning() {
+function goToLeadCapture() {
+  state.step = 7;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function backToEstimate() {
+  state.step = 6;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function backToLeadCapture() {
+  state.step = 7;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function submitLeadAndShowCalendar() {
+  const fullName = document.getElementById("fullName").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const errorBox = document.getElementById("formError");
+  const emailLooksValid = email.includes("@") && email.includes(".");
+
+  if (!fullName || !phone || !emailLooksValid) {
+    errorBox.style.display = "block";
+    return;
+  }
+
+  state.fullName = fullName;
+  state.phone = phone;
+  state.email = email;
+
   const button = document.getElementById("reserveBtn");
 
   if (button) {
@@ -828,13 +949,7 @@ function reserveCleaning() {
 
   sendEstimateToGoHighLevel();
 
-  state.step = 7;
-  render();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function backToEstimate() {
-  state.step = 6;
+  state.step = 8;
   render();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
