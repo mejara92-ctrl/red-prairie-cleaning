@@ -837,6 +837,21 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
 gtag('config', 'AW-17734105967');
+
+function gtag_report_conversion(url) {
+  var callback = function () {
+    if (typeof(url) != 'undefined') {
+      window.location = url;
+    }
+  };
+  gtag('event', 'conversion', {
+      'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
+      'value': 1.0,
+      'currency': 'USD',
+      'event_callback': callback
+  });
+  return false;
+}
 </script>
 </head>
 
@@ -1301,7 +1316,7 @@ gtag('config', 'AW-17734105967');
     </p>
 
     <div class="cta-buttons">
-        <a href="tel:5802150915" class="book-btn">Call Us</a>
+        <a href="tel:5802150915" onclick="return gtag_report_conversion('tel:5802150915');" class="book-btn">Call Us</a>
         <a href="sms:5802150915" class="secondary-btn">Text Us</a>
     </div>
 </section>
