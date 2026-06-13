@@ -657,6 +657,177 @@
             .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; }
         }
 
+
+        /* Value-focused included section */
+        .rp-card-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff0f0;
+            color: var(--red);
+            border: 1px solid #f0caca;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .rp-value-cards .rp-inclusion-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .moveout-value {
+            border-color: var(--red) !important;
+            box-shadow: 0 18px 44px rgba(208,0,0,.14) !important;
+        }
+
+        .rp-typical-pricing {
+            margin-top: 28px;
+            background: #111;
+            color: #fff;
+            border-radius: 24px;
+            padding: 24px;
+            text-align: left;
+            box-shadow: 0 18px 45px rgba(0,0,0,.16);
+        }
+
+        .rp-typical-pricing h3 {
+            color: #fff;
+            font-size: clamp(24px, 6vw, 34px);
+            line-height: 1.1;
+            margin: 0 0 10px;
+        }
+
+        .rp-typical-pricing p {
+            color: #e9e9e9;
+            margin: 0 0 18px;
+            line-height: 1.65;
+        }
+
+        .rp-price-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .rp-price-card {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .rp-price-card span {
+            display: block;
+            color: #ddd;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .rp-price-card strong {
+            display: block;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .rp-carpet-value {
+            margin-top: 18px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 22px;
+            padding: 22px;
+            text-align: left;
+            box-shadow: 0 12px 28px rgba(0,0,0,.07);
+        }
+
+        .rp-carpet-value h3 {
+            margin: 0 0 10px;
+            font-size: 23px;
+        }
+
+        .rp-carpet-value p {
+            color: #555;
+            margin: 0 0 14px;
+            line-height: 1.6;
+        }
+
+        .rp-carpet-value ul {
+            margin: 0 0 0 18px;
+            padding: 0;
+        }
+
+        .rp-carpet-value li {
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .rp-checklist-details {
+            margin-top: 18px;
+            text-align: left;
+        }
+
+        .rp-checklist-details summary {
+            cursor: pointer;
+            background: #f7f7f7;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 16px 18px;
+            font-weight: 900;
+            color: #111;
+        }
+
+        .rp-checklist-details[open] summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .rp-checklist-details .rp-table-wrap {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        @media (max-width: 699px) {
+            .rp-checklist-details {
+                display: none;
+            }
+
+            .rp-comparison {
+                padding-top: 46px;
+                padding-bottom: 46px;
+            }
+
+            .rp-inclusion-card p,
+            .rp-carpet-value p,
+            .rp-typical-pricing p {
+                font-size: 14px;
+            }
+        }
+
+        @media (min-width: 700px) {
+            .rp-price-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .rp-typical-pricing {
+                display: grid;
+                grid-template-columns: 1.1fr 1.4fr;
+                gap: 22px;
+                align-items: center;
+            }
+
+            .rp-carpet-value {
+                display: grid;
+                grid-template-columns: 1.2fr 1fr;
+                gap: 22px;
+                align-items: center;
+            }
+        }
+
     </style>
 </head>
 
@@ -783,7 +954,7 @@
             <div class="rp-package-badge">Most Popular</div>
             <h3>Factory Reset Move-Out + Carpet</h3>
             <p class="rp-package-lead">
-                Built around the jobs customers actually book most often: move-out cleaning plus carpet cleaning when needed.
+                One appointment. One crew. One invoice. Move-out cleaning plus professional carpet cleaning when needed.
             </p>
             <ul class="rp-package-list">
                 <li>Apartment packages commonly land around the mid-$400s</li>
@@ -798,71 +969,122 @@
 
 <section class="rp-comparison">
     <div class="rp-comparison-wrap">
-        <h2>What Is Included?</h2>
+        <h2>Choose Your Level of Clean</h2>
         <p class="section-text">
-            Clear service levels help you choose the right cleaning without paying twice for the same work.
+            Clear service levels help you pick the right cleaning without paying twice for the same work.
             Move-Out Cleaning is our full factory reset service.
         </p>
 
-        <div class="rp-inclusion-cards">
+        <div class="rp-inclusion-cards rp-value-cards">
             <div class="rp-inclusion-card">
+                <div class="rp-card-eyebrow">Starting at $149</div>
                 <h3>Maintenance Cleaning</h3>
-                <p>Best for homes that are already maintained or customers looking for recurring service.</p>
+                <p>Perfect for homes that are already maintained or recurring customers who want to stay ahead of the mess.</p>
                 <ul>
                     <li>Bathrooms cleaned and sanitized</li>
                     <li>Kitchen surfaces and appliance exteriors</li>
-                    <li>Dusting, vacuuming, and mopping</li>
+                    <li>Dusting all reachable surfaces</li>
+                    <li>Vacuuming and mopping</li>
                     <li>Trash removed and general tidy-up</li>
                 </ul>
             </div>
 
             <div class="rp-inclusion-card featured">
+                <div class="rp-card-eyebrow">Starting at $249</div>
                 <h3>Deep Cleaning</h3>
-                <p>Best for first-time visits, seasonal resets, and homes needing extra detail.</p>
+                <p>For first-time cleans, seasonal resets, and homes that need more attention than a standard clean.</p>
                 <ul>
-                    <li>Everything in Maintenance</li>
+                    <li>Everything in Maintenance Cleaning</li>
                     <li>Baseboards, doors, and door frames</li>
                     <li>Inside microwave and inside oven</li>
-                    <li>Detailed dusting and cabinet fronts</li>
+                    <li>Detailed dusting and buildup areas</li>
+                    <li>Cabinet fronts and high-touch surfaces</li>
                 </ul>
             </div>
 
-            <div class="rp-inclusion-card">
+            <div class="rp-inclusion-card moveout-value">
+                <div class="rp-card-eyebrow">Usually $450–$600+</div>
                 <h3>Move-Out Cleaning</h3>
-                <p>A top-to-bottom factory reset for empty homes, apartments, PCS moves, rentals, and turnovers.</p>
+                <p><strong>The closest thing to a brand-new home.</strong> Built for PCS moves, rentals, home sales, apartments, landlords, and property turnovers.</p>
                 <ul>
                     <li>Everything in Deep Cleaning</li>
-                    <li>Inside refrigerator, cabinets, and drawers</li>
+                    <li>Refrigerator cleaned inside and out</li>
+                    <li>Cabinets and drawers emptied and cleaned</li>
                     <li>Interior windows included</li>
-                    <li>Optional carpet cleaning package</li>
+                    <li>Detailed edges, corners, and buildup areas</li>
                 </ul>
             </div>
         </div>
 
-        <div class="rp-table-wrap">
-            <table class="rp-compare-table">
-                <thead>
-                    <tr>
-                        <th>Cleaning Task</th>
-                        <th>Maintenance</th>
-                        <th>Deep</th>
-                        <th>Move-Out</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>Bathrooms</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Kitchen surfaces</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Vacuuming & mopping</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Baseboards</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Inside microwave</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Inside oven</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-                    <tr><td>Inside refrigerator</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
-                    <tr><td>Inside cabinets & drawers</td><td class="no">Not included</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
-                    <tr><td>Interior windows</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
-                    <tr><td>Carpet cleaning</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="addon">Optional package</td></tr>
-                </tbody>
-            </table>
+        <div class="rp-typical-pricing">
+            <div class="rp-typical-copy">
+                <span class="rp-package-badge">Most Popular</span>
+                <h3>The Complete Move-Out Package</h3>
+                <p>
+                    One appointment. One crew. One invoice. Move-out cleaning plus professional carpet cleaning
+                    so you can hand over the keys with confidence.
+                </p>
+            </div>
+
+            <div class="rp-price-cards">
+                <div class="rp-price-card">
+                    <span>Apartment</span>
+                    <strong>Usually around $450</strong>
+                </div>
+                <div class="rp-price-card">
+                    <span>Small Home</span>
+                    <strong>Usually around $500</strong>
+                </div>
+                <div class="rp-price-card">
+                    <span>Larger Home</span>
+                    <strong>$600+</strong>
+                </div>
+            </div>
         </div>
+
+        <div class="rp-carpet-value">
+            <div>
+                <h3>🧼 Add Professional Carpet Cleaning</h3>
+                <p>
+                    Complete your move-out with professional hot-water extraction using commercial Mytee equipment.
+                    Great for dirt, odors, traffic lanes, and making the home feel finished.
+                </p>
+            </div>
+            <ul>
+                <li>Powerful Mytee 2002CS extraction</li>
+                <li>Pre-spray and professional wand cleaning</li>
+                <li>Faster drying than rental-grade machines</li>
+                <li>Bundled into the same appointment when possible</li>
+            </ul>
+        </div>
+
+        <details class="rp-checklist-details">
+            <summary>See full cleaning checklist</summary>
+            <div class="rp-table-wrap">
+                <table class="rp-compare-table">
+                    <thead>
+                        <tr>
+                            <th>Cleaning Task</th>
+                            <th>Maintenance</th>
+                            <th>Deep</th>
+                            <th>Move-Out</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Bathrooms</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Kitchen surfaces</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Vacuuming & mopping</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Baseboards</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Inside microwave</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Inside oven</td><td class="no">Not included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+                        <tr><td>Inside refrigerator</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
+                        <tr><td>Inside cabinets & drawers</td><td class="no">Not included</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
+                        <tr><td>Interior windows</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="yes">Included</td></tr>
+                        <tr><td>Carpet cleaning</td><td class="addon">Add-on</td><td class="addon">Add-on</td><td class="addon">Optional package</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </details>
     </div>
 </section>
 
@@ -1194,7 +1416,7 @@ const rpServices = {
     desc: "Factory reset cleaning for apartments, homes, PCS moves, and property turnovers.",
     includes: [
       "Everything in Deep Cleaning", "Inside cabinets and drawers", "Inside refrigerator", "Inside oven",
-      "Inside microwave", "Baseboards", "Bathrooms", "Kitchen detail", "Inspection-ready detail"
+      "Inside microwave", "Interior windows", "Baseboards", "Bathrooms", "Kitchen detail", "Inspection-ready detail"
     ]
   },
   carpet: {
