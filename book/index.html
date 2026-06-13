@@ -326,6 +326,11 @@
       border: 1px solid #555;
     }
 
+    button:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+    }
+
     .fineprint {
       color: #888;
       font-size: 13px;
@@ -381,13 +386,16 @@
   </main>
 
 <script>
+const WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
+
 const state = {
   step: 1,
   service: null,
   bedrooms: null,
   bathrooms: null,
   condition: "Average",
-  addons: []
+  addons: [],
+  estimateSent: false
 };
 
 const services = {
@@ -520,6 +528,49 @@ function includedBox(serviceKey) {
       </div>
     </div>
   `;
+}
+
+function getEstimatePayload() {
+  const total = calculatePrice();
+  const serviceName = services[state.service]?.name || "Not selected";
+  const addonNames = state.addons.map(a => a.name);
+
+  return {
+    source: "Red Prairie Website Calculator",
+    business: "Red Prairie Cleaning",
+    service: serviceName,
+    service_key: state.service,
+    estimated_price: `$${total}`,
+    estimated_price_number: total,
+    bedrooms_rooms_items: state.bedrooms ? String(state.bedrooms) : "N/A",
+    bathrooms: state.bathrooms ? String(state.bathrooms) : "N/A",
+    condition: ["standard", "deep", "moveout"].includes(state.service) ? state.condition : "N/A",
+    addons: addonNames.length ? addonNames.join(", ") : "None",
+    addon_count: addonNames.length,
+    submitted_at: new Date().toISOString(),
+    page_url: window.location.href
+  };
+}
+
+async function sendEstimateToGoHighLevel() {
+  const payload = getEstimatePayload();
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    state.estimateSent = true;
+    return true;
+  } catch (error) {
+    console.error("Webhook failed:", error);
+    return false;
+  }
 }
 
 function render() {
@@ -671,7 +722,7 @@ function render() {
 
       <div class="btns">
         <button class="secondary" onclick="back()">Edit</button>
-        <button class="primary" onclick="showCalendar()">Reserve My Cleaning →</button>
+        <button id="reserveBtn" class="primary" onclick="reserveCleaning()">Reserve My Cleaning →</button>
       </div>
 
       <p class="fineprint">A $50 reservation deposit is collected during booking and applied toward your final invoice.</p>
@@ -691,7 +742,7 @@ function render() {
       </p>
 
       <div class="notice">
-        Your estimate and service details are shown above. Please add any important notes during booking, such as pets, gate codes, stains, parking instructions, or special requests.
+        Your estimate has been submitted to Red Prairie Cleaning. During booking, add your address, pets, gate code, stains, parking notes, or any special requests.
       </div>
 
       <div class="booking-widget">
@@ -718,6 +769,7 @@ function selectService(service) {
   state.bedrooms = null;
   state.bathrooms = null;
   state.condition = "Average";
+  state.estimateSent = false;
   state.step = 2;
   render();
 }
@@ -752,6 +804,8 @@ function toggleAddon(name, price, checked) {
   } else {
     state.addons = state.addons.filter(a => a.name !== name);
   }
+
+  state.estimateSent = false;
 }
 
 function next() {
@@ -770,7 +824,16 @@ function back() {
   }
 }
 
-function showCalendar() {
+async function reserveCleaning() {
+  const button = document.getElementById("reserveBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Saving estimate...";
+  }
+
+  await sendEstimateToGoHighLevel();
+
   state.step = 7;
   render();
   window.scrollTo({ top: 0, behavior: "smooth" });
