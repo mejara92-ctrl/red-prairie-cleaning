@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preload" as="image" href="images/hero/hero-cleaning-team.jpg">
 
     <style>
         :root {
@@ -539,6 +540,56 @@
             }
         }
 
+
+        /* Mobile conversion polish */
+        @media (max-width: 699px) {
+            .hero {
+                min-height: 76vh;
+                padding-top: 72px;
+                padding-bottom: 32px;
+            }
+
+            .hero h1 {
+                font-size: clamp(32px, 9vw, 44px);
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .hero-buttons .quote-btn {
+                min-height: 54px;
+                font-size: 16px;
+            }
+
+            .rp-funnel {
+                padding-top: 44px;
+            }
+
+            .trust-bar {
+                padding-top: 22px;
+                padding-bottom: 22px;
+            }
+
+            .service-area-note {
+                max-width: 760px;
+                margin: 22px auto 0;
+                text-align: center;
+                color: #555;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        }
+
+        @media (min-width: 700px) {
+            .service-area-note {
+                max-width: 800px;
+                margin: 26px auto 0;
+                text-align: center;
+                color: #555;
+            }
+        }
+
         @media (min-width: 700px) {
             body { padding-bottom: 0; }
             .logo img { width: 170px; }
@@ -623,9 +674,7 @@
         </div>
 
         <p>
-            Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls,
-            and surrounding communities with house cleaning, factory reset move-out cleaning,
-            carpet cleaning, and upholstery cleaning.
+            House cleaning, factory reset move-outs, carpet cleaning, and upholstery cleaning across Southwest Oklahoma.
         </p>
 
         <div class="hero-buttons">
@@ -951,25 +1000,28 @@
 </section>
 
 <section class="reviews" id="reviews">
-    <h2>What Our Customers Say</h2>
+    <h2>What Customers Say</h2>
+    <p class="section-text">
+        Real Google review snippets and customer photos will be added here as Red Prairie continues collecting feedback.
+    </p>
 
     <div class="review-grid">
         <div class="review-card">
             <div class="stars">★★★★★</div>
             <p>"Absolutely incredible service. Our house felt brand new when they were finished."</p>
-            <h4>- Local Customer</h4>
+            <h4>- Google Review</h4>
         </div>
 
         <div class="review-card">
             <div class="stars">★★★★★</div>
             <p>"The carpets came out better than I expected. The equipment they use is the real deal."</p>
-            <h4>- Happy Homeowner</h4>
+            <h4>- Google Review</h4>
         </div>
 
         <div class="review-card">
             <div class="stars">★★★★★</div>
             <p>"Easy communication, on time, and the attention to detail was amazing."</p>
-            <h4>- Satisfied Client</h4>
+            <h4>- Google Review</h4>
         </div>
     </div>
 
@@ -995,32 +1047,27 @@
 </section>
 
 <section class="service-area">
-    <h2>Professional Cleaning Services Across Southwest Oklahoma & North Texas</h2>
+    <h2>Cleaning Services Across Southwest Oklahoma & North Texas</h2>
 
     <p class="section-text">
-        Red Prairie Cleaning proudly serves Lawton, Fort Sill, Duncan, Wichita Falls,
-        and surrounding communities.
+        Red Prairie Cleaning proudly serves Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls,
+        and nearby communities.
     </p>
 
-    <div class="areas">
+    <div class="areas featured-areas">
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Lawton</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fort Sill</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Cache</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Elgin</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Medicine Park</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Duncan</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Comanche</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Sterling</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Chickasha</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Apache</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fletcher</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Geronimo</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Walters</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Temple</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Marlow</h3></div>
-        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Rush Springs</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Wichita Falls, TX</h3></div>
     </div>
+
+    <p class="service-area-note">
+        Also serving Comanche, Sterling, Chickasha, Apache, Fletcher, Geronimo, Walters, Temple, Marlow,
+        Rush Springs, and surrounding communities.
+    </p>
 </section>
 
 <section class="final-cta">
