@@ -578,3 +578,28 @@ Mobile-First Main Stylesheet
             .footer-content { grid-template-columns: repeat(3, 1fr); gap: 30px; }
             .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; }
         }
+/* ==============================
+   MOBILE CHAT WIDGET FIX
+============================== */
+
+@media (max-width: 768px) {
+
+    /* Prevent chat from covering buttons */
+    body {
+        padding-bottom: 120px;
+    }
+
+    /* Move GoHighLevel chat bubble upward */
+    iframe[src*="leadconnector"],
+    iframe[src*="widget"],
+    .lc-chat-widget,
+    #chat-widget {
+        bottom: 100px !important;
+    }
+
+    /* Give buttons more room on mobile */
+    .hero-buttons,
+    .cta-buttons {
+        margin-bottom: 40px;
+    }
+}
