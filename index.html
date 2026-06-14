@@ -955,38 +955,38 @@ function gtag_report_conversion(url) {
 <section class="rp-feature-section">
     <div class="rp-feature-wrap">
         <div>
-            <h2>Moving Soon? Make It Easy.</h2>
+            <h2>Moving Soon? Get a Factory Reset.</h2>
             <p>
-                Many move-outs need more than a basic clean. Our factory reset move-out cleaning includes
-                the detail items renters, homeowners, landlords, realtors, and property managers usually care about.
+                Many move-outs need more than a basic cleaning. Our <strong>Factory Reset Move-Out Cleaning</strong>
+                is designed to bring the home back to its best condition before the next occupant arrives.
             </p>
             <p>
-                Add professional carpet cleaning when needed and keep the whole turnover simple with one estimate,
-                one appointment, and one reservation.
+                Whether you're moving out, selling your home, completing a PCS move, or preparing a rental turnover,
+                we handle the details that matter.
             </p>
             <div class="rp-feature-list">
-                <div>✓ Move-out cleaning checklist</div>
-                <div>✓ Inside oven, refrigerator, microwave, cabinets, and drawers</div>
+                <div>✓ Complete move-out cleaning checklist</div>
+                <div>✓ Inside oven, refrigerator, microwave, cabinets & drawers</div>
                 <div>✓ Interior windows included</div>
-                <div>✓ Optional professional carpet cleaning package</div>
+                <div>✓ Optional professional carpet cleaning</div>
                 <div>✓ Simple online estimate and booking</div>
             </div>
-            <a href="#booking" class="book-btn">Get Move-Out + Carpet Estimate</a>
+            <a href="#booking" class="book-btn">Build Your Factory Reset Estimate</a>
         </div>
 
         <div class="rp-package-card">
-            <div class="rp-package-badge">Most Popular</div>
-            <h3>Factory Reset Move-Out + Carpet</h3>
+            <div class="rp-package-badge">Move-Out Cleaning</div>
+            <h3>Our Factory Reset Service</h3>
             <p class="rp-package-lead">
-                One appointment. One crew. One invoice. Move-out cleaning plus professional carpet cleaning when needed.
+                The closest thing to a brand-new home before handing over the keys.
             </p>
             <ul class="rp-package-list">
-                <li>Apartment packages commonly land around the mid-$400s</li>
-                <li>Small homes commonly land around the $500s</li>
-                <li>Larger homes commonly land around the $600s+</li>
-                <li>Final price depends on size, condition, carpet, and travel</li>
+                <li>Built for PCS moves, rentals, home sales, and landlord turnovers</li>
+                <li>Includes the detailed items a normal maintenance clean does not</li>
+                <li>Carpet cleaning can be added during your estimate if needed</li>
+                <li>Your final quote is built around home size, condition, and add-ons</li>
             </ul>
-            <a href="#booking" class="book-btn">Build Package Estimate</a>
+            <a href="#booking" class="book-btn">Price Move-Out Cleaning</a>
         </div>
     </div>
 </section>
@@ -996,7 +996,7 @@ function gtag_report_conversion(url) {
         <h2>Choose Your Level of Clean</h2>
         <p class="section-text">
             Clear service levels help you pick the right cleaning without paying twice for the same work.
-            Move-Out Cleaning is our full factory reset service.
+            Move-Out Cleaning is our Factory Reset service, with carpet cleaning available during the estimate.
         </p>
 
         <div class="rp-inclusion-cards rp-value-cards">
@@ -1027,7 +1027,7 @@ function gtag_report_conversion(url) {
             </div>
 
             <div class="rp-inclusion-card moveout-value">
-                <div class="rp-card-eyebrow">Usually $450–$600+</div>
+                <div class="rp-card-eyebrow">Factory Reset Service</div>
                 <h3>Move-Out Cleaning</h3>
                 <p><strong>The closest thing to a brand-new home.</strong> Built for PCS moves, rentals, home sales, apartments, landlords, and property turnovers.</p>
                 <ul>
@@ -1040,45 +1040,20 @@ function gtag_report_conversion(url) {
             </div>
         </div>
 
-        <div class="rp-typical-pricing">
-            <div class="rp-typical-copy">
-                <span class="rp-package-badge">Most Popular</span>
-                <h3>The Complete Move-Out Package</h3>
-                <p>
-                    One appointment. One crew. One invoice. Move-out cleaning plus professional carpet cleaning
-                    so you can hand over the keys with confidence.
-                </p>
-            </div>
-
-            <div class="rp-price-cards">
-                <div class="rp-price-card">
-                    <span>Apartment</span>
-                    <strong>Usually around $450</strong>
-                </div>
-                <div class="rp-price-card">
-                    <span>Small Home</span>
-                    <strong>Usually around $500</strong>
-                </div>
-                <div class="rp-price-card">
-                    <span>Larger Home</span>
-                    <strong>$600+</strong>
-                </div>
-            </div>
-        </div>
 
         <div class="rp-carpet-value">
             <div>
-                <h3>🧼 Add Professional Carpet Cleaning</h3>
+                <h3>🧼 Complete Your Factory Reset With Professional Carpet Cleaning</h3>
                 <p>
-                    Complete your move-out with professional hot-water extraction using commercial Mytee equipment.
-                    Great for dirt, odors, traffic lanes, and making the home feel finished.
+                    Add professional hot-water extraction using commercial Mytee equipment during your estimate.
+                    Great for dirt, traffic lanes, pet odors, stains, spills, and refreshing carpet before the next occupant.
                 </p>
             </div>
             <ul>
                 <li>Powerful Mytee 2002CS extraction</li>
-                <li>Pre-spray and professional wand cleaning</li>
+                <li>Professional pre-spray and wand cleaning</li>
                 <li>Faster drying than rental-grade machines</li>
-                <li>Bundled into the same appointment when possible</li>
+                <li>Added directly to your personalized estimate</li>
             </ul>
         </div>
 
@@ -1539,8 +1514,7 @@ function rpCalculatePrice() {
   let total = rpServices[rpState.service]?.base || 0;
 
   if (rpState.service === "moveout") {
-    // Move-out is priced as a factory reset. Keep quotes premium but close to real-world booked jobs:
-    // apartment/small combo mid-$400s, small home around $500s, larger home around $600s+.
+    // Move-out is priced as a factory reset. Carpet cleaning is added separately when selected.
     const bedrooms = Number(rpState.bedrooms || 1);
     const bathrooms = Number(rpState.bathrooms || 1);
 
