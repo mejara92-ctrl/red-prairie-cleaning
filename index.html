@@ -336,7 +336,8 @@
 
         .rp-lead-form { display: grid; gap: 13px; margin-top: 18px; }
         .rp-lead-field label { display: block; font-weight: 900; margin-bottom: 7px; color: var(--text); font-size: 14px; }
-        .rp-lead-field input {
+        .rp-lead-field input,
+        .rp-lead-field textarea {
             width: 100%;
             background: #fff;
             color: var(--text);
@@ -344,8 +345,14 @@
             border-radius: 14px;
             padding: 15px;
             font-size: 16px;
+            font-family: 'Poppins', sans-serif;
         }
-        .rp-lead-field input:focus { outline: none; border-color: var(--red); }
+        .rp-lead-field textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+        .rp-lead-field input:focus,
+        .rp-lead-field textarea:focus { outline: none; border-color: var(--red); }
         .rp-error {
             display: none;
             background: #fff0f0;
@@ -1510,6 +1517,7 @@ const rpState = {
   fullName: "",
   phone: "",
   email: "",
+  specialInstructions: "",
   estimateSent: false
 };
 
@@ -1717,6 +1725,9 @@ function rpGetEstimatePayload() {
   const condition = rpIsHomeCleaning() ? rpState.condition : "N/A";
   const addons = addonNames.length ? addonNames.join(", ") : "None";
   const carpetWithMoveout = rpState.carpetWithMoveout ? "Yes" : "No";
+  const specialInstructions = rpState.specialInstructions && rpState.specialInstructions.trim()
+    ? rpState.specialInstructions.trim()
+    : "None";
 
   const jobDetails = [
     `Service: ${serviceName}`,
@@ -1727,7 +1738,8 @@ function rpGetEstimatePayload() {
     `Add-ons: ${addons}`,
     `Carpet with move-out: ${carpetWithMoveout}`,
     `Carpet rooms: ${carpetRooms}`,
-    `Furniture item: ${furnitureItem}`
+    `Furniture item: ${furnitureItem}`,
+    `Special instructions: ${specialInstructions}`
   ].join(" | ");
 
   return {
@@ -1756,6 +1768,8 @@ function rpGetEstimatePayload() {
     carpet_with_moveout: carpetWithMoveout,
     carpet_rooms: carpetRooms,
     furniture_item: furnitureItem,
+    special_instructions: specialInstructions,
+    customer_notes: specialInstructions,
     estimate_notes: jobDetails,
     job_details: jobDetails,
     cleaner_notes: jobDetails,
@@ -2058,6 +2072,11 @@ function rpRenderLeadStep() {
         <label for="rpEmail">Email Address *</label>
         <input id="rpEmail" type="email" value="${rpState.email}" placeholder="you@email.com">
       </div>
+
+      <div class="rp-lead-field">
+        <label for="rpSpecialInstructions">Special Instructions</label>
+        <textarea id="rpSpecialInstructions" placeholder="Gate code, pets, parking notes, stains, access instructions, or anything we should know before we arrive.">${rpState.specialInstructions || ""}</textarea>
+      </div>
     </div>
 
     <div id="rpFormError" class="rp-error">
@@ -2089,8 +2108,7 @@ function rpRenderCalendarStep() {
     </p>
 
     <div class="rp-notice">
-      Your estimate has been submitted to Red Prairie Cleaning. During booking, add your address, pets, gate code,
-      stains, parking notes, or any special requests.
+      Your estimate has been submitted to Red Prairie Cleaning. During booking, add your service address and complete your reservation deposit.
     </div>
 
     <div class="rp-booking-widget">
@@ -2248,6 +2266,7 @@ function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
   const email = document.getElementById("rpEmail").value.trim();
+  const specialInstructions = document.getElementById("rpSpecialInstructions")?.value.trim() || "";
   const errorBox = document.getElementById("rpFormError");
   const emailLooksValid = email.includes("@") && email.includes(".");
 
@@ -2259,6 +2278,7 @@ function rpSubmitLeadAndShowCalendar() {
   rpState.fullName = fullName;
   rpState.phone = phone;
   rpState.email = email;
+  rpState.specialInstructions = specialInstructions;
 
   const button = document.getElementById("rpReserveBtn");
 
