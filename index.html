@@ -853,6 +853,132 @@ function gtag_report_conversion(url) {
   return false;
 }
 </script>
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CleaningService",
+      "@id": "https://redprairiecleaning.com/#business",
+      "name": "Red Prairie Cleaning",
+      "url": "https://redprairiecleaning.com/",
+      "telephone": "+1-580-215-0915",
+      "image": "https://redprairiecleaning.com/images/logo/logo-color.png",
+      "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
+      "description": "Professional house cleaning, move-out cleaning, carpet cleaning, and upholstery cleaning across Southwest Oklahoma and North Texas.",
+      "priceRange": "$$",
+      "areaServed": [
+        { "@type": "City", "name": "Lawton" },
+        { "@type": "Place", "name": "Fort Sill" },
+        { "@type": "City", "name": "Cache" },
+        { "@type": "City", "name": "Elgin" },
+        { "@type": "City", "name": "Medicine Park" },
+        { "@type": "City", "name": "Duncan" },
+        { "@type": "City", "name": "Wichita Falls" },
+        { "@type": "City", "name": "Chickasha" },
+        { "@type": "City", "name": "Fletcher" },
+        { "@type": "City", "name": "Geronimo" }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "OK",
+        "addressCountry": "US"
+      },
+      "sameAs": [
+        "https://g.page/r/Cfx0wV2BCKMxEBM/review"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Cleaning Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "name": "Maintenance Cleaning",
+            "priceCurrency": "USD",
+            "price": "149",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Maintenance Cleaning",
+              "serviceType": "House cleaning",
+              "areaServed": "Southwest Oklahoma"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Deep Cleaning",
+            "priceCurrency": "USD",
+            "price": "249",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Deep Cleaning",
+              "serviceType": "Residential deep cleaning",
+              "areaServed": "Southwest Oklahoma"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Move-Out Cleaning",
+            "priceCurrency": "USD",
+            "price": "349",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Move-Out Cleaning",
+              "serviceType": "Move-out cleaning",
+              "areaServed": "Southwest Oklahoma"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Carpet Cleaning",
+            "priceCurrency": "USD",
+            "price": "149",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Carpet Cleaning",
+              "serviceType": "Hot water extraction carpet cleaning",
+              "areaServed": "Southwest Oklahoma"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Upholstery Cleaning",
+            "priceCurrency": "USD",
+            "price": "99",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Upholstery Cleaning",
+              "serviceType": "Furniture and upholstery cleaning",
+              "areaServed": "Southwest Oklahoma"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://redprairiecleaning.com/#website",
+      "url": "https://redprairiecleaning.com/",
+      "name": "Red Prairie Cleaning",
+      "publisher": { "@id": "https://redprairiecleaning.com/#business" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://redprairiecleaning.com/#webpage",
+      "url": "https://redprairiecleaning.com/",
+      "name": "Red Prairie Cleaning | House, Move-Out & Carpet Cleaning in Southwest Oklahoma",
+      "isPartOf": { "@id": "https://redprairiecleaning.com/#website" },
+      "about": { "@id": "https://redprairiecleaning.com/#business" }
+    }
+  ]
+}
+    </script>
+
 </head>
 
 <body>
@@ -1369,7 +1495,7 @@ function gtag_report_conversion(url) {
 </footer>
 
 <script>
-const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
+const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/05947288-6996-4ecc-80aa-42766c3be32b";
 
 const rpState = {
   step: 1,
@@ -2141,25 +2267,14 @@ document.addEventListener("click", function(e) {
 
 </script>
 
+
 <script
     src="https://widgets.leadconnectorhq.com/loader.js"
     data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
     data-widget-id="6a25f071ed0ee22f923d8835"
     data-source="WEB_USER">
-
-document.addEventListener("click", function(e) {
-  const link = e.target.closest('a[href="#booking"]');
-  if (!link) return;
-
-  e.preventDefault();
-  const booking = document.getElementById("booking");
-  if (booking) {
-    booking.scrollIntoView({ behavior: "smooth", block: "start" });
-    setTimeout(() => rpScrollToCalculator(), 250);
-  }
-});
-
 </script>
+
 
 </body>
 </html>
