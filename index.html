@@ -1517,6 +1517,10 @@ const rpState = {
   fullName: "",
   phone: "",
   email: "",
+  address1: "",
+  city: "",
+  state: "OK",
+  postalCode: "",
   specialInstructions: "",
   estimateSent: false
 };
@@ -1729,6 +1733,15 @@ function rpGetEstimatePayload() {
     ? rpState.specialInstructions.trim()
     : "None";
 
+  const address1 = rpState.address1 && rpState.address1.trim() ? rpState.address1.trim() : "";
+  const city = rpState.city && rpState.city.trim() ? rpState.city.trim() : "";
+  const state = rpState.state && rpState.state.trim() ? rpState.state.trim().toUpperCase() : "OK";
+  const postalCode = rpState.postalCode && rpState.postalCode.trim() ? rpState.postalCode.trim() : "";
+  const fullAddress = [
+    address1,
+    [city, state, postalCode].filter(Boolean).join(" ")
+  ].filter(Boolean).join(", ");
+
   const jobDetails = [
     `Service: ${serviceName}`,
     `Estimate: $${total}`,
@@ -1739,6 +1752,7 @@ function rpGetEstimatePayload() {
     `Carpet with move-out: ${carpetWithMoveout}`,
     `Carpet rooms: ${carpetRooms}`,
     `Furniture item: ${furnitureItem}`,
+    `Address: ${fullAddress || "N/A"}`,
     `Special instructions: ${specialInstructions}`
   ].join(" | ");
 
@@ -1750,6 +1764,14 @@ function rpGetEstimatePayload() {
     full_name: rpState.fullName,
     phone: rpState.phone,
     email: rpState.email,
+    address1: address1,
+    street_address: address1,
+    address: address1,
+    city: city,
+    state: state,
+    postal_code: postalCode,
+    zip: postalCode,
+    full_address: fullAddress,
 
     // Main booking fields
     service: serviceName,
@@ -2074,13 +2096,33 @@ function rpRenderLeadStep() {
       </div>
 
       <div class="rp-lead-field">
+        <label for="rpAddress1">Street Address *</label>
+        <input id="rpAddress1" type="text" value="${rpState.address1}" placeholder="123 Main St">
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpCity">City *</label>
+        <input id="rpCity" type="text" value="${rpState.city}" placeholder="Lawton">
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpStateField">State *</label>
+        <input id="rpStateField" type="text" value="${rpState.state || "OK"}" placeholder="OK" maxlength="2">
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpPostalCode">ZIP Code *</label>
+        <input id="rpPostalCode" type="text" value="${rpState.postalCode}" placeholder="73505" inputmode="numeric">
+      </div>
+
+      <div class="rp-lead-field">
         <label for="rpSpecialInstructions">Special Instructions</label>
         <textarea id="rpSpecialInstructions" placeholder="Gate code, pets, parking notes, stains, access instructions, or anything we should know before we arrive.">${rpState.specialInstructions || ""}</textarea>
       </div>
     </div>
 
     <div id="rpFormError" class="rp-error">
-      Please enter your name, phone number, and a valid email address.
+      Please enter your name, phone, email, street address, city, state, and ZIP code.
     </div>
 
     <div class="rp-btns">
@@ -2108,7 +2150,7 @@ function rpRenderCalendarStep() {
     </p>
 
     <div class="rp-notice">
-      Your estimate has been submitted to Red Prairie Cleaning. During booking, add your service address and complete your reservation deposit.
+      Your estimate has been submitted to Red Prairie Cleaning. During booking, confirm your appointment details and complete your reservation deposit.
     </div>
 
     <div class="rp-booking-widget">
@@ -2266,11 +2308,16 @@ function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
   const email = document.getElementById("rpEmail").value.trim();
+  const address1 = document.getElementById("rpAddress1")?.value.trim() || "";
+  const city = document.getElementById("rpCity")?.value.trim() || "";
+  const state = (document.getElementById("rpStateField")?.value.trim() || "OK").toUpperCase();
+  const postalCode = document.getElementById("rpPostalCode")?.value.trim() || "";
   const specialInstructions = document.getElementById("rpSpecialInstructions")?.value.trim() || "";
   const errorBox = document.getElementById("rpFormError");
   const emailLooksValid = email.includes("@") && email.includes(".");
+  const stateLooksValid = /^[A-Z]{2}$/.test(state);
 
-  if (!fullName || !phone || !emailLooksValid) {
+  if (!fullName || !phone || !emailLooksValid || !address1 || !city || !stateLooksValid || !postalCode) {
     errorBox.style.display = "block";
     return;
   }
@@ -2278,6 +2325,10 @@ function rpSubmitLeadAndShowCalendar() {
   rpState.fullName = fullName;
   rpState.phone = phone;
   rpState.email = email;
+  rpState.address1 = address1;
+  rpState.city = city;
+  rpState.state = state;
+  rpState.postalCode = postalCode;
   rpState.specialInstructions = specialInstructions;
 
   const button = document.getElementById("rpReserveBtn");
