@@ -1710,24 +1710,57 @@ function rpGetEstimatePayload() {
   const serviceName = rpServices[rpState.service]?.name || "Not selected";
   const addonNames = rpState.addons.map(a => a.name);
 
+  const bedrooms = rpState.bedrooms ? String(rpState.bedrooms) : "N/A";
+  const bathrooms = rpState.bathrooms ? String(rpState.bathrooms) : "N/A";
+  const carpetRooms = rpState.carpetRooms ? String(rpState.carpetRooms) : "N/A";
+  const furnitureItem = rpState.furnitureItem ? rpFurnitureItems[rpState.furnitureItem].name : "N/A";
+  const condition = rpIsHomeCleaning() ? rpState.condition : "N/A";
+  const addons = addonNames.length ? addonNames.join(", ") : "None";
+  const carpetWithMoveout = rpState.carpetWithMoveout ? "Yes" : "No";
+
+  const jobDetails = [
+    `Service: ${serviceName}`,
+    `Estimate: $${total}`,
+    `Bedrooms: ${bedrooms}`,
+    `Bathrooms: ${bathrooms}`,
+    `Condition: ${condition}`,
+    `Add-ons: ${addons}`,
+    `Carpet with move-out: ${carpetWithMoveout}`,
+    `Carpet rooms: ${carpetRooms}`,
+    `Furniture item: ${furnitureItem}`
+  ].join(" | ");
+
   return {
     source: "Red Prairie Website Calculator",
     business: "Red Prairie Cleaning",
+
+    // Contact fields
     full_name: rpState.fullName,
     phone: rpState.phone,
     email: rpState.email,
+
+    // Main booking fields
     service: serviceName,
+    service_type: serviceName,
     service_key: rpState.service,
     estimated_price: `$${total}`,
     estimated_price_number: total,
-    bedrooms: rpState.bedrooms ? String(rpState.bedrooms) : "N/A",
-    bathrooms: rpState.bathrooms ? String(rpState.bathrooms) : "N/A",
-    carpet_with_moveout: rpState.carpetWithMoveout ? "Yes" : "No",
-    carpet_rooms: rpState.carpetRooms ? String(rpState.carpetRooms) : "N/A",
-    furniture_item: rpState.furnitureItem ? rpFurnitureItems[rpState.furnitureItem].name : "N/A",
-    condition: rpIsHomeCleaning() ? rpState.condition : "N/A",
-    addons: addonNames.length ? addonNames.join(", ") : "None",
+    price_estimate: `$${total}`,
+
+    // Job details for GHL / cleaner notifications
+    bedrooms: bedrooms,
+    bathrooms: bathrooms,
+    condition: condition,
+    addons: addons,
     addon_count: addonNames.length,
+    carpet_with_moveout: carpetWithMoveout,
+    carpet_rooms: carpetRooms,
+    furniture_item: furnitureItem,
+    estimate_notes: jobDetails,
+    job_details: jobDetails,
+    cleaner_notes: jobDetails,
+
+    // Tracking
     submitted_at: new Date().toISOString(),
     page_url: window.location.href
   };
