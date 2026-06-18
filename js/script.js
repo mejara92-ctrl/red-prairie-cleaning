@@ -64,3 +64,24 @@ ctaLinks.forEach(link => {
         console.log("Red Prairie CTA clicked:", link.textContent.trim());
     });
 });
+
+// -------------------------------
+// Disable Calculator Mobile Jump
+// -------------------------------
+
+// Wait until everything loads, then override
+// the calculator scroll function used on
+// landing pages.
+
+window.addEventListener("load", () => {
+
+    if (typeof window.rpScrollAfterRender === "function") {
+
+        window.rpScrollAfterRender = function() {
+            return;
+        };
+
+        console.log("Red Prairie: Calculator auto-scroll disabled");
+    }
+
+});
