@@ -13,7 +13,7 @@
 <meta property="og:title" content="Apartment Move-Out Cleaning Lawton, OK | Red Prairie Cleaning">
 <meta property="og:description" content="Apartment move-out cleaning in Lawton, OK for renters, military families, landlords, and property managers. Get an estimate and book online.">
 <meta property="og:url" content="https://redprairiecleaning.com/apartment-move-out-cleaning-lawton-ok/">
-<meta property="og:image" content="https://redprairiecleaning.com/images/social/red-prairie-cleaning-preview.jpg">
+<meta property="og:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Red Prairie Cleaning move-out cleaning in Lawton, Oklahoma">
@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Apartment Move-Out Cleaning Lawton, OK | Red Prairie Cleaning">
 <meta name="twitter:description" content="Apartment move-out cleaning in Lawton, OK for renters, military families, landlords, and property managers.">
-<meta name="twitter:image" content="https://redprairiecleaning.com/images/social/red-prairie-cleaning-preview.jpg">
+<meta name="twitter:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1029,6 +1029,49 @@ footer li, footer p {
   box-shadow:0 0 0 4px rgba(208,0,0,.10);
 }
 
+.rp-summary-card {
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  border-radius:18px;
+  padding:18px;
+  margin-top:18px;
+}
+.rp-summary-total {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
+  font-weight:900;
+  color:var(--red);
+}
+.rp-summary-meta {
+  margin-top:8px;
+  color:#333;
+  font-size:14px;
+  font-weight:700;
+}
+.rp-estimate-details {
+  margin-top:12px;
+}
+.rp-estimate-details summary {
+  cursor:pointer;
+  font-weight:900;
+  color:#111;
+  padding:10px 0 0;
+}
+.rp-estimate-details .rp-invoice {
+  margin-top:12px;
+}
+.rp-included details summary {
+  cursor:pointer;
+  font-weight:900;
+  color:#111;
+}
+.rp-included details[open] summary {
+  margin-bottom:10px;
+}
+
 </style>
 
 <script type="application/ld+json">
@@ -1063,6 +1106,13 @@ footer li, footer p {
         "ratingValue": "5",
         "reviewCount": "24"
       }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://redprairiecleaning.com/#website",
+      "url": "https://redprairiecleaning.com/",
+      "name": "Red Prairie Cleaning",
+      "publisher": { "@id": "https://redprairiecleaning.com/#business" }
     },
     {
       "@type": "Service",
@@ -1113,7 +1163,7 @@ footer li, footer p {
       "about": { "@id": "https://redprairiecleaning.com/apartment-move-out-cleaning-lawton-ok/#service" },
       "primaryImageOfPage": {
         "@type": "ImageObject",
-        "url": "https://redprairiecleaning.com/images/social/red-prairie-cleaning-preview.jpg"
+        "url": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg"
       }
     },
     {
@@ -1178,7 +1228,7 @@ footer li, footer p {
       </ul>
     </nav>
 
-    <a href="#booking" class="book-btn">Book Now</a>
+    <a href="#booking" class="book-btn">Get Estimate</a>
   </div>
 </header>
 
@@ -1800,7 +1850,7 @@ function rpSubmitLead() {
 
   rpSendEstimateToGoHighLevel();
   rpRenderCalendar();
-  rpScrollAfterRender();
+  setTimeout(() => rpScrollToCalculator(), 100);
 }
 
 function rpRender() {
@@ -1848,19 +1898,21 @@ function rpRender() {
     </div>
 
     <div class="rp-included">
-      <div class="rp-included-title">Included with Apartment Move-Out Cleaning</div>
-      <div class="rp-checklist">
-        <div>✓ Bathrooms cleaned and sanitized</div>
-        <div>✓ Kitchen detailed</div>
-        <div>✓ Inside oven</div>
-        <div>✓ Inside refrigerator</div>
-        <div>✓ Inside microwave</div>
-        <div>✓ Cabinets and drawers wiped inside</div>
-        <div>✓ Baseboards</div>
-        <div>✓ Interior windows</div>
-        <div>✓ Floors vacuumed and mopped</div>
-        <div>✓ High-touch surfaces</div>
-      </div>
+      <details>
+        <summary>What's included with Apartment Move-Out Cleaning</summary>
+        <div class="rp-checklist">
+          <div>✓ Bathrooms cleaned and sanitized</div>
+          <div>✓ Kitchen detailed</div>
+          <div>✓ Inside oven</div>
+          <div>✓ Inside refrigerator</div>
+          <div>✓ Inside microwave</div>
+          <div>✓ Cabinets and drawers wiped inside</div>
+          <div>✓ Baseboards</div>
+          <div>✓ Interior windows</div>
+          <div>✓ Floors vacuumed and mopped</div>
+          <div>✓ High-touch surfaces</div>
+        </div>
+      </details>
     </div>
 
     <h3>Add professional carpet cleaning?</h3>
@@ -1889,15 +1941,23 @@ function rpRender() {
     <h3>Add-ons</h3>
     ${rpAddonsHtml()}
 
-    <div class="rp-invoice">
-      <div class="rp-row"><span>Service</span><strong>Apartment Move-Out Cleaning</strong></div>
-      <div class="rp-row"><span>Location Page</span><strong>Lawton Area</strong></div>
-      <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
-      <div class="rp-row"><span>Carpet cleaning</span><strong>${rpState.carpetWithMoveout ? "Included in estimate" : "No"}</strong></div>
-      <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
-      <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
+    <div class="rp-summary-card">
+      <div class="rp-summary-total"><span>Estimated Total</span><strong>$${total}</strong></div>
+      <div class="rp-summary-meta">
+        Apartment Move-Out Cleaning • ${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""} Bed / ${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""} Bath • ${rpState.condition}
+      </div>
+      <details class="rp-estimate-details">
+        <summary>View estimate details</summary>
+        <div class="rp-invoice">
+          <div class="rp-row"><span>Service</span><strong>Apartment Move-Out Cleaning</strong></div>
+          <div class="rp-row"><span>Location Page</span><strong>Lawton Area</strong></div>
+          <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
+          <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
+          <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
+          <div class="rp-row"><span>Carpet cleaning</span><strong>${rpState.carpetWithMoveout ? "Included in estimate" : "No"}</strong></div>
+          <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
+        </div>
+      </details>
     </div>
 
     <div class="rp-notice">
@@ -1987,7 +2047,7 @@ function rpRenderCalendar() {
     </div>
 
     <div class="rp-btns">
-      <button type="button" class="rp-secondary" onclick="rpRender(); rpScrollAfterRender();">Back To Estimate</button>
+      <button type="button" class="rp-secondary" onclick="rpRender(); setTimeout(() => rpScrollToCalculator(), 100);">Back To Estimate</button>
       <a class="rp-primary" href="sms:5802150915">Text Us</a>
     </div>
   `;
@@ -2014,9 +2074,7 @@ function rpScrollToCalculator(instant = false) {
 }
 
 function rpScrollAfterRender() {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => rpScrollToCalculator());
-  });
+  return;
 }
 
 document.addEventListener("click", function(e) {
@@ -2031,7 +2089,6 @@ document.addEventListener("click", function(e) {
 });
 
 rpRender();
-</script>
 </script>
 
 <script
