@@ -1860,9 +1860,7 @@ function rpScrollToCalculator(instant = false) {
 }
 
 function rpScrollAfterRender() {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => rpScrollToCalculator());
-  });
+  return;
 }
 
 document.addEventListener("click", function(e) {

@@ -1545,6 +1545,7 @@ function rpScrollToCalculator(instant = false) {
 }
 
 function rpScrollAfterRender() {
+  return;
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => rpScrollToCalculator());
   });
