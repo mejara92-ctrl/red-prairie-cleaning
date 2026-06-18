@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Carpet Cleaning Lawton, OK | Red Prairie Cleaning</title>
-  <meta name="description" content="Professional carpet cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma. Hot water extraction with commercial Mytee equipment.">
+  <title>Carpet Cleaning Lawton, OK | Pet Odor & Stain Help | Red Prairie Cleaning</title>
+  <meta name="description" content="Professional carpet cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma. Hot water extraction for pet odor help, traffic lanes, stains, and move-out carpet cleaning.">
   <link rel="canonical" href="https://redprairiecleaning.com/carpet-cleaning-lawton-ok/">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -770,6 +770,11 @@
           "@type": "PostalAddress",
           "addressRegion": "OK",
           "addressCountry": "US"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "reviewCount": "24"
         }
       },
       {
@@ -807,6 +812,22 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Red Prairie Cleaning uses professional Mytee hot water extraction equipment with pre-spray and wand cleaning."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you move furniture for carpet cleaning?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Small items should be picked up before the appointment. Normal furniture can usually be worked around, but heavy furniture moving is not included unless discussed before booking."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does carpet take to dry?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Dry time depends on carpet thickness, airflow, humidity, soil level, and how much moisture is needed during cleaning. Air movement and fans can help carpet dry faster."
             }
           }
         ]
@@ -847,11 +868,12 @@
       <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
       <span><i class="fa-solid fa-water"></i> Mytee Hot Water Extraction</span>
       <span><i class="fa-solid fa-paw"></i> Pet Odor Help</span>
+      <span><i class="fa-solid fa-shoe-prints"></i> Traffic Lane Cleaning</span>
     </div>
 
     <p>
       Carpet cleaning for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma.
-      Remove dirt, odors, traffic lanes, and everyday buildup with professional equipment.
+      Help with traffic lanes, pet areas, odors, stains, and everyday carpet buildup using professional equipment.
     </p>
 
     <div class="hero-buttons">
@@ -876,7 +898,7 @@
 
   <div class="trust-card">
     <i class="fa-solid fa-wind"></i>
-    <h3>Fast Drying</h3>
+    <h3>Moisture Recovery</h3>
     <p>Professional Extraction Process</p>
   </div>
 
@@ -931,7 +953,7 @@
       <div class="rp-package-badge">Popular Carpet Package</div>
       <h3>Rooms + Pet Treatment + Deodorizer</h3>
       <p class="rp-package-lead">
-        A strong option for homes with dogs, kids, heavy foot traffic, or lingering carpet odor.
+        A strong option for homes with dogs, kids, heavy foot traffic, or carpet that needs a serious refresh.
       </p>
       <ul class="rp-package-list">
         <li>2 room carpet cleaning starts at $149</li>
@@ -955,7 +977,7 @@
       <div class="rp-inclusion-card">
         <div class="rp-card-eyebrow">Pet Homes</div>
         <h3>Pet Odors & Accidents</h3>
-        <p>Great for dog hair, accidents, muddy paws, and lingering pet smells.</p>
+        <p>Helpful for dog hair, muddy paws, and pet-related carpet spots or odors.</p>
         <ul>
           <li>Pet stain treatment available</li>
           <li>Deodorizer available</li>
@@ -977,7 +999,7 @@
       <div class="rp-inclusion-card">
         <div class="rp-card-eyebrow">Move-Outs</div>
         <h3>Rental & PCS Carpet Cleaning</h3>
-        <p>Pair carpet cleaning with move-out cleaning for a cleaner turnover and easier handoff.</p>
+        <p>Good for move-outs, apartment turnovers, PCS moves, and lease-end carpet requirements.</p>
         <ul>
           <li>Great for apartments</li>
           <li>Great for Fort Sill PCS moves</li>
@@ -1074,10 +1096,11 @@
 </section>
 
 <section>
-  <h2>Built For Pet Homes, Move-Outs & High-Traffic Carpet</h2>
+  <h2>Before Your Carpet Cleaning Appointment</h2>
   <p class="section-text">
-    Whether you are dealing with dog hair, traffic lanes, rental carpet, or carpet that simply needs to feel fresh again,
-    Red Prairie Cleaning uses professional hot water extraction equipment instead of rental-grade machines.
+    For the best result, pick up small items from carpeted areas, point out pet spots or stains when we arrive,
+    and plan for airflow after the cleaning. We can work around normal furniture, but heavy furniture moving is not included
+    unless discussed before the appointment.
   </p>
 </section>
 
@@ -1090,7 +1113,7 @@
   <div class="review-grid">
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Professional, on time, and the carpets came out way better than I expected. You can tell they use real equipment."</p>
+      <p>"I contacted Red Prairie Cleaning and was able to get on the schedule right away. They were very polite and professional."</p>
       <h4>Tyler A.</h4>
       <span>Verified Customer</span>
     </div>
@@ -1181,6 +1204,7 @@
     <div>
       <h3>Contact</h3>
       <p>(580) 215-0915</p>
+      <p>admin@redprairiecleaning.com</p>
       <p>redprairiecleaning.com</p>
     </div>
 
@@ -1485,9 +1509,7 @@ function rpScrollToCalculator(instant = false) {
 }
 
 function rpScrollAfterRender() {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => rpScrollToCalculator());
-  });
+  return;
 }
 
 document.addEventListener("click", function(e) {
