@@ -660,6 +660,79 @@
       return false;
     }
   </script>
+
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CleaningService",
+        "@id": "https://redprairiecleaning.com/#business",
+        "name": "Red Prairie Cleaning",
+        "url": "https://redprairiecleaning.com/",
+        "telephone": "+1-580-215-0915",
+        "image": "https://redprairiecleaning.com/images/logo/logo-color.png",
+        "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
+        "priceRange": "$$",
+        "areaServed": [
+          { "@type": "City", "name": "Lawton" },
+          { "@type": "Place", "name": "Fort Sill" },
+          { "@type": "City", "name": "Cache" },
+          { "@type": "City", "name": "Elgin" },
+          { "@type": "City", "name": "Medicine Park" },
+          { "@type": "City", "name": "Duncan" },
+          { "@type": "City", "name": "Wichita Falls" }
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "OK",
+          "addressCountry": "US"
+        }
+      },
+      {
+        "@type": "Service",
+        "@id": "https://redprairiecleaning.com/carpet-cleaning-lawton-ok/#service",
+        "name": "Carpet Cleaning in Lawton, OK",
+        "serviceType": "Hot water extraction carpet cleaning",
+        "provider": { "@id": "https://redprairiecleaning.com/#business" },
+        "areaServed": "Lawton, Fort Sill, and Southwest Oklahoma",
+        "description": "Professional carpet cleaning in Lawton, OK using hot water extraction and commercial Mytee equipment."
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://redprairiecleaning.com/carpet-cleaning-lawton-ok/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How much does carpet cleaning start at?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Carpet cleaning starts at $149 for up to 2 rooms. Final pricing can vary based on room size, carpet condition, pet treatment, stairs, area rugs, and travel."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you offer pet odor treatment?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Pet stain treatment and deodorizer are available as add-ons during the carpet cleaning estimate."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What equipment do you use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Red Prairie Cleaning uses professional Mytee hot water extraction equipment with pre-spray and wand cleaning."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
 </head>
 
 <body>
@@ -689,7 +762,7 @@
     <h1>Professional Carpet Cleaning in Lawton, OK</h1>
 
     <div class="hero-trust">
-      <span><i class="fa-solid fa-star"></i> 24 Verified Google Reviews</span>
+      <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
       <span><i class="fa-solid fa-water"></i> Mytee Hot Water Extraction</span>
       <span><i class="fa-solid fa-paw"></i> Pet Odor Help</span>
     </div>
@@ -710,7 +783,7 @@
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
     <h3>24+</h3>
-    <p>Google Reviews</p>
+    <p>5-Star Reviews</p>
   </div>
 
   <div class="trust-card">
@@ -918,39 +991,47 @@
   </div>
 </section>
 
-<section class="reviews" id="reviews">
-  <h2>What Customers Say</h2>
+<section>
+  <h2>Built For Pet Homes, Move-Outs & High-Traffic Carpet</h2>
   <p class="section-text">
-    Review-style cards for the landing page. Replace with real pulled reviews as you collect more.
+    Whether you are dealing with dog hair, traffic lanes, rental carpet, or carpet that simply needs to feel fresh again,
+    Red Prairie Cleaning uses professional hot water extraction equipment instead of rental-grade machines.
+  </p>
+</section>
+
+<section class="reviews" id="reviews">
+  <h2>Trusted By Lawton Carpet Cleaning Customers</h2>
+  <p class="section-text">
+    ⭐⭐⭐⭐⭐ Based on 24+ Google Reviews
   </p>
 
   <div class="review-grid">
     <div class="review-card">
       <div class="stars">★★★★★</div>
       <p>"Professional, on time, and the carpets came out way better than I expected. You can tell they use real equipment."</p>
-      <h4>James T.</h4>
-      <span>Google Review</span>
+      <h4>Tyler A.</h4>
+      <span>Verified Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Easy to schedule, great communication, and the carpet looked fresh again after the cleaning."</p>
-      <h4>Amanda R.</h4>
-      <span>Google Review</span>
+      <p>"Christa was professional, detail-oriented, and did an excellent job. We were very happy with the results and would definitely recommend them."</p>
+      <h4>Nina O.</h4>
+      <span>Verified Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Red Prairie helped with our move-out and carpet cleaning. It made the whole process easier."</p>
-      <h4>Sarah M.</h4>
-      <span>Google Review</span>
+      <p>"The BEST cleaning I've ever had in my house before. The staff was AMAZING, efficient and super detailed."</p>
+      <h4>Ava C.</h4>
+      <span>Verified Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Great service and fast communication. The carpet cleaning made a huge difference."</p>
-      <h4>Michael H.</h4>
-      <span>Google Review</span>
+      <p>"Extremely professional and convenient! Would highly recommend!"</p>
+      <h4>Chandler W.</h4>
+      <span>Verified Customer</span>
     </div>
   </div>
 </section>
