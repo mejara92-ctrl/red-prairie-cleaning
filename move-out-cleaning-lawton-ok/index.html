@@ -15,6 +15,111 @@
 
   <link rel="preload" as="image" href="../images/services/move-out-cleaning.jpg">
 
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://redprairiecleaning.com/#localbusiness",
+      "name": "Red Prairie Cleaning",
+      "url": "https://redprairiecleaning.com/",
+      "telephone": "+15802150915",
+      "email": "admin@redprairiecleaning.com",
+      "areaServed": [
+        "Lawton, OK",
+        "Fort Sill, OK",
+        "Cache, OK",
+        "Elgin, OK",
+        "Medicine Park, OK",
+        "Duncan, OK",
+        "Southwest Oklahoma"
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/#service",
+      "name": "Move-Out Cleaning in Lawton, OK",
+      "serviceType": "Move-Out Cleaning",
+      "provider": {
+        "@id": "https://redprairiecleaning.com/#localbusiness"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Lawton",
+        "addressRegion": "OK",
+        "addressCountry": "US"
+      },
+      "description": "Move-out cleaning in Lawton, OK for renters, PCS moves, landlords, apartments, home sellers, property managers, and property turnovers.",
+      "url": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://redprairiecleaning.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Move-Out Cleaning",
+          "item": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Lawton OK",
+          "item": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://redprairiecleaning.com/move-out-cleaning-lawton-ok/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does move-out cleaning include appliances?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Move-out cleaning includes kitchen detail such as inside the refrigerator, inside the oven, inside the microwave, and cabinets and drawers wiped inside when empty."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can carpet cleaning be added to move-out cleaning?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Professional carpet cleaning can be added during the estimate process for a more complete move-out reset."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you clean rentals and apartments in Lawton?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Red Prairie Cleaning helps renters, landlords, property managers, military families, and homeowners with rentals, apartments, PCS moves, home sales, and property turnovers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does move-out cleaning cost in Lawton?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pricing depends on home size, bathrooms, condition, add-ons, carpet cleaning, access, travel, and buildup level. The online estimator gives a starting price before booking."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+
   <style>
     :root {
       --red: #d00000;
@@ -329,30 +434,49 @@
       line-height: 1.45;
     }
 
-    .rp-lead-form { display: grid; gap: 13px; margin-top: 18px; }
-    .rp-lead-field label { display: block; font-weight: 900; margin-bottom: 7px; color: var(--text); font-size: 14px; }
+    .rp-lead-form {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .rp-lead-field label {
+      display: block;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 14px;
+    }
 
     .rp-lead-field input {
       width: 100%;
       background: #fff;
       color: var(--text);
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 14px;
-      padding: 15px;
+      padding: 16px;
       font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      transition: .18s ease;
+      box-shadow: 0 6px 16px rgba(0,0,0,.04);
     }
 
-    .rp-lead-field input:focus { outline: none; border-color: var(--red); }
+    .rp-lead-field input:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px rgba(208,0,0,.10);
+    }
 
     .rp-error {
       display: none;
       background: #fff0f0;
-      border: 1px solid var(--red);
+      border: 1px solid #f0caca;
       color: #900;
       border-radius: 12px;
       padding: 12px;
-      margin-top: 14px;
+      margin: 0;
       font-size: 14px;
+      font-weight: 800;
     }
 
     .rp-btns { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
@@ -668,7 +792,7 @@
     <h1>Move-Out Cleaning in Lawton, OK</h1>
 
     <div class="hero-trust">
-      <span><i class="fa-solid fa-star"></i> 24 Verified Google Reviews</span>
+      <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
       <span><i class="fa-solid fa-truck-moving"></i> PCS & Rental Move-Outs</span>
       <span><i class="fa-solid fa-broom"></i> Factory Reset Cleaning</span>
     </div>
@@ -689,7 +813,7 @@
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
     <h3>24+</h3>
-    <p>Google Reviews</p>
+    <p>5-Star Reviews</p>
   </div>
 
   <div class="trust-card">
@@ -817,6 +941,54 @@
   </div>
 </section>
 
+
+<section class="rp-comparison" id="turnover-ready">
+  <div class="rp-comparison-wrap">
+    <h2>Deposit & Turnover Ready</h2>
+    <p class="section-text">
+      Move-out cleaning is about more than making the home look better. It helps prepare the property for landlord walkthroughs, PCS inspections, buyer showings, listing photos, and key handoff.
+    </p>
+
+    <div class="rp-inclusion-cards">
+      <div class="rp-inclusion-card">
+        <div class="rp-card-eyebrow">Renters</div>
+        <h3>Inspection Prep</h3>
+        <p>We focus on the areas that usually get noticed during move-out walkthroughs.</p>
+        <ul>
+          <li>Kitchens and appliances</li>
+          <li>Bathrooms and fixtures</li>
+          <li>Baseboards and floors</li>
+          <li>Interior windows and high-touch areas</li>
+        </ul>
+      </div>
+
+      <div class="rp-inclusion-card featured">
+        <div class="rp-card-eyebrow">Military Moves</div>
+        <h3>PCS Friendly</h3>
+        <p>Helpful for Fort Sill PCS timelines, rental handoffs, and busy move-out schedules.</p>
+        <ul>
+          <li>Online booking</li>
+          <li>Invoice available</li>
+          <li>Optional carpet cleaning</li>
+          <li>Move-out checklist focus</li>
+        </ul>
+      </div>
+
+      <div class="rp-inclusion-card">
+        <div class="rp-card-eyebrow">Landlords</div>
+        <h3>Turnover Support</h3>
+        <p>Useful for rentals, apartments, home sellers, and property managers preparing a unit for the next person.</p>
+        <ul>
+          <li>Rental turnover cleaning</li>
+          <li>Vacant home reset</li>
+          <li>Heavy buildup add-ons</li>
+          <li>Carpet cleaning add-on</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="before-after" id="results">
   <h2>Pair Move-Out Cleaning With Carpet Cleaning</h2>
   <p class="section-text">
@@ -880,36 +1052,68 @@
 </section>
 
 <section class="reviews" id="reviews">
-  <h2>What Customers Say</h2>
-  <p class="section-text">Review-style cards for the landing page. Replace with real pulled reviews as you collect more.</p>
+  <h2>Trusted By Homeowners Across Southwest Oklahoma</h2>
+  <p class="section-text">
+    ⭐⭐⭐⭐⭐ Based on 24+ Google Reviews
+  </p>
 
   <div class="review-grid">
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Red Prairie did an amazing job with our move-out cleaning. Everything looked spotless and it made the whole process easier."</p>
-      <h4>Sarah M.</h4>
-      <span>Google Review</span>
+      <p>"Christa and her team were excellent for my move-out clean. They were professional, responsive, and did a fantastic job. The house looked great, and the entire process was smooth and stress-free."</p>
+      <h4>Corey M.</h4>
+      <span>Move-Out Cleaning Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Easy to schedule, great communication, and the attention to detail was excellent."</p>
-      <h4>Amanda R.</h4>
-      <span>Google Review</span>
+      <p>"Christa was professional, detail-oriented, and did an excellent job. We were very happy with the results and would definitely recommend them."</p>
+      <h4>Nina O.</h4>
+      <span>Verified Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"They handled the deep clean better than any cleaner we have used before. The baseboards, bathrooms, and kitchen looked great."</p>
-      <h4>Michael H.</h4>
-      <span>Google Review</span>
+      <p>"The BEST cleaning I've ever had in my house before. The staff was AMAZING, efficient and super detailed."</p>
+      <h4>Ava C.</h4>
+      <span>Verified Customer</span>
     </div>
 
     <div class="review-card">
       <div class="stars">★★★★★</div>
-      <p>"Professional, on time, and the carpets came out way better than I expected."</p>
-      <h4>James T.</h4>
-      <span>Google Review</span>
+      <p>"I contacted Red Prairie Cleaning and was able to get on the schedule right away. They were very polite and professional."</p>
+      <h4>Tyler A.</h4>
+      <span>Verified Customer</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:26px;">
+    <a href="https://g.page/r/Cfx0wV2BCKMxEBM/review" target="_blank" rel="noopener" class="book-btn">Read More Google Reviews</a>
+  </div>
+</section>
+
+<section class="rp-comparison" id="faq">
+  <div class="rp-comparison-wrap">
+    <h2>Lawton Move-Out Cleaning FAQs</h2>
+    <p class="section-text">
+      Common questions before booking move-out cleaning in Lawton, OK.
+    </p>
+
+    <div class="rp-inclusion-cards">
+      <div class="rp-inclusion-card">
+        <h3>Does move-out cleaning include appliances?</h3>
+        <p>Yes. Move-out cleaning includes inside the refrigerator, oven, microwave, and cabinets and drawers when empty.</p>
+      </div>
+
+      <div class="rp-inclusion-card featured">
+        <h3>Can carpet cleaning be added?</h3>
+        <p>Yes. You can add professional carpet cleaning in the estimator for a more complete move-out reset.</p>
+      </div>
+
+      <div class="rp-inclusion-card">
+        <h3>Do you help with PCS and rental move-outs?</h3>
+        <p>Yes. We help Fort Sill PCS moves, Lawton rentals, apartments, landlords, property managers, and home sellers.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -976,6 +1180,7 @@
     <div>
       <h3>Contact</h3>
       <p>(580) 215-0915</p>
+      <p>admin@redprairiecleaning.com</p>
       <p>redprairiecleaning.com</p>
     </div>
 
