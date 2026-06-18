@@ -845,6 +845,98 @@ footer li, footer p {
   font-size:13px;
 }
 
+
+
+/* ===== LEAD FORM FIX ===== */
+.rp-lead-form{
+  margin-top:28px;
+  padding:24px;
+  background:#fafafa;
+  border:1px solid #e7e7e7;
+  border-radius:20px;
+}
+
+.rp-lead-field{margin-bottom:16px;}
+
+.rp-lead-field label{
+  display:block;
+  font-size:14px;
+  font-weight:800;
+  margin-bottom:8px;
+  color:#111;
+}
+
+.rp-lead-field input{
+  width:100%;
+  height:56px;
+  padding:0 18px;
+  border:1px solid #ddd;
+  border-radius:14px;
+  font-size:16px;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  transition:.2s ease;
+}
+
+.rp-lead-field input:focus{
+  outline:none;
+  border-color:#d00000;
+  box-shadow:0 0 0 4px rgba(208,0,0,.10);
+}
+
+.rp-error{
+  display:none;
+  margin-top:12px;
+  padding:14px;
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  border-radius:12px;
+  color:#a80000;
+  font-size:14px;
+  font-weight:700;
+}
+
+.rp-btns{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+
+.rp-primary,
+.rp-secondary{
+  flex:1;
+  min-height:58px;
+  font-size:16px;
+  font-weight:900;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.rp-primary{
+  background:#d00000;
+  color:#fff;
+  border:none;
+  box-shadow:0 12px 30px rgba(208,0,0,.25);
+}
+
+.rp-primary:hover{background:#b30000;}
+
+.rp-secondary{
+  background:#fff;
+  color:#111;
+  border:1px solid #ddd;
+}
+
+.rp-secondary:hover{background:#fafafa;}
+
+@media (max-width:700px){
+  .rp-lead-form{padding:18px;}
+  .rp-btns{flex-direction:column;}
+  .rp-primary,.rp-secondary{width:100%;}
+}
+
 @media (max-width:768px) {
   .hero-buttons, .cta-buttons, .rp-btns { margin-bottom:18px; }
 
@@ -1516,6 +1608,7 @@ function rpRender() {
     </div>
 
     <div class="rp-notice">
+      <strong>Starting Estimate</strong><br>
       This is a starting estimate. Final pricing can change for severe buildup, heavy pet hair, unusual conditions,
       limited access, long travel, stairs, or specialty requests.
     </div>
@@ -1523,17 +1616,17 @@ function rpRender() {
     <div class="rp-lead-form">
       <div class="rp-lead-field">
         <label for="rpFullName">Full Name</label>
-        <input id="rpFullName" type="text" placeholder="Your name">
+        <input id="rpFullName" type="text" placeholder="John Smith">
       </div>
 
       <div class="rp-lead-field">
         <label for="rpPhone">Phone</label>
-        <input id="rpPhone" type="tel" placeholder="Your phone number">
+        <input id="rpPhone" type="tel" placeholder="(580) 555-1234">
       </div>
 
       <div class="rp-lead-field">
         <label for="rpEmail">Email</label>
-        <input id="rpEmail" type="email" placeholder="Your email">
+        <input id="rpEmail" type="email" placeholder="you@example.com">
       </div>
 
       <div class="rp-error" id="rpFormError">
