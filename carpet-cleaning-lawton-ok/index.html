@@ -8,6 +8,21 @@
   <meta name="description" content="Professional carpet cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma. Hot water extraction for pet odor help, traffic lanes, stains, and move-out carpet cleaning.">
   <link rel="canonical" href="https://redprairiecleaning.com/carpet-cleaning-lawton-ok/">
 
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Red Prairie Cleaning">
+  <meta property="og:title" content="Carpet Cleaning Lawton, OK | Red Prairie Cleaning">
+  <meta property="og:description" content="Professional carpet cleaning in Lawton, OK for pet odor help, traffic lanes, stains, rugs, stairs, and move-out carpet cleaning.">
+  <meta property="og:url" content="https://redprairiecleaning.com/carpet-cleaning-lawton-ok/">
+  <meta property="og:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Red Prairie Cleaning serving Lawton and surrounding communities">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Carpet Cleaning Lawton, OK | Red Prairie Cleaning">
+  <meta name="twitter:description" content="Professional carpet cleaning in Lawton, OK for pet odor help, traffic lanes, stains, and move-out carpet cleaning.">
+  <meta name="twitter:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -717,6 +732,89 @@
       .footer-content { grid-template-columns: repeat(3, 1fr); gap: 30px; }
       .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; }
     }
+
+
+    .rp-step-bar {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-bottom:22px;
+    }
+    .rp-step-pill {
+      background:#f4f4f4;
+      border:1px solid #e2e2e2;
+      border-radius:999px;
+      padding:10px 8px;
+      text-align:center;
+      font-size:12px;
+      font-weight:900;
+      color:#555;
+    }
+    .rp-step-pill.is-active {
+      background:#fff5f5;
+      border-color:var(--red);
+      color:var(--red);
+    }
+    .rp-estimate-summary {
+      background:#fff5f5;
+      border:1px solid #f0caca;
+      border-radius:18px;
+      padding:18px;
+      margin:18px 0;
+    }
+    .rp-estimate-summary strong { color:var(--red); }
+    details.rp-details {
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:16px;
+      margin-top:14px;
+      overflow:hidden;
+    }
+    details.rp-details summary {
+      cursor:pointer;
+      padding:14px 16px;
+      font-weight:900;
+      color:#111;
+    }
+    details.rp-details .rp-details-body {
+      padding:0 16px 16px;
+    }
+    .rp-lead-field textarea{
+      width:100%;
+      min-height:110px;
+      padding:16px 18px;
+      border:1px solid #ddd;
+      border-radius:14px;
+      font-size:16px;
+      font-family:'Poppins',sans-serif;
+      background:#fff;
+      resize:vertical;
+    }
+    .rp-lead-field textarea:focus{
+      outline:none;
+      border-color:var(--red);
+      box-shadow:0 0 0 4px rgba(208,0,0,.10);
+    }
+    .rp-map-wrap {
+      max-width:1100px;
+      margin:26px auto 0;
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      border:1px solid #eee;
+      background:#fff;
+    }
+    .rp-map-wrap iframe {
+      width:100%;
+      min-height:360px;
+      border:0;
+      display:block;
+    }
+    @media (max-width:700px){
+      .rp-step-pill { font-size:11px; padding:9px 6px; }
+      .rp-map-wrap iframe { min-height:320px; }
+    }
+
   </style>
 
   <!-- Google tag (gtag.js) -->
@@ -754,7 +852,7 @@
         "name": "Red Prairie Cleaning",
         "url": "https://redprairiecleaning.com/",
         "telephone": "+1-580-215-0915",
-        "image": "https://redprairiecleaning.com/images/logo/logo-color.png",
+        "image": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg",
         "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
         "priceRange": "$$",
         "areaServed": [
@@ -785,6 +883,26 @@
         "provider": { "@id": "https://redprairiecleaning.com/#business" },
         "areaServed": "Lawton, Fort Sill, and Southwest Oklahoma",
         "description": "Professional carpet cleaning in Lawton, OK using hot water extraction and commercial Mytee equipment."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://redprairiecleaning.com/#website",
+        "url": "https://redprairiecleaning.com/",
+        "name": "Red Prairie Cleaning",
+        "publisher": { "@id": "https://redprairiecleaning.com/#business" }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://redprairiecleaning.com/carpet-cleaning-lawton-ok/#webpage",
+        "url": "https://redprairiecleaning.com/carpet-cleaning-lawton-ok/",
+        "name": "Carpet Cleaning Lawton, OK | Red Prairie Cleaning",
+        "description": "Professional carpet cleaning in Lawton, OK for pet odor help, traffic lanes, stains, rugs, stairs, and move-out carpet cleaning.",
+        "isPartOf": { "@id": "https://redprairiecleaning.com/#website" },
+        "about": { "@id": "https://redprairiecleaning.com/carpet-cleaning-lawton-ok/#service" },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg"
+        }
       },
       {
         "@type": "FAQPage",
@@ -856,7 +974,7 @@
       </ul>
     </nav>
 
-    <a href="#booking" class="book-btn">Book Now</a>
+    <a href="#booking" class="book-btn">Get Estimate</a>
   </div>
 </header>
 
@@ -1054,7 +1172,7 @@
       <li>Carpet grooming for a cleaner finished look</li>
     </ul>
 
-    <a href="#booking" class="book-btn">Schedule Carpet Cleaning</a>
+    <a href="#booking" class="book-btn">Get Carpet Estimate</a>
   </div>
 
   <div class="equipment-image">
@@ -1172,6 +1290,17 @@
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Wichita Falls, TX</h3></div>
   </div>
 
+
+
+  <div class="rp-map-wrap" aria-label="Red Prairie Cleaning carpet cleaning service area map">
+    <iframe
+      title="Red Prairie Cleaning carpet cleaning service area map"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q=Lawton%2C%20OK&output=embed">
+    </iframe>
+  </div>
+
   <p class="service-area-note">
     Also serving Comanche, Sterling, Chickasha, Apache, Fletcher, Geronimo, Walters, Temple, Marlow,
     Rush Springs, and surrounding communities.
@@ -1181,7 +1310,7 @@
 <section class="final-cta">
   <h2>Ready For Cleaner Carpet?</h2>
   <p>Build your estimate, choose your add-ons, and reserve your carpet cleaning online.</p>
-  <a href="#booking" class="book-btn">Get Started Today</a>
+  <a href="#booking" class="book-btn">Get Carpet Estimate</a>
 </section>
 
 <footer>
@@ -1224,15 +1353,22 @@
 </footer>
 
 <script>
-const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
+const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/05947288-6996-4ecc-80aa-42766c3be32b";
+const RP_BOOKING_CALENDAR_URL = "https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2";
 
 const rpState = {
+  step: 1,
   rooms: 2,
   condition: "Normal",
   addons: [],
   fullName: "",
   phone: "",
   email: "",
+  address1: "",
+  city: "Lawton",
+  state: "OK",
+  postalCode: "",
+  specialInstructions: "",
   estimateSent: false
 };
 
@@ -1263,13 +1399,27 @@ function rpCalculatePrice() {
   return Math.max(total, 129);
 }
 
+function rpEscapeAttr(value) {
+  return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function rpStepBar(active) {
+  return `
+    <div class="rp-step-bar" aria-label="Booking steps">
+      <div class="rp-step-pill ${active === 1 ? "is-active" : ""}">1. Estimate</div>
+      <div class="rp-step-pill ${active === 2 ? "is-active" : ""}">2. Contact & Address</div>
+      <div class="rp-step-pill ${active === 3 ? "is-active" : ""}">3. Appointment</div>
+    </div>
+  `;
+}
+
 function rpAddonsHtml() {
   return rpAddons.map(addon => {
     const checked = rpState.addons.some(a => a.name === addon.name) ? "checked" : "";
     return `
       <label class="rp-addon">
         <span class="rp-addon-left">
-          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name}', ${addon.price}, this.checked)">
+          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name.replace(/'/g, "\\'")}', ${addon.price}, this.checked)">
           ${addon.name}
         </span>
         <span class="rp-price">+$${addon.price}</span>
@@ -1280,45 +1430,87 @@ function rpAddonsHtml() {
 
 function rpToggleAddon(name, price, checked) {
   if (checked) {
-    if (!rpState.addons.some(a => a.name === name)) {
-      rpState.addons.push({ name, price });
-    }
+    if (!rpState.addons.some(a => a.name === name)) rpState.addons.push({ name, price });
   } else {
     rpState.addons = rpState.addons.filter(a => a.name !== name);
   }
-  rpRender();
+  rpRenderEstimate();
 }
 
-function rpSetRooms(rooms) {
-  rpState.rooms = rooms;
-  rpRender();
-  rpScrollAfterRender();
+function rpSetRooms(rooms) { rpState.rooms = rooms; rpRenderEstimate(); }
+function rpSetCondition(condition) { rpState.condition = condition; rpRenderEstimate(); }
+
+function rpGoToContact() {
+  rpState.step = 2;
+  rpRenderContact();
+  rpScrollAfterRender(true);
 }
 
-function rpSetCondition(condition) {
-  rpState.condition = condition;
-  rpRender();
-  rpScrollAfterRender();
+function rpBackToEstimate() {
+  rpState.step = 1;
+  rpRenderEstimate();
+  rpScrollAfterRender(true);
 }
 
 function rpGetEstimatePayload() {
   const total = rpCalculatePrice();
   const addonNames = rpState.addons.map(a => a.name);
+  const address1 = rpState.address1.trim();
+  const city = rpState.city.trim();
+  const state = rpState.state.trim().toUpperCase();
+  const postalCode = rpState.postalCode.trim();
+  const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const addons = addonNames.length ? addonNames.join(", ") : "None";
+  const specialInstructions = rpState.specialInstructions.trim() || "None";
+
+  const jobDetails = [
+    "Service: Carpet Cleaning",
+    `Estimate: $${total}`,
+    `Carpet rooms: ${rpState.rooms}${rpState.rooms === 5 ? "+" : ""}`,
+    `Condition: ${rpState.condition}`,
+    `Add-ons: ${addons}`,
+    "Bedrooms: N/A",
+    "Bathrooms: N/A",
+    "Carpet with move-out: N/A",
+    "Furniture item: N/A",
+    `Address: ${fullAddress || "N/A"}`,
+    `Special instructions: ${specialInstructions}`
+  ].join(" | ");
 
   return {
-    source: "Red Prairie Carpet Cleaning Landing Page",
+    source: "Carpet Cleaning Lawton Landing Page",
     business: "Red Prairie Cleaning",
     full_name: rpState.fullName,
     phone: rpState.phone,
     email: rpState.email,
+    address1: address1,
+    street_address: address1,
+    address: address1,
+    city: city,
+    state: state,
+    postal_code: postalCode,
+    zip: postalCode,
+    full_address: fullAddress,
     service: "Carpet Cleaning",
+    service_type: "Carpet Cleaning",
     service_key: "carpet",
+    city_page: "Lawton",
     estimated_price: `$${total}`,
     estimated_price_number: total,
-    carpet_rooms: String(rpState.rooms),
+    price_estimate: `$${total}`,
+    bedrooms: "N/A",
+    bathrooms: "N/A",
     condition: rpState.condition,
-    addons: addonNames.length ? addonNames.join(", ") : "None",
+    addons: addons,
     addon_count: addonNames.length,
+    carpet_with_moveout: "N/A",
+    carpet_rooms: String(rpState.rooms),
+    furniture_item: "N/A",
+    special_instructions: specialInstructions,
+    customer_notes: specialInstructions,
+    estimate_notes: jobDetails,
+    job_details: jobDetails,
+    cleaner_notes: jobDetails,
     submitted_at: new Date().toISOString(),
     page_url: window.location.href
   };
@@ -1327,26 +1519,36 @@ function rpGetEstimatePayload() {
 function rpSendEstimateToGoHighLevel() {
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_WEBHOOK_URL);
-
-  Object.keys(payload).forEach(key => {
-    url.searchParams.append(key, payload[key]);
-  });
-
+  Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
   const img = new Image();
   img.src = url.toString();
-
   rpState.estimateSent = true;
   return true;
 }
 
-function rpSubmitLead() {
+function rpBuildCalendarUrl() {
+  const payload = rpGetEstimatePayload();
+  const url = new URL(RP_BOOKING_CALENDAR_URL);
+  ["full_name", "phone", "email", "address1", "street_address", "address", "city", "state", "postal_code", "zip", "full_address", "service", "service_type", "service_key", "estimated_price", "estimated_price_number", "price_estimate", "bedrooms", "bathrooms", "condition", "addons", "addon_count", "carpet_with_moveout", "carpet_rooms", "special_instructions", "customer_notes", "estimate_notes", "job_details", "cleaner_notes", "source", "business", "page_url"].forEach(key => {
+    if (payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
+  });
+  return url.toString();
+}
+
+function rpSubmitContact() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
   const email = document.getElementById("rpEmail").value.trim();
+  const address1 = document.getElementById("rpAddress1").value.trim();
+  const city = document.getElementById("rpCity").value.trim();
+  const state = document.getElementById("rpStateField").value.trim().toUpperCase();
+  const postalCode = document.getElementById("rpPostalCode").value.trim();
+  const specialInstructions = document.getElementById("rpSpecialInstructions").value.trim();
   const errorBox = document.getElementById("rpFormError");
   const emailLooksValid = email.includes("@") && email.includes(".");
+  const stateLooksValid = /^[A-Z]{2}$/.test(state);
 
-  if (!fullName || !phone || !emailLooksValid) {
+  if (!fullName || !phone || !emailLooksValid || !address1 || !city || !stateLooksValid || !postalCode) {
     errorBox.style.display = "block";
     return;
   }
@@ -1354,28 +1556,57 @@ function rpSubmitLead() {
   rpState.fullName = fullName;
   rpState.phone = phone;
   rpState.email = email;
+  rpState.address1 = address1;
+  rpState.city = city;
+  rpState.state = state;
+  rpState.postalCode = postalCode;
+  rpState.specialInstructions = specialInstructions;
+
+  const button = document.getElementById("rpReserveBtn");
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Saving estimate...";
+  }
 
   rpSendEstimateToGoHighLevel();
+  rpState.step = 3;
   rpRenderCalendar();
-  rpScrollAfterRender();
+  rpScrollAfterRender(true);
 }
 
-function rpRender() {
-  const app = document.getElementById("rpApp");
+function rpEstimateSummaryHtml() {
   const total = rpCalculatePrice();
   const addonNames = rpState.addons.map(a => a.name);
+  return `
+    <div class="rp-estimate-summary">
+      <div class="rp-total"><span>Your Estimated Total</span><strong>$${total}</strong></div>
+      <p class="rp-fineprint"><strong>Carpet Cleaning</strong> • ${rpState.rooms}${rpState.rooms === 5 ? "+" : ""} room${rpState.rooms === 1 ? "" : "s"} • ${rpState.condition} condition${addonNames.length ? " • " + addonNames.join(", ") : ""}</p>
+      <details class="rp-details">
+        <summary>View estimate details</summary>
+        <div class="rp-details-body">
+          <div class="rp-row"><span>Service</span><strong>Carpet Cleaning</strong></div>
+          <div class="rp-row"><span>Rooms</span><strong>${rpState.rooms}${rpState.rooms === 5 ? "+" : ""}</strong></div>
+          <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
+          <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
+        </div>
+      </details>
+    </div>
+  `;
+}
 
+function rpRenderEstimate() {
+  const app = document.getElementById("rpApp");
   app.innerHTML = `
+    ${rpStepBar(1)}
     <h1>Carpet Cleaning Estimate</h1>
     <p class="rp-sub">
-      Pricing starts at $149 for up to 2 rooms. Final pricing can vary based on room size, carpet condition,
-      pet treatment, stairs, area rugs, and travel.
+      Pricing starts at $149 for up to 2 rooms. Build your estimate first, then save your contact and address before choosing an appointment.
     </p>
 
     <h3>How many carpeted rooms?</h3>
     <div class="rp-pill-grid">
       ${[1,2,3,4,5].map(num => `
-        <button class="rp-pill ${rpState.rooms === num ? "is-selected" : ""}" onclick="rpSetRooms(${num})">
+        <button type="button" class="rp-pill ${rpState.rooms === num ? "is-selected" : ""}" onclick="rpSetRooms(${num})">
           ${num}${num === 5 ? "+" : ""}
         </button>
       `).join("")}
@@ -1384,7 +1615,7 @@ function rpRender() {
     <h3>Carpet condition</h3>
     <div class="rp-grid">
       ${["Light", "Normal", "Heavy", "Severe"].map(condition => `
-        <button class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
+        <button type="button" class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
           <strong>${condition}</strong>
           <span>${condition === "Light" ? "Light refresh / well maintained carpet."
             : condition === "Normal" ? "Regular cleaning with normal traffic."
@@ -1394,99 +1625,121 @@ function rpRender() {
       `).join("")}
     </div>
 
-    <div class="rp-included">
-      <div class="rp-included-title">Included with Carpet Cleaning</div>
-      <div class="rp-checklist">
-        <div>✓ Hot-water extraction</div>
-        <div>✓ Professional pre-spray</div>
-        <div>✓ Basic spot attention</div>
-        <div>✓ Professional wand cleaning</div>
-        <div>✓ Carpet rake / grooming</div>
-        <div>✓ Fresh finish</div>
+    <details class="rp-details">
+      <summary>What's included with carpet cleaning</summary>
+      <div class="rp-details-body">
+        <div class="rp-checklist">
+          <div>✓ Hot-water extraction</div>
+          <div>✓ Professional pre-spray</div>
+          <div>✓ Basic spot attention</div>
+          <div>✓ Professional wand cleaning</div>
+          <div>✓ Carpet rake / grooming</div>
+          <div>✓ Fresh finish</div>
+        </div>
       </div>
-    </div>
+    </details>
 
     <h3>Add-ons</h3>
     ${rpAddonsHtml()}
 
-    <div class="rp-invoice">
-      <div class="rp-row"><span>Service</span><strong>Carpet Cleaning</strong></div>
-      <div class="rp-row"><span>Rooms</span><strong>${rpState.rooms}${rpState.rooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
-      <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
-      <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
-    </div>
+    ${rpEstimateSummaryHtml()}
 
     <div class="rp-notice">
-      <strong>Starting Estimate</strong><br>
       This is a starting estimate. Large rooms, heavy soil, severe odor, stairs, specialty rugs, or long travel may change final pricing.
     </div>
 
+    <div class="rp-btns">
+      <button type="button" class="rp-primary" onclick="rpGoToContact()">Continue To Contact & Address</button>
+      <a class="rp-secondary" href="sms:5802150915">Text Photos Instead</a>
+    </div>
+  `;
+}
+
+function rpRenderContact() {
+  const app = document.getElementById("rpApp");
+  app.innerHTML = `
+    ${rpStepBar(2)}
+    <h2>Save Your Carpet Cleaning Estimate</h2>
+    <p class="rp-sub">Enter the contact and address details we need before unlocking the appointment calendar.</p>
+    ${rpEstimateSummaryHtml()}
+
     <div class="rp-lead-form">
       <div class="rp-lead-field">
-        <label for="rpFullName">Full Name</label>
-        <input id="rpFullName" type="text" placeholder="John Smith">
+        <label for="rpFullName">Full Name *</label>
+        <input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name">
       </div>
-
       <div class="rp-lead-field">
-        <label for="rpPhone">Phone</label>
-        <input id="rpPhone" type="tel" placeholder="(580) 555-1234">
+        <label for="rpPhone">Phone *</label>
+        <input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel">
       </div>
-
       <div class="rp-lead-field">
-        <label for="rpEmail">Email</label>
-        <input id="rpEmail" type="email" placeholder="john@email.com">
+        <label for="rpEmail">Email *</label>
+        <input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="john@email.com" autocomplete="email">
       </div>
-
-      <div class="rp-error" id="rpFormError">
-        Please enter your name, phone, and a valid email.
+      <div class="rp-lead-field">
+        <label for="rpAddress1">Street Address / Unit *</label>
+        <input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1">
       </div>
-
+      <div class="rp-grid">
+        <div class="rp-lead-field">
+          <label for="rpCity">City *</label>
+          <input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" autocomplete="address-level2">
+        </div>
+        <div class="rp-lead-field">
+          <label for="rpStateField">State *</label>
+          <input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1">
+        </div>
+      </div>
+      <div class="rp-lead-field">
+        <label for="rpPostalCode">ZIP Code *</label>
+        <input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73501" autocomplete="postal-code">
+      </div>
+      <div class="rp-lead-field">
+        <label for="rpSpecialInstructions">Access Notes / Pet Spots / Stains / Special Instructions</label>
+        <textarea id="rpSpecialInstructions" placeholder="Gate code, pet stains, carpet odor, stairs, area rugs, room access, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea>
+      </div>
+      <div class="rp-error" id="rpFormError">Please enter your name, phone, valid email, address, city, state, and ZIP before booking.</div>
       <div class="rp-btns">
-        <button class="rp-primary" onclick="rpSubmitLead()">Reserve Appointment</button>
-        <a class="rp-secondary" href="sms:5802150915">Text Photos Instead</a>
+        <button type="button" class="rp-secondary" onclick="rpBackToEstimate()">Back To Estimate</button>
+        <button id="rpReserveBtn" type="button" class="rp-primary" onclick="rpSubmitContact()">Save Estimate & Choose Appointment</button>
       </div>
     </div>
 
-    <p class="rp-fineprint">
-      By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment.
-    </p>
+    <p class="rp-fineprint">By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. The calendar unlocks after the required details are saved.</p>
   `;
 }
 
 function rpRenderCalendar() {
   const app = document.getElementById("rpApp");
   const total = rpCalculatePrice();
-
+  const fullAddress = [rpState.address1, [rpState.city, rpState.state, rpState.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   app.innerHTML = `
+    ${rpStepBar(3)}
     <h2>Reserve Your Carpet Cleaning</h2>
     <p class="rp-sub">
-      Your estimate has been saved. Estimated carpet cleaning total: <strong>$${total}</strong>.
+      Your estimate has been saved. Estimated carpet cleaning total: <strong>$${total}</strong>.<br>
+      Address saved: <strong>${fullAddress}</strong><br>
       Choose an available time below.
     </p>
-
     <div class="rp-booking-widget">
       <iframe
-        src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2"
-        style="width: 100%;border:none;overflow: hidden;"
+        src="${rpBuildCalendarUrl()}"
+        style="width:100%;border:none;overflow:hidden;"
         scrolling="no"
-        id="1VXLRmyHfLdsHa4rTKJ2_175"
+        id="1VXLRmyHfLdsHa4rTKJ2_carpet_lawton"
         title="Red Prairie Cleaning Booking Calendar">
       </iframe>
     </div>
-
     <div class="rp-btns">
-      <button class="rp-secondary" onclick="rpRender()">Back To Estimate</button>
+      <button type="button" class="rp-secondary" onclick="rpRenderContact(); rpScrollAfterRender(true);">Back To Contact</button>
       <a class="rp-primary" href="sms:5802150915">Text Us</a>
     </div>
   `;
-
   rpLoadCalendarScript();
 }
 
 function rpLoadCalendarScript() {
   if (document.getElementById("ghl-calendar-script")) return;
-
   const script = document.createElement("script");
   script.src = "https://link.msgsndr.com/js/form_embed.js";
   script.type = "text/javascript";
@@ -1497,25 +1750,22 @@ function rpLoadCalendarScript() {
 function rpScrollToCalculator(instant = false) {
   const card = document.querySelector(".rp-card");
   if (!card) return;
-
   const nav = document.querySelector(".navbar");
   const navHeight = nav ? nav.offsetHeight : 70;
   const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-
-  window.scrollTo({
-    top: Math.max(0, y),
-    behavior: instant ? "auto" : "smooth"
-  });
+  window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" });
 }
 
-function rpScrollAfterRender() {
-  return;
+function rpScrollAfterRender(shouldScroll = false) {
+  if (!shouldScroll) return;
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => rpScrollToCalculator());
+  });
 }
 
 document.addEventListener("click", function(e) {
   const link = e.target.closest('a[href="#booking"]');
   if (!link) return;
-
   e.preventDefault();
   const booking = document.getElementById("booking");
   if (booking) {
@@ -1524,7 +1774,7 @@ document.addEventListener("click", function(e) {
   }
 });
 
-rpRender();
+rpRenderEstimate();
 </script>
 
 <script
