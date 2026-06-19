@@ -8,6 +8,22 @@
 <meta name="description" content="Deep cleaning in Elgin, OK for first-time cleans, seasonal resets, busy families, pet homes, and homes with buildup. Get an estimate and book online with Red Prairie Cleaning.">
 <link rel="canonical" href="https://redprairiecleaning.com/deep-cleaning-elgin-ok/">
 
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Red Prairie Cleaning">
+<meta property="og:title" content="Deep Cleaning Elgin, OK | Red Prairie Cleaning">
+<meta property="og:description" content="Deep cleaning in Elgin, OK for first-time cleans, seasonal resets, busy families, pet homes, and homes with buildup.">
+<meta property="og:url" content="https://redprairiecleaning.com/deep-cleaning-elgin-ok/">
+<meta property="og:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Red Prairie Cleaning serving Lawton and surrounding communities">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Deep Cleaning Elgin, OK | Red Prairie Cleaning">
+<meta name="twitter:description" content="Deep cleaning in Elgin, OK for first-time cleans, seasonal resets, pet homes, and homes with buildup.">
+<meta name="twitter:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -931,7 +947,272 @@ footer li, footer p {
   .footer-content { grid-template-columns:repeat(3, 1fr); gap:30px; }
   .cta-buttons { display:flex; justify-content:center; flex-wrap:wrap; }
 }
+
+/* ===== 3-Step Funnel + Map + No-Jump Polish ===== */
+.rp-step-badges {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin:0 0 22px;
+}
+.rp-step-badge {
+  border:1px solid #e5e5e5;
+  background:#fafafa;
+  border-radius:999px;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:900;
+  text-align:center;
+  color:#444;
+}
+.rp-step-badge.is-active {
+  background:#fff5f5;
+  border-color:var(--red);
+  color:var(--red);
+}
+.rp-summary-card {
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  border-radius:18px;
+  padding:18px;
+  margin:18px 0;
+}
+.rp-summary-card h3 { margin:0 0 8px; }
+.rp-summary-price {
+  font-size:34px;
+  line-height:1;
+  font-weight:900;
+  color:var(--red);
+  margin:8px 0 6px;
+}
+.rp-mini-details {
+  color:#444;
+  font-weight:700;
+  font-size:13px;
+}
+.rp-details {
+  margin-top:14px;
+}
+.rp-details summary {
+  cursor:pointer;
+  list-style:none;
+  font-weight:900;
+  color:#111;
+  background:#fafafa;
+  border:1px solid #e5e5e5;
+  border-radius:14px;
+  padding:13px 15px;
+}
+.rp-details summary::-webkit-details-marker { display:none; }
+.rp-details summary::after {
+  content:" +";
+  color:var(--red);
+  font-weight:900;
+}
+.rp-details[open] summary::after { content:" −"; }
+.rp-lead-form {
+  margin-top:22px;
+  padding:22px;
+  background:#fafafa;
+  border:1px solid #e7e7e7;
+  border-radius:20px;
+}
+.rp-lead-field { margin-bottom:16px; }
+.rp-lead-field label {
+  display:block;
+  font-size:14px;
+  font-weight:900;
+  margin-bottom:8px;
+  color:#111;
+}
+.rp-lead-field input,
+.rp-lead-field textarea {
+  width:100%;
+  padding:0 18px;
+  border:1px solid #ddd;
+  border-radius:14px;
+  font-size:16px;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  transition:.2s ease;
+}
+.rp-lead-field input { height:56px; }
+.rp-lead-field textarea {
+  min-height:110px;
+  padding-top:16px;
+  padding-bottom:16px;
+  resize:vertical;
+}
+.rp-lead-field input:focus,
+.rp-lead-field textarea:focus {
+  outline:none;
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(208,0,0,.10);
+}
+.rp-error {
+  display:none;
+  margin:12px 0;
+  padding:14px;
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  border-radius:12px;
+  color:#a80000;
+  font-size:14px;
+  font-weight:800;
+}
+.rp-map-wrap {
+  max-width:1100px;
+  margin:26px auto 0;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  border:1px solid #eee;
+  background:#fff;
+}
+.rp-map-wrap iframe {
+  width:100%;
+  min-height:340px;
+  border:0;
+  display:block;
+}
+@media (min-width:700px) {
+  .rp-step-badges { grid-template-columns:repeat(3, 1fr); }
+}
+@media (max-width:700px) {
+  .rp-lead-form { padding:18px; }
+  .rp-map-wrap iframe { min-height:300px; }
+}
+
 </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CleaningService",
+      "@id": "https://redprairiecleaning.com/#business",
+      "name": "Red Prairie Cleaning",
+      "url": "https://redprairiecleaning.com/",
+      "telephone": "+1-580-215-0915",
+      "email": "admin@redprairiecleaning.com",
+      "image": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg",
+      "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
+      "priceRange": "$$",
+      "areaServed": [
+        { "@type": "City", "name": "Elgin" },
+        { "@type": "City", "name": "Lawton" },
+        { "@type": "Place", "name": "Fort Sill" },
+        { "@type": "City", "name": "Cache" },
+        { "@type": "City", "name": "Medicine Park" },
+        { "@type": "City", "name": "Fletcher" }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "OK",
+        "addressCountry": "US"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "reviewCount": "24"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://redprairiecleaning.com/#website",
+      "url": "https://redprairiecleaning.com/",
+      "name": "Red Prairie Cleaning",
+      "publisher": { "@id": "https://redprairiecleaning.com/#business" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/#webpage",
+      "url": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/",
+      "name": "Deep Cleaning Elgin, OK | Red Prairie Cleaning",
+      "description": "Deep cleaning in Elgin, OK for first-time cleans, seasonal resets, busy families, pet homes, and homes with buildup.",
+      "isPartOf": { "@id": "https://redprairiecleaning.com/#website" },
+      "about": { "@id": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/#service" },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/#service",
+      "name": "Deep Cleaning in Elgin, OK",
+      "serviceType": "Deep Cleaning",
+      "provider": { "@id": "https://redprairiecleaning.com/#business" },
+      "areaServed": {
+        "@type": "City",
+        "name": "Elgin",
+        "addressRegion": "OK",
+        "addressCountry": "US"
+      },
+      "description": "Detailed deep cleaning for Elgin homes, first-time cleans, seasonal resets, pet homes, busy families, and homes with buildup.",
+      "url": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://redprairiecleaning.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Deep Cleaning Elgin OK",
+          "item": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://redprairiecleaning.com/deep-cleaning-elgin-ok/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is included in deep cleaning?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Deep cleaning includes bathrooms, kitchen detail, inside oven, inside microwave, cabinet fronts, baseboards, doors, door frames, floors, dusting, and high-touch surfaces."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I add carpet cleaning?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Carpet cleaning can be added during the estimate process for homes that need a more complete reset."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you offer deep cleaning in Elgin?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Red Prairie Cleaning offers deep cleaning in Elgin and nearby communities including Lawton, Fort Sill, Cache, Medicine Park, and Fletcher."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does deep cleaning cost in Elgin?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pricing depends on home size, bathrooms, condition, add-ons, pet hair, buildup, access, and travel. The online estimator gives a starting price before booking."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
 </head>
 
 <body>
@@ -952,7 +1233,7 @@ footer li, footer p {
       </ul>
     </nav>
 
-    <a href="#booking" class="book-btn">Book Now</a>
+    <a href="#booking" class="book-btn">Get Estimate</a>
   </div>
 </header>
 
@@ -1151,14 +1432,14 @@ footer li, footer p {
 
       <div class="rp-process-card">
         <i class="fa-solid fa-calendar-check"></i>
-        <h3>2. Reserve Time</h3>
-        <p>Choose an available appointment online.</p>
+        <h3>2. Contact & Address</h3>
+        <p>Enter your contact details, service address, and access notes.</p>
       </div>
 
       <div class="rp-process-card">
         <i class="fa-solid fa-location-dot"></i>
-        <h3>3. Add Address</h3>
-        <p>Enter your service address and access notes.</p>
+        <h3>3. Choose Appointment</h3>
+        <p>Pick an available time after your estimate details are saved.</p>
       </div>
 
       <div class="rp-process-card">
@@ -1234,6 +1515,16 @@ footer li, footer p {
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fletcher</h3></div>
   </div>
 
+
+  <div class="rp-map-wrap" aria-label="Red Prairie Cleaning Elgin service area map">
+    <iframe
+      title="Red Prairie Cleaning Elgin service area map"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q=Elgin%2C%20OK&output=embed">
+    </iframe>
+  </div>
+
   <p class="service-area-note">
     Also serving nearby Southwest Oklahoma communities depending on schedule, job size, and travel.
   </p>
@@ -1283,9 +1574,11 @@ footer li, footer p {
 </footer>
 
 <script>
-const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
+const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/05947288-6996-4ecc-80aa-42766c3be32b";
+const RP_BOOKING_CALENDAR_URL = "https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2";
 
 const rpState = {
+  step: 1,
   bedrooms: 2,
   bathrooms: 1,
   condition: "Average",
@@ -1295,25 +1588,30 @@ const rpState = {
   fullName: "",
   phone: "",
   email: "",
+  address1: "",
+  city: "Elgin",
+  state: "OK",
+  postalCode: "",
+  specialInstructions: "",
   estimateSent: false
 };
 
 const rpAddons = [
-  { name: "Wall scuff removal", price: 35 },
-  { name: "Small trash removal", price: 60 },
-  { name: "Heavy buildup / excessive grime", price: 60 },
+  { name: "Inside refrigerator", price: 35 },
+  { name: "Interior windows", price: 45 },
+  { name: "Heavy pet hair", price: 45 },
+  { name: "Wall spot cleaning", price: 35 },
   { name: "Window tracks & sills", price: 35 },
-  { name: "Extra pet hair removal", price: 45 }
+  { name: "Inside cabinets/drawers", price: 50 }
 ];
 
 function rpCalculatePrice() {
-  let total = 299;
-
-  total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 30;
-  total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 20;
+  let total = 249;
+  total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 35;
+  total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 25;
 
   if (rpState.condition === "Well maintained") total -= 15;
-  if (rpState.condition === "Heavy buildup") total += 50;
+  if (rpState.condition === "Heavy buildup") total += 65;
 
   if (rpState.carpetWithMoveout) {
     const rooms = Number(rpState.carpetRooms || 1);
@@ -1323,8 +1621,21 @@ function rpCalculatePrice() {
   }
 
   rpState.addons.forEach(addon => total += addon.price);
-
   return Math.max(total, 249);
+}
+
+function rpEscapeAttr(value) {
+  return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function rpStepBadges() {
+  return `
+    <div class="rp-step-badges" aria-label="Estimate steps">
+      <div class="rp-step-badge ${rpState.step === 1 ? "is-active" : ""}">1. Estimate</div>
+      <div class="rp-step-badge ${rpState.step === 2 ? "is-active" : ""}">2. Contact & Address</div>
+      <div class="rp-step-badge ${rpState.step === 3 ? "is-active" : ""}">3. Appointment</div>
+    </div>
+  `;
 }
 
 function rpToggleAddon(name, price, checked) {
@@ -1342,7 +1653,7 @@ function rpAddonsHtml() {
     return `
       <label class="rp-addon">
         <span class="rp-addon-left">
-          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name.replace(/'/g, "\\'")}', ${addon.price}, this.checked)">
+          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name.replace(/'/g, "\'")}', ${addon.price}, this.checked)">
           ${addon.name}
         </span>
         <span class="rp-price">+$${addon.price}</span>
@@ -1351,39 +1662,38 @@ function rpAddonsHtml() {
   }).join("");
 }
 
-function rpSetBedrooms(n) {
-  rpState.bedrooms = n;
-  rpRender();
-  rpScrollAfterRender();
-}
-
-function rpSetBathrooms(n) {
-  rpState.bathrooms = n;
-  rpRender();
-  rpScrollAfterRender();
-}
-
-function rpSetCondition(condition) {
-  rpState.condition = condition;
-  rpRender();
-  rpScrollAfterRender();
-}
-
-function rpToggleCarpet(value) {
-  rpState.carpetWithMoveout = value;
-  rpRender();
-  rpScrollAfterRender();
-}
-
-function rpSetCarpetRooms(n) {
-  rpState.carpetRooms = n;
-  rpRender();
-  rpScrollAfterRender();
-}
+function rpSetBedrooms(n) { rpState.bedrooms = n; rpRender(); }
+function rpSetBathrooms(n) { rpState.bathrooms = n; rpRender(); }
+function rpSetCondition(condition) { rpState.condition = condition; rpRender(); }
+function rpToggleCarpet(value) { rpState.carpetWithMoveout = value; rpRender(); }
+function rpSetCarpetRooms(n) { rpState.carpetRooms = n; rpRender(); }
 
 function rpGetEstimatePayload() {
   const total = rpCalculatePrice();
   const addonNames = rpState.addons.map(a => a.name);
+  const address1 = rpState.address1.trim();
+  const city = rpState.city.trim();
+  const state = rpState.state.trim().toUpperCase();
+  const postalCode = rpState.postalCode.trim();
+  const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const addons = addonNames.length ? addonNames.join(", ") : "None";
+  const carpetWithMoveout = rpState.carpetWithMoveout ? "Yes" : "No";
+  const carpetRooms = rpState.carpetWithMoveout ? String(rpState.carpetRooms) : "N/A";
+  const specialInstructions = rpState.specialInstructions.trim() || "None";
+
+  const jobDetails = [
+    "Service: Deep Cleaning",
+    `Estimate: $${total}`,
+    `Bedrooms: ${rpState.bedrooms}`,
+    `Bathrooms: ${rpState.bathrooms}`,
+    `Condition: ${rpState.condition}`,
+    `Add-ons: ${addons}`,
+    `Carpet with cleaning: ${carpetWithMoveout}`,
+    `Carpet rooms: ${carpetRooms}`,
+    `Furniture item: N/A`,
+    `Address: ${fullAddress || "N/A"}`,
+    `Special instructions: ${specialInstructions}`
+  ].join(" | ");
 
   return {
     source: "Deep Cleaning Elgin Landing Page",
@@ -1391,16 +1701,34 @@ function rpGetEstimatePayload() {
     full_name: rpState.fullName,
     phone: rpState.phone,
     email: rpState.email,
+    address1: address1,
+    street_address: address1,
+    address: address1,
+    city: city,
+    state: state,
+    postal_code: postalCode,
+    zip: postalCode,
+    full_address: fullAddress,
     service: "Deep Cleaning",
+    service_type: "Deep Cleaning",
     service_key: "deep",
     city_page: "Elgin",
     estimated_price: `$${total}`,
     estimated_price_number: total,
+    price_estimate: `$${total}`,
     bedrooms: String(rpState.bedrooms),
     bathrooms: String(rpState.bathrooms),
     condition: rpState.condition,
-    addons: addonNames.length ? addonNames.join(", ") : "None",
+    addons: addons,
     addon_count: addonNames.length,
+    carpet_with_moveout: carpetWithMoveout,
+    carpet_rooms: carpetRooms,
+    furniture_item: "N/A",
+    special_instructions: specialInstructions,
+    customer_notes: specialInstructions,
+    estimate_notes: jobDetails,
+    job_details: jobDetails,
+    cleaner_notes: jobDetails,
     submitted_at: new Date().toISOString(),
     page_url: window.location.href
   };
@@ -1409,24 +1737,48 @@ function rpGetEstimatePayload() {
 function rpSendEstimateToGoHighLevel() {
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_WEBHOOK_URL);
-
   Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
-
   const img = new Image();
   img.src = url.toString();
-
   rpState.estimateSent = true;
   return true;
 }
 
-function rpSubmitLead() {
+function rpBuildCalendarUrl() {
+  const payload = rpGetEstimatePayload();
+  const url = new URL(RP_BOOKING_CALENDAR_URL);
+  [
+    "full_name","phone","email","address1","street_address","address","city","state","postal_code","zip",
+    "full_address","service","service_type","service_key","estimated_price","estimated_price_number",
+    "price_estimate","bedrooms","bathrooms","condition","addons","addon_count","carpet_with_moveout",
+    "carpet_rooms","special_instructions","customer_notes","estimate_notes","job_details","cleaner_notes",
+    "source","business","page_url"
+  ].forEach(key => {
+    if (payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
+  });
+  return url.toString();
+}
+
+function rpGoToStep(step) {
+  rpState.step = step;
+  rpRender();
+  rpScrollAfterRender();
+}
+
+function rpSubmitContact() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
   const email = document.getElementById("rpEmail").value.trim();
+  const address1 = document.getElementById("rpAddress1").value.trim();
+  const city = document.getElementById("rpCity").value.trim();
+  const state = document.getElementById("rpStateField").value.trim().toUpperCase();
+  const postalCode = document.getElementById("rpPostalCode").value.trim();
+  const specialInstructions = document.getElementById("rpSpecialInstructions").value.trim();
   const errorBox = document.getElementById("rpFormError");
   const emailLooksValid = email.includes("@") && email.includes(".");
+  const stateLooksValid = /^[A-Z]{2}$/.test(state);
 
-  if (!fullName || !phone || !emailLooksValid) {
+  if (!fullName || !phone || !emailLooksValid || !address1 || !city || !stateLooksValid || !postalCode) {
     errorBox.style.display = "block";
     return;
   }
@@ -1434,27 +1786,39 @@ function rpSubmitLead() {
   rpState.fullName = fullName;
   rpState.phone = phone;
   rpState.email = email;
+  rpState.address1 = address1;
+  rpState.city = city;
+  rpState.state = state;
+  rpState.postalCode = postalCode;
+  rpState.specialInstructions = specialInstructions;
+
+  const button = document.getElementById("rpReserveBtn");
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Saving estimate...";
+  }
 
   rpSendEstimateToGoHighLevel();
-  rpRenderCalendar();
+  rpState.step = 3;
+  rpRender();
   rpScrollAfterRender();
 }
 
-function rpRender() {
-  const app = document.getElementById("rpApp");
+function rpRenderEstimateStep() {
   const total = rpCalculatePrice();
   const addonNames = rpState.addons.map(a => a.name);
+  const carpetText = rpState.carpetWithMoveout ? `${rpState.carpetRooms}${rpState.carpetRooms === 5 ? "+" : ""} carpeted room(s)` : "No carpet cleaning";
 
-  app.innerHTML = `
+  return `
     <h1>Elgin Deep Cleaning Estimate</h1>
     <p class="rp-sub">
-      Built for Elgin homes that need a detailed reset. Final pricing may vary for severe buildup, pet hair, large homes, long travel, or specialty requests.
+      Build your deep cleaning estimate first, then enter your contact and address details before choosing an appointment.
     </p>
 
     <h3>How many bedrooms?</h3>
     <div class="rp-pill-grid">
       ${[1,2,3,4,5].map(n => `
-        <button class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" onclick="rpSetBedrooms(${n})">
+        <button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" onclick="rpSetBedrooms(${n})">
           ${n}${n === 5 ? "+" : ""}
         </button>
       `).join("")}
@@ -1463,7 +1827,7 @@ function rpRender() {
     <h3>How many bathrooms?</h3>
     <div class="rp-pill-grid">
       ${[1,2,3,4,5].map(n => `
-        <button class="rp-pill ${rpState.bathrooms === n ? "is-selected" : ""}" onclick="rpSetBathrooms(${n})">
+        <button type="button" class="rp-pill ${rpState.bathrooms === n ? "is-selected" : ""}" onclick="rpSetBathrooms(${n})">
           ${n}${n === 5 ? "+" : ""}
         </button>
       `).join("")}
@@ -1472,10 +1836,10 @@ function rpRender() {
     <h3>Home condition</h3>
     <div class="rp-grid">
       ${["Well maintained", "Average", "Heavy buildup"].map(condition => `
-        <button class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
+        <button type="button" class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
           <strong>${condition}</strong>
           <span>${
-            condition === "Well maintained" ? "Mostly empty, maintained, and ready for a final detail."
+            condition === "Well maintained" ? "Maintained home needing a detailed reset."
             : condition === "Average" ? "Normal home condition with typical dust, grime, and use."
             : "Heavy buildup, excessive grime, pet hair, or neglected areas."
           }</span>
@@ -1483,33 +1847,71 @@ function rpRender() {
       `).join("")}
     </div>
 
-    <div class="rp-included">
-      <div class="rp-included-title">Included with Deep Cleaning</div>
-      <div class="rp-checklist">
-        <div>✓ Bathrooms cleaned and sanitized</div>
-        <div>✓ Kitchen detailed</div>
-        <div>✓ Inside oven</div>
-        <div>✓ Inside microwave</div>
-        <div>✓ Cabinet fronts wiped</div>
-        <div>✓ Cabinet fronts wiped</div>
-        <div>✓ Baseboards</div>
-        <div>✓ Doors and door frames</div>
-        <div>✓ Vacuuming and mopping</div>
-        <div>✓ High-touch surfaces</div>
+    <details class="rp-details">
+      <summary>What is included with deep cleaning?</summary>
+      <div class="rp-included">
+        <div class="rp-checklist">
+          <div>✓ Bathrooms cleaned and sanitized</div>
+          <div>✓ Kitchen detailed</div>
+          <div>✓ Inside oven</div>
+          <div>✓ Inside microwave</div>
+          <div>✓ Cabinet fronts wiped</div>
+          <div>✓ Baseboards</div>
+          <div>✓ Doors and door frames</div>
+          <div>✓ Vacuuming and mopping</div>
+          <div>✓ High-touch surfaces</div>
+          <div>✓ Edges and buildup areas</div>
+        </div>
       </div>
+    </details>
+
+    <h3>Add carpet cleaning?</h3>
+    <div class="rp-grid">
+      <button type="button" class="rp-option ${!rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(false)">
+        <strong>No carpet cleaning</strong>
+        <span>Deep cleaning only.</span>
+      </button>
+      <button type="button" class="rp-option ${rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(true)">
+        <strong>Yes, add carpet cleaning</strong>
+        <span>Professional hot water extraction with Mytee equipment.</span>
+      </button>
     </div>
 
-    <h3>Add-ons</h3>
-    ${rpAddonsHtml()}
+    ${rpState.carpetWithMoveout ? `
+      <h3>How many carpeted rooms?</h3>
+      <div class="rp-pill-grid">
+        ${[1,2,3,4,5].map(n => `
+          <button type="button" class="rp-pill ${rpState.carpetRooms === n ? "is-selected" : ""}" onclick="rpSetCarpetRooms(${n})">
+            ${n}${n === 5 ? "+" : ""}
+          </button>
+        `).join("")}
+      </div>
+    ` : ""}
 
-    <div class="rp-invoice">
-      <div class="rp-row"><span>Service</span><strong>Deep Cleaning</strong></div>
-      <div class="rp-row"><span>Location Page</span><strong>Elgin Area</strong></div>
-      <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
-      <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
-      <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
+    <details class="rp-details" open>
+      <summary>Add-ons</summary>
+      ${rpAddonsHtml()}
+    </details>
+
+    <div class="rp-summary-card">
+      <h3>Your Estimated Deep Cleaning Price</h3>
+      <div class="rp-summary-price">$${total}</div>
+      <div class="rp-mini-details">
+        ${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""} bed / ${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""} bath • ${rpState.condition} • ${carpetText}
+      </div>
+      <details class="rp-details">
+        <summary>View estimate details</summary>
+        <div class="rp-invoice">
+          <div class="rp-row"><span>Service</span><strong>Deep Cleaning</strong></div>
+          <div class="rp-row"><span>Location Page</span><strong>Elgin Area</strong></div>
+          <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
+          <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
+          <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
+          <div class="rp-row"><span>Carpet cleaning</span><strong>${rpState.carpetWithMoveout ? "Included in estimate" : "No"}</strong></div>
+          <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
+          <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
+        </div>
+      </details>
     </div>
 
     <div class="rp-notice">
@@ -1517,52 +1919,95 @@ function rpRender() {
       limited access, long travel, stairs, or specialty requests.
     </div>
 
+    <div class="rp-btns">
+      <button type="button" class="rp-primary" onclick="rpGoToStep(2)">Continue To Contact & Address</button>
+      <a class="rp-secondary" href="sms:5802150915">Text Us Instead</a>
+    </div>
+  `;
+}
+
+function rpRenderContactStep() {
+  const total = rpCalculatePrice();
+
+  return `
+    <h1>Contact & Service Address</h1>
+    <p class="rp-sub">
+      Your estimated deep cleaning price is <strong>$${total}</strong>. Enter the required details below to unlock the appointment calendar.
+    </p>
+
     <div class="rp-lead-form">
       <div class="rp-lead-field">
-        <label for="rpFullName">Full Name</label>
-        <input id="rpFullName" type="text" placeholder="Your name">
+        <label for="rpFullName">Full Name *</label>
+        <input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name">
       </div>
 
       <div class="rp-lead-field">
-        <label for="rpPhone">Phone</label>
-        <input id="rpPhone" type="tel" placeholder="Your phone number">
+        <label for="rpPhone">Phone *</label>
+        <input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel">
       </div>
 
       <div class="rp-lead-field">
-        <label for="rpEmail">Email</label>
-        <input id="rpEmail" type="email" placeholder="Your email">
+        <label for="rpEmail">Email *</label>
+        <input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="john@email.com" autocomplete="email">
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpAddress1">Service Street Address *</label>
+        <input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1">
+      </div>
+
+      <div class="rp-grid">
+        <div class="rp-lead-field">
+          <label for="rpCity">City *</label>
+          <input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Elgin" autocomplete="address-level2">
+        </div>
+        <div class="rp-lead-field">
+          <label for="rpStateField">State *</label>
+          <input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1">
+        </div>
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpPostalCode">ZIP Code *</label>
+        <input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73538" autocomplete="postal-code">
+      </div>
+
+      <div class="rp-lead-field">
+        <label for="rpSpecialInstructions">Access Notes / Problem Areas / Special Instructions</label>
+        <textarea id="rpSpecialInstructions" placeholder="Gate code, pet hair, rooms that need extra attention, access notes, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea>
       </div>
 
       <div class="rp-error" id="rpFormError">
-        Please enter your name, phone, and a valid email.
+        Please enter your name, phone, valid email, service address, city, state, and ZIP before booking.
       </div>
 
       <div class="rp-btns">
-        <button class="rp-primary" onclick="rpSubmitLead()">Reserve Appointment</button>
-        <a class="rp-secondary" href="sms:5802150915">Text Us Instead</a>
+        <button type="button" class="rp-secondary" onclick="rpGoToStep(1)">Back To Estimate</button>
+        <button id="rpReserveBtn" type="button" class="rp-primary" onclick="rpSubmitContact()">Save Estimate & Choose Appointment</button>
       </div>
     </div>
 
     <p class="rp-fineprint">
-      By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment.
+      By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. The calendar unlocks after required details are saved.
     </p>
   `;
 }
 
-function rpRenderCalendar() {
-  const app = document.getElementById("rpApp");
+function rpRenderCalendarStep() {
   const total = rpCalculatePrice();
+  const fullAddress = [rpState.address1, [rpState.city, rpState.state, rpState.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
-  app.innerHTML = `
-    <h2>Reserve Your Deep Cleaning</h2>
+  return `
+    <h2>Choose Your Deep Cleaning Appointment</h2>
     <p class="rp-sub">
-      Your estimate has been saved. Estimated deep cleaning total: <strong>$${total}</strong>.
+      Your estimate has been saved. Estimated deep cleaning total: <strong>$${total}</strong>.<br>
+      Address saved: <strong>${fullAddress}</strong><br>
       Choose an available time below.
     </p>
 
     <div class="rp-booking-widget">
       <iframe
-        src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2"
+        src="${rpBuildCalendarUrl()}"
         style="width:100%;border:none;overflow:hidden;"
         scrolling="no"
         id="1VXLRmyHfLdsHa4rTKJ2_deep_elgin"
@@ -1571,17 +2016,28 @@ function rpRenderCalendar() {
     </div>
 
     <div class="rp-btns">
-      <button class="rp-secondary" onclick="rpRender()">Back To Estimate</button>
+      <button type="button" class="rp-secondary" onclick="rpGoToStep(2)">Back To Contact</button>
       <a class="rp-primary" href="sms:5802150915">Text Us</a>
     </div>
   `;
+}
 
-  rpLoadCalendarScript();
+function rpRender() {
+  const app = document.getElementById("rpApp");
+  if (!app) return;
+
+  let content = "";
+  if (rpState.step === 1) content = rpRenderEstimateStep();
+  if (rpState.step === 2) content = rpRenderContactStep();
+  if (rpState.step === 3) content = rpRenderCalendarStep();
+
+  app.innerHTML = rpStepBadges() + content;
+
+  if (rpState.step === 3) rpLoadCalendarScript();
 }
 
 function rpLoadCalendarScript() {
   if (document.getElementById("ghl-calendar-script")) return;
-
   const script = document.createElement("script");
   script.src = "https://link.msgsndr.com/js/form_embed.js";
   script.type = "text/javascript";
@@ -1592,15 +2048,10 @@ function rpLoadCalendarScript() {
 function rpScrollToCalculator(instant = false) {
   const card = document.querySelector(".rp-card");
   if (!card) return;
-
   const nav = document.querySelector(".navbar");
   const navHeight = nav ? nav.offsetHeight : 70;
   const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-
-  window.scrollTo({
-    top: Math.max(0, y),
-    behavior: instant ? "auto" : "smooth"
-  });
+  window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" });
 }
 
 function rpScrollAfterRender() {
@@ -1612,7 +2063,6 @@ function rpScrollAfterRender() {
 document.addEventListener("click", function(e) {
   const link = e.target.closest('a[href="#booking"]');
   if (!link) return;
-
   e.preventDefault();
   const booking = document.getElementById("booking");
   if (booking) {
