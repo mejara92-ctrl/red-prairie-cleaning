@@ -7,7 +7,23 @@
 
     <meta name="description" content="Professional house cleaning, move-out cleaning, carpet cleaning, and upholstery cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, Wichita Falls, and Southwest Oklahoma.">
 
-    <link rel="stylesheet" href="css/style.css">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Red Prairie Cleaning">
+    <meta property="og:title" content="Red Prairie Cleaning | House, Move-Out & Carpet Cleaning in Southwest Oklahoma">
+    <meta property="og:description" content="House cleaning, move-out cleaning, carpet cleaning, and upholstery cleaning across Lawton, Fort Sill, and Southwest Oklahoma.">
+    <meta property="og:url" content="https://redprairiecleaning.com/">
+    <meta property="og:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Red Prairie Cleaning serving Lawton and surrounding communities">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Red Prairie Cleaning | House, Move-Out & Carpet Cleaning">
+    <meta name="twitter:description" content="Professional cleaning services across Lawton, Fort Sill, and Southwest Oklahoma.">
+    <meta name="twitter:image" content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg">
+
+<link rel="stylesheet" href="css/style.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -835,6 +851,26 @@
             }
         }
 
+
+        .rp-map-wrap {
+            max-width: 1100px;
+            margin: 26px auto 0;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid #eee;
+            background: #fff;
+        }
+        .rp-map-wrap iframe {
+            width: 100%;
+            min-height: 360px;
+            border: 0;
+            display: block;
+        }
+        @media (max-width: 700px) {
+            .rp-map-wrap iframe { min-height: 320px; }
+        }
+
     </style>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -1403,19 +1439,19 @@ function gtag_report_conversion(url) {
                 <p>Choose the service, home size, and any needed add-ons.</p>
             </div>
             <div class="rp-process-card">
+                <i class="fa-solid fa-address-card"></i>
+                <h3>2. Contact & Address</h3>
+                <p>Save your contact details, service address, and notes before booking.</p>
+            </div>
+            <div class="rp-process-card">
                 <i class="fa-solid fa-calendar-check"></i>
-                <h3>2. Reserve Your Time</h3>
-                <p>Select your appointment and pay the reservation deposit.</p>
+                <h3>3. Choose Appointment</h3>
+                <p>Select your appointment after your estimate details are saved.</p>
             </div>
             <div class="rp-process-card">
                 <i class="fa-solid fa-broom"></i>
-                <h3>3. We Clean</h3>
+                <h3>4. We Clean</h3>
                 <p>Our team arrives prepared with professional supplies and equipment.</p>
-            </div>
-            <div class="rp-process-card">
-                <i class="fa-solid fa-face-smile"></i>
-                <h3>4. You Enjoy</h3>
-                <p>Enjoy a cleaner home, refreshed carpets, or easier move-out.</p>
             </div>
         </div>
     </div>
@@ -1542,6 +1578,16 @@ function gtag_report_conversion(url) {
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Medicine Park</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Duncan</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Wichita Falls, TX</h3></div>
+    </div>
+
+
+    <div class="rp-map-wrap" aria-label="Red Prairie Cleaning service area map">
+        <iframe
+            title="Red Prairie Cleaning service area map"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Lawton%2C%20OK&output=embed">
+        </iframe>
     </div>
 
     <p class="service-area-note">
@@ -1930,10 +1976,7 @@ function rpScrollToCalculator(instant = false) {
 }
 
 function rpScrollAfterRender() {
-  // Let the browser finish laying out the newly rendered step first.
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => rpScrollToCalculator());
-  });
+  return;
 }
 
 function rpRender() {
@@ -2479,4 +2522,3 @@ document.addEventListener("click", function(e) {
 
 </body>
 </html>
-
