@@ -1543,21 +1543,12 @@ function gtag_report_conversion(url) {
         }
     
 
-        /* Mobile: hide LeadConnector chat completely so it cannot cover Estimate/Text buttons */
+        /* Mobile: hide chat-specific UI only.
+           Do NOT hide LeadConnector/msgsndr iframes globally, because the booking calendar also uses LeadConnector. */
         @media (max-width: 768px) {
-            iframe[src*="leadconnector" i],
-            iframe[src*="leadconnectorhq" i],
-            iframe[src*="msgsndr" i],
-            iframe[src*="lc_chat" i],
             iframe[title*="chat" i],
             iframe[id*="chat" i],
             iframe[class*="chat" i],
-            div[id*="leadconnector" i],
-            div[class*="leadconnector" i],
-            div[id*="msgsndr" i],
-            div[class*="msgsndr" i],
-            div[id*="lc-" i],
-            div[class*="lc-" i],
             div[id*="chat-widget" i],
             div[class*="chat-widget" i],
             div[id*="chat-widget-container" i],
@@ -1566,6 +1557,18 @@ function gtag_report_conversion(url) {
                 visibility: hidden !important;
                 opacity: 0 !important;
                 pointer-events: none !important;
+            }
+
+            .rp-booking-widget,
+            .rp-booking-widget iframe,
+            iframe[src*="/widget/booking/" i],
+            iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i] {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 100% !important;
+                min-height: 760px !important;
             }
         }
 </style>
@@ -2017,7 +2020,7 @@ function rpRenderCalendarStep() {
     <h2>Reserve Your Cleaning Time</h2>
     <p class="rp-sub">Choose your preferred date and time below. Your confirmation should only send after this calendar booking is completed.</p>
     <div class="rp-booking-widget">
-      <iframe src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2" style="width:100%; border:none; overflow:hidden;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_1781361516868"></iframe>
+      <iframe src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2" style="width:100%; border:none; overflow:hidden; min-height:760px;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_1781361516868" title="Red Prairie Cleaning booking calendar"></iframe>
     </div>
     <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
   `;
