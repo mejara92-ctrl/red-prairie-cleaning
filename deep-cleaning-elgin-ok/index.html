@@ -1098,45 +1098,6 @@ footer li, footer p {
 }
 
 
-.chamber-trust {
-  background:#fff;
-  padding:34px 18px;
-}
-.chamber-trust-card {
-  max-width:980px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:auto 1fr;
-  gap:16px;
-  align-items:center;
-  background:#fff5f5;
-  border:1px solid #f0caca;
-  border-radius:22px;
-  padding:20px;
-  box-shadow:0 12px 28px rgba(208,0,0,.08);
-}
-.chamber-trust-card i {
-  color:var(--red);
-  font-size:30px;
-}
-.chamber-trust-card h2 {
-  text-align:left;
-  font-size:clamp(20px, 5vw, 28px);
-  margin:0 0 6px;
-}
-.chamber-trust-card p {
-  color:#555;
-  margin:0;
-  font-size:14px;
-  line-height:1.55;
-}
-@media (max-width:699px) {
-  .chamber-trust { padding:26px 18px; }
-  .chamber-trust-card { grid-template-columns:1fr; text-align:center; }
-  .chamber-trust-card h2 { text-align:center; }
-}
-
-
 /* Homepage trust stack + mobile CTA/lightbox */
 .sticky-mobile-cta { display:none; }
 @media (max-width:699px) {
@@ -1202,7 +1163,9 @@ footer li, footer p {
 }
 .gallery-item { cursor:zoom-in; }
 
-/* Mobile: hide chat-specific UI only; never hide booking calendar iframes */
+
+/* Homepage-standard LeadConnector behavior:
+   Desktop shows chat. Mobile hides chat-only UI while keeping the booking calendar visible. */
 @media (max-width:768px) {
   iframe[title*="chat" i],
   iframe[id*="chat" i],
@@ -1210,12 +1173,16 @@ footer li, footer p {
   div[id*="chat-widget" i],
   div[class*="chat-widget" i],
   div[id*="chat-widget-container" i],
-  div[class*="chat-widget-container" i] {
+  div[class*="chat-widget-container" i],
+  div[class*="lc-widget" i],
+  div[class*="lc_chat" i],
+  div[class*="leadconnector" i] {
     display:none !important;
     visibility:hidden !important;
     opacity:0 !important;
     pointer-events:none !important;
   }
+
   .rp-booking-widget,
   .rp-booking-widget iframe,
   iframe[src*="/widget/booking/" i],
@@ -1412,41 +1379,27 @@ footer li, footer p {
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
     <h3>28+</h3>
-    <p>5-Star Reviews</p>
+    <p>5-Star Google Reviews</p>
   </div>
 
   <div class="trust-card">
-    <i class="fa-solid fa-key"></i>
+    <i class="fa-solid fa-building"></i>
+    <h3>Chamber Member</h3>
+    <p>Lawton Fort Sill Chamber</p>
+  </div>
+
+  <div class="trust-card">
+    <i class="fa-solid fa-house-circle-check"></i>
     <h3>Deep Clean Ready</h3>
-    <p>Move-Out Cleaning</p>
+    <p>Detailed Home Reset</p>
   </div>
 
   <div class="trust-card">
-    <i class="fa-solid fa-calendar-check"></i>
-    <h3>Online Booking</h3>
-    <p>Estimate & Schedule Online</p>
-  </div>
-
-  <div class="trust-card">
-    <i class="fa-solid fa-location-dot"></i>
-    <h3>Elgin Area</h3>
-    <p>Elgin, Lawton, Fort Sill & Cache</p>
+    <i class="fa-solid fa-shield-halved"></i>
+    <h3>Deposit Defense</h3>
+    <p>Inspection-Ready Detail</p>
   </div>
 </section>
-
-<section class="chamber-trust" aria-label="Local business trust">
-  <div class="chamber-trust-card">
-    <i class="fa-solid fa-award"></i>
-    <div>
-      <h2>Lawton Fort Sill Chamber Member</h2>
-      <p>
-        Red Prairie Cleaning is a local Southwest Oklahoma cleaning company and proud Lawton Fort Sill Chamber of Commerce member,
-        serving Elgin, Lawton, Fort Sill, Cache, Medicine Park, Fletcher, and nearby communities.
-      </p>
-    </div>
-  </div>
-</section>
-
 
 <section class="rp-funnel" id="booking">
   <div class="rp-funnel-wrap">
@@ -1922,7 +1875,6 @@ function rpServiceStep() {
         <button type="button" class="rp-option ${key === "moveout" || key === "movein" ? "featured-option" : ""}" onclick="rpChooseService('${key}')">
           ${s.featured ? `<span class="badge">${s.featured}</span>` : ""}
           <strong>${s.emoji} ${s.name}</strong>
-          <span>${s.desc}</span>
         </button>
       `).join("")}
     </div>
