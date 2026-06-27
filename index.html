@@ -1509,7 +1509,34 @@ function gtag_report_conversion(url) {
             .rp-funnel { padding: 72px 20px; }
             .included-grid { grid-template-columns: repeat(3, 1fr); }
         }
-    </style>
+    
+
+        /* Mobile: hide LeadConnector chat completely so it cannot cover Estimate/Text buttons */
+        @media (max-width: 768px) {
+            iframe[src*="leadconnector" i],
+            iframe[src*="leadconnectorhq" i],
+            iframe[src*="msgsndr" i],
+            iframe[src*="lc_chat" i],
+            iframe[title*="chat" i],
+            iframe[id*="chat" i],
+            iframe[class*="chat" i],
+            div[id*="leadconnector" i],
+            div[class*="leadconnector" i],
+            div[id*="msgsndr" i],
+            div[class*="msgsndr" i],
+            div[id*="lc-" i],
+            div[class*="lc-" i],
+            div[id*="chat-widget" i],
+            div[class*="chat-widget" i],
+            div[id*="chat-widget-container" i],
+            div[class*="chat-widget-container" i] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+        }
+</style>
 
 </head>
 
