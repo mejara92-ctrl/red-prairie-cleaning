@@ -37,7 +37,7 @@
     .hero{min-height:calc(100vh - 66px);background:linear-gradient(rgba(0,0,0,.74),rgba(0,0,0,.58)),url("../images/services/house-cleaning.jpg") center/cover no-repeat;display:flex;align-items:flex-end;padding:92px 18px 42px}.hero-overlay{max-width:700px;color:#fff}.hero h1{font-size:clamp(35px,10vw,58px);line-height:1.04;margin:0 0 18px;font-weight:900;letter-spacing:-.03em}.hero p{font-size:15.5px;margin:0 0 22px;color:#fff}.hero-trust{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}.hero-trust span{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.16);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;backdrop-filter:blur(8px)}.hero-trust i,.stars{color:#ffcc00}.hero-buttons{display:grid;grid-template-columns:1fr;gap:10px}.hero-buttons a{width:100%}
     section{padding:56px 18px}section h2{font-size:clamp(28px,8vw,46px);line-height:1.1;text-align:center;margin:0 0 14px;letter-spacing:-.03em}.section-text{text-align:center;color:var(--muted);max-width:760px;margin:0 auto 28px;font-size:15px}
     .trust-bar{background:var(--light);display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:28px 16px}.trust-card{background:#fff;border-radius:18px;padding:18px 12px;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,.06);border:1px solid #eee}.trust-card i{color:var(--red);font-size:24px;margin-bottom:8px}.trust-card h3{font-size:18px;margin:0 0 4px}.trust-card p{margin:0;color:var(--muted);font-size:12px}
-    .rp-funnel{background:var(--light);padding:56px 14px}.rp-funnel-wrap{max-width:1050px;margin:0 auto}.rp-funnel-header{text-align:center;margin-bottom:22px}.rp-funnel-header h2{font-size:clamp(30px,8vw,52px);line-height:1.08;margin:0 0 12px}.rp-funnel-header p{color:#444;max-width:780px;margin:0 auto;font-size:15px}.rp-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 18px 45px rgba(0,0,0,.13);border:1px solid var(--border);overflow:hidden}.rp-card h1,.rp-card h2,.rp-card h3{margin-top:0}.rp-card h1,.rp-card h2{font-size:clamp(27px,7.5vw,42px);line-height:1.12;margin-bottom:10px}.rp-sub{color:#555;margin-bottom:20px;font-size:14.5px}
+    .rp-funnel{background:var(--light);padding:56px 14px}.rp-funnel-wrap{max-width:1050px;margin:0 auto}.rp-funnel-header{text-align:center;margin-bottom:22px}.rp-funnel-header h2{font-size:clamp(30px,8vw,52px);line-height:1.08;margin:0 0 12px}.rp-funnel-header p{color:#444;max-width:780px;margin:0 auto;font-size:15px}.rp-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 18px 45px rgba(0,0,0,.13);border:1px solid var(--border);overflow:hidden}.rp-card h1,.rp-card h2,.rp-card h3{margin-top:0}.rp-card h1,.rp-card h2{font-size:clamp(27px,7.5vw,42px);line-height:1.12;margin-bottom:10px;text-align:center}.rp-sub{color:#555;margin-bottom:20px;font-size:14.5px}
     .rp-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}.rp-option{background:#fafafa;border:1px solid #ddd;color:var(--text);padding:16px;border-radius:16px;cursor:pointer;text-align:left;font-size:15px;transition:.18s ease;min-height:88px}.rp-option:hover,.rp-option.is-selected{border-color:var(--red);background:#fff5f5;transform:translateY(-2px)}.rp-option strong{display:block;font-size:17px;margin-bottom:4px}.rp-option span{display:block;color:#555;font-size:13px;line-height:1.4}.rp-pill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.rp-pill{background:#fff;color:var(--text);border:1px solid #ccc;border-radius:999px;padding:14px;cursor:pointer;font-weight:900;min-height:48px}.rp-pill:hover,.rp-pill.is-selected{border-color:var(--red);background:#fff5f5}
     .rp-included{background:#fafafa;border:1px solid #ddd;border-radius:18px;padding:16px;margin:18px 0}.rp-included-title{font-weight:900;margin-bottom:10px}.rp-checklist{display:grid;grid-template-columns:1fr;gap:7px;color:#333;font-size:13.5px}
     label.rp-addon{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fafafa;border:1px solid #ddd;padding:14px;border-radius:14px;margin:10px 0;cursor:pointer}label.rp-addon:hover{border-color:var(--red);background:#fff5f5}label.rp-addon input{transform:scale(1.15);margin-right:8px}.rp-addon-left{display:flex;align-items:center;color:var(--text);font-weight:700;font-size:14px}.rp-price{color:var(--red);font-weight:900;white-space:nowrap}
@@ -564,31 +564,37 @@ const RP_BOOKING_CALENDAR_URL = "https://api.leadconnectorhq.com/widget/booking/
 
 const rpServices = {
   moveout: {
-    name: "Factory Reset™ Move-Out Cleaning", shortName: "Move-Out Cleaning", emoji: "🚚",
+    name: "Factory Reset™ Move-Out Cleaning", shortName: "Factory Reset™ Move-Out Cleaning", emoji: "🚚",
     baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Starting at $199",
     includes: ["Kitchen detailed","Bathrooms cleaned","Inside oven","Inside refrigerator","Inside microwave","Cabinets and drawers wiped","Baseboards","Interior windows","Floors vacuumed and mopped"],
     featured: "Most Popular"
   },
   movein: {
-    name: "Factory Reset™ Move-In Cleaning", shortName: "Move-In Cleaning", emoji: "🔑",
+    name: "Factory Reset™ Move-In Cleaning", shortName: "Factory Reset™ Move-In Cleaning", emoji: "🔑",
     baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Starting at $199",
     includes: ["Kitchen detailed","Bathrooms cleaned","Inside appliances","Cabinets and drawers wiped","Baseboards","Interior windows","Floors cleaned"],
     featured: "Second Most Popular"
   },
   carpet: {
-    name: "Carpet Cleaning", shortName: "Carpet Cleaning", emoji: "🧼", base: 75,
+    name: "Steam Carpet Cleaning", shortName: "Steam Carpet Cleaning", emoji: "🧼", base: 75,
+    desc: "$75 per room",
     includes: ["Hot-water extraction","Professional pre-spray","Basic spot attention","Professional wand cleaning","Carpet rake / grooming","Fresh finish"]
   },
   upholstery: {
-    name: "Upholstery Cleaning", shortName: "Upholstery Cleaning", emoji: "🛋️", base: 100,
+    name: "Professional Upholstery Cleaning", shortName: "Professional Upholstery Cleaning", emoji: "🛋️", base: 100,
+    desc: "Starting at $100",
     includes: ["Fabric pre-spray","Extraction cleaning","Basic spot attention","Freshened finish"]
   },
   deep: {
     name: "Deep Cleaning", shortName: "Deep Cleaning", emoji: "✨", base: 249,
+    desc: "Starting at $249",
     includes: ["Detailed bathrooms","Kitchen detail","Detailed dusting","Baseboards","Floors","High-touch surfaces"]
   },
   maintenance: {
     name: "Maintenance Cleaning", shortName: "Maintenance Cleaning", emoji: "🏠", base: 149,
+    desc: "Starting at $149",
     includes: ["Kitchen wipe-down","Bathrooms","Dusting","Floors","Trash removal","General tidy-up"]
   }
 };
@@ -720,18 +726,11 @@ function rpHeaderHtml() {
   const total = rpCalculatePrice();
   const service = rpSelectedService();
   return `
-    <div class="rp-progress-label">
-      <span><strong>${rpStepLabel()}</strong></span>
-      <span>${rpProgress()}% complete</span>
+    <div class="rp-live-price">
+      <small>Current Estimate</small>
+      <strong>$${total}</strong>
+      <span>${service ? service.name : "Choose your service below."}</span>
     </div>
-    <div class="rp-progress"><div class="rp-progress-fill" style="width:${rpProgress()}%"></div></div>
-    ${service ? `
-      <div class="rp-live-price">
-        <small>${service.shortName} estimate</small>
-        <strong>$${total}</strong>
-        <span>This is a starting estimate. Final price may vary for unusual conditions, access, travel, or specialty requests.</span>
-      </div>
-    ` : ""}
   `;
 }
 function rpGo(stage) {
@@ -777,16 +776,14 @@ function rpBackStage() {
 function rpServiceChoiceHtml() {
   const order = ["moveout","movein","carpet","upholstery","deep","maintenance"];
   return `
-    <span class="rp-estimator-kicker">Start here</span>
     <h1>What service do you need?</h1>
-    <p class="rp-sub">Choose any Red Prairie service. This page is about house cleaning in Lawton, but the estimator works for every service.</p>
     <p class="rp-tap-note">👇 Tap one option</p>
     <div class="rp-grid">
       ${order.map(key => {
         const s = rpServices[key];
-        const featured = key === "maintenance" ? "featured-option" : "";
-        const badge = key === "maintenance" ? `<span class="badge">House Cleaning</span>` : "";
-        return `<button type="button" class="rp-option ${featured}" onclick="rpChooseService('${key}')">${badge}<strong>${s.emoji} ${s.shortName}</strong></button>`;
+        const featured = key === "moveout" ? "featured-option" : "";
+        const badge = s.featured ? `<span class="badge">${s.featured}</span>` : "";
+        return `<button type="button" class="rp-option ${featured}" onclick="rpChooseService('${key}')">${badge}<strong>${s.emoji} ${s.shortName}</strong><span>${s.desc}</span></button>`;
       }).join("")}
     </div>
   `;
