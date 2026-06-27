@@ -891,8 +891,8 @@
     }
 
   
-    /* LeadConnector chat widget visibility fix.
-       Keep the booking calendar visible and keep chat above the mobile sticky CTA. */
+    /* LeadConnector chat widget visibility copied from the homepage standard:
+       hide chat on mobile while keeping the booking calendar visible. */
     @media (max-width: 768px) {
       iframe[title*="chat" i],
       iframe[id*="chat" i],
@@ -904,12 +904,10 @@
       div[class*="lc-widget" i],
       div[class*="lc_chat" i],
       div[class*="leadconnector" i] {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        bottom: 94px !important;
-        z-index: 2147482999 !important;
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
       }
 
       .rp-booking-widget,
@@ -1453,15 +1451,6 @@
   </p>
 </section>
 
-<section class="chamber-trust" aria-label="Local business trust signal">
-  <div class="chamber-trust-card">
-    <i class="fa-solid fa-building"></i>
-    <div>
-      <h2>Proud Member of the Lawton Fort Sill Chamber of Commerce</h2>
-      <p>Red Prairie Cleaning is a local Southwest Oklahoma cleaning company serving Lawton, Fort Sill, Elgin, Cache, Medicine Park, and nearby communities with move-out cleaning, move-in cleaning, deep cleaning, carpet cleaning, and upholstery cleaning.</p>
-    </div>
-  </div>
-</section>
 
 <section class="final-cta">
   <h2>Ready For Cleaner Carpet?</h2>
@@ -1777,7 +1766,6 @@ function rpRenderService() {
         <button type="button" class="rp-option ${key === "carpet" ? "featured-option" : ""}" onclick="rpSelectService('${key}')">
           ${key === "carpet" ? '<span class="badge">Carpet Cleaning Page</span>' : ""}
           <strong>${service.emoji} ${service.name}</strong>
-          <span>${service.desc}</span>
         </button>
       `).join("")}
     </div>
