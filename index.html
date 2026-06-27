@@ -2118,13 +2118,23 @@ window.addEventListener("message", function(event) {
 
 function rpSetupStickyMobileCta() {
   const sticky = document.querySelector(".sticky-mobile-cta");
-  const hero = document.querySelector(".hero");
-  if (!sticky || !hero) return;
+  const booking = document.querySelector("#booking");
+  if (!sticky || !booking) return;
+
   const update = () => {
     const isMobile = window.matchMedia("(max-width: 699px)").matches;
-    const heroBottom = hero.getBoundingClientRect().bottom;
-    sticky.classList.toggle("is-visible", isMobile && heroBottom < 12);
+    const bookingBottom = booking.getBoundingClientRect().bottom;
+
+    /*
+      Mobile CTA rule:
+      Keep the floating Estimate/Text buttons hidden while the visitor is in the hero,
+      estimator, contact step, or live booking calendar. Show them only after the full
+      price estimator + calendar section has been scrolled past, so they never compete
+      with the booking flow or cover the calendar on mobile.
+    */
+    sticky.classList.toggle("is-visible", isMobile && bookingBottom < 0);
   };
+
   update();
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
