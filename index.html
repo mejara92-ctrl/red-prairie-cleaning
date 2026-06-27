@@ -1664,7 +1664,8 @@ const rpState = {
   state: "OK",
   postalCode: "",
   specialInstructions: "",
-  estimateSent: false
+  estimateSent: false,
+  bookingWebhookSent: false
 };
 
 const rpServices = {
@@ -1882,16 +1883,16 @@ function rpRenderLeadStep() {
       <button class="rp-secondary" onclick="rpBack()">Back</button>
       <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose Appointment Time</button>
     </div>
-    <p class="rp-fineprint">By continuing, you agree that Red Prairie Cleaning may contact you about your estimate and appointment by call, text, or email.</p>
+    <p class="rp-fineprint">Next you will choose a calendar time. Confirmation messages should only send after your appointment time is booked.</p>
   `;
 }
 
 function rpRenderCalendarStep() {
   const app = document.getElementById("rpApp");
   app.innerHTML = `
-    ${rpLivePrice("Your estimate has been saved.")}
+    ${rpLivePrice("Now choose your appointment time.")}
     <h2>Reserve Your Cleaning</h2>
-    <p class="rp-sub">Choose your preferred date and time below. Your deposit reserves the appointment and applies to your final invoice.</p>
+    <p class="rp-sub">Choose your preferred date and time below. No confirmation text is sent from this estimator step. Confirmation should only send after the calendar booking is completed.</p>
     <div class="rp-booking-widget">
       <iframe src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2" style="width:100%; border:none; overflow:hidden;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_1781361516868"></iframe>
     </div>
@@ -1900,7 +1901,7 @@ function rpRenderCalendarStep() {
   rpLoadCalendarScript();
 }
 
-function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.estimateSent = false; rpRender(); rpScrollToCalculator(); }
+function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.estimateSent = false; rpState.bookingWebhookSent = false; rpRender(); rpScrollToCalculator(); }
 function rpSelectBedrooms(n) { rpState.bedrooms = n; rpState.step = 3; rpRender(); rpScrollToCalculator(); }
 function rpSelectBathrooms(n) { rpState.bathrooms = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
 function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpState.step = 3; rpRender(); rpScrollToCalculator(); }
@@ -1928,7 +1929,27 @@ function rpGetEstimatePayload() {
   ].join(" | ");
   return { source:"Red Prairie Website Instant Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", addons:[rpState.carpetRooms ? `Steam carpet cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href };
 }
-function rpSendEstimateToGoHighLevel() { const payload = rpGetEstimatePayload(); const url = new URL(RP_WEBHOOK_URL); Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key])); const img = new Image(); img.src = url.toString(); rpState.estimateSent = true; return true; }
+function rpSendEstimateToGoHighLevel(extra = {}) {
+  if (rpState.bookingWebhookSent) return true;
+  const payload = { ...rpGetEstimatePayload(), ...extra };
+  const url = new URL(RP_WEBHOOK_URL);
+  Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
+  const img = new Image();
+  img.src = url.toString();
+  rpState.estimateSent = true;
+  rpState.bookingWebhookSent = true;
+  return true;
+}
+
+function rpFinalizeBookedAppointment(source = "calendar_booking_detected", bookingData = "") {
+  if (rpState.bookingWebhookSent) return;
+  rpSendEstimateToGoHighLevel({
+    booking_status: "Booked",
+    booking_source: source,
+    booking_event_data: String(bookingData || "").slice(0, 1200),
+    booked_at: new Date().toISOString()
+  });
+}
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
@@ -1941,10 +1962,32 @@ function rpSubmitLeadAndShowCalendar() {
   const emailLooksValid = email.includes("@") && email.includes(".");
   if (!fullName || !phone || !emailLooksValid || !address1 || !city || !postalCode) { errorBox.style.display = "block"; return; }
   rpState.fullName = fullName; rpState.phone = phone; rpState.email = email; rpState.address1 = address1; rpState.city = city; rpState.state = "OK"; rpState.postalCode = postalCode; rpState.specialInstructions = specialInstructions;
-  const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Saving estimate..."; }
-  rpSendEstimateToGoHighLevel(); rpState.step = 6; rpRender(); rpScrollToCalculator();
+  const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Opening calendar..."; }
+  rpState.step = 6; rpRender(); rpScrollToCalculator();
 }
 function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-script")) return; const script = document.createElement("script"); script.src = "https://link.msgsndr.com/js/form_embed.js"; script.type = "text/javascript"; script.id = "ghl-calendar-script"; document.body.appendChild(script); }
+
+/*
+  IMPORTANT:
+  The website no longer fires the Red Prairie/GHL webhook when contact details are entered.
+  That prevents "you are booked" or confirmation-style automations from sending before a time is chosen.
+  The webhook only fires if the embedded GHL calendar posts a booking/appointment confirmation message.
+  Your main confirmation workflow should be triggered inside GHL by "Appointment Status = Confirmed/Booked",
+  not by "Contact Created" or this estimator contact step.
+*/
+window.addEventListener("message", function(event) {
+  const raw = event && event.data ? event.data : "";
+  let text = "";
+  try { text = typeof raw === "string" ? raw : JSON.stringify(raw); } catch (e) { text = String(raw || ""); }
+  const lower = text.toLowerCase();
+
+  const looksLikeCalendar = lower.includes("calendar") || lower.includes("appointment") || lower.includes("booking") || lower.includes("calendly") || lower.includes("leadconnector") || lower.includes("msgsndr");
+  const looksBooked = lower.includes("booked") || lower.includes("confirmed") || lower.includes("appointment.created") || lower.includes("appointment_create") || lower.includes("calendar_event") || lower.includes("success");
+
+  if (looksLikeCalendar && looksBooked) {
+    rpFinalizeBookedAppointment("ghl_calendar_postmessage", text);
+  }
+});
 
 rpRender();
 document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); const booking = document.getElementById("booking"); if (booking) { booking.scrollIntoView({ behavior: "smooth", block: "start" }); setTimeout(() => rpScrollToCalculator(), 220); } });
