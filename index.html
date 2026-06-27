@@ -1478,6 +1478,26 @@ function gtag_report_conversion(url) {
             .contact-cta { padding-bottom: 96px; }
             .sticky-mobile-cta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 99999; display: grid; grid-template-columns: 1.25fr .75fr; gap: 8px; pointer-events:auto; }
             .sticky-mobile-cta a { min-height: 52px; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+
+            /* Keep LeadConnector chat from covering the mobile Estimate/Text bar */
+            body { padding-bottom: 92px; }
+            iframe[src*="leadconnector" i],
+            iframe[src*="leadconnectorhq" i],
+            iframe[src*="msgsndr" i],
+            iframe[title*="chat" i],
+            iframe[id*="chat" i],
+            iframe[class*="chat" i],
+            div[id*="chat-widget" i],
+            div[class*="chat-widget" i],
+            div[class*="lc-widget" i],
+            div[class*="lc_chat" i],
+            div[class*="leadconnector" i] {
+                bottom: 94px !important;
+            }
+
+            /* Make sure the user's primary actions stay visually on top of the page chrome */
+            .sticky-mobile-cta { z-index: 2147482990 !important; }
+
         }
         @media (min-width: 700px) {
             .hero { min-height: 74vh; padding: 120px 7% 70px; align-items:center; }
@@ -1507,7 +1527,7 @@ function gtag_report_conversion(url) {
                 <li><a href="#faq">FAQ</a></li>
             </ul>
         </nav>
-        <a href="#booking" class="book-btn">Book Now</a>
+        <a href="#booking" class="book-btn">Reserve Now</a>
     </div>
 </header>
 
@@ -1523,7 +1543,7 @@ function gtag_report_conversion(url) {
         <p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, and Southwest Oklahoma.</p>
         <div class="hero-microcopy">
             <span>✓ Get a price in about 30 seconds</span>
-            <span>✓ Reserve online or text us directly</span>
+            <span>✓ Book instantly or text us with questions</span>
         </div>
         <div class="hero-buttons">
             <a href="#booking" class="quote-btn">Start Instant Estimate</a>
@@ -1991,6 +2011,46 @@ window.addEventListener("message", function(event) {
 
 rpRender();
 document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); const booking = document.getElementById("booking"); if (booking) { booking.scrollIntoView({ behavior: "smooth", block: "start" }); setTimeout(() => rpScrollToCalculator(), 220); } });
+</script>
+
+
+<script>
+(function() {
+  const MOBILE_QUERY = window.matchMedia('(max-width: 699px)');
+  const CHAT_BOTTOM = '96px';
+  const CHAT_SELECTORS = [
+    'iframe[src*="leadconnector"]',
+    'iframe[src*="leadconnectorhq"]',
+    'iframe[src*="msgsndr"]',
+    'iframe[title*="chat" i]',
+    'iframe[id*="chat" i]',
+    'iframe[class*="chat" i]',
+    'div[id*="chat-widget" i]',
+    'div[class*="chat-widget" i]',
+    'div[class*="lc-widget" i]',
+    'div[class*="leadconnector" i]'
+  ];
+
+  function keepChatClearOfStickyButtons() {
+    if (!MOBILE_QUERY.matches) return;
+    CHAT_SELECTORS.forEach(function(selector) {
+      document.querySelectorAll(selector).forEach(function(el) {
+        if (!el || el.closest('.sticky-mobile-cta')) return;
+        const style = window.getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        const isFloating = style.position === 'fixed' || style.position === 'absolute' || rect.bottom > window.innerHeight - 120;
+        if (!isFloating) return;
+        el.style.setProperty('bottom', CHAT_BOTTOM, 'important');
+        el.style.setProperty('z-index', '2147482988', 'important');
+      });
+    });
+  }
+
+  keepChatClearOfStickyButtons();
+  window.addEventListener('load', keepChatClearOfStickyButtons);
+  window.addEventListener('resize', keepChatClearOfStickyButtons);
+  setInterval(keepChatClearOfStickyButtons, 800);
+})();
 </script>
 
 <script
