@@ -30,6 +30,29 @@
 
   <link rel="preload" as="image" href="../images/services/move-out-cleaning.jpg">
 
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'AW-17734105967');
+
+function gtag_report_conversion(url) {
+  var callback = function () {
+    if (typeof(url) != 'undefined') window.location = url;
+  };
+  gtag('event', 'conversion', {
+    'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
+    'value': 1.0,
+    'currency': 'USD',
+    'event_callback': callback
+  });
+  return false;
+}
+</script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -48,6 +71,7 @@
           "Elgin, OK",
           "Medicine Park, OK",
           "Duncan, OK",
+          "Fletcher, OK",
           "Southwest Oklahoma"
         ]
       },
@@ -134,1002 +158,1142 @@
 
 
   <style>
-    :root {
-      --red: #d00000;
-      --red-dark: #a80000;
-      --black: #101010;
-      --text: #151515;
-      --muted: #555;
-      --light: #f7f7f7;
-      --border: #e6e6e6;
-      --shadow: 0 14px 35px rgba(0,0,0,.10);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      color: var(--text);
-      background: #fff;
-      line-height: 1.55;
-      overflow-x: hidden;
-    }
-
-    img { max-width: 100%; display: block; }
-    a { text-decoration: none; }
-
-    .navbar {
-      position: sticky;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 999;
-      background: rgba(255,255,255,.97);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 6px 24px rgba(0,0,0,.08);
-    }
-
-    .nav-container {
-      width: 100%;
-      max-width: 1280px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      padding: 10px 16px;
-      min-height: 66px;
-    }
-
-    .navbar nav {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-    }
-
-    .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; }
-    .logo img { width: 138px; height: auto; object-fit: contain; }
-
-    .nav-links { display: none; }
-
-    .book-btn, .quote-btn, .secondary-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      font-weight: 900;
-      border: none;
-      line-height: 1;
-      min-height: 46px;
-    }
-
-    .book-btn, .quote-btn {
-      background: var(--red);
-      color: #fff;
-      padding: 14px 20px;
-      box-shadow: 0 10px 24px rgba(208,0,0,.23);
-    }
-
-    .navbar .book-btn {
-      padding: 10px 14px;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .book-btn:hover, .quote-btn:hover { background: var(--red-dark); }
-
-    .secondary-btn {
-      background: #fff;
-      color: var(--red);
-      padding: 14px 20px;
-      border: 1px solid #eee;
-    }
-
-    .hero {
-      min-height: calc(100vh - 66px);
-      background:
-        linear-gradient(rgba(0,0,0,.74), rgba(0,0,0,.58)),
-        url("../images/services/move-out-cleaning.jpg") center center/cover no-repeat;
-      display: flex;
-      align-items: flex-end;
-      padding: 92px 18px 42px;
-    }
-
-    .hero-overlay { width: 100%; max-width: 700px; color: #fff; }
-
-    .hero h1 {
-      font-size: clamp(35px, 10vw, 58px);
-      line-height: 1.04;
-      margin: 0 0 18px;
-      font-weight: 900;
-      letter-spacing: -.03em;
-    }
-
-    .hero p {
-      font-size: 15.5px;
-      margin: 0 0 22px;
-      color: #fff;
-    }
-
-    .hero-trust {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .hero-trust span {
-      background: rgba(255,255,255,.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.16);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-trust i, .stars { color: #ffcc00; }
-
-    .hero-buttons {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .hero-buttons a { width: 100%; }
-
-    section { padding: 56px 18px; }
-
-    section h2 {
-      font-size: clamp(28px, 8vw, 46px);
-      line-height: 1.1;
-      text-align: center;
-      margin: 0 0 14px;
-      letter-spacing: -.03em;
-    }
-
-    .section-text {
-      text-align: center;
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 auto 28px;
-      font-size: 15px;
-    }
-
-    .trust-bar {
-      background: var(--light);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 28px 16px;
-    }
-
-    .trust-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 12px;
-      text-align: center;
-      box-shadow: 0 8px 22px rgba(0,0,0,.06);
-      border: 1px solid #eee;
-    }
-
-    .trust-card i {
-      color: var(--red);
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .trust-card h3 {
-      font-size: 18px;
-      margin: 0 0 4px;
-    }
-
-    .trust-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .rp-funnel {
-      background: var(--light);
-      color: var(--text);
-      padding: 56px 14px;
-    }
-
-    .rp-funnel-wrap {
-      max-width: 1050px;
-      margin: 0 auto;
-    }
-
-    .rp-funnel-header {
-      text-align: center;
-      margin-bottom: 22px;
-    }
-
-    .rp-funnel-header h2 {
-      font-size: clamp(30px, 8vw, 52px);
-      line-height: 1.08;
-      margin: 0 0 12px;
-      color: var(--text);
-    }
-
-    .rp-funnel-header p {
-      color: #444;
-      margin: 0 auto;
-      max-width: 780px;
-      font-size: 15px;
-    }
-
-    .rp-card {
-      background: #fff;
-      border-radius: 22px;
-      padding: 20px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.13);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .rp-card h1, .rp-card h2, .rp-card h3 {
-      color: var(--text);
-      margin-top: 0;
-    }
-
-    .rp-card h1, .rp-card h2 {
-      font-size: clamp(27px, 7.5vw, 42px);
-      line-height: 1.12;
-      margin-bottom: 10px;
-    }
-
-    .rp-sub {
-      color: #555;
-      line-height: 1.55;
-      margin-bottom: 20px;
-      font-size: 14.5px;
-    }
-
-    .rp-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin: 18px 0;
-    }
-
-    .rp-option {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      color: var(--text);
-      padding: 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      text-align: left;
-      font-size: 15px;
-      transition: .18s ease;
-      min-height: 88px;
-    }
-
-    .rp-option:hover, .rp-option.is-selected {
-      border-color: var(--red);
-      background: #fff5f5;
-      transform: translateY(-2px);
-    }
-
-    .rp-option strong {
-      display: block;
-      font-size: 17px;
-      margin-bottom: 4px;
-    }
-
-    .rp-option span {
-      display: block;
-      color: #555;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .rp-pill-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 18px 0;
-    }
-
-    .rp-pill {
-      background: #fff;
-      color: var(--text);
-      border: 1px solid #ccc;
-      border-radius: 999px;
-      padding: 14px;
-      cursor: pointer;
-      font-weight: 900;
-      min-height: 48px;
-    }
-
-    .rp-pill:hover, .rp-pill.is-selected {
-      border-color: var(--red);
-      background: #fff5f5;
-    }
-
-    .rp-included {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      border-radius: 18px;
-      padding: 16px;
-      margin: 18px 0;
-    }
-
-    .rp-included-title {
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    .rp-checklist {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 7px;
-      color: #333;
-      font-size: 13.5px;
-    }
-
-    label.rp-addon {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-      background: #fafafa;
-      border: 1px solid #ddd;
-      padding: 14px;
-      border-radius: 14px;
-      margin: 10px 0;
-      cursor: pointer;
-    }
-
-    label.rp-addon:hover {
-      border-color: var(--red);
-      background: #fff5f5;
-    }
-
-    label.rp-addon input {
-      transform: scale(1.15);
-      margin-right: 8px;
-    }
-
-    .rp-addon-left {
-      display: flex;
-      align-items: center;
-      color: var(--text);
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .rp-price {
-      color: var(--red);
-      font-weight: 900;
-      white-space: nowrap;
-    }
-
-    .rp-invoice {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      border-radius: 18px;
-      padding: 14px;
-      margin-top: 18px;
-    }
-
-    .rp-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid #e3e3e3;
-      padding: 11px 0;
-      color: #333;
-      font-size: 13.5px;
-    }
-
-    .rp-row strong {
-      color: var(--text);
-      text-align: right;
-    }
-
-    .rp-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--red);
-      padding-top: 16px;
-    }
-
-    .rp-notice {
-      background: #fff5f5;
-      border: 1px solid #f0caca;
-      padding: 13px;
-      border-radius: 12px;
-      color: #333;
-      margin-top: 18px;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .rp-lead-form {
-      display: grid;
-      gap: 13px;
-      margin-top: 18px;
-    }
-
-    .rp-lead-field label {
-      display: block;
-      font-weight: 900;
-      margin-bottom: 7px;
-      color: var(--text);
-      font-size: 14px;
-    }
-
-    .rp-lead-field input {
-      width: 100%;
-      background: #fff;
-      color: var(--text);
-      border: 1px solid #ccc;
-      border-radius: 14px;
-      padding: 15px;
-      font-size: 16px;
-    }
-
-    .rp-lead-field input:focus {
-      outline: none;
-      border-color: var(--red);
-      box-shadow: 0 0 0 4px rgba(208,0,0,.10);
-    }
-
-    .rp-error {
-      display: none;
-      background: #fff5f5;
-      border: 1px solid #f0caca;
-      color: var(--red-dark);
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 14px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .rp-btns {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .rp-primary, .rp-secondary {
-      border-radius: 999px;
-      font-size: 15px;
-      padding: 15px 20px;
-      cursor: pointer;
-      min-height: 50px;
-      font-weight: 900;
-    }
-
-    .rp-primary {
-      background: var(--red);
-      color: #fff;
-      border: none;
-      box-shadow: 0 12px 30px rgba(208,0,0,.25);
-    }
-
-    .rp-primary:hover { background: #b80000; }
-
-    .rp-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid #aaa;
-    }
-
-    .rp-fineprint {
-      color: #666;
-      font-size: 12px;
-      margin-top: 16px;
-      line-height: 1.45;
-    }
-
-    .rp-booking-widget {
-      background: #fff;
-      border-radius: 18px;
-      overflow: hidden;
-      margin-top: 18px;
-      border: 1px solid #ddd;
-    }
-
-    .rp-booking-widget iframe {
-      display: block;
-      min-height: 760px;
-    }
-
-    .rp-feature-section {
-      background: #111;
-      color: #fff;
-      padding: 58px 18px;
-    }
-
-    .rp-feature-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-      align-items: center;
-    }
-
-    .rp-feature-section h2 {
-      font-size: clamp(33px, 10vw, 52px);
-      line-height: 1.08;
-      margin: 0 0 16px;
-      text-align: left;
-    }
-
-    .rp-feature-section p {
-      color: #e5e5e5;
-      line-height: 1.65;
-      margin: 0 0 16px;
-      font-size: 14.5px;
-    }
-
-    .rp-feature-list {
-      display: grid;
-      gap: 9px;
-      color: #fff;
-      font-weight: 800;
-      margin: 20px 0;
-      font-size: 14px;
-    }
-
-    .rp-package-card {
-      background: #fff;
-      color: var(--text);
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-    }
-
-    .rp-package-card h3 {
-      font-size: 25px;
-      line-height: 1.12;
-      margin: 0 0 12px;
-    }
-
-    .rp-package-badge, .rp-card-eyebrow {
-      display: inline-block;
-      background: #fff0f0;
-      color: var(--red);
-      border: 1px solid #f0caca;
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-weight: 900;
-      margin-bottom: 14px;
-      font-size: 13px;
-    }
-
-    .rp-package-lead {
-      font-size: 15px;
-      font-weight: 600;
-      color: #333 !important;
-      margin-bottom: 14px;
-    }
-
-    .rp-package-list {
-      margin: 16px 0 22px 18px;
-      color: #222;
-    }
-
-    .rp-package-list li {
-      margin-bottom: 9px;
-      font-weight: 700;
-      font-size: 13.5px;
-    }
-
-    .rp-comparison {
-      padding: 58px 18px;
-      background: #fff;
-      color: var(--text);
-    }
-
-    .rp-comparison-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .rp-comparison-wrap h2 {
-      font-size: clamp(30px, 9vw, 48px);
-      line-height: 1.08;
-      margin: 0 0 12px;
-    }
-
-    .rp-inclusion-cards {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin: 26px 0 22px;
-      text-align: left;
-    }
-
-    .rp-inclusion-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 12px 28px rgba(0,0,0,.07);
-    }
-
-    .rp-inclusion-card.featured {
-      border-color: var(--red);
-      box-shadow: 0 16px 38px rgba(208,0,0,.12);
-    }
-
-    .rp-inclusion-card h3 {
-      font-size: 20px;
-      margin: 0 0 8px;
-      color: var(--text);
-    }
-
-    .rp-inclusion-card p {
-      color: #555;
-      margin: 0 0 12px;
-      line-height: 1.55;
-      font-size: 14px;
-    }
-
-    .rp-inclusion-card ul {
-      margin: 0 0 0 18px;
-      color: #222;
-      padding: 0;
-    }
-
-    .rp-inclusion-card li {
-      margin-bottom: 7px;
-      font-weight: 700;
-      font-size: 13.5px;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .gallery-item {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .gallery-item img {
-      width: 100%;
-      height: 230px;
-      object-fit: cover;
-      background: #f1f1f1;
-    }
-
-    .gallery-item span {
-      position: absolute;
-      left: 14px;
-      bottom: 14px;
-      background: var(--red);
-      color: #fff;
-      padding: 8px 13px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 13px;
-    }
-
-    .rp-process {
-      background: var(--light);
-      color: var(--text);
-      padding: 58px 18px;
-    }
-
-    .rp-process-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .rp-process-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .rp-process-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.08);
-      border: 1px solid #eee;
-    }
-
-    .rp-process-card i {
-      color: var(--red);
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .rp-process-card h3 {
-      margin: 0 0 8px;
-    }
-
-    .rp-process-card p {
-      margin: 0;
-      color: #555;
-      font-size: 14px;
-    }
-
-    .review-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .review-card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      border: 1px solid #eee;
-    }
-
-    .review-card p {
-      margin: 14px 0;
-      color: #444;
-      font-size: 14px;
-    }
-
-    .review-card h4 { margin: 0; }
-
-    .review-card span {
-      display: inline-block;
-      margin-top: 6px;
-      color: var(--red);
-      font-weight: 900;
-      font-size: 13px;
-    }
-
-    .contact-cta, .final-cta {
-      text-align: center;
-      background: var(--red);
-      color: #fff;
-    }
-
-    .contact-cta p, .final-cta p {
-      color: #fff;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-
-    .cta-buttons {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .areas {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .area-card {
-      background: var(--light);
-      border-radius: 16px;
-      padding: 18px 14px;
-      text-align: center;
-      width: calc(50% - 6px);
-      border: 1px solid #eee;
-    }
-
-    .area-card i {
-      color: var(--red);
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .area-card h3 {
-      font-size: 14px;
-      margin: 0;
-    }
-
-    .service-area-note {
-      max-width: 760px;
-      margin: 22px auto 0;
-      text-align: center;
-      color: #555;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    footer {
-      background: #070707;
-      color: #fff;
-      padding: 42px 18px 28px;
-    }
-
-    .footer-logo img {
-      max-width: 180px;
-      margin-bottom: 28px;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    footer h3 { margin: 0 0 10px; }
-
-    footer ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    footer li, footer p {
-      color: #ccc;
-      margin: 0 0 8px;
-      font-size: 14px;
-    }
-
-    .copyright {
-      margin-top: 30px;
-      text-align: center;
-      border-top: 1px solid #333;
-      padding-top: 18px;
-      font-size: 13px;
-    }
-
-    @media (max-width: 768px) {
-      .hero-buttons, .cta-buttons, .rp-btns { margin-bottom: 18px; }
-
-      iframe[title*="chat" i],
-      iframe[id*="chat" i],
-      iframe[class*="chat" i],
-      iframe[src*="leadconnector" i],
-      iframe[src*="msgsndr" i],
-      iframe[src*="widget" i],
-      div[id*="chat" i],
-      div[class*="chat" i],
-      div[class*="lc" i] {
-        z-index: 2147482999 !important;
-      }
-    }
-
-    @media (max-width: 699px) {
-      .hero {
-        min-height: 76vh;
-        padding-top: 72px;
-        padding-bottom: 32px;
-      }
-
-      .hero h1 { font-size: clamp(32px, 9vw, 44px); }
-      .hero p { font-size: 15px; }
-      .hero-buttons .quote-btn { min-height: 54px; font-size: 16px; }
-      .rp-funnel { padding-top: 44px; }
-      .trust-bar { padding-top: 22px; padding-bottom: 22px; }
-    }
-
-    @media (min-width: 700px) {
-      .logo img { width: 170px; }
-      .hero { align-items: center; padding: 120px 6% 70px; }
-      .hero-buttons { display: flex; flex-wrap: wrap; }
-      .hero-buttons a { width: auto; }
-      .trust-bar { grid-template-columns: repeat(4, 1fr); padding: 50px 5%; }
-      section { padding: 76px 6%; }
-      .rp-grid { grid-template-columns: repeat(2, 1fr); }
-      .rp-pill-grid { grid-template-columns: repeat(5, 1fr); }
-      .rp-checklist { grid-template-columns: repeat(2, 1fr); }
-      .rp-btns { display: flex; flex-wrap: wrap; }
-      .rp-primary, .rp-secondary { width: auto; }
-      .gallery, .review-grid { grid-template-columns: repeat(2, 1fr); }
-      .rp-process-grid { grid-template-columns: repeat(2, 1fr); }
-      .area-card { width: 220px; }
-    }
-
-    @media (min-width: 1000px) {
-      .navbar { position: fixed; }
-      .nav-container { min-height: 78px; padding: 14px 7%; }
-      .logo img { width: 185px; }
-      .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
-      .nav-links a { color: #111; font-weight: 800; font-size: 15px; }
-      .nav-links a:hover { color: var(--red); }
-      .navbar .book-btn { padding: 13px 24px; font-size: 15px; }
-
-      .hero {
-        min-height: 92vh;
-        background:
-          linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.42), rgba(0,0,0,.25)),
-          url("../images/services/move-out-cleaning.jpg") center right/cover no-repeat;
-        padding: 135px 7% 80px;
-      }
-
-      .hero h1 { font-size: clamp(48px, 5vw, 74px); }
-      .hero p { font-size: 18px; }
-      .rp-card { padding: 34px; border-radius: 28px; }
-      .rp-funnel { padding: 90px 20px; }
-      .rp-inclusion-cards { grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 34px 0 26px; }
-      .gallery { grid-template-columns: repeat(4, 1fr); gap: 22px; }
-      .gallery-item img { height: 260px; }
-      .rp-feature-wrap { grid-template-columns: 1fr 1fr; gap: 36px; }
-      .rp-process-grid { grid-template-columns: repeat(4, 1fr); }
-      .footer-content { grid-template-columns: repeat(3, 1fr); gap: 30px; }
-      .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; }
-    }
-
-    .rp-stepbar{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-      margin:0 0 22px;
-    }
-    .rp-step{
-      border:1px solid #ddd;
-      background:#fafafa;
-      border-radius:999px;
-      padding:10px 8px;
-      font-size:12px;
-      font-weight:900;
-      text-align:center;
-      color:#555;
-    }
-    .rp-step.is-active{
-      background:#fff5f5;
-      border-color:var(--red);
-      color:var(--red);
-    }
-    .rp-lead-field textarea{
-      width:100%;
-      min-height:110px;
-      padding:16px 18px;
-      border:1px solid #ddd;
-      border-radius:14px;
-      font-size:16px;
-      font-family:'Poppins',sans-serif;
-      background:#fff;
-      resize:vertical;
-    }
-    .rp-lead-field textarea:focus{
-      outline:none;
-      border-color:var(--red);
-      box-shadow:0 0 0 4px rgba(208,0,0,.10);
-    }
-    .rp-map-wrap {
-      max-width:1100px;
-      margin:26px auto 0;
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-      border:1px solid #eee;
-      background:#fff;
-    }
-    .rp-map-wrap iframe {
-      width:100%;
-      min-height:360px;
-      border:0;
-      display:block;
-    }
-    @media (max-width:700px){
-      .rp-stepbar{grid-template-columns:1fr; gap:6px;}
-      .rp-step{border-radius:14px;}
-      .rp-map-wrap iframe{min-height:320px;}
-    }
-
-  </style>
+:root {
+  --red:#d00000;
+  --red-dark:#a80000;
+  --black:#101010;
+  --text:#151515;
+  --muted:#555;
+  --light:#f7f7f7;
+  --border:#e6e6e6;
+  --shadow:0 14px 35px rgba(0,0,0,.10);
+}
+
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0;
+  font-family:'Poppins', sans-serif;
+  color:var(--text);
+  background:#fff;
+  line-height:1.55;
+  overflow-x:hidden;
+}
+
+img { max-width:100%; display:block; }
+a { text-decoration:none; }
+
+.navbar {
+  position:sticky;
+  top:0;
+  width:100%;
+  z-index:999;
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(12px);
+  box-shadow:0 6px 24px rgba(0,0,0,.08);
+}
+
+.nav-container {
+  max-width:1280px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:10px 16px;
+  min-height:66px;
+}
+
+.logo img { width:138px; height:auto; }
+
+.navbar nav {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:1;
+}
+
+.nav-links { display:none; }
+
+.book-btn, .quote-btn, .secondary-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  font-weight:900;
+  border:none;
+  line-height:1;
+  min-height:46px;
+}
+
+.book-btn, .quote-btn {
+  background:var(--red);
+  color:#fff;
+  padding:14px 20px;
+  box-shadow:0 10px 24px rgba(208,0,0,.23);
+}
+
+.navbar .book-btn {
+  padding:10px 14px;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.book-btn:hover, .quote-btn:hover { background:var(--red-dark); }
+
+.secondary-btn {
+  background:#fff;
+  color:var(--red);
+  padding:14px 20px;
+  border:1px solid #eee;
+}
+
+.hero {
+  min-height:calc(100vh - 66px);
+  background:
+    linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.60)),
+    url("../images/services/move-out-cleaning.jpg") center center/cover no-repeat;
+  display:flex;
+  align-items:flex-end;
+  padding:92px 18px 42px;
+}
+
+.hero-overlay {
+  width:100%;
+  max-width:680px;
+  color:#fff;
+}
+
+.hero h1 {
+  font-size:clamp(35px, 10vw, 62px);
+  line-height:1.04;
+  margin:0 0 18px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+
+.hero p {
+  font-size:15.5px;
+  margin:0 0 22px;
+  color:#fff;
+}
+
+.hero-trust {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.hero-trust span {
+  background:rgba(255,255,255,.18);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.16);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  backdrop-filter:blur(8px);
+}
+
+.hero-trust i, .stars { color:#ffcc00; }
+
+.hero-buttons {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.hero-buttons a { width:100%; }
+
+section { padding:56px 18px; }
+
+section h2 {
+  font-size:clamp(28px, 8vw, 46px);
+  line-height:1.1;
+  text-align:center;
+  margin:0 0 14px;
+  letter-spacing:-.03em;
+}
+
+.section-text {
+  text-align:center;
+  color:var(--muted);
+  max-width:780px;
+  margin:0 auto 28px;
+  font-size:15px;
+}
+
+.trust-bar {
+  background:var(--light);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:28px 16px;
+}
+
+.trust-card {
+  background:#fff;
+  border-radius:18px;
+  padding:18px 12px;
+  text-align:center;
+  box-shadow:0 8px 22px rgba(0,0,0,.06);
+  border:1px solid #eee;
+}
+
+.trust-card i {
+  color:var(--red);
+  font-size:24px;
+  margin-bottom:8px;
+}
+
+.trust-card h3 {
+  font-size:18px;
+  margin:0 0 4px;
+}
+
+.trust-card p {
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.rp-funnel {
+  background:var(--light);
+  color:var(--text);
+  padding:56px 14px;
+}
+
+.rp-funnel-wrap {
+  max-width:1050px;
+  margin:0 auto;
+}
+
+.rp-funnel-header {
+  text-align:center;
+  margin-bottom:22px;
+}
+
+.rp-funnel-header h2 {
+  font-size:clamp(30px, 8vw, 52px);
+  line-height:1.08;
+  margin:0 0 12px;
+}
+
+.rp-funnel-header p {
+  color:#444;
+  margin:0 auto;
+  max-width:780px;
+  font-size:15px;
+}
+
+.rp-card {
+  background:#fff;
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 18px 45px rgba(0,0,0,.13);
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+.rp-card h1, .rp-card h2, .rp-card h3 {
+  color:var(--text);
+  margin-top:0;
+}
+
+.rp-card h1, .rp-card h2 {
+  font-size:clamp(27px, 7.5vw, 42px);
+  line-height:1.12;
+  margin-bottom:10px;
+}
+
+.rp-sub {
+  color:#555;
+  line-height:1.55;
+  margin-bottom:20px;
+  font-size:14.5px;
+}
+
+.rp-pill-grid {
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  margin:18px 0;
+}
+
+.rp-pill {
+  background:#fff;
+  color:var(--text);
+  border:1px solid #ccc;
+  border-radius:999px;
+  padding:14px;
+  cursor:pointer;
+  font-weight:900;
+  min-height:48px;
+}
+
+.rp-pill:hover, .rp-pill.is-selected {
+  border-color:var(--red);
+  background:#fff5f5;
+}
+
+.rp-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin:18px 0;
+}
+
+.rp-option {
+  background:#fafafa;
+  border:1px solid #ddd;
+  color:var(--text);
+  padding:16px;
+  border-radius:16px;
+  cursor:pointer;
+  text-align:left;
+  font-size:15px;
+  transition:.18s ease;
+  min-height:88px;
+}
+
+.rp-option:hover, .rp-option.is-selected {
+  border-color:var(--red);
+  background:#fff5f5;
+  transform:translateY(-2px);
+}
+
+.rp-option strong {
+  display:block;
+  font-size:17px;
+  margin-bottom:4px;
+}
+
+.rp-option span {
+  display:block;
+  color:#555;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.rp-included {
+  background:#fafafa;
+  border:1px solid #ddd;
+  border-radius:18px;
+  padding:16px;
+  margin:18px 0;
+}
+
+.rp-included-title {
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.rp-checklist {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+  color:#333;
+  font-size:13.5px;
+}
+
+label.rp-addon {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  background:#fafafa;
+  border:1px solid #ddd;
+  padding:14px;
+  border-radius:14px;
+  margin:10px 0;
+  cursor:pointer;
+}
+
+label.rp-addon:hover {
+  border-color:var(--red);
+  background:#fff5f5;
+}
+
+label.rp-addon input {
+  transform:scale(1.15);
+  margin-right:8px;
+}
+
+.rp-addon-left {
+  display:flex;
+  align-items:center;
+  color:var(--text);
+  font-weight:700;
+  font-size:14px;
+}
+
+.rp-price {
+  color:var(--red);
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.rp-invoice {
+  background:#fafafa;
+  border:1px solid #ddd;
+  border-radius:18px;
+  padding:14px;
+  margin-top:18px;
+}
+
+.rp-row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid #e3e3e3;
+  padding:11px 0;
+  color:#333;
+  font-size:13.5px;
+}
+
+.rp-row strong {
+  color:var(--text);
+  text-align:right;
+}
+
+.rp-total {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
+  font-weight:900;
+  color:var(--red);
+  padding-top:16px;
+}
+
+.rp-notice {
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  padding:13px;
+  border-radius:12px;
+  color:#333;
+  margin-top:18px;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.rp-btns {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:20px;
+}
+
+.rp-primary, .rp-secondary {
+  border-radius:999px;
+  font-size:15px;
+  padding:15px 20px;
+  cursor:pointer;
+  min-height:50px;
+  font-weight:900;
+}
+
+.rp-primary {
+  background:var(--red);
+  color:#fff;
+  border:none;
+  box-shadow:0 12px 30px rgba(208,0,0,.25);
+}
+
+.rp-primary:hover { background:#b80000; }
+
+.rp-secondary {
+  background:transparent;
+  color:var(--text);
+  border:1px solid #aaa;
+}
+
+.rp-fineprint {
+  color:#666;
+  font-size:12px;
+  margin-top:16px;
+  line-height:1.45;
+}
+
+.rp-booking-widget {
+  background:#fff;
+  border-radius:18px;
+  overflow:hidden;
+  margin-top:18px;
+  border:1px solid #ddd;
+}
+
+.rp-booking-widget iframe {
+  display:block;
+  min-height:760px;
+}
+
+.rp-feature-section {
+  background:#111;
+  color:#fff;
+  padding:58px 18px;
+}
+
+.rp-feature-wrap {
+  max-width:1100px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:24px;
+  align-items:center;
+}
+
+.rp-feature-section h2 {
+  font-size:clamp(33px, 10vw, 52px);
+  line-height:1.08;
+  margin:0 0 16px;
+  text-align:left;
+}
+
+.rp-feature-section p {
+  color:#e5e5e5;
+  line-height:1.65;
+  margin:0 0 16px;
+  font-size:14.5px;
+}
+
+.rp-feature-list {
+  display:grid;
+  gap:9px;
+  color:#fff;
+  font-weight:800;
+  margin:20px 0;
+  font-size:14px;
+}
+
+.rp-package-card {
+  background:#fff;
+  color:var(--text);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+}
+
+.rp-package-card h3 {
+  font-size:25px;
+  line-height:1.12;
+  margin:0 0 12px;
+}
+
+.rp-package-badge, .rp-card-eyebrow {
+  display:inline-block;
+  background:#fff0f0;
+  color:var(--red);
+  border:1px solid #f0caca;
+  border-radius:999px;
+  padding:8px 14px;
+  font-weight:900;
+  margin-bottom:14px;
+  font-size:13px;
+}
+
+.rp-package-lead {
+  font-size:15px;
+  font-weight:600;
+  color:#333 !important;
+  margin-bottom:14px;
+}
+
+.rp-package-list {
+  margin:16px 0 22px 18px;
+  color:#222;
+}
+
+.rp-package-list li {
+  margin-bottom:9px;
+  font-weight:700;
+  font-size:13.5px;
+}
+
+.rp-comparison {
+  padding:58px 18px;
+  background:#fff;
+  color:var(--text);
+}
+
+.rp-comparison-wrap {
+  max-width:1100px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.rp-inclusion-cards {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin:26px 0 22px;
+  text-align:left;
+}
+
+.rp-inclusion-card {
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 12px 28px rgba(0,0,0,.07);
+}
+
+.rp-inclusion-card.featured {
+  border-color:var(--red);
+  box-shadow:0 16px 38px rgba(208,0,0,.12);
+}
+
+.rp-inclusion-card h3 {
+  font-size:20px;
+  margin:0 0 8px;
+}
+
+.rp-inclusion-card p {
+  color:#555;
+  margin:0 0 12px;
+  line-height:1.55;
+  font-size:14px;
+}
+
+.rp-inclusion-card ul {
+  margin:0 0 0 18px;
+  padding:0;
+}
+
+.rp-inclusion-card li {
+  margin-bottom:7px;
+  font-weight:700;
+  font-size:13.5px;
+}
+
+.gallery {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+.gallery-item {
+  position:relative;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+.gallery-item img {
+  width:100%;
+  height:230px;
+  object-fit:cover;
+  background:#f1f1f1;
+}
+
+.gallery-item span {
+  position:absolute;
+  left:14px;
+  bottom:14px;
+  background:var(--red);
+  color:#fff;
+  padding:8px 13px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:13px;
+}
+
+.rp-process {
+  background:var(--light);
+  color:var(--text);
+  padding:58px 18px;
+}
+
+.rp-process-wrap {
+  max-width:1100px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.rp-process-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:24px;
+}
+
+.rp-process-card {
+  background:#fff;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+  border:1px solid #eee;
+}
+
+.rp-process-card i {
+  color:var(--red);
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.rp-process-card h3 { margin:0 0 8px; }
+
+.rp-process-card p {
+  margin:0;
+  color:#555;
+  font-size:14px;
+}
+
+.review-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+.review-card {
+  background:#fff;
+  padding:24px;
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  border:1px solid #eee;
+}
+
+.review-card p {
+  margin:14px 0;
+  color:#444;
+  font-size:14px;
+}
+
+.review-card h4 { margin:0; }
+
+.review-card span {
+  display:inline-block;
+  margin-top:6px;
+  color:var(--red);
+  font-weight:900;
+  font-size:13px;
+}
+
+.contact-cta, .final-cta {
+  text-align:center;
+  background:var(--red);
+  color:#fff;
+}
+
+.contact-cta p, .final-cta p {
+  color:#fff;
+  max-width:720px;
+  margin:0 auto;
+}
+
+.cta-buttons {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:22px;
+}
+
+.areas {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+}
+
+.area-card {
+  background:var(--light);
+  border-radius:16px;
+  padding:18px 14px;
+  text-align:center;
+  width:calc(50% - 6px);
+  border:1px solid #eee;
+}
+
+.area-card i {
+  color:var(--red);
+  font-size:22px;
+  margin-bottom:8px;
+}
+
+.area-card h3 {
+  font-size:14px;
+  margin:0;
+}
+
+.service-area-note {
+  max-width:760px;
+  margin:22px auto 0;
+  text-align:center;
+  color:#555;
+  font-size:14px;
+  line-height:1.6;
+}
+
+footer {
+  background:#070707;
+  color:#fff;
+  padding:42px 18px 28px;
+}
+
+.footer-logo img {
+  max-width:180px;
+  margin-bottom:28px;
+}
+
+.footer-content {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:24px;
+}
+
+footer h3 { margin:0 0 10px; }
+
+footer ul {
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+footer li, footer p {
+  color:#ccc;
+  margin:0 0 8px;
+  font-size:14px;
+}
+
+.copyright {
+  margin-top:30px;
+  text-align:center;
+  border-top:1px solid #333;
+  padding-top:18px;
+  font-size:13px;
+}
+
+
+/* ===== LEAD FORM / CALCULATOR POLISH ===== */
+.rp-lead-form{
+  margin-top:28px;
+  padding:24px;
+  background:#fafafa;
+  border:1px solid #e7e7e7;
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(0,0,0,.05);
+}
+
+.rp-lead-field{
+  margin-bottom:16px;
+}
+
+.rp-lead-field label{
+  display:block;
+  font-size:14px;
+  font-weight:800;
+  margin-bottom:8px;
+  color:#111;
+}
+
+.rp-lead-field input{
+  width:100%;
+  height:56px;
+  padding:0 18px;
+  border:1px solid #ddd;
+  border-radius:14px;
+  font-size:16px;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  transition:.2s ease;
+}
+
+.rp-lead-field input:focus{
+  outline:none;
+  border-color:#d00000;
+  box-shadow:0 0 0 4px rgba(208,0,0,.10);
+}
+
+.rp-error{
+  display:none;
+  margin:12px 0 0;
+  padding:14px;
+  background:#fff5f5;
+  border:1px solid #f0caca;
+  border-radius:12px;
+  color:#a80000;
+  font-size:14px;
+  font-weight:700;
+}
+
+.rp-btns{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+
+.rp-primary,
+.rp-secondary{
+  flex:1;
+  min-height:58px;
+  font-size:16px;
+  font-weight:900;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+}
+
+.rp-primary{
+  background:#d00000;
+  color:#fff;
+  border:none;
+  box-shadow:0 12px 30px rgba(208,0,0,.25);
+}
+
+.rp-primary:hover{
+  background:#b30000;
+}
+
+.rp-secondary{
+  background:#fff;
+  color:#111;
+  border:1px solid #ddd;
+}
+
+.rp-secondary:hover{
+  background:#fafafa;
+}
+
+.rp-fineprint{
+  display:block;
+  color:#666;
+  font-size:12px;
+  margin-top:16px;
+  line-height:1.45;
+}
+
+.rp-notice strong{
+  display:block;
+  margin-bottom:4px;
+  color:#111;
+}
+
+@media (max-width:700px){
+  .rp-lead-form{
+    padding:18px;
+  }
+
+  .rp-btns{
+    flex-direction:column;
+  }
+
+  .rp-primary,
+  .rp-secondary{
+    width:100%;
+  }
+}
+
+
+@media (max-width:768px) {
+  .hero-buttons, .cta-buttons, .rp-btns { margin-bottom:18px; }
+
+  iframe[title*="chat" i],
+  iframe[id*="chat" i],
+  iframe[class*="chat" i],
+  iframe[src*="leadconnector" i],
+  iframe[src*="msgsndr" i],
+  iframe[src*="widget" i],
+  div[id*="chat" i],
+  div[class*="chat" i],
+  div[class*="lc" i] {
+    z-index:2147482999 !important;
+  }
+}
+
+@media (max-width:699px) {
+  .hero {
+    min-height:76vh;
+    padding-top:72px;
+    padding-bottom:32px;
+  }
+
+  .hero h1 { font-size:clamp(32px, 9vw, 44px); }
+  .hero p { font-size:15px; }
+  .hero-buttons .quote-btn { min-height:54px; font-size:16px; }
+  .rp-funnel { padding-top:44px; }
+  .trust-bar { padding-top:22px; padding-bottom:22px; }
+}
+
+@media (min-width:700px) {
+  .logo img { width:170px; }
+  .hero { align-items:center; padding:120px 6% 70px; }
+  .hero-buttons { display:flex; flex-wrap:wrap; }
+  .hero-buttons a { width:auto; }
+  .trust-bar { grid-template-columns:repeat(4, 1fr); padding:50px 5%; }
+  section { padding:76px 6%; }
+  .rp-grid { grid-template-columns:repeat(2, 1fr); }
+  .rp-pill-grid { grid-template-columns:repeat(5, 1fr); }
+  .rp-checklist { grid-template-columns:repeat(2, 1fr); }
+  .rp-btns { display:flex; flex-wrap:wrap; }
+  .rp-primary, .rp-secondary { width:auto; }
+  .gallery, .review-grid { grid-template-columns:repeat(2, 1fr); }
+  .rp-process-grid { grid-template-columns:repeat(2, 1fr); }
+  .area-card { width:220px; }
+}
+
+@media (min-width:1000px) {
+  .navbar { position:fixed; }
+  .nav-container { min-height:78px; padding:14px 7%; }
+  .logo img { width:185px; }
+  .nav-links {
+    display:flex;
+    gap:28px;
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .nav-links a {
+    color:#111;
+    font-weight:800;
+    font-size:15px;
+  }
+  .nav-links a:hover { color:var(--red); }
+  .navbar .book-btn { padding:13px 24px; font-size:15px; }
+
+  .hero {
+    min-height:92vh;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.75), rgba(0,0,0,.42), rgba(0,0,0,.25)),
+      url("../images/services/move-out-cleaning.jpg") center right/cover no-repeat;
+    padding:135px 7% 80px;
+  }
+
+  .hero h1 { font-size:clamp(48px, 5vw, 74px); }
+  .hero p { font-size:18px; }
+  .rp-card { padding:34px; border-radius:28px; }
+  .rp-funnel { padding:90px 20px; }
+  .rp-inclusion-cards { grid-template-columns:repeat(3, 1fr); gap:18px; margin:34px 0 26px; }
+  .gallery { grid-template-columns:repeat(4, 1fr); gap:22px; }
+  .gallery-item img { height:260px; }
+  .rp-feature-wrap { grid-template-columns:1fr 1fr; gap:36px; }
+  .rp-process-grid { grid-template-columns:repeat(4, 1fr); }
+  .footer-content { grid-template-columns:repeat(3, 1fr); gap:30px; }
+  .cta-buttons { display:flex; justify-content:center; flex-wrap:wrap; }
+}
+
+.rp-stepbar{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:0 0 22px;
+}
+.rp-step{
+  border:1px solid #ddd;
+  background:#fafafa;
+  border-radius:999px;
+  padding:10px 8px;
+  font-size:12px;
+  font-weight:900;
+  text-align:center;
+  color:#555;
+}
+.rp-step.is-active{
+  background:#fff5f5;
+  border-color:var(--red);
+  color:var(--red);
+}
+.rp-lead-field textarea{
+  width:100%;
+  min-height:110px;
+  padding:16px 18px;
+  border:1px solid #ddd;
+  border-radius:14px;
+  font-size:16px;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  resize:vertical;
+}
+.rp-lead-field textarea:focus{
+  outline:none;
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(208,0,0,.10);
+}
+.rp-map-wrap {
+  max-width:1100px;
+  margin:26px auto 0;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  border:1px solid #eee;
+  background:#fff;
+}
+.rp-map-wrap iframe {
+  width:100%;
+  min-height:360px;
+  border:0;
+  display:block;
+}
+@media (max-width:700px){
+  .rp-stepbar{grid-template-columns:1fr; gap:6px;}
+  .rp-step{border-radius:14px;}
+  .rp-map-wrap iframe{min-height:320px;}
+}
+
+/* ===== Homepage-standard compact progressive estimator ===== */
+.rp-card{max-width:760px;margin-left:auto;margin-right:auto;}
+.rp-progress-label{display:flex;justify-content:space-between;gap:12px;color:#555;font-size:12px;margin-bottom:9px;}
+.rp-progress-label strong{color:var(--red);}
+.rp-progress{width:100%;height:10px;background:#eee;border-radius:999px;overflow:hidden;margin-bottom:16px;}
+.rp-progress-fill{height:100%;background:linear-gradient(90deg,#b80000,#e00000);transition:width .25s ease;}
+.rp-estimator-kicker{display:inline-flex;align-items:center;justify-content:center;background:#fff0f0;color:var(--red);border:1px solid #f0caca;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:900;margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em;}
+.rp-live-price{background:#101010;color:#fff;border-radius:20px;padding:15px;margin:0 0 12px;box-shadow:0 16px 36px rgba(0,0,0,.18);}
+.rp-live-price small{display:block;color:#ddd;font-weight:900;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.rp-live-price strong{display:block;color:#fff;font-size:clamp(40px,13vw,66px);line-height:.95;letter-spacing:-.05em;}
+.rp-live-price span{display:block;color:#eee;font-size:13.5px;margin-top:9px;}
+.rp-tap-note{font-weight:900;color:var(--red);margin:0 0 10px;font-size:15px;}
+.rp-option{position:relative;padding-right:48px;border:2px solid #ddd;min-height:76px;font-family:'Poppins',sans-serif;}
+.rp-option::after{content:'›';position:absolute;right:17px;top:50%;transform:translateY(-50%);color:var(--red);font-size:34px;font-weight:900;line-height:1;}
+.rp-option.featured-option{border-color:var(--red);background:#fff5f5;box-shadow:0 12px 30px rgba(208,0,0,.10);}
+.rp-option .badge{display:inline-flex;background:var(--red);color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-bottom:6px;}
+.rp-choice-grid{display:grid;gap:10px;margin:14px 0;}
+.rp-checkbox-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fafafa;border:2px solid #ddd;border-radius:16px;padding:14px;cursor:pointer;}
+.rp-checkbox-card input{width:20px;height:20px;accent-color:var(--red);}
+.rp-checkbox-card strong{display:block;font-size:15px;color:#111;}
+.rp-checkbox-card span span{display:block;color:#555;font-size:12px;}
+.rp-price-chip{background:#fff0f0;color:var(--red);border:1px solid #f0caca;border-radius:999px;padding:6px 10px;font-weight:900;white-space:nowrap;font-size:13px;}
+.rp-details{margin-top:14px;}
+.rp-details summary{cursor:pointer;list-style:none;font-weight:900;color:#111;background:#fafafa;border:1px solid #e5e5e5;border-radius:14px;padding:13px 15px;}
+.rp-details summary::-webkit-details-marker{display:none;}
+.rp-details summary::after{content:" +";color:var(--red);font-weight:900;}
+.rp-details[open] summary::after{content:" −";}
+.sticky-mobile-cta{display:none;}
+@media (max-width:699px){
+  .sticky-mobile-cta{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147482990;display:grid;grid-template-columns:1.25fr .75fr;gap:8px;}
+  .sticky-mobile-cta a{min-height:44px;font-size:14px;padding:11px 14px;box-shadow:0 10px 30px rgba(0,0,0,.22);}
+  body{padding-bottom:76px;}
+}
+/* Mobile: hide chat-specific LeadConnector UI only; keep booking calendar visible */
+@media (max-width:768px){
+  iframe[title*="chat" i],
+  iframe[id*="chat" i],
+  iframe[class*="chat" i],
+  div[id*="chat-widget" i],
+  div[class*="chat-widget" i],
+  div[id*="chat-widget-container" i],
+  div[class*="chat-widget-container" i]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+  .rp-booking-widget,
+  .rp-booking-widget iframe,
+  iframe[src*="/widget/booking/" i],
+  iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i]{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    width:100%!important;
+    min-height:760px!important;
+  }
+}
+
+</style>
 
 </head>
 
@@ -1160,7 +1324,7 @@
     <h1>PCS Move-Out Cleaning Near Fort Sill, OK</h1>
 
     <div class="hero-trust">
-      <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
+      <span><i class="fa-solid fa-star"></i> 28+ Google Reviews</span>
       <span><i class="fa-solid fa-shield-halved"></i> Military Move-Outs</span>
       <span><i class="fa-solid fa-water"></i> Carpet Add-On Available</span>
     </div>
@@ -1180,8 +1344,14 @@
 <section class="trust-bar">
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
-    <h3>24+</h3>
+    <h3>28+</h3>
     <p>5-Star Reviews</p>
+  </div>
+
+  <div class="trust-card">
+    <i class="fa-solid fa-building"></i>
+    <h3>Chamber Member</h3>
+    <p>Lawton Fort Sill Chamber</p>
   </div>
 
   <div class="trust-card">
@@ -1191,14 +1361,8 @@
   </div>
 
   <div class="trust-card">
-    <i class="fa-solid fa-water"></i>
-    <h3>Carpet Add-On</h3>
-    <p>Mytee Hot Water Extraction</p>
-  </div>
-
-  <div class="trust-card">
     <i class="fa-solid fa-calendar-check"></i>
-    <h3>Easy Booking</h3>
+    <h3>Online Booking</h3>
     <p>Estimate & Schedule Online</p>
   </div>
 </section>
@@ -1420,7 +1584,7 @@
 <section class="reviews" id="reviews">
   <h2>Trusted By Customers Across Southwest Oklahoma</h2>
   <p class="section-text">
-    ⭐⭐⭐⭐⭐ Based on 24+ Google Reviews
+    ⭐⭐⭐⭐⭐ Based on 28+ Google Reviews
   </p>
 
   <div class="review-grid">
@@ -1502,8 +1666,7 @@
   <h2>PCS Cleaning Near Fort Sill & Southwest Oklahoma</h2>
 
   <p class="section-text">
-    Red Prairie Cleaning proudly serves Fort Sill, Lawton, Cache, Elgin, Medicine Park, Duncan, Wichita Falls,
-    and nearby communities.
+    Red Prairie Cleaning proudly serves Fort Sill, Lawton, Cache, Elgin, Medicine Park, Duncan, Fletcher, and nearby Southwest Oklahoma communities.
   </p>
 
   <div class="areas featured-areas">
@@ -1513,7 +1676,7 @@
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Elgin</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Medicine Park</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Duncan</h3></div>
-    <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Wichita Falls, TX</h3></div>
+    <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fletcher</h3></div>
   </div>
 
   <div class="rp-map-wrap" aria-label="Red Prairie Cleaning Fort Sill service area map">
@@ -1526,8 +1689,7 @@
   </div>
 
   <p class="service-area-note">
-    Also serving Comanche, Sterling, Chickasha, Apache, Fletcher, Geronimo, Walters, Temple, Marlow,
-    Rush Springs, and surrounding communities.
+    Also serving nearby Southwest Oklahoma communities depending on schedule, job size, and travel.
   </p>
 </section>
 
@@ -1564,9 +1726,9 @@
     <div>
       <h3>Service Areas</h3>
       <p>
-        Serving Southwest Oklahoma & North Texas<br>
-        Fort Sill • Lawton • Duncan • Wichita Falls<br>
-        and surrounding communities
+        Serving Southwest Oklahoma<br>
+        Fort Sill • Lawton • Cache • Elgin<br>
+        Medicine Park • Duncan • Fletcher
       </p>
     </div>
   </div>
@@ -1577,17 +1739,121 @@
 </footer>
 
 <script>
-const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
+const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/05947288-6996-4ecc-80aa-42766c3be32b";
 const RP_BOOKING_CALENDAR_URL = "https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2";
 
+const rpServices = {
+  moveout: {
+    name: "Factory Reset™ Move-Out Cleaning",
+    shortName: "Move-Out Cleaning",
+    emoji: "🚚",
+    baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Starting at $199",
+    featured: "Most Popular",
+    includes: ["Kitchen detailed","Bathrooms cleaned","Inside oven","Inside refrigerator","Inside microwave","Cabinets and drawers wiped","Baseboards","Interior windows","Floors vacuumed and mopped","High-touch surfaces"]
+  },
+  movein: {
+    name: "Factory Reset™ Move-In Cleaning",
+    shortName: "Move-In Cleaning",
+    emoji: "🔑",
+    baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Starting at $199",
+    featured: "Second Most Popular",
+    includes: ["Kitchen detailed","Bathrooms cleaned","Inside appliances","Cabinets and drawers wiped","Baseboards","Interior windows","Floors cleaned","High-touch surfaces"]
+  },
+  carpet: {
+    name: "Steam Carpet Cleaning",
+    shortName: "Carpet Cleaning",
+    emoji: "🧼",
+    base: 75,
+    desc: "$75 per room",
+    includes: ["Hot-water extraction","Professional pre-spray","Basic spot attention","Professional wand cleaning","Carpet grooming","Fresh finish"]
+  },
+  upholstery: {
+    name: "Professional Upholstery Cleaning",
+    shortName: "Upholstery Cleaning",
+    emoji: "🛋️",
+    base: 100,
+    desc: "Starting at $100",
+    includes: ["Fabric pre-spray","Extraction cleaning","Basic spot treatment","Freshened finish"]
+  },
+  deep: {
+    name: "Deep Cleaning",
+    shortName: "Deep Cleaning",
+    emoji: "✨",
+    base: 249,
+    desc: "Starting at $249",
+    includes: ["Detailed bathrooms","Kitchen detail","Inside oven","Inside microwave","Cabinet fronts","Baseboards","Doors and frames","Floors"]
+  },
+  maintenance: {
+    name: "Maintenance Cleaning",
+    shortName: "Maintenance Cleaning",
+    emoji: "🏠",
+    base: 149,
+    desc: "Starting at $149",
+    includes: ["Kitchen wipe-down","Bathrooms","Dusting","Floors","General tidy-up","High-touch surfaces"]
+  }
+};
+
+const rpUpholsteryPrices = {
+  "Dining chair": 100,
+  "Recliner": 125,
+  "Loveseat": 150,
+  "Sofa": 175,
+  "Sectional up to 5 seats": 250,
+  "Large sectional": 325
+};
+
+const rpAddonsByService = {
+  moveout: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Heavy buildup / excessive grime", price:75, description:"Extra time for heavy buildup"},
+    {name:"Extra pet hair removal", price:50, description:"Additional pet hair attention"}
+  ],
+  movein: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Inside refrigerator", price:35, description:"Interior refrigerator detail"},
+    {name:"Extra pet hair removal", price:50, description:"Additional pet hair attention"}
+  ],
+  carpet: [
+    {name:"Pet stain treatment", price:35, description:"Targeted pet spots"},
+    {name:"Deodorizer", price:30, description:"Odor help"},
+    {name:"Heavy traffic lane treatment", price:30, description:"High-use carpet areas"},
+    {name:"Stair cleaning", price:50, description:"Stair carpet cleaning"},
+    {name:"Area rug cleaning", price:40, description:"Basic area rug clean"}
+  ],
+  upholstery: [
+    {name:"Deodorizer", price:20, description:"Odor help"},
+    {name:"Pet hair removal", price:25, description:"Extra pet hair attention"},
+    {name:"Stain treatment", price:25, description:"Basic spot treatment"},
+    {name:"Fabric protector", price:35, description:"Protective treatment"}
+  ],
+  deep: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Inside refrigerator", price:35, description:"Interior refrigerator detail"},
+    {name:"Heavy pet hair", price:45, description:"Extra pet hair attention"},
+    {name:"Inside cabinets/drawers", price:50, description:"Interior cabinet/drawer wipeout"}
+  ],
+  maintenance: [
+    {name:"Inside oven", price:35, description:"Optional interior appliance cleaning"},
+    {name:"Inside refrigerator", price:35, description:"Optional interior appliance cleaning"},
+    {name:"Interior windows", price:45, description:"Accessible interior glass"},
+    {name:"Baseboard detailing", price:35, description:"Extra detail for baseboards"}
+  ]
+};
+
 const rpState = {
-  step: 1,
+  stage: "service",
+  service: null,
   bedrooms: 2,
   bathrooms: 1,
   condition: "Average",
-  addons: [],
-  carpetWithMoveout: true,
   carpetRooms: 2,
+  furnitureItem: "Sofa",
+  addons: [],
   fullName: "",
   phone: "",
   email: "",
@@ -1599,465 +1865,452 @@ const rpState = {
   estimateSent: false
 };
 
-const rpAddons = [
-  { name: "Wall scuff removal", price: 35 },
-  { name: "Small trash removal", price: 60 },
-  { name: "Heavy buildup / excessive grime", price: 60 },
-  { name: "Window tracks & sills", price: 35 },
-  { name: "Extra pet hair removal", price: 45 }
-];
-
-function rpCalculatePrice() {
-  let total = 299;
-  total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 30;
-  total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 20;
-  if (rpState.condition === "Well maintained") total -= 15;
-  if (rpState.condition === "Heavy buildup") total += 50;
-  if (rpState.carpetWithMoveout) {
-    const rooms = Number(rpState.carpetRooms || 1);
-    if (rooms <= 2) total += 100;
-    else if (rooms <= 4) total += 150;
-    else total += 200;
+function rpEscapeAttr(value){
+  return String(value || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function rpEscapeJs(value){
+  return String(value || "").replace(/\/g,"\\").replace(/'/g,"\'");
+}
+function rpSelectedService(){ return rpState.service ? rpServices[rpState.service] : null; }
+function rpHomeService(){ return ["moveout","movein","deep","maintenance"].includes(rpState.service); }
+function rpConditionAdjustment(){
+  if(!rpHomeService()) return 0;
+  if(rpState.condition === "Well maintained") return -15;
+  if(rpState.condition === "Heavy buildup") return 65;
+  return 0;
+}
+function rpAddonPrice(addon){
+  if(addon.type === "per_room") return addon.price * Math.max(1, Number(rpState.carpetRooms || 1));
+  return addon.price;
+}
+function rpCalculatePrice(){
+  const service = rpSelectedService();
+  if(!service) return 0;
+  let total = 0;
+  if(["moveout","movein"].includes(rpState.service)){
+    const beds = Math.min(Number(rpState.bedrooms || 1), 5);
+    total = service.baseByBedroom[beds] || service.baseByBedroom[5];
+    total += Math.max(0, Number(rpState.bathrooms || 1) - 2) * 35;
+    total += rpConditionAdjustment();
+  } else if(["deep","maintenance"].includes(rpState.service)){
+    total = service.base;
+    total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 35;
+    total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 25;
+    total += rpConditionAdjustment();
+  } else if(rpState.service === "carpet"){
+    total = service.base * Math.max(1, Number(rpState.carpetRooms || 1));
+  } else if(rpState.service === "upholstery"){
+    total = rpUpholsteryPrices[rpState.furnitureItem] || 175;
   }
-  rpState.addons.forEach(addon => total += addon.price);
-  return Math.max(total, 249);
+  rpState.addons.forEach(addon => total += rpAddonPrice(addon));
+  if(["moveout","movein"].includes(rpState.service)) return Math.max(total, 199);
+  if(rpState.service === "deep") return Math.max(total, 249);
+  if(rpState.service === "maintenance") return Math.max(total, 149);
+  if(rpState.service === "carpet") return Math.max(total, 75);
+  if(rpState.service === "upholstery") return Math.max(total, 100);
+  return total;
 }
-
-function rpEscapeAttr(value) {
-  return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function rpProgress(){
+  const map = {service:20, bedrooms:35, bathrooms:45, condition:55, carpetRooms:45, upholsteryItem:45, addons:70, contact:88, calendar:100};
+  return map[rpState.stage] || 20;
 }
-
-function rpStepBar() {
+function rpHeaderHtml(note){
+  const total = rpCalculatePrice();
+  const service = rpSelectedService();
   return `
-    <div class="rp-stepbar" aria-label="Estimate steps">
-      <div class="rp-step ${rpState.step === 1 ? "is-active" : ""}">1. Estimate</div>
-      <div class="rp-step ${rpState.step === 2 ? "is-active" : ""}">2. Contact & Address</div>
-      <div class="rp-step ${rpState.step === 3 ? "is-active" : ""}">3. Appointment</div>
+    <div class="rp-progress-label">
+      <strong>${rpState.stage === "service" ? "30 second estimate" : "Instant estimate"}</strong>
+      <span>${rpProgress()}% complete</span>
+    </div>
+    <div class="rp-progress"><div class="rp-progress-fill" style="width:${rpProgress()}%"></div></div>
+    <div class="rp-live-price">
+      <small>Current Estimate</small>
+      <strong>$${total}</strong>
+      <span>${note || (service ? service.name : "Choose your service below.")}</span>
     </div>
   `;
 }
-
-function rpToggleAddon(name, price, checked) {
-  if (checked) {
-    if (!rpState.addons.some(a => a.name === name)) rpState.addons.push({ name, price });
+function rpGo(stage){
+  rpState.stage = stage;
+  rpRender();
+  rpScrollAfterRender();
+}
+function rpChooseService(key){
+  rpState.service = key;
+  rpState.addons = [];
+  rpState.carpetRooms = key === "carpet" ? 2 : 0;
+  rpState.furnitureItem = "Sofa";
+  rpState.condition = "Average";
+  if(rpHomeService()) rpGo("bedrooms");
+  else if(key === "carpet") rpGo("carpetRooms");
+  else if(key === "upholstery") rpGo("upholsteryItem");
+}
+function rpBack(){
+  const s = rpState.stage;
+  if(["bedrooms","carpetRooms","upholsteryItem"].includes(s)) return rpGo("service");
+  if(s === "bathrooms") return rpGo("bedrooms");
+  if(s === "condition") return rpGo("bathrooms");
+  if(s === "addons"){
+    if(rpHomeService()) return rpGo("condition");
+    if(rpState.service === "carpet") return rpGo("carpetRooms");
+    if(rpState.service === "upholstery") return rpGo("upholsteryItem");
+  }
+  if(s === "contact") return rpGo("addons");
+  if(s === "calendar") return rpGo("contact");
+  return rpGo("service");
+}
+function rpSetBedrooms(n){ rpState.bedrooms = n; rpGo("bathrooms"); }
+function rpSetBathrooms(n){ rpState.bathrooms = n; rpGo("condition"); }
+function rpSetCondition(condition){ rpState.condition = condition; rpGo("addons"); }
+function rpSetCarpetRooms(n){ rpState.carpetRooms = n; rpGo("addons"); }
+function rpSetFurnitureItem(item){ rpState.furnitureItem = item; rpGo("addons"); }
+function rpToggleAddon(name, price, type, description, checked){
+  if(checked){
+    if(!rpState.addons.some(a => a.name === name)) rpState.addons.push({name, price, type, description});
   } else {
     rpState.addons = rpState.addons.filter(a => a.name !== name);
   }
-  rpRenderEstimateStep();
+  rpRender();
 }
-
-function rpAddonsHtml() {
-  return rpAddons.map(addon => {
-    const checked = rpState.addons.some(a => a.name === addon.name) ? "checked" : "";
-    return `
-      <label class="rp-addon">
-        <span class="rp-addon-left">
-          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name.replace(/'/g, "\'")}', ${addon.price}, this.checked)">
-          ${addon.name}
-        </span>
-        <span class="rp-price">+$${addon.price}</span>
-      </label>
-    `;
-  }).join("");
+function rpSelectedAddonsText(){
+  return rpState.addons.length ? rpState.addons.map(a => a.name).join(", ") : "None";
 }
-
-function rpSetBedrooms(n) { rpState.bedrooms = n; rpRenderEstimateStep(); }
-function rpSetBathrooms(n) { rpState.bathrooms = n; rpRenderEstimateStep(); }
-function rpSetCondition(condition) { rpState.condition = condition; rpRenderEstimateStep(); }
-function rpToggleCarpet(value) { rpState.carpetWithMoveout = value; rpRenderEstimateStep(); }
-function rpSetCarpetRooms(n) { rpState.carpetRooms = n; rpRenderEstimateStep(); }
-
-function rpBuildJobDetails(payload) {
-  return [
+function rpServiceDetailsText(){
+  const service = rpSelectedService();
+  if(!service) return "No service selected";
+  if(rpHomeService()) return `${service.shortName} · ${rpState.bedrooms} bed / ${rpState.bathrooms} bath · ${rpState.condition}`;
+  if(rpState.service === "carpet") return `${service.shortName} · ${rpState.carpetRooms} carpeted room${rpState.carpetRooms === 1 ? "" : "s"}`;
+  if(rpState.service === "upholstery") return `${service.shortName} · ${rpState.furnitureItem}`;
+  return service.shortName;
+}
+function rpIncludedHtml(){
+  const service = rpSelectedService();
+  if(!service) return "";
+  return `<details class="rp-details"><summary>What's included with ${service.shortName}</summary><div class="rp-included"><div class="rp-checklist">${service.includes.map(item => `<div>✓ ${item}</div>`).join("")}</div></div></details>`;
+}
+function rpInvoiceHtml(){
+  const service = rpSelectedService();
+  if(!service) return "";
+  const details = [];
+  if(rpHomeService()){
+    details.push(["Bedrooms", `${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}`]);
+    details.push(["Bathrooms", `${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}`]);
+    details.push(["Condition", rpState.condition]);
+  }
+  if(rpState.service === "carpet") details.push(["Carpeted rooms", `${rpState.carpetRooms}${rpState.carpetRooms === 5 ? "+" : ""}`]);
+  if(rpState.service === "upholstery") details.push(["Upholstery item", rpState.furnitureItem]);
+  details.push(["Add-ons", rpSelectedAddonsText()]);
+  return `
+    <div class="rp-invoice">
+      <div class="rp-row"><span>Service</span><strong>${service.name}</strong></div>
+      <div class="rp-row"><span>Details</span><strong>${rpServiceDetailsText()}</strong></div>
+      ${details.map(([label,value]) => `<div class="rp-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+      <div class="rp-total"><span>Total</span><strong>$${rpCalculatePrice()}</strong></div>
+    </div>
+    <div class="rp-notice">This is a starting estimate. Final pricing can change for severe buildup, heavy pet hair, unusual conditions, limited access, long travel, stairs, or specialty requests.</div>
+  `;
+}
+function rpServiceChoiceHtml(){
+  const order = ["moveout","movein","carpet","upholstery","deep","maintenance"];
+  return `
+    ${rpHeaderHtml("Choose your service below.")}
+    <h1>What service do you need?</h1>
+    <p class="rp-tap-note">👇 Tap one option</p>
+    <div class="rp-grid">
+      ${order.map(key => {
+        const s = rpServices[key];
+        return `<button type="button" class="rp-option ${s.featured ? "featured-option" : ""}" onclick="rpChooseService('${key}')">
+          ${s.featured ? `<span class="badge">${s.featured}</span>` : ""}
+          <strong>${s.emoji} ${s.name}</strong>
+          <span>${s.desc}</span>
+        </button>`;
+      }).join("")}
+    </div>
+  `;
+}
+function rpBedroomsHtml(){
+  return `
+    ${rpHeaderHtml(rpSelectedService().name)}
+    <h1>How many bedrooms?</h1>
+    <p class="rp-sub">${rpSelectedService().shortName} pricing starts with home size.</p>
+    <div class="rp-pill-grid">${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" onclick="rpSetBedrooms(${n})">${n}${n===5?"+":""}</button>`).join("")}</div>
+    ${rpIncludedHtml()}
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpBathroomsHtml(){
+  return `
+    ${rpHeaderHtml(rpSelectedService().name)}
+    <h1>How many bathrooms?</h1>
+    <p class="rp-sub">Bathrooms affect the time needed for a proper clean.</p>
+    <div class="rp-pill-grid">${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill ${rpState.bathrooms === n ? "is-selected" : ""}" onclick="rpSetBathrooms(${n})">${n}${n===5?"+":""}</button>`).join("")}</div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpConditionHtml(){
+  return `
+    ${rpHeaderHtml(rpSelectedService().name)}
+    <h1>What condition is the home in?</h1>
+    <p class="rp-sub">Pick the closest option. You can add notes before booking.</p>
+    <div class="rp-grid">
+      ${["Well maintained","Average","Heavy buildup"].map(condition => `<button type="button" class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')"><strong>${condition}</strong><span>${condition === "Well maintained" ? "Mostly maintained and needs a professional detail." : condition === "Average" ? "Normal lived-in condition. This is the default." : "Heavy grime, pet hair, buildup, or neglected areas."}</span></button>`).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpCarpetRoomsHtml(){
+  return `
+    ${rpHeaderHtml("Carpet cleaning is $75 per carpeted room.")}
+    <h1>How many carpeted rooms?</h1>
+    <div class="rp-pill-grid">${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill ${rpState.carpetRooms === n ? "is-selected" : ""}" onclick="rpSetCarpetRooms(${n})">${n}${n===5?"+":""}</button>`).join("")}</div>
+    ${rpIncludedHtml()}
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpUpholsteryHtml(){
+  return `
+    ${rpHeaderHtml("Choose the upholstery item you need cleaned.")}
+    <h1>What upholstery item?</h1>
+    <div class="rp-grid">
+      ${Object.keys(rpUpholsteryPrices).map(item => `<button type="button" class="rp-option ${rpState.furnitureItem === item ? "is-selected" : ""}" onclick="rpSetFurnitureItem('${rpEscapeJs(item)}')"><strong>${item}</strong><span>Starting at $${rpUpholsteryPrices[item]}</span></button>`).join("")}
+    </div>
+    ${rpIncludedHtml()}
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpAddonsHtml(){
+  const addons = rpAddonsByService[rpState.service] || [];
+  return `
+    ${rpHeaderHtml(rpServiceDetailsText())}
+    <h1>Optional add-ons</h1>
+    <p class="rp-sub">Select anything that applies, or continue with no add-ons.</p>
+    <div class="rp-choice-grid">
+      ${addons.map(addon => {
+        const checked = rpState.addons.some(a => a.name === addon.name) ? "checked" : "";
+        const type = addon.type || "";
+        const price = rpAddonPrice(addon);
+        return `<label class="rp-checkbox-card">
+          <input type="checkbox" ${checked} onchange="rpToggleAddon('${rpEscapeJs(addon.name)}', ${addon.price}, '${type}', '${rpEscapeJs(addon.description || "")}', this.checked)">
+          <span><strong>${addon.name}</strong><span>${addon.description || "Optional add-on"}</span></span>
+          <span class="rp-price-chip">${price === 0 ? "Included" : "+$" + price}</span>
+        </label>`;
+      }).join("")}
+    </div>
+    ${rpInvoiceHtml()}
+    <div class="rp-btns">
+      <button type="button" class="rp-secondary" onclick="rpBack()">Back</button>
+      <button type="button" class="rp-primary" onclick="rpGo('contact')">Next: Contact & Address</button>
+    </div>
+  `;
+}
+function rpContactHtml(){
+  return `
+    ${rpHeaderHtml("Contact and address details come before the appointment calendar.")}
+    ${rpInvoiceHtml()}
+    <h1>Contact & service address</h1>
+    <div class="rp-lead-form">
+      <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name"></div>
+      <div class="rp-lead-field"><label for="rpPhone">Phone *</label><input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel"></div>
+      <div class="rp-lead-field"><label for="rpEmail">Email *</label><input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="rp-lead-field"><label for="rpAddress1">Service Address *</label><input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1"></div>
+      <div class="rp-grid">
+        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Fort Sill" autocomplete="address-level2"></div>
+        <div class="rp-lead-field"><label for="rpStateField">State *</label><input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1"></div>
+      </div>
+      <div class="rp-lead-field"><label for="rpPostalCode">ZIP Code *</label><input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73503" autocomplete="postal-code"></div>
+      <div class="rp-lead-field"><label for="rpSpecialInstructions">Access Notes / Special Instructions</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, move-out deadline, inspection date, carpet notes, priority areas, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
+      <div class="rp-error" id="rpFormError">Please enter your name, phone, valid email, service address, city, state, and ZIP before booking.</div>
+      <div class="rp-btns">
+        <button type="button" class="rp-secondary" onclick="rpSaveContactFields(); rpBack()">Back</button>
+        <button id="rpReserveBtn" type="button" class="rp-primary" onclick="rpSubmitLead()">Save Estimate & Choose Appointment</button>
+      </div>
+    </div>
+    <p class="rp-fineprint">By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. The calendar unlocks after the required details are saved.</p>
+  `;
+}
+function rpSaveContactFields(){
+  const fields = [["rpFullName","fullName"],["rpPhone","phone"],["rpEmail","email"],["rpAddress1","address1"],["rpCity","city"],["rpStateField","state"],["rpPostalCode","postalCode"],["rpSpecialInstructions","specialInstructions"]];
+  fields.forEach(([id,key]) => {
+    const el = document.getElementById(id);
+    if(el) rpState[key] = key === "state" ? el.value.trim().toUpperCase() : el.value.trim();
+  });
+}
+function rpFullAddress(){
+  const address1 = rpState.address1.trim();
+  const city = rpState.city.trim();
+  const state = rpState.state.trim().toUpperCase();
+  const postal = rpState.postalCode.trim();
+  return [address1, [city,state,postal].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+}
+function rpGetEstimatePayload(){
+  const service = rpSelectedService();
+  const total = rpCalculatePrice();
+  const addons = rpSelectedAddonsText();
+  const fullAddress = rpFullAddress();
+  const notes = rpState.specialInstructions.trim() || "None";
+  const payload = {
+    source: "PCS Cleaning Fort Sill Landing Page",
+    business: "Red Prairie Cleaning",
+    full_name: rpState.fullName,
+    phone: rpState.phone,
+    email: rpState.email,
+    address1: rpState.address1,
+    street_address: rpState.address1,
+    address: rpState.address1,
+    city: rpState.city,
+    state: rpState.state,
+    postal_code: rpState.postalCode,
+    zip: rpState.postalCode,
+    full_address: fullAddress,
+    service: service ? service.name : "",
+    service_type: service ? service.name : "",
+    service_key: rpState.service,
+    city_page: "Fort Sill",
+    estimated_price: `$${total}`,
+    estimated_price_number: total,
+    price_estimate: `$${total}`,
+    bedrooms: rpHomeService() ? String(rpState.bedrooms) : "N/A",
+    bathrooms: rpHomeService() ? String(rpState.bathrooms) : "N/A",
+    condition: rpHomeService() ? rpState.condition : "N/A",
+    addons: addons,
+    addon_count: rpState.addons.length,
+    carpet_with_moveout: rpState.addons.some(a => a.name.toLowerCase().includes("carpet")) ? "Yes" : "No",
+    carpet_rooms: (rpState.service === "carpet" || rpState.addons.some(a => a.type === "per_room")) ? String(Math.max(1, rpState.carpetRooms || 1)) : "N/A",
+    furniture_item: rpState.service === "upholstery" ? rpState.furnitureItem : "N/A",
+    special_instructions: notes,
+    customer_notes: notes,
+    submitted_at: new Date().toISOString(),
+    page_url: window.location.href
+  };
+  const jobDetails = [
     `Service: ${payload.service_type}`,
     `Estimate: ${payload.estimated_price}`,
     `Bedrooms: ${payload.bedrooms}`,
     `Bathrooms: ${payload.bathrooms}`,
     `Condition: ${payload.condition}`,
     `Add-ons: ${payload.addons}`,
-    `Carpet with move-out: ${payload.carpet_with_pcs_cleaning}`,
     `Carpet rooms: ${payload.carpet_rooms}`,
-    `Furniture item: N/A`,
+    `Furniture item: ${payload.furniture_item}`,
     `Address: ${payload.full_address || "N/A"}`,
     `Special instructions: ${payload.special_instructions || "None"}`
   ].join(" | ");
-}
-
-function rpGetEstimatePayload() {
-  const total = rpCalculatePrice();
-  const addonNames = rpState.addons.map(a => a.name);
-  const address1 = rpState.address1.trim();
-  const city = rpState.city.trim();
-  const state = rpState.state.trim().toUpperCase();
-  const postalCode = rpState.postalCode.trim();
-  const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-  const payload = {
-    source: "Red Prairie PCS Cleaning Landing Page",
-    business: "Red Prairie Cleaning",
-    full_name: rpState.fullName.trim(),
-    phone: rpState.phone.trim(),
-    email: rpState.email.trim(),
-    address1: address1,
-    street_address: address1,
-    address: address1,
-    city: city,
-    state: state,
-    postal_code: postalCode,
-    zip: postalCode,
-    full_address: fullAddress,
-    service: "PCS Move-Out Cleaning",
-    service_type: "PCS Move-Out Cleaning",
-    service_key: "pcs_cleaning",
-    city_page: "Fort Sill",
-    estimated_price: `$${total}`,
-    estimated_price_number: total,
-    price_estimate: `$${total}`,
-    bedrooms: String(rpState.bedrooms),
-    bathrooms: String(rpState.bathrooms),
-    condition: rpState.condition,
-    carpet_with_pcs_cleaning: rpState.carpetWithMoveout ? "Yes" : "No",
-    carpet_rooms: rpState.carpetWithMoveout ? String(rpState.carpetRooms) : "N/A",
-    addons: addonNames.length ? addonNames.join(", ") : "None",
-    addon_count: addonNames.length,
-    furniture_item: "N/A",
-    special_instructions: rpState.specialInstructions.trim() || "None",
-    customer_notes: rpState.specialInstructions.trim() || "None",
-    submitted_at: new Date().toISOString(),
-    page_url: window.location.href
-  };
-  const jobDetails = rpBuildJobDetails(payload);
   payload.estimate_notes = jobDetails;
   payload.job_details = jobDetails;
   payload.cleaner_notes = jobDetails;
   return payload;
 }
-
-function rpSendEstimateToGoHighLevel() {
+function rpSendEstimateToGoHighLevel(){
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_WEBHOOK_URL);
   Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
   const img = new Image();
   img.src = url.toString();
   rpState.estimateSent = true;
-  return true;
 }
-
-function rpBuildCalendarUrl() {
+function rpBuildCalendarUrl(){
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_BOOKING_CALENDAR_URL);
-  [
-    "full_name", "phone", "email", "address1", "street_address", "address", "city", "state", "postal_code", "zip",
-    "full_address", "service", "service_type", "service_key", "city_page", "estimated_price", "estimated_price_number",
-    "price_estimate", "bedrooms", "bathrooms", "condition", "addons", "addon_count", "carpet_with_pcs_cleaning", "carpet_rooms",
-    "special_instructions", "customer_notes", "estimate_notes", "job_details", "cleaner_notes", "source", "business", "page_url"
-  ].forEach(key => {
-    if (payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
+  Object.keys(payload).forEach(key => {
+    if(payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
   });
   return url.toString();
 }
-
-function rpGoContactStep() {
-  rpState.step = 2;
-  rpRenderContactStep();
-  rpScrollToCalculator();
-}
-
-function rpSubmitLead() {
-  const fullName = document.getElementById("rpFullName").value.trim();
-  const phone = document.getElementById("rpPhone").value.trim();
-  const email = document.getElementById("rpEmail").value.trim();
-  const address1 = document.getElementById("rpAddress1").value.trim();
-  const city = document.getElementById("rpCity").value.trim();
-  const state = document.getElementById("rpStateField").value.trim().toUpperCase();
-  const postalCode = document.getElementById("rpPostalCode").value.trim();
-  const specialInstructions = document.getElementById("rpSpecialInstructions").value.trim();
+function rpSubmitLead(){
+  rpSaveContactFields();
   const errorBox = document.getElementById("rpFormError");
-  const emailLooksValid = email.includes("@") && email.includes(".");
-  const stateLooksValid = /^[A-Z]{2}$/.test(state);
-
-  if (!fullName || !phone || !emailLooksValid || !address1 || !city || !stateLooksValid || !postalCode) {
-    errorBox.style.display = "block";
+  const emailLooksValid = rpState.email.includes("@") && rpState.email.includes(".");
+  const stateLooksValid = /^[A-Z]{2}$/.test(rpState.state);
+  if(!rpState.fullName || !rpState.phone || !emailLooksValid || !rpState.address1 || !rpState.city || !stateLooksValid || !rpState.postalCode){
+    if(errorBox) errorBox.style.display = "block";
     return;
   }
-
-  rpState.fullName = fullName;
-  rpState.phone = phone;
-  rpState.email = email;
-  rpState.address1 = address1;
-  rpState.city = city;
-  rpState.state = state;
-  rpState.postalCode = postalCode;
-  rpState.specialInstructions = specialInstructions;
-
   const button = document.getElementById("rpReserveBtn");
-  if (button) {
+  if(button){
     button.disabled = true;
     button.innerText = "Saving estimate...";
   }
-
   rpSendEstimateToGoHighLevel();
-  rpState.step = 3;
-  rpRenderCalendarStep();
-  rpScrollToCalculator();
+  rpGo("calendar");
 }
-
-function rpRenderEstimateStep() {
-  rpState.step = 1;
-  const app = document.getElementById("rpApp");
+function rpCalendarHtml(){
+  const service = rpSelectedService();
   const total = rpCalculatePrice();
-  const addonNames = rpState.addons.map(a => a.name);
-
-  app.innerHTML = `
-    ${rpStepBar()}
-    <h1>PCS Cleaning Estimate</h1>
+  const fullAddress = rpFullAddress();
+  return `
+    ${rpHeaderHtml("Your estimate has been saved. Choose an available appointment below.")}
+    <h1>Choose Your Appointment</h1>
     <p class="rp-sub">
-      Build a starting PCS cleaning estimate first. Then add your contact information and service address before choosing an appointment.
+      Estimated ${service.shortName.toLowerCase()} total: <strong>$${total}</strong><br>
+      Address saved: <strong>${fullAddress}</strong>
     </p>
-
-    <h3>How many bedrooms?</h3>
-    <div class="rp-pill-grid">
-      ${[1,2,3,4,5].map(n => `
-        <button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" onclick="rpSetBedrooms(${n})">
-          ${n}${n === 5 ? "+" : ""}
-        </button>
-      `).join("")}
-    </div>
-
-    <h3>How many bathrooms?</h3>
-    <div class="rp-pill-grid">
-      ${[1,2,3,4,5].map(n => `
-        <button type="button" class="rp-pill ${rpState.bathrooms === n ? "is-selected" : ""}" onclick="rpSetBathrooms(${n})">
-          ${n}${n === 5 ? "+" : ""}
-        </button>
-      `).join("")}
-    </div>
-
-    <h3>Home condition</h3>
-    <div class="rp-grid">
-      ${["Well maintained", "Average", "Heavy buildup"].map(condition => `
-        <button type="button" class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
-          <strong>${condition}</strong>
-          <span>${
-            condition === "Well maintained" ? "Mostly empty, maintained, and ready for a final detail."
-            : condition === "Average" ? "Normal move-out condition with typical dust, grime, and use."
-            : "Heavy buildup, excessive grime, pet hair, or neglected areas."
-          }</span>
-        </button>
-      `).join("")}
-    </div>
-
-    <details class="rp-included" open>
-      <summary class="rp-included-title">Included with PCS Move-Out Cleaning</summary>
-      <div class="rp-checklist">
-        <div>✓ Bathrooms cleaned and sanitized</div>
-        <div>✓ Kitchen detailed</div>
-        <div>✓ Inside oven</div>
-        <div>✓ Inside refrigerator</div>
-        <div>✓ Inside microwave</div>
-        <div>✓ Cabinets and drawers wiped inside</div>
-        <div>✓ Baseboards</div>
-        <div>✓ Interior windows</div>
-        <div>✓ Floors vacuumed and mopped</div>
-        <div>✓ High-touch surfaces</div>
-      </div>
-    </details>
-
-    <h3>Add professional carpet cleaning?</h3>
-    <div class="rp-grid">
-      <button type="button" class="rp-option ${!rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(false)">
-        <strong>No carpet cleaning</strong>
-        <span>PCS move-out cleaning only.</span>
-      </button>
-      <button type="button" class="rp-option ${rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(true)">
-        <strong>Yes, add carpet cleaning</strong>
-        <span>Professional hot water extraction with Mytee equipment.</span>
-      </button>
-    </div>
-
-    ${rpState.carpetWithMoveout ? `
-      <h3>How many carpeted rooms?</h3>
-      <div class="rp-pill-grid">
-        ${[1,2,3,4,5].map(n => `
-          <button type="button" class="rp-pill ${rpState.carpetRooms === n ? "is-selected" : ""}" onclick="rpSetCarpetRooms(${n})">
-            ${n}${n === 5 ? "+" : ""}
-          </button>
-        `).join("")}
-      </div>
-    ` : ""}
-
-    <details class="rp-included">
-      <summary class="rp-included-title">Optional Add-ons</summary>
-      ${rpAddonsHtml()}
-    </details>
-
-    <div class="rp-invoice">
-      <div class="rp-row"><span>Service</span><strong>PCS Move-Out Cleaning</strong></div>
-      <div class="rp-row"><span>Location Page</span><strong>Fort Sill Area</strong></div>
-      <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
-      <div class="rp-row"><span>Carpet cleaning</span><strong>${rpState.carpetWithMoveout ? "Included in estimate" : "No"}</strong></div>
-      <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
-      <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
-    </div>
-
-    <div class="rp-notice">
-      <strong>Starting Estimate</strong>
-      Final pricing can change for severe buildup, heavy pet hair, unusual conditions, limited access, long travel, stairs, or specialty requests.
-    </div>
-
-    <div class="rp-btns">
-      <button type="button" class="rp-primary" onclick="rpGoContactStep()">Continue To Contact & Address</button>
-      <a class="rp-secondary" href="sms:5802150915">Text Us Instead</a>
-    </div>
-  `;
-}
-
-function rpRenderContactStep() {
-  rpState.step = 2;
-  const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
-
-  app.innerHTML = `
-    ${rpStepBar()}
-    <h2>Save Your Estimate</h2>
-    <p class="rp-sub">
-      Estimated PCS cleaning total: <strong>$${total}</strong>. Enter your contact information and service address before choosing an appointment.
-    </p>
-
-    <div class="rp-lead-form">
-      <div class="rp-lead-field">
-        <label for="rpFullName">Full Name *</label>
-        <input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpPhone">Phone *</label>
-        <input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpEmail">Email *</label>
-        <input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="john@email.com" autocomplete="email">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpAddress1">Street Address / Unit *</label>
-        <input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1">
-      </div>
-
-      <div class="rp-grid">
-        <div class="rp-lead-field">
-          <label for="rpCity">City *</label>
-          <input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Fort Sill" autocomplete="address-level2">
-        </div>
-        <div class="rp-lead-field">
-          <label for="rpStateField">State *</label>
-          <input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1">
-        </div>
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpPostalCode">ZIP Code *</label>
-        <input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73527" autocomplete="postal-code">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpSpecialInstructions">Access Notes / Move-Out Deadline / Special Instructions</label>
-        <textarea id="rpSpecialInstructions" placeholder="Gate code, lockbox, inspection date, pet hair, carpet notes, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea>
-      </div>
-
-      <div class="rp-error" id="rpFormError">
-        Please enter your name, phone, valid email, street address/unit, city, state, and ZIP before booking.
-      </div>
-
-      <div class="rp-btns">
-        <button type="button" class="rp-secondary" onclick="rpRenderEstimateStep(); rpScrollToCalculator();">Back To Estimate</button>
-        <button id="rpReserveBtn" type="button" class="rp-primary" onclick="rpSubmitLead()">Save Estimate & Choose Appointment</button>
-      </div>
-    </div>
-
-    <p class="rp-fineprint">
-      By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. The calendar unlocks after required details are saved.
-    </p>
-  `;
-}
-
-function rpRenderCalendarStep() {
-  rpState.step = 3;
-  const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
-  const fullAddress = [rpState.address1, [rpState.city, rpState.state, rpState.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-
-  app.innerHTML = `
-    ${rpStepBar()}
-    <h2>Reserve Your PCS Cleaning</h2>
-    <p class="rp-sub">
-      Your estimate has been saved. Estimated PCS cleaning total: <strong>$${total}</strong>.<br>
-      Address saved: <strong>${fullAddress}</strong><br>
-      Choose an available time below.
-    </p>
-
     <div class="rp-booking-widget">
-      <iframe
-        src="${rpBuildCalendarUrl()}"
-        style="width:100%;border:none;overflow:hidden;"
-        scrolling="no"
-        id="1VXLRmyHfLdsHa4rTKJ2_fort_sill"
-        title="Red Prairie Cleaning Booking Calendar">
-      </iframe>
+      <iframe src="${rpBuildCalendarUrl()}" style="width:100%;border:none;overflow:hidden;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_fort sill" title="Red Prairie Cleaning Booking Calendar"></iframe>
     </div>
-
     <div class="rp-btns">
-      <button type="button" class="rp-secondary" onclick="rpRenderContactStep(); rpScrollToCalculator();">Back To Contact</button>
+      <button type="button" class="rp-secondary" onclick="rpGo('contact')">Back To Contact</button>
       <a class="rp-primary" href="sms:5802150915">Text Us</a>
     </div>
   `;
-
-  rpLoadCalendarScript();
 }
-
-function rpLoadCalendarScript() {
-  if (document.getElementById("ghl-calendar-script")) return;
+function rpRender(){
+  const app = document.getElementById("rpApp");
+  if(!app) return;
+  if(rpState.stage === "service") app.innerHTML = rpServiceChoiceHtml();
+  if(rpState.stage === "bedrooms") app.innerHTML = rpBedroomsHtml();
+  if(rpState.stage === "bathrooms") app.innerHTML = rpBathroomsHtml();
+  if(rpState.stage === "condition") app.innerHTML = rpConditionHtml();
+  if(rpState.stage === "carpetRooms") app.innerHTML = rpCarpetRoomsHtml();
+  if(rpState.stage === "upholsteryItem") app.innerHTML = rpUpholsteryHtml();
+  if(rpState.stage === "addons") app.innerHTML = rpAddonsHtml();
+  if(rpState.stage === "contact") app.innerHTML = rpContactHtml();
+  if(rpState.stage === "calendar"){
+    app.innerHTML = rpCalendarHtml();
+    rpLoadCalendarScript();
+  }
+}
+function rpLoadCalendarScript(){
+  if(document.getElementById("ghl-calendar-script")) return;
   const script = document.createElement("script");
   script.src = "https://link.msgsndr.com/js/form_embed.js";
   script.type = "text/javascript";
   script.id = "ghl-calendar-script";
   document.body.appendChild(script);
 }
-
-function rpScrollToCalculator(instant = false) {
+function rpScrollToCalculator(instant=false){
   const card = document.querySelector(".rp-card");
-  if (!card) return;
+  if(!card) return;
   const nav = document.querySelector(".navbar");
   const navHeight = nav ? nav.offsetHeight : 70;
   const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-  window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" });
+  window.scrollTo({top:Math.max(0,y), behavior:instant ? "auto" : "smooth"});
 }
-
-function rpScrollAfterRender() {
-  return;
+function rpScrollAfterRender(){
+  window.requestAnimationFrame(() => window.requestAnimationFrame(() => rpScrollToCalculator()));
 }
-
-document.addEventListener("click", function(e) {
+document.addEventListener("click", function(e){
   const link = e.target.closest('a[href="#booking"]');
-  if (!link) return;
+  if(!link) return;
   e.preventDefault();
   const booking = document.getElementById("booking");
-  if (booking) {
-    booking.scrollIntoView({ behavior:"smooth", block:"start" });
+  if(booking){
+    booking.scrollIntoView({behavior:"smooth", block:"start"});
     setTimeout(() => rpScrollToCalculator(), 250);
   }
 });
-
-rpRenderEstimateStep();
+rpRender();
 </script>
 
-<script
-  src="https://widgets.leadconnectorhq.com/loader.js"
-  data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
-  data-widget-id="6a25f071ed0ee22f923d8835"
-  data-source="WEB_USER">
+
+<script>
+(function loadLeadConnectorChatDesktopOnly(){
+  if (!window.matchMedia || !window.matchMedia("(min-width: 769px)").matches) return;
+  var script = document.createElement("script");
+  script.src = "https://widgets.leadconnectorhq.com/loader.js";
+  script.setAttribute("data-resources-url", "https://widgets.leadconnectorhq.com/chat-widget/loader.js");
+  script.setAttribute("data-widget-id", "6a25f071ed0ee22f923d8835");
+  script.setAttribute("data-source", "WEB_USER");
+  document.body.appendChild(script);
+})();
 </script>
 
 </body>
