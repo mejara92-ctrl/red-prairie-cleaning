@@ -1743,7 +1743,7 @@ function gtag_report_conversion(url) {
     <div class="footer-logo"><img src="images/logo/logo-white.png" alt="Red Prairie Cleaning Logo"></div>
     <div class="footer-content">
         <div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, deep cleaning, carpet cleaning, and upholstery cleaning across Southwest Oklahoma.</p></div>
-        <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li><a href="tel:5802150915" style="color:#ccc;">Call: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin</li></ul></div>
+        <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin</li></ul></div>
         <div><h3>Services</h3><ul><li>Factory Reset™ Move-Out Cleaning</li><li>Deep Cleaning</li><li>Steam Carpet Cleaning</li><li>Upholstery Cleaning</li></ul></div>
     </div>
     <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div>
@@ -1825,11 +1825,13 @@ function rpPriceLabel() {
 }
 
 function rpLivePrice(note = "Choose a service to begin.") {
+  const total = rpCalculatePrice();
+  const displayNote = total ? `✓ Nice — ${note}` : note;
   return `
     <div class="rp-live-price">
       <small>Current Estimate</small>
       <strong>${rpPriceLabel()}</strong>
-      <span>${note}</span>
+      <span>${displayNote}</span>
     </div>
   `;
 }
@@ -1955,8 +1957,8 @@ function rpRenderEstimateStep() {
   const total = rpCalculatePrice();
   const service = rpServices[rpState.service];
   app.innerHTML = `
-    ${rpLivePrice("Ready to reserve your appointment.")}
-    <h2>Your Estimate</h2>
+    ${rpLivePrice("looks good. You can reserve your cleaning next.")}
+    <h2>Estimated Price</h2>
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
@@ -1969,7 +1971,7 @@ function rpRenderEstimateStep() {
     <div class="rp-notice">Final price may change for severe mess, heavy trash, unusual access issues, biohazard conditions, or work beyond scope.</div>
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Edit</button>
-      <button class="rp-primary" onclick="rpGoToLead()">Reserve Online</button>
+      <button class="rp-primary" onclick="rpGoToLead()">Continue To Contact & Time</button>
     </div>
     <p class="rp-fineprint">Prefer texting? Tap Text Us and send a screenshot of this estimate.</p>
   `;
@@ -1978,9 +1980,9 @@ function rpRenderEstimateStep() {
 function rpRenderLeadStep() {
   const app = document.getElementById("rpApp");
   app.innerHTML = `
-    ${rpLivePrice("Next: choose your appointment time.")}
-    <h2>Save Your Estimate</h2>
-    <p class="rp-sub">Enter your details, then choose your appointment time.</p>
+    ${rpLivePrice("then choose your appointment time.")}
+    <h2>Almost Done</h2>
+    <p class="rp-sub">Enter your details so your booking has the right contact and property information. Then choose your appointment time.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" value="${rpState.fullName}" placeholder="Your full name"></div>
       <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" value="${rpState.phone}" placeholder="(580) 000-0000"></div>
@@ -2002,9 +2004,9 @@ function rpRenderLeadStep() {
 function rpRenderCalendarStep() {
   const app = document.getElementById("rpApp");
   app.innerHTML = `
-    ${rpLivePrice("Now choose your appointment time.")}
-    <h2>Reserve Your Cleaning</h2>
-    <p class="rp-sub">Choose your preferred date and time below. No confirmation text is sent from this estimator step. Confirmation should only send after the calendar booking is completed.</p>
+    ${rpLivePrice("choose your appointment time below.")}
+    <h2>Reserve Your Cleaning Time</h2>
+    <p class="rp-sub">Choose your preferred date and time below. Your confirmation should only send after this calendar booking is completed.</p>
     <div class="rp-booking-widget">
       <iframe src="https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2" style="width:100%; border:none; overflow:hidden;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_1781361516868"></iframe>
     </div>
