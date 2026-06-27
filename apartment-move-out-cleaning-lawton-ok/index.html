@@ -1452,6 +1452,10 @@ footer li, footer p {
       "image": "https://redprairiecleaning.com/images/logo/logo-color.png",
       "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
       "priceRange": "$$",
+      "memberOf": {
+        "@type": "Organization",
+        "name": "Lawton Fort Sill Chamber of Commerce"
+      },
       "areaServed": [
         { "@type": "City", "name": "Lawton" },
         { "@type": "Place", "name": "Fort Sill" },
@@ -1623,41 +1627,27 @@ footer li, footer p {
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
     <h3>28+</h3>
-    <p>5-Star Reviews</p>
+    <p>5-Star Google Reviews</p>
+  </div>
+
+  <div class="trust-card">
+    <i class="fa-solid fa-building"></i>
+    <h3>Chamber Member</h3>
+    <p>Lawton Fort Sill Chamber</p>
   </div>
 
   <div class="trust-card">
     <i class="fa-solid fa-key"></i>
-    <h3>Key Turnover</h3>
-    <p>Move-Out Cleaning</p>
+    <h3>Key Handoff</h3>
+    <p>Apartment Move-Out Cleaning</p>
   </div>
 
   <div class="trust-card">
-    <i class="fa-solid fa-calendar-check"></i>
-    <h3>Online Booking</h3>
-    <p>Estimate & Schedule Online</p>
-  </div>
-
-  <div class="trust-card">
-    <i class="fa-solid fa-location-dot"></i>
-    <h3>Lawton Area</h3>
-    <p>Lawton, Fort Sill, Elgin & Cache</p>
+    <i class="fa-solid fa-shield-halved"></i>
+    <h3>Deposit Defense</h3>
+    <p>Inspection-Ready Detail</p>
   </div>
 </section>
-
-<section class="chamber-trust" aria-label="Local business trust">
-  <div class="chamber-trust-card">
-    <i class="fa-solid fa-handshake"></i>
-    <div>
-      <h2>Lawton Fort Sill Chamber of Commerce Member</h2>
-      <p>
-        Red Prairie Cleaning is a local Southwest Oklahoma cleaning company serving Lawton,
-        Fort Sill, Elgin, Cache, Medicine Park, Fletcher, and nearby communities.
-      </p>
-    </div>
-  </div>
-</section>
-
 
 <section class="rp-funnel" id="booking">
   <div class="rp-funnel-wrap">
@@ -2141,28 +2131,28 @@ function rpRender() {
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
           <strong>🚚 Factory Reset™ Move-Out Cleaning</strong>
-          <span>Flat pricing: 1bd $199 · 2bd $299 · 3bd $399 · 4bd $499</span>
+          <span>Starting at $199</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('movein')">
           <span class="badge">Second Most Popular</span>
           <strong>🔑 Factory Reset™ Move-In Cleaning</strong>
-          <span>Same clear pricing as move-out: 1bd $199 · 2bd $299 · 3bd $399 · 4bd $499</span>
+          <span>Starting at $199</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('carpet')">
           <strong>🧼 Steam Carpet Cleaning</strong>
-          <span>$75 per carpeted room.</span>
+          <span>$75 per room</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('upholstery')">
           <strong>🛋️ Professional Upholstery Cleaning</strong>
-          <span>Fabric cleaning from $100. Sectionals from $250.</span>
+          <span>Starting at $100</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('deep')">
           <strong>✨ Deep Cleaning</strong>
-          <span>Starting at $249. Add carpet cleaning or exterior windows if needed.</span>
+          <span>Starting at $249</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('maintenance')">
           <strong>🏠 Maintenance Cleaning</strong>
-          <span>Starting at $149 for maintained homes.</span>
+          <span>Starting at $149</span>
         </button>
       </div>
     `;
@@ -2185,7 +2175,7 @@ function rpRender() {
 
   if (rpState.step === 2 && rpState.service === "carpet") {
     app.innerHTML = `
-      ${rpLivePrice("$75 per carpeted room.")}
+      ${rpLivePrice("$75 per room")}
       <h2>How many carpeted rooms?</h2>
       <div class="rp-pill-grid">
         ${[1,2,3,4,5,6].map(n => `<button class="rp-pill" onclick="rpSelectCarpetOnlyRooms(${n})">${n}${n === 6 ? "+" : ""}<br><small>$${n*75}${n === 6 ? "+" : ""}</small></button>`).join("")}
