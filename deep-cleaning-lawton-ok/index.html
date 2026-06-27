@@ -1120,12 +1120,77 @@ footer li, footer p {
 .rp-checkbox-card span span { display:block; color:#555; font-size:12px; }
 .rp-price-chip { background:#fff0f0; color:var(--red); border:1px solid #f0caca; border-radius:999px; padding:6px 10px; font-weight:900; white-space:nowrap; font-size:13px; }
 .rp-card { max-width:760px; margin-left:auto; margin-right:auto; }
-.chamber-trust { background:#fff; padding:34px 18px; }
-.chamber-trust-card { max-width:980px; margin:0 auto; display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:center; background:#fff5f5; border:1px solid #f0caca; border-radius:22px; padding:20px; box-shadow:0 12px 28px rgba(208,0,0,.08); }
-.chamber-trust-card i { color:var(--red); font-size:30px; }
-.chamber-trust-card h2 { text-align:left; font-size:clamp(20px,5vw,28px); margin:0 0 6px; }
-.chamber-trust-card p { color:#555; margin:0; font-size:14px; line-height:1.55; }
-@media (max-width:699px){ .chamber-trust{padding:26px 18px;} .chamber-trust-card{grid-template-columns:1fr;text-align:center;} .chamber-trust-card h2{text-align:center;} }
+/* === Red Prairie homepage-standard repair ===
+   Keeps the dark feature band clean, keeps Chamber inside the trust bar only,
+   hides the LeadConnector chat widget on mobile, and preserves the booking calendar. */
+
+.rp-feature-section {
+  background:#111 !important;
+  color:#fff !important;
+  padding:58px 18px !important;
+}
+
+.rp-feature-section h2 {
+  color:#fff !important;
+  text-align:left !important;
+}
+
+.rp-feature-section p {
+  color:#e5e5e5 !important;
+}
+
+.rp-feature-list,
+.rp-feature-list div {
+  color:#fff !important;
+}
+
+.rp-package-card {
+  background:#fff !important;
+  color:var(--text) !important;
+}
+
+.rp-package-card h3,
+.rp-package-card p,
+.rp-package-card li {
+  color:var(--text) !important;
+}
+
+/* Service choice cards: no extra tagline under each option */
+#rpApp .rp-option > strong + span {
+  display:none !important;
+}
+
+/* Mobile: hide chat-specific LeadConnector UI only.
+   Do not hide the GHL booking calendar iframe. */
+@media (max-width:768px) {
+  iframe[title*="chat" i],
+  iframe[id*="chat" i],
+  iframe[class*="chat" i],
+  div[id*="chat-widget" i],
+  div[class*="chat-widget" i],
+  div[id*="chat-widget-container" i],
+  div[class*="chat-widget-container" i],
+  div[class*="lc-widget" i],
+  div[class*="lc_chat" i],
+  div[class*="leadconnector" i] {
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+
+  .rp-booking-widget,
+  .rp-booking-widget iframe,
+  iframe[src*="/widget/booking/" i],
+  iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i] {
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    width:100% !important;
+    min-height:760px !important;
+  }
+}
 
 </style>
 
@@ -1576,18 +1641,6 @@ footer li, footer p {
     Also serving nearby Southwest Oklahoma communities depending on schedule, job size, and travel.
   </p>
 </section>
-
-
-<section class="chamber-trust" aria-label="Local business trust signal">
-  <div class="chamber-trust-card">
-    <i class="fa-solid fa-building"></i>
-    <div>
-      <h2>Proud Member of the Lawton Fort Sill Chamber of Commerce</h2>
-      <p>Red Prairie Cleaning is a local Southwest Oklahoma cleaning company serving Lawton, Fort Sill, Elgin, Cache, Medicine Park, and nearby communities with move-out cleaning, move-in cleaning, deep cleaning, carpet cleaning, and upholstery cleaning.</p>
-    </div>
-  </div>
-</section>
-
 <section class="final-cta">
   <h2>Ready For A Cleaner Home?</h2>
   <p>Build your estimate, choose any service you need, and reserve online.</p>
@@ -1906,7 +1959,6 @@ function rpRenderStep1() {
         <button type="button" class="rp-option ${service.featured ? "featured-option" : ""}" onclick="rpSelectService('${key}')">
           ${service.featured ? `<span class="badge">Most Popular</span>` : ""}
           <strong>${service.emoji} ${service.name}</strong>
-          <span>${service.desc}</span>
         </button>`).join("")}
     </div>
   `;
