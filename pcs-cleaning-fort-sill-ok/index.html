@@ -1748,7 +1748,7 @@ const rpServices = {
     shortName: "Move-Out Cleaning",
     emoji: "🚚",
     baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
-    desc: "Starting at $199",
+    desc: "Our signature empty-home reset for keys, inspections, landlord walkthroughs, and property turnovers.",
     featured: "Most Popular",
     includes: ["Kitchen detailed","Bathrooms cleaned","Inside oven","Inside refrigerator","Inside microwave","Cabinets and drawers wiped","Baseboards","Interior windows","Floors vacuumed and mopped","High-touch surfaces"]
   },
@@ -1757,7 +1757,7 @@ const rpServices = {
     shortName: "Move-In Cleaning",
     emoji: "🔑",
     baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
-    desc: "Starting at $199",
+    desc: "Get the home ready before furniture, boxes, kids, pets, and real life move in.",
     featured: "Second Most Popular",
     includes: ["Kitchen detailed","Bathrooms cleaned","Inside appliances","Cabinets and drawers wiped","Baseboards","Interior windows","Floors cleaned","High-touch surfaces"]
   },
@@ -1766,7 +1766,7 @@ const rpServices = {
     shortName: "Carpet Cleaning",
     emoji: "🧼",
     base: 75,
-    desc: "$75 per room",
+    desc: "Hot-water extraction carpet cleaning for bedrooms, living areas, hallways, and move-out requirements.",
     includes: ["Hot-water extraction","Professional pre-spray","Basic spot attention","Professional wand cleaning","Carpet grooming","Fresh finish"]
   },
   upholstery: {
@@ -1774,7 +1774,7 @@ const rpServices = {
     shortName: "Upholstery Cleaning",
     emoji: "🛋️",
     base: 100,
-    desc: "Starting at $100",
+    desc: "Professional fabric furniture cleaning for sofas, recliners, loveseats, dining chairs, and sectionals.",
     includes: ["Fabric pre-spray","Extraction cleaning","Basic spot treatment","Freshened finish"]
   },
   deep: {
@@ -1782,7 +1782,7 @@ const rpServices = {
     shortName: "Deep Cleaning",
     emoji: "✨",
     base: 249,
-    desc: "Starting at $249",
+    desc: "A heavier detail clean for lived-in homes with buildup, grime, dust, and neglected areas.",
     includes: ["Detailed bathrooms","Kitchen detail","Inside oven","Inside microwave","Cabinet fronts","Baseboards","Doors and frames","Floors"]
   },
   maintenance: {
@@ -1790,7 +1790,7 @@ const rpServices = {
     shortName: "Maintenance Cleaning",
     emoji: "🏠",
     base: 149,
-    desc: "Starting at $149",
+    desc: "Routine upkeep for homes that are already in decent shape and need consistent cleaning.",
     includes: ["Kitchen wipe-down","Bathrooms","Dusting","Floors","General tidy-up","High-touch surfaces"]
   }
 };
@@ -1869,7 +1869,7 @@ function rpEscapeAttr(value){
   return String(value || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 function rpEscapeJs(value){
-  return String(value || "").replace(/\/g,"\\").replace(/'/g,"\'");
+  return String(value || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 }
 function rpSelectedService(){ return rpState.service ? rpServices[rpState.service] : null; }
 function rpHomeService(){ return ["moveout","movein","deep","maintenance"].includes(rpState.service); }
