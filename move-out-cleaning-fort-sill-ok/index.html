@@ -1128,6 +1128,52 @@ footer li, footer p {
   .rp-map-wrap iframe{min-height:320px;}
 }
 
+
+/* ===== MAIN INDEX STANDARD ESTIMATOR FIX ===== */
+.rp-card{max-width:760px;margin-left:auto;margin-right:auto;}
+.rp-progress-label{display:flex;justify-content:space-between;gap:12px;color:#555;font-size:12px;margin-bottom:9px;}
+.rp-progress-label strong{color:var(--red);}
+.rp-progress{width:100%;height:10px;background:#eee;border-radius:999px;overflow:hidden;margin-bottom:16px;}
+.rp-progress-fill{height:100%;background:linear-gradient(90deg,#b80000,#e00000);transition:width .25s ease;}
+.rp-estimator-kicker{display:inline-flex;align-items:center;justify-content:center;background:#fff0f0;color:var(--red);border:1px solid #f0caca;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:900;margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em;}
+.rp-live-price{background:#101010;color:#fff;border-radius:20px;padding:15px;margin:0 0 12px;box-shadow:0 16px 36px rgba(0,0,0,.18);}
+.rp-live-price small{display:block;color:#ddd;font-weight:900;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.rp-live-price strong{display:block;color:#fff;font-size:clamp(40px,13vw,66px);line-height:.95;letter-spacing:-.05em;}
+.rp-live-price span{display:block;color:#eee;font-size:13.5px;margin-top:9px;}
+.rp-tap-note{font-weight:900;color:var(--red);margin:0 0 10px;font-size:15px;}
+.rp-option{position:relative;padding-right:48px;border:2px solid #ddd;min-height:76px;font-family:'Poppins',sans-serif;}
+.rp-option::after{content:"›";position:absolute;right:17px;top:50%;transform:translateY(-50%);color:var(--red);font-size:34px;font-weight:900;line-height:1;}
+.rp-option.featured-option{border-color:var(--red);background:#fff5f5;box-shadow:0 12px 30px rgba(208,0,0,.10);}
+.rp-option .badge{display:inline-flex;background:var(--red);color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-bottom:6px;}
+.rp-choice-grid{display:grid;gap:10px;margin:14px 0;}
+.rp-checkbox-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fafafa;border:2px solid #ddd;border-radius:16px;padding:14px;cursor:pointer;}
+.rp-checkbox-card input{width:20px;height:20px;accent-color:var(--red);}
+.rp-checkbox-card strong{display:block;font-size:15px;color:#111;}
+.rp-checkbox-card span span{display:block;color:#555;font-size:12px;}
+.rp-price-chip{background:#fff0f0;color:var(--red);border:1px solid #f0caca;border-radius:999px;padding:6px 10px;font-weight:900;white-space:nowrap;font-size:13px;}
+.rp-details{margin-top:14px;}
+.rp-details summary{cursor:pointer;list-style:none;font-weight:900;color:#111;background:#fafafa;border:1px solid #e5e5e5;border-radius:14px;padding:13px 15px;}
+.rp-details summary::-webkit-details-marker{display:none;}
+.rp-details summary::after{content:" +";color:var(--red);font-weight:900;}
+.rp-details[open] summary::after{content:" −";}
+@media(max-width:768px){
+  iframe[title*="chat" i],
+  iframe[id*="chat" i],
+  iframe[class*="chat" i],
+  div[id*="chat-widget" i],
+  div[class*="chat-widget" i],
+  div[id*="chat-widget-container" i],
+  div[class*="chat-widget-container" i]{
+    display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;
+  }
+  .rp-booking-widget,
+  .rp-booking-widget iframe,
+  iframe[src*="/widget/booking/" i],
+  iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i]{
+    display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:100%!important;min-height:760px!important;
+  }
+}
+
 </style>
 
 <script type="application/ld+json">
@@ -1245,8 +1291,8 @@ footer li, footer p {
     <h1>Move-Out Cleaning Near Fort Sill, OK</h1>
 
     <div class="hero-trust">
-      <span><i class="fa-solid fa-star"></i> 24+ Google Reviews</span>
-      <span><i class="fa-solid fa-building"></i> Fort Sill Move-Outs</span>
+      <span><i class="fa-solid fa-star"></i> 28+ Google Reviews</span>
+      <span><i class="fa-solid fa-building"></i> Lawton Fort Sill Chamber Member</span>
       <span><i class="fa-solid fa-receipt"></i> Invoice Available</span>
     </div>
 
@@ -1265,14 +1311,14 @@ footer li, footer p {
 <section class="trust-bar">
   <div class="trust-card">
     <i class="fa-solid fa-star"></i>
-    <h3>24+</h3>
+    <h3>28+</h3>
     <p>5-Star Reviews</p>
   </div>
 
   <div class="trust-card">
-    <i class="fa-solid fa-key"></i>
-    <h3>Move-Out Ready</h3>
-    <p>Move-Out Cleaning</p>
+    <i class="fa-solid fa-building"></i>
+    <h3>Chamber Member</h3>
+    <p>Lawton Fort Sill Chamber</p>
   </div>
 
   <div class="trust-card">
@@ -1505,7 +1551,7 @@ footer li, footer p {
 <section class="reviews" id="reviews">
   <h2>Trusted By Customers Across Southwest Oklahoma</h2>
   <p class="section-text">
-    ⭐⭐⭐⭐⭐ Based on 24+ Google Reviews
+    ⭐⭐⭐⭐⭐ Based on 28+ Google Reviews
   </p>
 
   <div class="review-grid">
@@ -1564,7 +1610,7 @@ footer li, footer p {
   <div class="areas featured-areas">
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fort Sill</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Lawton</h3></div>
-    <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fort Sill</h3></div>
+    <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Cache</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Elgin</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Medicine Park</h3></div>
     <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fletcher</h3></div>
@@ -1642,7 +1688,7 @@ footer li, footer p {
     <div>
       <h3>Service Areas</h3>
       <p>
-        Fort Sill • Lawton • Fort Sill • Elgin<br>
+        Fort Sill • Lawton • Cache • Elgin<br>
         Medicine Park • Fletcher • Southwest Oklahoma
       </p>
     </div>
@@ -1657,14 +1703,118 @@ footer li, footer p {
 const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/86d95f18-b0fa-4520-87a7-629a3f777695";
 const RP_BOOKING_CALENDAR_URL = "https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2";
 
+const rpServices = {
+  moveout: {
+    name: "Factory Reset™ Move-Out Cleaning",
+    shortName: "Move-Out Cleaning",
+    emoji: "🚚",
+    baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Detailed empty-home reset for renters, landlords, PCS moves, and key handoff.",
+    featured: "Most Popular",
+    includes: ["Kitchen detailed","Bathrooms cleaned","Inside oven","Inside refrigerator","Inside microwave","Cabinets and drawers wiped","Baseboards","Interior windows","Floors vacuumed and mopped","High-touch surfaces"]
+  },
+  movein: {
+    name: "Factory Reset™ Move-In Cleaning",
+    shortName: "Move-In Cleaning",
+    emoji: "🔑",
+    baseByBedroom: {1:199,2:299,3:399,4:499,5:599},
+    desc: "Detailed reset before furniture arrives so the home feels clean from day one.",
+    featured: "Second Most Popular",
+    includes: ["Kitchen detailed","Bathrooms cleaned","Inside appliances","Cabinets and drawers wiped","Baseboards","Interior windows","Floors cleaned","High-touch surfaces"]
+  },
+  carpet: {
+    name: "Steam Carpet Cleaning",
+    shortName: "Carpet Cleaning",
+    emoji: "🧼",
+    base: 75,
+    desc: "Professional hot water extraction for bedrooms, living rooms, traffic lanes, and move-outs.",
+    includes: ["Hot-water extraction","Professional pre-spray","Basic spot attention","Professional wand cleaning","Carpet grooming","Fresh finish"]
+  },
+  upholstery: {
+    name: "Professional Upholstery Cleaning",
+    shortName: "Upholstery Cleaning",
+    emoji: "🛋️",
+    base: 100,
+    desc: "Fabric furniture cleaning for couches, sectionals, chairs, and upholstery refreshes.",
+    includes: ["Fabric pre-spray","Extraction cleaning","Basic spot treatment","Freshened finish"]
+  },
+  deep: {
+    name: "Deep Cleaning",
+    shortName: "Deep Cleaning",
+    emoji: "✨",
+    base: 249,
+    desc: "Top-to-bottom clean for lived-in homes, buildup, resets, and one-time detail work.",
+    includes: ["Detailed bathrooms","Kitchen detail","Inside oven","Inside microwave","Cabinet fronts","Baseboards","Doors and frames","Floors"]
+  },
+  maintenance: {
+    name: "Maintenance Cleaning",
+    shortName: "Maintenance Cleaning",
+    emoji: "🏠",
+    base: 149,
+    desc: "General home cleaning for kitchens, bathrooms, dusting, floors, and upkeep.",
+    includes: ["Kitchen wipe-down","Bathrooms","Dusting","Floors","General tidy-up","High-touch surfaces"]
+  }
+};
+
+const rpUpholsteryPrices = {
+  "Dining chair": 100,
+  "Recliner": 125,
+  "Loveseat": 150,
+  "Sofa": 175,
+  "Sectional up to 5 seats": 250,
+  "Large sectional": 325
+};
+
+const rpAddonsByService = {
+  moveout: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Heavy buildup / excessive grime", price:75, description:"Extra time for heavy buildup"},
+    {name:"Extra pet hair removal", price:50, description:"Additional pet hair attention"}
+  ],
+  movein: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Inside refrigerator", price:35, description:"Interior refrigerator detail"},
+    {name:"Extra pet hair removal", price:50, description:"Additional pet hair attention"}
+  ],
+  carpet: [
+    {name:"Pet stain treatment", price:35, description:"Targeted pet spots"},
+    {name:"Deodorizer", price:30, description:"Odor help"},
+    {name:"Heavy traffic lane treatment", price:30, description:"High-use carpet areas"},
+    {name:"Stair cleaning", price:50, description:"Stair carpet cleaning"},
+    {name:"Area rug cleaning", price:40, description:"Basic area rug clean"}
+  ],
+  upholstery: [
+    {name:"Deodorizer", price:20, description:"Odor help"},
+    {name:"Pet hair removal", price:25, description:"Extra pet hair attention"},
+    {name:"Stain treatment", price:25, description:"Basic spot treatment"},
+    {name:"Fabric protector", price:35, description:"Protective treatment"}
+  ],
+  deep: [
+    {name:"Professional carpet cleaning", price:75, type:"per_room", description:"$75 per carpeted room"},
+    {name:"Exterior windows basic wash", price:100, description:"No screen removal"},
+    {name:"Inside refrigerator", price:35, description:"Interior refrigerator detail"},
+    {name:"Heavy pet hair", price:45, description:"Extra pet hair attention"},
+    {name:"Inside cabinets/drawers", price:50, description:"Interior cabinet/drawer wipeout"}
+  ],
+  maintenance: [
+    {name:"Inside oven", price:35, description:"Optional interior appliance cleaning"},
+    {name:"Inside refrigerator", price:35, description:"Optional interior appliance cleaning"},
+    {name:"Interior windows", price:45, description:"Accessible interior glass"},
+    {name:"Baseboard detailing", price:35, description:"Extra detail for baseboards"}
+  ]
+};
+
 const rpState = {
-  step: 1,
+  stage: "service",
+  service: null,
   bedrooms: 2,
   bathrooms: 1,
   condition: "Average",
-  addons: [],
-  carpetWithMoveout: false,
   carpetRooms: 2,
+  furnitureItem: "Sofa",
+  addons: [],
   fullName: "",
   phone: "",
   email: "",
@@ -1676,74 +1826,265 @@ const rpState = {
   estimateSent: false
 };
 
-const rpAddons = [
-  { name: "Wall scuff removal", price: 35 },
-  { name: "Small trash removal", price: 60 },
-  { name: "Heavy buildup / excessive grime", price: 60 },
-  { name: "Window tracks & sills", price: 35 },
-  { name: "Extra pet hair removal", price: 45 }
-];
-
-function rpCalculatePrice() {
-  let total = 299;
-  total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 30;
-  total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 20;
-  if (rpState.condition === "Well maintained") total -= 15;
-  if (rpState.condition === "Heavy buildup") total += 50;
-  if (rpState.carpetWithMoveout) {
-    const rooms = Number(rpState.carpetRooms || 1);
-    if (rooms <= 2) total += 100;
-    else if (rooms <= 4) total += 150;
-    else total += 200;
+function rpEscapeAttr(value){
+  return String(value || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function rpEscapeJs(value){
+  return String(value || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
+function rpSelectedService(){ return rpState.service ? rpServices[rpState.service] : null; }
+function rpHomeService(){ return ["moveout","movein","deep","maintenance"].includes(rpState.service); }
+function rpConditionAdjustment(){
+  if(!rpHomeService()) return 0;
+  if(rpState.condition === "Well maintained") return -15;
+  if(rpState.condition === "Heavy buildup") return 65;
+  return 0;
+}
+function rpAddonPrice(addon){
+  if(addon.type === "per_room") return addon.price * Math.max(1, Number(rpState.carpetRooms || 1));
+  return addon.price;
+}
+function rpCalculatePrice(){
+  const service = rpSelectedService();
+  if(!service) return 0;
+  let total = 0;
+  if(["moveout","movein"].includes(rpState.service)){
+    const beds = Math.min(Number(rpState.bedrooms || 1), 5);
+    total = service.baseByBedroom[beds] || service.baseByBedroom[5];
+    total += Math.max(0, Number(rpState.bathrooms || 1) - 2) * 35;
+    total += rpConditionAdjustment();
+  } else if(["deep","maintenance"].includes(rpState.service)){
+    total = service.base;
+    total += Math.max(0, Number(rpState.bedrooms || 1) - 1) * 35;
+    total += Math.max(0, Number(rpState.bathrooms || 1) - 1) * 25;
+    total += rpConditionAdjustment();
+  } else if(rpState.service === "carpet"){
+    total = service.base * Math.max(1, Number(rpState.carpetRooms || 1));
+  } else if(rpState.service === "upholstery"){
+    total = rpUpholsteryPrices[rpState.furnitureItem] || 175;
   }
-  rpState.addons.forEach(addon => total += addon.price);
-  return Math.max(total, 249);
+  rpState.addons.forEach(addon => total += rpAddonPrice(addon));
+  if(["moveout","movein"].includes(rpState.service)) return Math.max(total, 199);
+  if(rpState.service === "deep") return Math.max(total, 249);
+  if(rpState.service === "maintenance") return Math.max(total, 149);
+  if(rpState.service === "carpet") return Math.max(total, 75);
+  if(rpState.service === "upholstery") return Math.max(total, 100);
+  return total;
 }
-
-function rpEscapeAttr(value) {
-  return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function rpProgress(){
+  const map = {service:20, bedrooms:35, bathrooms:45, condition:55, carpetRooms:45, upholsteryItem:45, addons:70, contact:88, calendar:100};
+  return map[rpState.stage] || 20;
 }
-
-function rpStepBar() {
+function rpHeaderHtml(note){
+  const total = rpCalculatePrice();
+  const service = rpSelectedService();
   return `
-    <div class="rp-stepbar" aria-label="Estimate steps">
-      <div class="rp-step ${rpState.step === 1 ? "is-active" : ""}">1. Estimate</div>
-      <div class="rp-step ${rpState.step === 2 ? "is-active" : ""}">2. Contact & Address</div>
-      <div class="rp-step ${rpState.step === 3 ? "is-active" : ""}">3. Appointment</div>
+    <div class="rp-progress-label">
+      <strong>${rpState.stage === "service" ? "30 second estimate" : "Instant estimate"}</strong>
+      <span>${rpProgress()}% complete</span>
+    </div>
+    <div class="rp-progress"><div class="rp-progress-fill" style="width:${rpProgress()}%"></div></div>
+    <div class="rp-live-price">
+      <small>Current Estimate</small>
+      <strong>$${total}</strong>
+      <span>${note || (service ? service.name : "Choose your service below.")}</span>
     </div>
   `;
 }
-
-function rpToggleAddon(name, price, checked) {
-  if (checked) {
-    if (!rpState.addons.some(a => a.name === name)) rpState.addons.push({ name, price });
+function rpGo(stage){
+  rpState.stage = stage;
+  rpRender();
+  rpScrollAfterRender();
+}
+function rpChooseService(key){
+  rpState.service = key;
+  rpState.addons = [];
+  rpState.carpetRooms = key === "carpet" ? 2 : 0;
+  rpState.furnitureItem = "Sofa";
+  rpState.condition = "Average";
+  if(rpHomeService()) rpGo("bedrooms");
+  else if(key === "carpet") rpGo("carpetRooms");
+  else if(key === "upholstery") rpGo("upholsteryItem");
+}
+function rpBack(){
+  const s = rpState.stage;
+  if(["bedrooms","carpetRooms","upholsteryItem"].includes(s)) return rpGo("service");
+  if(s === "bathrooms") return rpGo("bedrooms");
+  if(s === "condition") return rpGo("bathrooms");
+  if(s === "addons"){
+    if(rpHomeService()) return rpGo("condition");
+    if(rpState.service === "carpet") return rpGo("carpetRooms");
+    if(rpState.service === "upholstery") return rpGo("upholsteryItem");
+  }
+  if(s === "contact") return rpGo("addons");
+  if(s === "calendar") return rpGo("contact");
+  return rpGo("service");
+}
+function rpSetBedrooms(n){ rpState.bedrooms = n; rpGo("bathrooms"); }
+function rpSetBathrooms(n){ rpState.bathrooms = n; rpGo("condition"); }
+function rpSetCondition(condition){ rpState.condition = condition; rpGo("addons"); }
+function rpSetCarpetRooms(n){ rpState.carpetRooms = n; rpGo("addons"); }
+function rpSetFurnitureItem(item){ rpState.furnitureItem = item; rpGo("addons"); }
+function rpToggleAddon(name, price, type, description, checked){
+  if(checked){
+    if(!rpState.addons.some(a => a.name === name)) rpState.addons.push({name, price, type, description});
   } else {
     rpState.addons = rpState.addons.filter(a => a.name !== name);
   }
-  rpRenderEstimateStep();
+  rpRender();
 }
-
-function rpAddonsHtml() {
-  return rpAddons.map(addon => {
-    const checked = rpState.addons.some(a => a.name === addon.name) ? "checked" : "";
-    return `
-      <label class="rp-addon">
-        <span class="rp-addon-left">
-          <input type="checkbox" ${checked} onchange="rpToggleAddon('${addon.name.replace(/'/g, "\\'")}', ${addon.price}, this.checked)">
-          ${addon.name}
-        </span>
-        <span class="rp-price">+$${addon.price}</span>
-      </label>
-    `;
-  }).join("");
+function rpSelectedAddonsText(){
+  return rpState.addons.length ? rpState.addons.map(a => a.name).join(", ") : "None";
 }
-
-function rpSetBedrooms(n) { rpState.bedrooms = n; rpRenderEstimateStep(); }
-function rpSetBathrooms(n) { rpState.bathrooms = n; rpRenderEstimateStep(); }
-function rpSetCondition(condition) { rpState.condition = condition; rpRenderEstimateStep(); }
-function rpToggleCarpet(value) { rpState.carpetWithMoveout = value; rpRenderEstimateStep(); }
-function rpSetCarpetRooms(n) { rpState.carpetRooms = n; rpRenderEstimateStep(); }
-
+function rpServiceDetailsText(){
+  const service = rpSelectedService();
+  if(!service) return "No service selected";
+  if(rpHomeService()) return `${service.shortName} · ${rpState.bedrooms} bed / ${rpState.bathrooms} bath · ${rpState.condition}`;
+  if(rpState.service === "carpet") return `${service.shortName} · ${rpState.carpetRooms} carpeted room${rpState.carpetRooms === 1 ? "" : "s"}`;
+  if(rpState.service === "upholstery") return `${service.shortName} · ${rpState.furnitureItem}`;
+  return service.shortName;
+}
+function rpIncludedHtml(){
+  const service = rpSelectedService();
+  if(!service) return "";
+  return `<details class="rp-details"><summary>What's included with ${service.shortName}</summary><div class="rp-included"><div class="rp-checklist">${service.includes.map(item => `<div>✓ ${item}</div>`).join("")}</div></div></details>`;
+}
+function rpInvoiceHtml(){
+  const service = rpSelectedService();
+  if(!service) return "";
+  const details = [];
+  if(rpHomeService()){
+    details.push(["Bedrooms", `${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}`]);
+    details.push(["Bathrooms", `${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}`]);
+    details.push(["Condition", rpState.condition]);
+  }
+  if(rpState.service === "carpet") details.push(["Carpeted rooms", `${rpState.carpetRooms}${rpState.carpetRooms === 5 ? "+" : ""}`]);
+  if(rpState.service === "upholstery") details.push(["Upholstery item", rpState.furnitureItem]);
+  details.push(["Add-ons", rpSelectedAddonsText()]);
+  return `
+    <div class="rp-invoice">
+      <div class="rp-row"><span>Service</span><strong>${service.name}</strong></div>
+      <div class="rp-row"><span>Details</span><strong>${rpServiceDetailsText()}</strong></div>
+      ${details.map(([label,value]) => `<div class="rp-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+      <div class="rp-total"><span>Total</span><strong>$${rpCalculatePrice()}</strong></div>
+    </div>
+    <div class="rp-notice">This is a starting estimate. Final pricing can change for severe buildup, heavy pet hair, unusual conditions, limited access, long travel, stairs, or specialty requests.</div>
+  `;
+}
+function rpServiceChoiceHtml(){
+  const order = ["moveout","movein","carpet","upholstery","deep","maintenance"];
+  return `
+    ${rpHeaderHtml("Choose your service below.")}
+    <span class="rp-estimator-kicker">Fort Sill Area Estimate</span>
+    <h1>What service do you need?</h1>
+    <p class="rp-tap-note">👇 Tap one option</p>
+    <div class="rp-grid">
+      ${order.map(key => {
+        const service = rpServices[key];
+        return `
+          <button type="button" class="rp-option ${service.featured ? "featured-option" : ""}" onclick="rpChooseService('${key}')">
+            ${service.featured ? `<span class="badge">${service.featured}</span>` : ""}
+            <strong>${service.emoji} ${service.name}</strong>
+            <span>${service.desc}</span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+function rpBedroomHtml(){
+  return `
+    ${rpHeaderHtml("Select the number of bedrooms.")}
+    <h2>How many bedrooms?</h2>
+    <div class="rp-pill-grid">
+      ${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill" onclick="rpSetBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpBathroomHtml(){
+  return `
+    ${rpHeaderHtml("Select the number of bathrooms.")}
+    <h2>How many bathrooms?</h2>
+    <div class="rp-pill-grid">
+      ${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill" onclick="rpSetBathrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpConditionHtml(){
+  return `
+    ${rpHeaderHtml("Select the current condition.")}
+    <h2>What condition is the home in?</h2>
+    <div class="rp-grid">
+      ${["Well maintained","Average","Heavy buildup"].map(condition => `
+        <button type="button" class="rp-option" onclick="rpSetCondition('${condition}')">
+          <strong>${condition}</strong>
+          <span>${
+            condition === "Well maintained" ? "Mostly empty, maintained, and ready for a final detail."
+            : condition === "Average" ? "Normal move-out condition with typical dust, grime, and use."
+            : "Heavy buildup, excessive grime, pet hair, or neglected areas."
+          }</span>
+        </button>
+      `).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpCarpetRoomsHtml(){
+  return `
+    ${rpHeaderHtml("Select how many carpeted rooms need cleaning.")}
+    <h2>How many carpeted rooms?</h2>
+    <p class="rp-sub">Carpet cleaning is priced by carpeted room. Choose 5+ for larger carpet jobs.</p>
+    <div class="rp-pill-grid">
+      ${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill" onclick="rpSetCarpetRooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpUpholsteryHtml(){
+  return `
+    ${rpHeaderHtml("Select the upholstery item you need cleaned.")}
+    <h2>What upholstery item?</h2>
+    <div class="rp-grid">
+      ${Object.entries(rpUpholsteryPrices).map(([item,price]) => `
+        <button type="button" class="rp-option" onclick="rpSetFurnitureItem('${rpEscapeJs(item)}')">
+          <strong>${item}</strong>
+          <span>Starting at $${price}</span>
+        </button>
+      `).join("")}
+    </div>
+    <div class="rp-btns"><button type="button" class="rp-secondary" onclick="rpBack()">Back</button></div>
+  `;
+}
+function rpAddonsHtml(){
+  const service = rpSelectedService();
+  const addons = rpAddonsByService[rpState.service] || [];
+  return `
+    ${rpHeaderHtml("Add optional extras or continue.")}
+    <h2>Any add-ons?</h2>
+    <p class="rp-sub">${service ? service.name : "Your service"} estimate: ${rpServiceDetailsText()}</p>
+    <div class="rp-choice-grid">
+      ${addons.map(addon => {
+        const checked = rpState.addons.some(a => a.name === addon.name) ? "checked" : "";
+        const price = rpAddonPrice(addon);
+        return `
+          <label class="rp-checkbox-card">
+            <input type="checkbox" ${checked} onchange="rpToggleAddon('${rpEscapeJs(addon.name)}', ${addon.price}, '${addon.type || ""}', '${rpEscapeJs(addon.description || "")}', this.checked)">
+            <span><strong>${addon.name}</strong><span>${addon.description || "Optional add-on"}</span></span>
+            <span class="rp-price-chip">+$${price}</span>
+          </label>
+        `;
+      }).join("")}
+    </div>
+    ${rpIncludedHtml()}
+    ${rpInvoiceHtml()}
+    <div class="rp-btns">
+      <button type="button" class="rp-secondary" onclick="rpBack()">Back</button>
+      <button type="button" class="rp-primary" onclick="rpGo('contact')">Continue To Contact & Address</button>
+    </div>
+  `;
+}
 function rpBuildJobDetails(payload) {
   return [
     `Service: ${payload.service_type}`,
@@ -1752,15 +2093,14 @@ function rpBuildJobDetails(payload) {
     `Bathrooms: ${payload.bathrooms}`,
     `Condition: ${payload.condition}`,
     `Add-ons: ${payload.addons}`,
-    `Carpet with move-out: ${payload.carpet_with_moveout}`,
     `Carpet rooms: ${payload.carpet_rooms}`,
-    `Furniture item: N/A`,
+    `Furniture item: ${payload.furniture_item}`,
     `Address: ${payload.full_address || "N/A"}`,
     `Special instructions: ${payload.special_instructions || "None"}`
   ].join(" | ");
 }
-
 function rpGetEstimatePayload() {
+  const service = rpSelectedService();
   const total = rpCalculatePrice();
   const addonNames = rpState.addons.map(a => a.name);
   const address1 = rpState.address1.trim();
@@ -1782,21 +2122,20 @@ function rpGetEstimatePayload() {
     postal_code: postalCode,
     zip: postalCode,
     full_address: fullAddress,
-    service: "Move-Out Cleaning",
-    service_type: "Move-Out Cleaning",
-    service_key: "moveout",
+    service: service ? service.name : "Move-Out Cleaning",
+    service_type: service ? service.name : "Move-Out Cleaning",
+    service_key: rpState.service || "moveout",
     city_page: "Fort Sill",
     estimated_price: `$${total}`,
     estimated_price_number: total,
     price_estimate: `$${total}`,
-    bedrooms: String(rpState.bedrooms),
-    bathrooms: String(rpState.bathrooms),
-    condition: rpState.condition,
-    carpet_with_moveout: rpState.carpetWithMoveout ? "Yes" : "No",
-    carpet_rooms: rpState.carpetWithMoveout ? String(rpState.carpetRooms) : "N/A",
+    bedrooms: rpHomeService() ? String(rpState.bedrooms) : "N/A",
+    bathrooms: rpHomeService() ? String(rpState.bathrooms) : "N/A",
+    condition: rpHomeService() ? rpState.condition : "N/A",
+    carpet_rooms: rpState.service === "carpet" || rpState.addons.some(a => a.type === "per_room") ? String(rpState.carpetRooms) : "N/A",
     addons: addonNames.length ? addonNames.join(", ") : "None",
     addon_count: addonNames.length,
-    furniture_item: "N/A",
+    furniture_item: rpState.service === "upholstery" ? rpState.furnitureItem : "N/A",
     special_instructions: rpState.specialInstructions.trim() || "None",
     customer_notes: rpState.specialInstructions.trim() || "None",
     submitted_at: new Date().toISOString(),
@@ -1808,7 +2147,6 @@ function rpGetEstimatePayload() {
   payload.cleaner_notes = jobDetails;
   return payload;
 }
-
 function rpSendEstimateToGoHighLevel() {
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_WEBHOOK_URL);
@@ -1818,27 +2156,14 @@ function rpSendEstimateToGoHighLevel() {
   rpState.estimateSent = true;
   return true;
 }
-
 function rpBuildCalendarUrl() {
   const payload = rpGetEstimatePayload();
   const url = new URL(RP_BOOKING_CALENDAR_URL);
-  [
-    "full_name", "phone", "email", "address1", "street_address", "address", "city", "state", "postal_code", "zip",
-    "full_address", "service", "service_type", "service_key", "city_page", "estimated_price", "estimated_price_number",
-    "price_estimate", "bedrooms", "bathrooms", "condition", "addons", "addon_count", "carpet_with_moveout", "carpet_rooms",
-    "special_instructions", "customer_notes", "estimate_notes", "job_details", "cleaner_notes", "source", "business", "page_url"
-  ].forEach(key => {
+  Object.keys(payload).forEach(key => {
     if (payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
   });
   return url.toString();
 }
-
-function rpGoContactStep() {
-  rpState.step = 2;
-  rpRenderContactStep();
-  rpScrollToCalculator();
-}
-
 function rpSubmitLead() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
@@ -1851,12 +2176,10 @@ function rpSubmitLead() {
   const errorBox = document.getElementById("rpFormError");
   const emailLooksValid = email.includes("@") && email.includes(".");
   const stateLooksValid = /^[A-Z]{2}$/.test(state);
-
   if (!fullName || !phone || !emailLooksValid || !address1 || !city || !stateLooksValid || !postalCode) {
     errorBox.style.display = "block";
     return;
   }
-
   rpState.fullName = fullName;
   rpState.phone = phone;
   rpState.email = email;
@@ -1865,269 +2188,99 @@ function rpSubmitLead() {
   rpState.state = state;
   rpState.postalCode = postalCode;
   rpState.specialInstructions = specialInstructions;
-
   const button = document.getElementById("rpReserveBtn");
   if (button) {
     button.disabled = true;
     button.innerText = "Saving estimate...";
   }
-
   rpSendEstimateToGoHighLevel();
-  rpState.step = 3;
-  rpRenderCalendarStep();
-  rpScrollToCalculator();
+  rpGo("calendar");
 }
-
-function rpRenderEstimateStep() {
-  rpState.step = 1;
-  const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
-  const addonNames = rpState.addons.map(a => a.name);
-
-  app.innerHTML = `
-    ${rpStepBar()}
-    <h1>Fort Sill Move-Out Cleaning Estimate</h1>
-    <p class="rp-sub">
-      Build a starting estimate first. Then add your contact information and service address before choosing an appointment.
-    </p>
-
-    <h3>How many bedrooms?</h3>
-    <div class="rp-pill-grid">
-      ${[1,2,3,4,5].map(n => `
-        <button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" onclick="rpSetBedrooms(${n})">
-          ${n}${n === 5 ? "+" : ""}
-        </button>
-      `).join("")}
-    </div>
-
-    <h3>How many bathrooms?</h3>
-    <div class="rp-pill-grid">
-      ${[1,2,3,4,5].map(n => `
-        <button type="button" class="rp-pill ${rpState.bathrooms === n ? "is-selected" : ""}" onclick="rpSetBathrooms(${n})">
-          ${n}${n === 5 ? "+" : ""}
-        </button>
-      `).join("")}
-    </div>
-
-    <h3>Home condition</h3>
-    <div class="rp-grid">
-      ${["Well maintained", "Average", "Heavy buildup"].map(condition => `
-        <button type="button" class="rp-option ${rpState.condition === condition ? "is-selected" : ""}" onclick="rpSetCondition('${condition}')">
-          <strong>${condition}</strong>
-          <span>${
-            condition === "Well maintained" ? "Mostly empty, maintained, and ready for a final detail."
-            : condition === "Average" ? "Normal move-out condition with typical dust, grime, and use."
-            : "Heavy buildup, excessive grime, pet hair, or neglected areas."
-          }</span>
-        </button>
-      `).join("")}
-    </div>
-
-    <details class="rp-included" open>
-      <summary class="rp-included-title">Included with Move-Out Cleaning</summary>
-      <div class="rp-checklist">
-        <div>✓ Bathrooms cleaned and sanitized</div>
-        <div>✓ Kitchen detailed</div>
-        <div>✓ Inside oven</div>
-        <div>✓ Inside refrigerator</div>
-        <div>✓ Inside microwave</div>
-        <div>✓ Cabinets and drawers wiped inside</div>
-        <div>✓ Baseboards</div>
-        <div>✓ Interior windows</div>
-        <div>✓ Floors vacuumed and mopped</div>
-        <div>✓ High-touch surfaces</div>
-      </div>
-    </details>
-
-    <h3>Add professional carpet cleaning?</h3>
-    <div class="rp-grid">
-      <button type="button" class="rp-option ${!rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(false)">
-        <strong>No carpet cleaning</strong>
-        <span>Move-out cleaning only.</span>
-      </button>
-      <button type="button" class="rp-option ${rpState.carpetWithMoveout ? "is-selected" : ""}" onclick="rpToggleCarpet(true)">
-        <strong>Yes, add carpet cleaning</strong>
-        <span>Professional hot water extraction with Mytee equipment.</span>
-      </button>
-    </div>
-
-    ${rpState.carpetWithMoveout ? `
-      <h3>How many carpeted rooms?</h3>
-      <div class="rp-pill-grid">
-        ${[1,2,3,4,5].map(n => `
-          <button type="button" class="rp-pill ${rpState.carpetRooms === n ? "is-selected" : ""}" onclick="rpSetCarpetRooms(${n})">
-            ${n}${n === 5 ? "+" : ""}
-          </button>
-        `).join("")}
-      </div>
-    ` : ""}
-
-    <details class="rp-included">
-      <summary class="rp-included-title">Optional Add-ons</summary>
-      ${rpAddonsHtml()}
-    </details>
-
-    <div class="rp-invoice">
-      <div class="rp-row"><span>Service</span><strong>Move-Out Cleaning</strong></div>
-      <div class="rp-row"><span>Location Page</span><strong>Fort Sill Area</strong></div>
-      <div class="rp-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms === 5 ? "+" : ""}</strong></div>
-      <div class="rp-row"><span>Condition</span><strong>${rpState.condition}</strong></div>
-      <div class="rp-row"><span>Carpet cleaning</span><strong>${rpState.carpetWithMoveout ? "Included in estimate" : "No"}</strong></div>
-      <div class="rp-row"><span>Add-ons</span><strong>${addonNames.length ? addonNames.join(", ") : "None"}</strong></div>
-      <div class="rp-total"><span>Estimated Total</span><strong>$${total}</strong></div>
-    </div>
-
-    <div class="rp-notice">
-      <strong>Starting Estimate</strong>
-      Final pricing can change for severe buildup, heavy pet hair, unusual conditions, limited access, long travel, stairs, or specialty requests.
-    </div>
-
-    <div class="rp-btns">
-      <button type="button" class="rp-primary" onclick="rpGoContactStep()">Continue To Contact & Address</button>
-      <a class="rp-secondary" href="sms:5802150915">Text Us Instead</a>
-    </div>
-  `;
-}
-
-function rpRenderContactStep() {
-  rpState.step = 2;
-  const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
-
-  app.innerHTML = `
-    ${rpStepBar()}
+function rpContactHtml(){
+  return `
+    ${rpHeaderHtml("Save your estimate before booking.")}
     <h2>Save Your Estimate</h2>
-    <p class="rp-sub">
-      Estimated move-out cleaning total: <strong>$${total}</strong>. Enter your contact information and service address before choosing an appointment.
-    </p>
-
+    <p class="rp-sub">Estimated total: <strong>$${rpCalculatePrice()}</strong>. Enter your contact information and service address before choosing an appointment.</p>
     <div class="rp-lead-form">
-      <div class="rp-lead-field">
-        <label for="rpFullName">Full Name *</label>
-        <input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpPhone">Phone *</label>
-        <input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpEmail">Email *</label>
-        <input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="john@email.com" autocomplete="email">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpAddress1">Street Address / Unit *</label>
-        <input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1">
-      </div>
-
+      <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" value="${rpEscapeAttr(rpState.fullName)}" placeholder="John Smith" autocomplete="name"></div>
+      <div class="rp-lead-field"><label for="rpPhone">Phone *</label><input id="rpPhone" type="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 555-1234" autocomplete="tel"></div>
+      <div class="rp-lead-field"><label for="rpEmail">Email *</label><input id="rpEmail" type="email" value="${rpEscapeAttr(rpState.email)}" placeholder="john@email.com" autocomplete="email"></div>
+      <div class="rp-lead-field"><label for="rpAddress1">Street Address / Unit *</label><input id="rpAddress1" type="text" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" autocomplete="address-line1"></div>
       <div class="rp-grid">
-        <div class="rp-lead-field">
-          <label for="rpCity">City *</label>
-          <input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Fort Sill" autocomplete="address-level2">
-        </div>
-        <div class="rp-lead-field">
-          <label for="rpStateField">State *</label>
-          <input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1">
-        </div>
+        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" value="${rpEscapeAttr(rpState.city)}" placeholder="Fort Sill" autocomplete="address-level2"></div>
+        <div class="rp-lead-field"><label for="rpStateField">State *</label><input id="rpStateField" type="text" value="${rpEscapeAttr(rpState.state)}" placeholder="OK" maxlength="2" autocomplete="address-level1"></div>
       </div>
-
-      <div class="rp-lead-field">
-        <label for="rpPostalCode">ZIP Code *</label>
-        <input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73527" autocomplete="postal-code">
-      </div>
-
-      <div class="rp-lead-field">
-        <label for="rpSpecialInstructions">Access Notes / Move-Out Deadline / Special Instructions</label>
-        <textarea id="rpSpecialInstructions" placeholder="Gate code, lockbox, inspection date, pet hair, carpet notes, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea>
-      </div>
-
-      <div class="rp-error" id="rpFormError">
-        Please enter your name, phone, valid email, street address/unit, city, state, and ZIP before booking.
-      </div>
-
+      <div class="rp-lead-field"><label for="rpPostalCode">ZIP Code *</label><input id="rpPostalCode" type="text" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73503" autocomplete="postal-code"></div>
+      <div class="rp-lead-field"><label for="rpSpecialInstructions">Access Notes / Move-Out Deadline / Special Instructions</label><textarea id="rpSpecialInstructions" placeholder="Gate code, lockbox, inspection date, pet hair, carpet notes, or anything Christa should know">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
+      <div class="rp-error" id="rpFormError">Please enter your name, phone, valid email, street address/unit, city, state, and ZIP before booking.</div>
       <div class="rp-btns">
-        <button type="button" class="rp-secondary" onclick="rpRenderEstimateStep(); rpScrollToCalculator();">Back To Estimate</button>
+        <button type="button" class="rp-secondary" onclick="rpBack()">Back To Estimate</button>
         <button id="rpReserveBtn" type="button" class="rp-primary" onclick="rpSubmitLead()">Save Estimate & Choose Appointment</button>
       </div>
     </div>
-
-    <p class="rp-fineprint">
-      By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. The calendar unlocks after required details are saved.
-    </p>
+    <p class="rp-fineprint">By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment.</p>
   `;
 }
-
-function rpRenderCalendarStep() {
-  rpState.step = 3;
-  const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
-  const fullAddress = [rpState.address1, [rpState.city, rpState.state, rpState.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-
-  app.innerHTML = `
-    ${rpStepBar()}
-    <h2>Reserve Your Move-Out Cleaning</h2>
-    <p class="rp-sub">
-      Your estimate has been saved. Estimated move-out cleaning total: <strong>$${total}</strong>.<br>
-      Address saved: <strong>${fullAddress}</strong><br>
-      Choose an available time below.
-    </p>
-
-    <div class="rp-booking-widget">
-      <iframe
-        src="${rpBuildCalendarUrl()}"
-        style="width:100%;border:none;overflow:hidden;"
-        scrolling="no"
-        id="1VXLRmyHfLdsHa4rTKJ2_fort_sill"
-        title="Red Prairie Cleaning Booking Calendar">
-      </iframe>
-    </div>
-
+function rpCalendarHtml(){
+  const calendarUrl = rpBuildCalendarUrl();
+  return `
+    ${rpHeaderHtml("Your estimate has been saved. Choose an appointment below.")}
+    <h2>Reserve Your Cleaning</h2>
+    <p class="rp-sub">Choose an available appointment time below. Your estimate details will be passed into the booking.</p>
+    ${rpInvoiceHtml()}
+    <div class="rp-booking-widget"><iframe src="${calendarUrl}" style="width:100%;border:none;overflow:hidden;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_fort_sill" title="Red Prairie Cleaning Booking Calendar"></iframe></div>
     <div class="rp-btns">
-      <button type="button" class="rp-secondary" onclick="rpRenderContactStep(); rpScrollToCalculator();">Back To Contact</button>
+      <button type="button" class="rp-secondary" onclick="rpBack()">Back To Contact</button>
       <a class="rp-primary" href="sms:5802150915">Text Us</a>
     </div>
   `;
-
-  rpLoadCalendarScript();
 }
-
-function rpLoadCalendarScript() {
-  if (document.getElementById("ghl-calendar-script")) return;
+function rpRender(){
+  const app = document.getElementById("rpApp");
+  if(!app) return;
+  if(rpState.stage === "service") app.innerHTML = rpServiceChoiceHtml();
+  if(rpState.stage === "bedrooms") app.innerHTML = rpBedroomHtml();
+  if(rpState.stage === "bathrooms") app.innerHTML = rpBathroomHtml();
+  if(rpState.stage === "condition") app.innerHTML = rpConditionHtml();
+  if(rpState.stage === "carpetRooms") app.innerHTML = rpCarpetRoomsHtml();
+  if(rpState.stage === "upholsteryItem") app.innerHTML = rpUpholsteryHtml();
+  if(rpState.stage === "addons") app.innerHTML = rpAddonsHtml();
+  if(rpState.stage === "contact") app.innerHTML = rpContactHtml();
+  if(rpState.stage === "calendar") {
+    app.innerHTML = rpCalendarHtml();
+    rpLoadCalendarScript();
+  }
+}
+function rpLoadCalendarScript(){
+  if(document.getElementById("ghl-calendar-script")) return;
   const script = document.createElement("script");
   script.src = "https://link.msgsndr.com/js/form_embed.js";
   script.type = "text/javascript";
   script.id = "ghl-calendar-script";
   document.body.appendChild(script);
 }
-
-function rpScrollToCalculator(instant = false) {
+function rpScrollToCalculator(instant=false){
   const card = document.querySelector(".rp-card");
-  if (!card) return;
+  if(!card) return;
   const nav = document.querySelector(".navbar");
   const navHeight = nav ? nav.offsetHeight : 70;
   const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10;
-  window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" });
+  window.scrollTo({top:Math.max(0,y), behavior:instant ? "auto" : "smooth"});
 }
-
-function rpScrollAfterRender() {
-  return;
+function rpScrollAfterRender(){
+  if(rpState.stage !== "service") rpScrollToCalculator();
 }
-
-document.addEventListener("click", function(e) {
+document.addEventListener("click",function(e){
   const link = e.target.closest('a[href="#booking"]');
-  if (!link) return;
+  if(!link) return;
   e.preventDefault();
   const booking = document.getElementById("booking");
-  if (booking) {
-    booking.scrollIntoView({ behavior:"smooth", block:"start" });
+  if(booking){
+    booking.scrollIntoView({behavior:"smooth", block:"start"});
     setTimeout(() => rpScrollToCalculator(), 250);
   }
 });
-
-rpRenderEstimateStep();
+rpRender();
 </script>
 
 <script
