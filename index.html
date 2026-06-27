@@ -546,13 +546,13 @@
         .area-card i { color: var(--red); font-size: 22px; margin-bottom: 8px; }
         .area-card h3 { font-size: 14px; margin: 0; }
 
-        footer { background: #070707; color: #fff; padding: 42px 18px 28px; }
-        .footer-logo img { max-width: 180px; margin-bottom: 28px; }
-        .footer-content { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        footer { background: #070707; color: #fff; padding: 30px 18px 22px; }
+        .footer-logo img { max-width: 150px; margin-bottom: 18px; }
+        .footer-content { display: grid; grid-template-columns: 1fr; gap: 16px; }
         footer h3 { margin: 0 0 10px; }
         footer ul { list-style: none; margin: 0; padding: 0; }
         footer li, footer p { color: #ccc; margin: 0 0 8px; font-size: 14px; }
-        .copyright { margin-top: 30px; text-align: center; border-top: 1px solid #333; padding-top: 18px; font-size: 13px; }
+        .copyright { margin-top: 18px; text-align: center; border-top: 1px solid #333; padding-top: 18px; font-size: 13px; }
 .hidden { opacity: 0; transform: translateY(22px); transition: all .6s ease; }
         .show { opacity: 1; transform: translateY(0); }
         .navbar-scrolled { box-shadow: 0 8px 35px rgba(0,0,0,.14); }
@@ -1405,15 +1405,15 @@ function gtag_report_conversion(url) {
         .hero-microcopy span { display: inline-flex; align-items: center; gap: 8px; }
 
         .rp-funnel { padding: 30px 12px 42px; background: #f6f6f6; }
-        .rp-funnel-header { margin-bottom: 14px; }
+        .rp-funnel-header { margin-bottom: 10px; }
         .rp-funnel-header h2 { font-size: clamp(30px, 8vw, 44px); margin-bottom: 8px; }
         .rp-funnel-header p { max-width: 620px; }
         .rp-card { max-width: 760px; margin: 0 auto; }
         .rp-progress-label strong { color: var(--red); }
 
-        .rp-live-price { background: #101010; color: #fff; border-radius: 22px; padding: 18px; margin: 0 0 16px; box-shadow: 0 16px 36px rgba(0,0,0,.18); }
+        .rp-live-price { background: #101010; color: #fff; border-radius: 20px; padding: 15px; margin: 0 0 12px; box-shadow: 0 16px 36px rgba(0,0,0,.18); }
         .rp-live-price small { display: block; color: #ddd; font-weight: 900; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
-        .rp-live-price strong { display: block; color: #fff; font-size: clamp(44px, 15vw, 74px); line-height: .95; letter-spacing: -.05em; }
+        .rp-live-price strong { display: block; color: #fff; font-size: clamp(40px, 13vw, 66px); line-height: .95; letter-spacing: -.05em; }
         .rp-live-price span { display: block; color: #eee; font-size: 13.5px; margin-top: 9px; }
         .rp-estimator-kicker { display: inline-flex; align-items:center; justify-content:center; background:#fff0f0; color:var(--red); border:1px solid #f0caca; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:900; margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em; }
         .rp-tap-note { font-weight: 900; color: var(--red); margin: 0 0 10px; font-size: 15px; }
@@ -1462,7 +1462,7 @@ function gtag_report_conversion(url) {
             .hero-trust { gap: 7px; margin-bottom: 12px; }
             .hero-trust span { font-size: 11px; padding: 7px 9px; }
             .rp-funnel-header p { font-size: 13.5px; }
-            .rp-card { padding: 15px; border-radius: 20px; }
+            .rp-card { padding: 14px; border-radius: 20px; }
             .rp-progress { height: 10px; margin-bottom: 14px; }
             .rp-card h1, .rp-card h2 { font-size: clamp(25px, 7vw, 32px); margin-bottom: 6px; }
             .rp-sub { font-size: 13.5px; margin-bottom: 12px; }
@@ -1475,12 +1475,35 @@ function gtag_report_conversion(url) {
             .rp-primary, .rp-secondary { min-height: 54px; }
             section { padding: 44px 18px; }
             .trust-bar { padding-top: 20px; }
-            .contact-cta { padding-bottom: 96px; }
-            .sticky-mobile-cta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 99999; display: grid; grid-template-columns: 1.25fr .75fr; gap: 8px; pointer-events:auto; }
-            .sticky-mobile-cta a { min-height: 52px; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+            .contact-cta { padding-bottom: 82px; }
+            .sticky-mobile-cta {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                z-index: 99999;
+                display: grid;
+                grid-template-columns: 1.25fr .75fr;
+                gap: 8px;
+                pointer-events: none;
+                opacity: 0;
+                transform: translateY(18px);
+                transition: opacity .18s ease, transform .18s ease;
+            }
+            .sticky-mobile-cta.is-visible {
+                pointer-events: auto;
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .sticky-mobile-cta a {
+                min-height: 44px;
+                font-size: 14px;
+                padding: 11px 14px;
+                box-shadow: 0 10px 30px rgba(0,0,0,.22);
+            }
 
             /* Keep LeadConnector chat from covering the mobile Estimate/Text bar */
-            body { padding-bottom: 92px; }
+            body { padding-bottom: 76px; }
             iframe[src*="leadconnector" i],
             iframe[src*="leadconnectorhq" i],
             iframe[src*="msgsndr" i],
@@ -1538,6 +1561,44 @@ function gtag_report_conversion(url) {
         }
 </style>
 
+
+<style>
+    .image-lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.86);
+        z-index: 2147483000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+    }
+    .image-lightbox.is-open { display: flex; }
+    .image-lightbox img {
+        width: auto;
+        max-width: 96vw;
+        max-height: 84vh;
+        border-radius: 18px;
+        box-shadow: 0 20px 70px rgba(0,0,0,.45);
+    }
+    .image-lightbox button {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        border: 0;
+        background: #fff;
+        color: #111;
+        border-radius: 999px;
+        width: 44px;
+        height: 44px;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+        font-weight: 900;
+    }
+    .gallery-item { cursor: zoom-in; }
+</style>
+
 </head>
 
 
@@ -1554,7 +1615,7 @@ function gtag_report_conversion(url) {
                 <li><a href="#faq">FAQ</a></li>
             </ul>
         </nav>
-        <a href="#booking" class="book-btn">Reserve Now</a>
+        <a href="sms:5802150915" class="book-btn">Text Us</a>
     </div>
 </header>
 
@@ -1583,8 +1644,8 @@ function gtag_report_conversion(url) {
     <div class="rp-funnel-wrap">
         <div class="rp-funnel-header">
             <div class="rp-estimator-kicker">Instant Price Estimator</div>
-            <h2>See Your Cleaning Price</h2>
-            <p>Choose a service, answer a few quick questions, then reserve online.</p>
+            <h2>Instant Price Estimate</h2>
+            <p>Answer a few quick questions. Your price updates as you go.</p>
         </div>
         <div class="rp-card">
             <div class="rp-progress-label"><span id="rpStepText">30 second estimate</span><span>Red Prairie Cleaning</span></div>
@@ -1688,9 +1749,14 @@ function gtag_report_conversion(url) {
     <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div>
 </footer>
 
-<div class="sticky-mobile-cta">
+<div class="sticky-mobile-cta" aria-label="Quick actions">
     <a href="#booking" class="book-btn">Estimate</a>
     <a href="sms:5802150915" class="secondary-btn">Text</a>
+</div>
+
+<div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+    <button type="button" aria-label="Close image preview">&times;</button>
+    <img src="" alt="Expanded cleaning result">
 </div>
 
 <script>
@@ -1775,8 +1841,7 @@ function rpRender() {
 
   if (rpState.step === 1) {
     app.innerHTML = `
-      ${rpLivePrice("Choose your service below. Price updates as you go.")}
-      <h1>Choose Your Service</h1>
+      ${rpLivePrice("Choose your service below.")}
       <p class="rp-tap-note">👇 Tap one option</p>
       <div class="rp-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
@@ -2036,7 +2101,51 @@ window.addEventListener("message", function(event) {
   }
 });
 
+
+function rpSetupStickyMobileCta() {
+  const sticky = document.querySelector(".sticky-mobile-cta");
+  const hero = document.querySelector(".hero");
+  if (!sticky || !hero) return;
+  const update = () => {
+    const isMobile = window.matchMedia("(max-width: 699px)").matches;
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    sticky.classList.toggle("is-visible", isMobile && heroBottom < 12);
+  };
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+}
+
+function rpSetupImageLightbox() {
+  const lightbox = document.getElementById("imageLightbox");
+  if (!lightbox) return;
+  const image = lightbox.querySelector("img");
+  const close = lightbox.querySelector("button");
+  document.querySelectorAll(".gallery-item img").forEach(img => {
+    img.addEventListener("click", () => {
+      image.src = img.src;
+      image.alt = img.alt || "Cleaning result";
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+    });
+  });
+  const closeLightbox = () => {
+    lightbox.classList.remove("is-open");
+    lightbox.setAttribute("aria-hidden", "true");
+    image.src = "";
+  };
+  close.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  });
+}
+
 rpRender();
+rpSetupStickyMobileCta();
+rpSetupImageLightbox();
 document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); const booking = document.getElementById("booking"); if (booking) { booking.scrollIntoView({ behavior: "smooth", block: "start" }); setTimeout(() => rpScrollToCalculator(), 220); } });
 </script>
 
