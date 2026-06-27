@@ -890,6 +890,41 @@
       .chamber-trust-card h2 { text-align: center; }
     }
 
+  
+    /* LeadConnector chat widget visibility fix.
+       Keep the booking calendar visible and keep chat above the mobile sticky CTA. */
+    @media (max-width: 768px) {
+      iframe[title*="chat" i],
+      iframe[id*="chat" i],
+      iframe[class*="chat" i],
+      div[id*="chat-widget" i],
+      div[class*="chat-widget" i],
+      div[id*="chat-widget-container" i],
+      div[class*="chat-widget-container" i],
+      div[class*="lc-widget" i],
+      div[class*="lc_chat" i],
+      div[class*="leadconnector" i] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        bottom: 94px !important;
+        z-index: 2147482999 !important;
+      }
+
+      .rp-booking-widget,
+      .rp-booking-widget iframe,
+      iframe[src*="/widget/booking/" i],
+      iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 100% !important;
+        min-height: 760px !important;
+      }
+    }
+
   </style>
 
   <!-- Google tag (gtag.js) -->
@@ -2066,6 +2101,22 @@ document.addEventListener("DOMContentLoaded", function() {
   rpRender(false);
   rpHandleStickyCta();
 });
+</script>
+
+
+<script>
+/* LeadConnector chat widget */
+(function() {
+  if (document.getElementById("leadconnector-chat-widget-loader")) return;
+
+  var script = document.createElement("script");
+  script.src = "https://widgets.leadconnectorhq.com/loader.js";
+  script.id = "leadconnector-chat-widget-loader";
+  script.setAttribute("data-resources-url", "https://widgets.leadconnectorhq.com/chat-widget/loader.js");
+  script.setAttribute("data-widget-id", "6a25f071ed0ee22f923d8835");
+  script.setAttribute("data-source", "WEB_USER");
+  document.body.appendChild(script);
+})();
 </script>
 
 </body>
