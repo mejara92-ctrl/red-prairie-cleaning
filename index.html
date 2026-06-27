@@ -2042,49 +2042,21 @@ document.addEventListener("click", function(e) { const link = e.target.closest('
 
 
 <script>
+/*
+  LeadConnector chat is desktop-only.
+  Mobile already has persistent Estimate/Text buttons, and the chat bubble was covering them.
+*/
 (function() {
-  const MOBILE_QUERY = window.matchMedia('(max-width: 699px)');
-  const CHAT_BOTTOM = '96px';
-  const CHAT_SELECTORS = [
-    'iframe[src*="leadconnector"]',
-    'iframe[src*="leadconnectorhq"]',
-    'iframe[src*="msgsndr"]',
-    'iframe[title*="chat" i]',
-    'iframe[id*="chat" i]',
-    'iframe[class*="chat" i]',
-    'div[id*="chat-widget" i]',
-    'div[class*="chat-widget" i]',
-    'div[class*="lc-widget" i]',
-    'div[class*="leadconnector" i]'
-  ];
+  var isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
 
-  function keepChatClearOfStickyButtons() {
-    if (!MOBILE_QUERY.matches) return;
-    CHAT_SELECTORS.forEach(function(selector) {
-      document.querySelectorAll(selector).forEach(function(el) {
-        if (!el || el.closest('.sticky-mobile-cta')) return;
-        const style = window.getComputedStyle(el);
-        const rect = el.getBoundingClientRect();
-        const isFloating = style.position === 'fixed' || style.position === 'absolute' || rect.bottom > window.innerHeight - 120;
-        if (!isFloating) return;
-        el.style.setProperty('bottom', CHAT_BOTTOM, 'important');
-        el.style.setProperty('z-index', '2147482988', 'important');
-      });
-    });
-  }
-
-  keepChatClearOfStickyButtons();
-  window.addEventListener('load', keepChatClearOfStickyButtons);
-  window.addEventListener('resize', keepChatClearOfStickyButtons);
-  setInterval(keepChatClearOfStickyButtons, 800);
+  var script = document.createElement('script');
+  script.src = 'https://widgets.leadconnectorhq.com/loader.js';
+  script.setAttribute('data-resources-url', 'https://widgets.leadconnectorhq.com/chat-widget/loader.js');
+  script.setAttribute('data-widget-id', '6a25f071ed0ee22f923d8835');
+  script.setAttribute('data-source', 'WEB_USER');
+  document.body.appendChild(script);
 })();
-</script>
-
-<script
-    src="https://widgets.leadconnectorhq.com/loader.js"
-    data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
-    data-widget-id="6a25f071ed0ee22f923d8835"
-    data-source="WEB_USER">
 </script>
 
 </body>
