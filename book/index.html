@@ -24,6 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -72,6 +73,7 @@
         "image": "https://redprairiecleaning.com/images/logo/logo-color.png",
         "logo": "https://redprairiecleaning.com/images/logo/logo-color.png",
         "priceRange": "$$",
+        "memberOf": { "@type": "Organization", "name": "Lawton Fort Sill Chamber of Commerce" },
         "areaServed": [
           { "@type": "City", "name": "Lawton" },
           { "@type": "Place", "name": "Fort Sill" },
@@ -172,6 +174,62 @@
     .lead-field input:focus,.lead-field textarea:focus { outline:none; border-color:var(--red2); }
     .error { display:none; background:#2b1111; border:1px solid #7a2b2b; color:#ffd0d0; border-radius:12px; padding:12px; margin-top:14px; font-size:14px; }
     @media (max-width:650px){ .topbar{align-items:flex-start; flex-direction:column;} .grid,.field-grid{grid-template-columns:1fr;} .pill-grid{grid-template-columns:repeat(2,1fr);} .checklist{grid-template-columns:1fr;} .card{padding:20px;} .wrap{padding:10px 12px 36px;} .btns{display:grid;} button.primary,button.secondary,.sms-btn{width:100%;} }
+
+
+    /* Homepage-standard trust bar + LeadConnector mobile behavior */
+    .trust-bar {
+      max-width: 1080px;
+      margin: 0 auto 18px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .trust-card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+    }
+    .trust-card i { color: #ffcc00; font-size: 22px; margin-bottom: 8px; }
+    .trust-card h3 { margin: 0 0 4px; font-size: 17px; color: #fff; }
+    .trust-card p { margin: 0; color: #d6d6d6; font-size: 12px; }
+    .option span { display: none !important; }
+    .option { min-height: 72px; display: flex; align-items: center; }
+    .option strong { margin-bottom: 0; }
+
+    @media (max-width: 768px) {
+      .trust-bar { grid-template-columns: repeat(2, 1fr); padding: 0 12px; }
+
+      /* Hide chat-specific LeadConnector UI only. Do not hide the booking calendar. */
+      iframe[title*="chat" i],
+      iframe[id*="chat" i],
+      iframe[class*="chat" i],
+      div[id*="chat-widget" i],
+      div[class*="chat-widget" i],
+      div[id*="chat-widget-container" i],
+      div[class*="chat-widget-container" i] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      .booking-widget,
+      .booking-widget iframe,
+      iframe[src*="/widget/booking/" i],
+      iframe[id*="1VXLRmyHfLdsHa4rTKJ2" i] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 100% !important;
+        min-height: 760px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -179,6 +237,29 @@
     <a class="brand" href="/">RED PRAIRIE CLEANING <span>Preparing Homes for Their Next Chapter</span></a>
     <a class="phone" href="tel:5802150915" onclick="return gtag_report_conversion('tel:5802150915');">Call/Text: (580) 215-0915</a>
   </div>
+
+  <section class="trust-bar" aria-label="Red Prairie Cleaning trust signals">
+    <div class="trust-card">
+      <i class="fa-solid fa-star"></i>
+      <h3>28+</h3>
+      <p>Google Reviews</p>
+    </div>
+    <div class="trust-card">
+      <i class="fa-solid fa-handshake"></i>
+      <h3>Chamber Member</h3>
+      <p>Lawton Fort Sill</p>
+    </div>
+    <div class="trust-card">
+      <i class="fa-solid fa-house-circle-check"></i>
+      <h3>100+</h3>
+      <p>Homes Prepared</p>
+    </div>
+    <div class="trust-card">
+      <i class="fa-solid fa-shield-halved"></i>
+      <h3>Deposit Defense</h3>
+      <p>Move-Out Ready</p>
+    </div>
+  </section>
 
   <main class="wrap">
     <div class="card">
@@ -314,7 +395,7 @@ function render(){
   updateProgress();
   const app = document.getElementById("app");
   if(state.step === 1){
-    app.innerHTML = `<h1>Get Your Instant Estimate</h1><p class="sub">Choose any Red Prairie Cleaning service, see your estimate, save your job details, then choose an appointment online.</p><div class="grid">${Object.entries(services).map(([key,s]) => `<button type="button" class="option ${state.service === key ? "is-selected" : ""}" onclick="selectService('${key}')"><strong>${s.emoji} ${s.name}</strong><span>${s.desc}</span></button>`).join("")}</div><p class="fineprint">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Fletcher, and nearby Southwest Oklahoma areas.</p>`;
+    app.innerHTML = `<h1>Get Your Instant Estimate</h1><p class="sub">Choose your service, answer one question at a time, save your contact and address, then choose an appointment online.</p><div class="grid">${Object.entries(services).map(([key,s]) => `<button type="button" class="option ${state.service === key ? "is-selected" : ""}" onclick="selectService('${key}')"><strong>${s.emoji} ${s.name}</strong><span>${s.desc}</span></button>`).join("")}</div><p class="fineprint">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Fletcher, and nearby Southwest Oklahoma areas.</p>`;
   }
   if(state.step === 2){
     const s = services[state.service];
@@ -324,7 +405,7 @@ function render(){
     app.innerHTML = `<span class="estimate-badge">Estimated Price: $${calculatePrice()}</span><h2>Contact & Job Details</h2><p class="sub">These details are required before the appointment calendar opens so the team has your estimate, address, and notes attached.</p>${estimateSummary()}<div class="lead-form"><div class="lead-field"><label for="fullName">Full Name *</label><input id="fullName" type="text" value="${escapeHtml(state.fullName)}" placeholder="John Smith" autocomplete="name"></div><div class="lead-field"><label for="phone">Phone *</label><input id="phone" type="tel" value="${escapeHtml(state.phone)}" placeholder="(580) 555-1234" autocomplete="tel"></div><div class="lead-field"><label for="email">Email *</label><input id="email" type="email" value="${escapeHtml(state.email)}" placeholder="john@email.com" autocomplete="email"></div><div class="lead-field"><label for="address1">Street Address / Unit *</label><input id="address1" type="text" value="${escapeHtml(state.address1)}" placeholder="123 Main St Apt 4B" autocomplete="address-line1"></div><div class="field-grid"><div class="lead-field"><label for="city">City *</label><input id="city" type="text" value="${escapeHtml(state.city)}" placeholder="Lawton" autocomplete="address-level2"></div><div class="lead-field"><label for="stateField">State *</label><input id="stateField" type="text" value="${escapeHtml(state.stateField)}" placeholder="OK" maxlength="2" autocomplete="address-level1"></div></div><div class="lead-field"><label for="postalCode">ZIP Code *</label><input id="postalCode" type="text" value="${escapeHtml(state.postalCode)}" placeholder="73501" autocomplete="postal-code"></div><div class="lead-field"><label for="specialInstructions">Access Notes / Deadline / Special Instructions</label><textarea id="specialInstructions" placeholder="Gate code, pets, carpet notes, inspection date, parking, unit access, or anything Christa should know">${escapeHtml(state.specialInstructions)}</textarea></div></div><div id="formError" class="error">Please enter your name, phone, valid email, street address/unit, city, state, and ZIP before booking.</div><div class="btns"><button type="button" class="secondary" onclick="backToEstimate()">Back To Estimate</button><button id="reserveBtn" type="button" class="primary" onclick="submitLeadAndShowCalendar()">Save Estimate & Choose Appointment</button></div><p class="fineprint">By submitting, you agree Red Prairie Cleaning may contact you about your estimate and appointment. This saves an estimate only; the appointment is not booked until the calendar is completed.</p>`;
   }
   if(state.step === 4){
-    app.innerHTML = `<span class="estimate-badge">Estimated Price: $${calculatePrice()}</span><h2>Choose Your Appointment</h2><p class="sub">Select your preferred date and time below. Your appointment confirmation should come from the GHL calendar booking workflow, not from the estimate form.</p><div class="notice">Your estimate and job details have been saved. Complete the calendar step to reserve your appointment.</div><div class="booking-widget"><iframe src="${RP_BOOKING_CALENDAR_URL}" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_book_page"></iframe></div><div class="btns"><button type="button" class="secondary" onclick="backToLeadCapture()">Back</button></div>`;
+    app.innerHTML = `<span class="estimate-badge">Estimated Price: $${calculatePrice()}</span><h2>Choose Your Appointment</h2><p class="sub">Select your preferred date and time below. Your appointment confirmation should come from the GHL calendar booking workflow, not from the estimate form.</p><div class="notice">Your estimate and job details have been saved. Complete the calendar step to reserve your appointment.</div><div class="booking-widget"><iframe src="${buildCalendarUrl()}" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_book_page" title="Red Prairie Cleaning Booking Calendar"></iframe></div><div class="btns"><button type="button" class="secondary" onclick="backToLeadCapture()">Back</button></div>`;
     loadCalendarScript();
   }
 }
@@ -429,6 +510,21 @@ function getEstimatePayload(){
     page_url: window.location.href
   };
 }
+
+function buildCalendarUrl(){
+  const payload = getEstimatePayload();
+  const url = new URL(RP_BOOKING_CALENDAR_URL);
+  [
+    "full_name","phone","email","address1","street_address","address","city","state","postal_code","zip",
+    "full_address","service","service_type","service_key","estimated_price","estimated_price_number",
+    "price_estimate","bedrooms","bathrooms","condition","addons","addon_count","carpet_rooms","furniture_item",
+    "special_instructions","customer_notes","estimate_notes","job_details","cleaner_notes","source","business","page_url"
+  ].forEach(key => {
+    if (payload[key] !== undefined && payload[key] !== null) url.searchParams.set(key, payload[key]);
+  });
+  return url.toString();
+}
+
 function sendEstimateToGoHighLevel(){
   const payload = getEstimatePayload();
   const url = new URL(RP_WEBHOOK_URL);
@@ -459,5 +555,13 @@ function loadCalendarScript(){
 }
 render();
 </script>
+
+<script
+  src="https://widgets.leadconnectorhq.com/loader.js"
+  data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
+  data-widget-id="6a25f071ed0ee22f923d8835"
+  data-source="WEB_USER">
+</script>
+
 </body>
 </html>
