@@ -26,19 +26,14 @@ jobs:
           repo = Path('.')
           changed = []
 
-          replacement = "\n".join([
+          disabled_function = "\n".join([
               "function rpSendEstimateToGoHighLevel(extra = {}) {",
-              "  /*",
-              "    Calendar-only confirmation gate:",
-              "    Do not send LeadConnector/GHL automation from the estimate/contact step.",
-              "    Estimate/contact details are passed into the embedded GHL calendar URL.",
-              "    Customer texts/emails should only trigger from the GHL appointment booked event",
-              "    after the customer chooses an actual calendar time.",
-              "  */",
+              "  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */",
+              "  rpState.estimateSent = true;",
+              "  rpState.preBookingWebhookSent = true;",
               "  return true;",
               "}",
-              "",
-              "function rpSubmitLeadAndShowCalendar"
+              ""
           ])
 
           important_comment = "\n".join([
@@ -56,14 +51,22 @@ jobs:
               original = text
 
               text = re.sub(
-                  r'const\s+RP_WEBHOOK_URL\s*=\s*"[^"]+";\s*\n',
+                  r'const\s+RP_WEBHOOK_URL\s*=\s*"[^"]+";\s*\n?',
                   'const RP_PREBOOKING_WEBHOOK_DISABLED = true;\n',
                   text
               )
 
+              # Landing pages that go from rpSendEstimateToGoHighLevel() to rpBuildCalendarUrl()
               text = re.sub(
-                  r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\n\}\s*\n\s*function\s+rpSubmitLeadAndShowCalendar',
-                  replacement,
+                  r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\}\s*function\s+rpBuildCalendarUrl',
+                  disabled_function + 'function rpBuildCalendarUrl',
+                  text
+              )
+
+              # Homepage / book page versions that go from rpSendEstimateToGoHighLevel() to rpSubmitLeadAndShowCalendar()
+              text = re.sub(
+                  r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\}\s*function\s+rpSubmitLeadAndShowCalendar',
+                  disabled_function + 'function rpSubmitLeadAndShowCalendar',
                   text
               )
 
@@ -71,11 +74,6 @@ jobs:
                   r'/\*\s*IMPORTANT:\s*This site sends the estimator webhook[\s\S]*?If confirmation texts are still sending early, update the GHL workflow trigger\.\s*\*/',
                   important_comment,
                   text
-              )
-
-              text = text.replace(
-                  'This webhook is intentionally sent BEFORE the calendar opens so GHL has the full estimate,\n     contact details, address, notes, and job details. It is NOT a booking confirmation.',
-                  'This function is intentionally disabled so no customer text automation fires before calendar booking.'
               )
 
               if text != original:
