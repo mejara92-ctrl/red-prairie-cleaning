@@ -1766,6 +1766,7 @@ function rpRenderService() {
         <button type="button" class="rp-option ${key === "carpet" ? "featured-option" : ""}" onclick="rpSelectService('${key}')">
           ${key === "carpet" ? '<span class="badge">Carpet Cleaning Page</span>' : ""}
           <strong>${service.emoji} ${service.name}</strong>
+          <span>${service.desc}</span>
         </button>
       `).join("")}
     </div>
