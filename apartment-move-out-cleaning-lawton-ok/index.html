@@ -2019,8 +2019,7 @@ footer li, footer p {
 </footer>
 
 <script>
-const RP_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/o4s9L5c0Rd4vqrzAeCY1/webhook-trigger/05947288-6996-4ecc-80aa-42766c3be32b";
-
+const RP_PREBOOKING_WEBHOOK_DISABLED = true;
 const rpState = {
   step: 1,
   service: null,
@@ -2428,20 +2427,13 @@ function rpGetEstimatePayload() {
   return { source:"Apartment Move-Out Cleaning Lawton Landing Page Universal Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", addons:[rpState.carpetRooms ? `Steam carpet cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href, landing_page:"Apartment Move-Out Cleaning Lawton OK" };
 }
 function rpSendEstimateToGoHighLevel(extra = {}) {
-  if (rpState.preBookingWebhookSent) return true;
-  const payload = { ...rpGetEstimatePayload(), ...extra };
-  const url = new URL(RP_WEBHOOK_URL);
-  Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
-
   /*
-    Use an image beacon so the visitor is not redirected and the calendar can open immediately.
-    This webhook is intentionally sent BEFORE the calendar opens so GHL has the full estimate,
-    contact details, address, notes, and job details. It is NOT a booking confirmation.
+    Calendar-only confirmation gate:
+    Do not send LeadConnector/GHL automation from the estimate/contact step.
+    Estimate/contact details are passed into the embedded GHL calendar URL.
+    Customer texts/emails should only trigger from the GHL appointment booked event
+    after the customer chooses an actual calendar time.
   */
-  const img = new Image();
-  img.src = url.toString();
-  rpState.estimateSent = true;
-  rpState.preBookingWebhookSent = true;
   return true;
 }
 
@@ -2472,13 +2464,10 @@ function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-scri
 
 /*
   IMPORTANT:
-  This site sends the estimator webhook after contact details are entered and BEFORE the calendar opens.
-  That gives GHL the full estimate, address, notes, and job details so the appointment can be connected
-  to the correct lead. The webhook payload clearly marks the lead as:
-  "Estimate Submitted - Appointment Time Not Selected Yet".
-
-  Booking confirmation texts/emails should be triggered by the GHL calendar appointment booked/confirmed event,
-  not by this estimator webhook. If confirmation texts are still sending early, update the GHL workflow trigger.
+  This page must NOT fire the customer text automation from the estimate/contact step.
+  The website only passes estimate/contact details into the embedded GHL calendar URL.
+  Booking confirmation texts/emails should be triggered by the GHL calendar appointment
+  booked/confirmed event after the customer selects a calendar time.
 */
 
 
