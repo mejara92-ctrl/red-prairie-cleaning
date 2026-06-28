@@ -1196,6 +1196,46 @@ footer li, footer p {
   }
 }
 
+
+/* ===== Main-index estimator repair: black estimate bubble + service descriptions ===== */
+#rpApp .rp-live-price {
+  display:block !important;
+  background:#101010 !important;
+  color:#fff !important;
+  border-radius:20px !important;
+  padding:15px !important;
+  margin:0 0 12px !important;
+  box-shadow:0 16px 36px rgba(0,0,0,.18) !important;
+}
+#rpApp .rp-live-price small {
+  display:block !important;
+  color:#ddd !important;
+  font-weight:900 !important;
+  margin-bottom:4px !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+}
+#rpApp .rp-live-price strong {
+  display:block !important;
+  color:#fff !important;
+  font-size:clamp(40px,13vw,66px) !important;
+  line-height:.95 !important;
+  letter-spacing:-.05em !important;
+}
+#rpApp .rp-live-price span {
+  display:block !important;
+  color:#eee !important;
+  font-size:13.5px !important;
+  margin-top:9px !important;
+}
+#rpApp .rp-option > strong + span {
+  display:block !important;
+  color:#555 !important;
+  font-size:13px !important;
+  line-height:1.45 !important;
+  margin-top:5px !important;
+}
+
 </style>
 
 <script type="application/ld+json">
@@ -1875,6 +1915,7 @@ function rpServiceStep() {
         <button type="button" class="rp-option ${key === "moveout" || key === "movein" ? "featured-option" : ""}" onclick="rpChooseService('${key}')">
           ${s.featured ? `<span class="badge">${s.featured}</span>` : ""}
           <strong>${s.emoji} ${s.name}</strong>
+          <span>${s.desc}</span>
         </button>
       `).join("")}
     </div>
