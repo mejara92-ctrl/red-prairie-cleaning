@@ -2261,16 +2261,11 @@ function rpGetEstimatePayload() {
   return { source:"Red Prairie Website Instant Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", addons:[rpState.carpetRooms ? `Steam carpet cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href };
 }
 function rpSendEstimateToGoHighLevel(extra = {}) {
-  /*
-    Calendar-only confirmation gate:
-    Do not send LeadConnector/GHL automation from the estimate/contact step.
-    Estimate/contact details are passed into the embedded GHL calendar URL.
-    Customer texts/emails should only trigger from the GHL appointment booked event
-    after the customer chooses an actual calendar time.
-  */
+  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */
+  rpState.estimateSent = true;
+  rpState.preBookingWebhookSent = true;
   return true;
 }
-
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();

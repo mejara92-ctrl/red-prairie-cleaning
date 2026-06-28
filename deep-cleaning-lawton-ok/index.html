@@ -2155,13 +2155,10 @@ function rpGetEstimatePayload() {
     page_url: window.location.href
   };
 }
-function rpSendEstimateToGoHighLevel() {
-  const payload = rpGetEstimatePayload();
-  const url = new URL(RP_WEBHOOK_URL);
-  Object.keys(payload).forEach(key => url.searchParams.append(key, payload[key]));
-  const img = new Image();
-  img.src = url.toString();
+function rpSendEstimateToGoHighLevel(extra = {}) {
+  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */
   rpState.estimateSent = true;
+  rpState.preBookingWebhookSent = true;
   return true;
 }
 function rpBuildCalendarUrl() {
