@@ -1,0 +1,98 @@
+name: Remove pre-calendar webhook
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-html:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Disable pre-calendar webhook calls
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          repo = Path('.')
+          changed = []
+
+          replacement = '''function rpSendEstimateToGoHighLevel(extra = {}) {
+  /*
+    Calendar-only confirmation gate:
+    Do not send LeadConnector/GHL automation from the estimate/contact step.
+    Estimate/contact details are passed into the embedded GHL calendar URL.
+    Customer texts/emails should only trigger from the GHL appointment booked event
+    after the customer chooses an actual calendar time.
+  */
+  return true;
+}
+
+function rpSubmitLeadAndShowCalendar'''
+
+          important_comment = '''/*
+  IMPORTANT:
+  This page must NOT fire the customer text automation from the estimate/contact step.
+  The website only passes estimate/contact details into the embedded GHL calendar URL.
+  Booking confirmation texts/emails should be triggered by the GHL calendar appointment
+  booked/confirmed event after the customer selects a calendar time.
+*/'''
+
+          for path in sorted(repo.rglob('*.html')):
+              text = path.read_text(encoding='utf-8')
+              original = text
+
+              text = re.sub(
+                  r'const\s+RP_WEBHOOK_URL\s*=\s*"[^"]+";\s*\n',
+                  'const RP_PREBOOKING_WEBHOOK_DISABLED = true;\n',
+                  text
+              )
+
+              text = re.sub(
+                  r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\n\}\s*\n\s*function\s+rpSubmitLeadAndShowCalendar',
+                  replacement,
+                  text
+              )
+
+              text = re.sub(
+                  r'/\*\s*IMPORTANT:\s*This site sends the estimator webhook[\s\S]*?If confirmation texts are still sending early, update the GHL workflow trigger\.\s*\*/',
+                  important_comment,
+                  text
+              )
+
+              text = text.replace(
+                  'This webhook is intentionally sent BEFORE the calendar opens so GHL has the full estimate,\n     contact details, address, notes, and job details. It is NOT a booking confirmation.',
+                  'This function is intentionally disabled so no customer text automation fires before calendar booking.'
+              )
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(str(path))
+
+          print('Changed files:')
+          for item in changed:
+              print(item)
+          if not changed:
+              print('No matching files needed changes.')
+          PY
+      - name: Commit changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Disable pre-calendar webhook triggers"
+          git push
