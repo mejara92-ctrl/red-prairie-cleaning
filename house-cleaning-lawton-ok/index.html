@@ -957,7 +957,12 @@ function rpGetEstimatePayload() {
   };
 }
 function rpSendEstimateToGoHighLevel(extra = {}) {
-  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */
+  /*
+    Calendar-only confirmation gate:
+    Do not send the website webhook from the estimate/contact step.
+    The site only passes customer and job details into the embedded GHL calendar URL.
+    GHL should send customer texts from the appointment booked trigger after a time slot is selected.
+  */
   rpState.estimateSent = true;
   rpState.preBookingWebhookSent = true;
   return true;

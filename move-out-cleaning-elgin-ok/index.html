@@ -1823,7 +1823,12 @@ function rpRenderStep7(){return `${rpHeaderHtml("Enter your details before choos
 function rpFullAddress(){return [rpState.address1,[rpState.city,rpState.state,rpState.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");}
 function rpGetEstimatePayload(){const service=rpSelectedService();const total=rpCalculatePrice();const notes=rpState.specialInstructions.trim()||"None";const addons=rpSelectedAddonsText();const fullAddress=rpFullAddress();const jobDetails=[`Service: ${service.name}`,`Estimate: $${total}`,`Details: ${rpServiceDetailsText()}`,`Add-ons: ${addons}`,`Address: ${fullAddress||"N/A"}`,`Special instructions: ${notes}`].join(" | ");return {source:"Move-Out Cleaning Elgin Landing Page",business:"Red Prairie Cleaning",full_name:rpState.fullName,phone:rpState.phone,email:rpState.email,address1:rpState.address1,street_address:rpState.address1,address:rpState.address1,city:rpState.city,state:rpState.state,postal_code:rpState.postalCode,zip:rpState.postalCode,full_address:fullAddress,service:service.name,service_type:service.name,service_key:rpState.service,city_page:"Elgin",estimated_price:`$${total}`,estimated_price_number:total,price_estimate:`$${total}`,bedrooms:rpHouseService()?String(rpState.bedrooms):"N/A",bathrooms:rpHouseService()?String(rpState.bathrooms):"N/A",condition:rpHouseService()?rpState.condition:"N/A",addons:addons,addon_count:rpState.addons.length,carpet_with_moveout:rpState.addons.some(a=>a.name==="Carpet cleaning")?"Yes":"No",carpet_rooms:String(rpState.carpetRooms||"N/A"),furniture_item:rpState.service==="upholstery"?rpState.furnitureItem:"N/A",special_instructions:notes,customer_notes:notes,estimate_notes:jobDetails,job_details:jobDetails,cleaner_notes:jobDetails,submitted_at:new Date().toISOString(),page_url:window.location.href};}
 function rpSendEstimateToGoHighLevel(extra = {}) {
-  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */
+  /*
+    Calendar-only confirmation gate:
+    Do not send the website webhook from the estimate/contact step.
+    The site only passes customer and job details into the embedded GHL calendar URL.
+    GHL should send customer texts from the appointment booked trigger after a time slot is selected.
+  */
   rpState.estimateSent = true;
   rpState.preBookingWebhookSent = true;
   return true;
