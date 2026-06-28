@@ -26,26 +26,30 @@ jobs:
           repo = Path('.')
           changed = []
 
-          replacement = '''function rpSendEstimateToGoHighLevel(extra = {}) {
-  /*
-    Calendar-only confirmation gate:
-    Do not send LeadConnector/GHL automation from the estimate/contact step.
-    Estimate/contact details are passed into the embedded GHL calendar URL.
-    Customer texts/emails should only trigger from the GHL appointment booked event
-    after the customer chooses an actual calendar time.
-  */
-  return true;
-}
+          replacement = "\n".join([
+              "function rpSendEstimateToGoHighLevel(extra = {}) {",
+              "  /*",
+              "    Calendar-only confirmation gate:",
+              "    Do not send LeadConnector/GHL automation from the estimate/contact step.",
+              "    Estimate/contact details are passed into the embedded GHL calendar URL.",
+              "    Customer texts/emails should only trigger from the GHL appointment booked event",
+              "    after the customer chooses an actual calendar time.",
+              "  */",
+              "  return true;",
+              "}",
+              "",
+              "function rpSubmitLeadAndShowCalendar"
+          ])
 
-function rpSubmitLeadAndShowCalendar'''
-
-          important_comment = '''/*
-  IMPORTANT:
-  This page must NOT fire the customer text automation from the estimate/contact step.
-  The website only passes estimate/contact details into the embedded GHL calendar URL.
-  Booking confirmation texts/emails should be triggered by the GHL calendar appointment
-  booked/confirmed event after the customer selects a calendar time.
-*/'''
+          important_comment = "\n".join([
+              "/*",
+              "  IMPORTANT:",
+              "  This page must NOT fire the customer text automation from the estimate/contact step.",
+              "  The website only passes estimate/contact details into the embedded GHL calendar URL.",
+              "  Booking confirmation texts/emails should be triggered by the GHL calendar appointment",
+              "  booked/confirmed event after the customer selects a calendar time.",
+              "*/"
+          ])
 
           for path in sorted(repo.rglob('*.html')):
               text = path.read_text(encoding='utf-8')
