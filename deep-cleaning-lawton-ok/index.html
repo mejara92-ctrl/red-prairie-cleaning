@@ -1155,9 +1155,13 @@ footer li, footer p {
   color:var(--text) !important;
 }
 
-/* Service choice cards: no extra tagline under each option */
+/* Service choice cards: show descriptions like the homepage */
 #rpApp .rp-option > strong + span {
-  display:none !important;
+  display:block !important;
+  color:#555;
+  font-size:13px;
+  line-height:1.4;
+  margin-top:4px;
 }
 
 /* Mobile: hide chat-specific LeadConnector UI only.
