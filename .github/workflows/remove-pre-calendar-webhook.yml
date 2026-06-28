@@ -28,7 +28,12 @@ jobs:
 
           disabled_function = "\n".join([
               "function rpSendEstimateToGoHighLevel(extra = {}) {",
-              "  /* Calendar-only confirmation gate: do not fire website webhook before calendar booking. */",
+              "  /*",
+              "    Calendar-only confirmation gate:",
+              "    Do not send the website webhook from the estimate/contact step.",
+              "    The site only passes customer and job details into the embedded GHL calendar URL.",
+              "    GHL should send customer texts from the appointment booked trigger after a time slot is selected.",
+              "  */",
               "  rpState.estimateSent = true;",
               "  rpState.preBookingWebhookSent = true;",
               "  return true;",
@@ -41,8 +46,8 @@ jobs:
               "  IMPORTANT:",
               "  This page must NOT fire the customer text automation from the estimate/contact step.",
               "  The website only passes estimate/contact details into the embedded GHL calendar URL.",
-              "  Booking confirmation texts/emails should be triggered by the GHL calendar appointment",
-              "  booked/confirmed event after the customer selects a calendar time.",
+              "  Booking confirmation texts/emails should be triggered by the GHL appointment booked event",
+              "  after the customer selects a calendar time slot.",
               "*/"
           ])
 
@@ -56,14 +61,12 @@ jobs:
                   text
               )
 
-              # Landing pages that go from rpSendEstimateToGoHighLevel() to rpBuildCalendarUrl()
               text = re.sub(
                   r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\}\s*function\s+rpBuildCalendarUrl',
                   disabled_function + 'function rpBuildCalendarUrl',
                   text
               )
 
-              # Homepage / book page versions that go from rpSendEstimateToGoHighLevel() to rpSubmitLeadAndShowCalendar()
               text = re.sub(
                   r'function\s+rpSendEstimateToGoHighLevel\s*\([^)]*\)\s*\{[\s\S]*?\}\s*function\s+rpSubmitLeadAndShowCalendar',
                   disabled_function + 'function rpSubmitLeadAndShowCalendar',
