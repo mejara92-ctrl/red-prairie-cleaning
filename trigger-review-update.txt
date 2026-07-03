@@ -1,1 +1,1 @@
-Trigger Google reviews button link update to https://maps.app.goo.gl/BrREqvo79hKp2TtM8 on 2026-07-03.
+Review link update trigger 2026-07-03 v2.
