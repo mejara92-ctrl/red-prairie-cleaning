@@ -33,6 +33,8 @@ jobs:
               '33+ Google Reviews': '35+ Google Reviews',
               '35 Google Reviews': '35+ Google Reviews',
               'Read More Reviews': 'Read Our Google Reviews',
+              'https://g.page/r/Cfx0wV2BCKMxEBM/review': review_link,
+              'https://share.google/i4fjcJA9FCItV6Qxa': review_link,
           }
 
           changed = []
@@ -45,10 +47,10 @@ jobs:
               for old, new in replacements.items():
                   new_text = new_text.replace(old, new)
 
-              # Update any anchor that contains the review button text so it opens the Google Maps reviews listing.
+              # Safety pass: any anchor whose visible text says Read Our Google Reviews should use the Google Maps listing.
               new_text = re.sub(
-                  r'<a\s+([^>]*?)href="[^"]*"([^>]*?)>(\s*(?:<i[^>]*></i>\s*)?Read Our Google Reviews\s*)</a>',
-                  lambda m: f'<a {m.group(1)}href="{review_link}"{m.group(2)}>{m.group(3)}</a>',
+                  r'(<a\b[^>]*?href=")[^"]*("[^>]*>[^<]*Read Our Google Reviews[^<]*</a>)',
+                  rf'\1{review_link}\2',
                   new_text,
                   flags=re.IGNORECASE
               )
