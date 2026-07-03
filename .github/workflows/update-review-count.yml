@@ -1,0 +1,58 @@
+name: Update Review Count
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-review-count.yml'
+      - 'trigger-review-update.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-review-count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Replace review count across site
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          replacements = {
+              '28+ Google Reviews': '35+ Google Reviews',
+              '28 Google Reviews': '35+ Google Reviews',
+              'Based on 28+ Google Reviews': 'Based on 35+ Google Reviews',
+              'Based on 28 Google Reviews': 'Based on 35+ Google Reviews',
+              '32+ Google Reviews': '35+ Google Reviews',
+              '33+ Google Reviews': '35+ Google Reviews',
+              '35 Google Reviews': '35+ Google Reviews',
+          }
+          changed = []
+          for path in Path('.').rglob('*.html'):
+              if '.git' in path.parts:
+                  continue
+              text = path.read_text(encoding='utf-8')
+              new_text = text
+              for old, new in replacements.items():
+                  new_text = new_text.replace(old, new)
+              if new_text != text:
+                  path.write_text(new_text, encoding='utf-8')
+                  changed.append(str(path))
+          print('Changed files:')
+          print('\n'.join(changed) if changed else 'None')
+          PY
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update review count to 35+"
+          git push
