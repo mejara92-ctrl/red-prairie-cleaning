@@ -1,4 +1,4 @@
-name: Update Review Count
+name: Update Review Count And Review Link
 
 on:
   push:
@@ -11,16 +11,19 @@ permissions:
   contents: write
 
 jobs:
-  update-review-count:
+  update-review-count-and-link:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Replace review count across site
+      - name: Replace review count and review button link across site
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
+
+          review_link = 'https://maps.app.goo.gl/BrREqvo79hKp2TtM8'
           replacements = {
               '28+ Google Reviews': '35+ Google Reviews',
               '28 Google Reviews': '35+ Google Reviews',
@@ -29,18 +32,31 @@ jobs:
               '32+ Google Reviews': '35+ Google Reviews',
               '33+ Google Reviews': '35+ Google Reviews',
               '35 Google Reviews': '35+ Google Reviews',
+              'Read More Reviews': 'Read Our Google Reviews',
           }
+
           changed = []
           for path in Path('.').rglob('*.html'):
               if '.git' in path.parts:
                   continue
               text = path.read_text(encoding='utf-8')
               new_text = text
+
               for old, new in replacements.items():
                   new_text = new_text.replace(old, new)
+
+              # Update any anchor that contains the review button text so it opens the Google Maps reviews listing.
+              new_text = re.sub(
+                  r'<a\s+([^>]*?)href="[^"]*"([^>]*?)>(\s*(?:<i[^>]*></i>\s*)?Read Our Google Reviews\s*)</a>',
+                  lambda m: f'<a {m.group(1)}href="{review_link}"{m.group(2)}>{m.group(3)}</a>',
+                  new_text,
+                  flags=re.IGNORECASE
+              )
+
               if new_text != text:
                   path.write_text(new_text, encoding='utf-8')
                   changed.append(str(path))
+
           print('Changed files:')
           print('\n'.join(changed) if changed else 'None')
           PY
@@ -54,5 +70,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Update review count to 35+"
+          git commit -m "Update Google reviews button link"
           git push
