@@ -1,4 +1,4 @@
-name: Update Review Count, Review Link, And Urgent Service Messaging
+name: Update Homepage Same Day Availability Copy
 
 on:
   push:
@@ -11,37 +11,16 @@ permissions:
   contents: write
 
 jobs:
-  update-sitewide-copy:
+  update-homepage-copy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update sitewide review and last-minute cleaning messaging
+      - name: Add same day availability messaging
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-
-          review_link = 'https://maps.app.goo.gl/BrREqvo79hKp2TtM8'
-
-          replacements = {
-              '28+ Google Reviews': '35+ Google Reviews',
-              '28 Google Reviews': '35+ Google Reviews',
-              '28+ Five-Star Reviews': '35+ Google Reviews',
-              '28+ 5-Star Reviews': '35+ Google Reviews',
-              '28+ Five Star Reviews': '35+ Google Reviews',
-              'Based on 28+ Google Reviews': 'Based on 35+ Google Reviews',
-              'Based on 28 Google Reviews': 'Based on 35+ Google Reviews',
-              '32+ Google Reviews': '35+ Google Reviews',
-              '33+ Google Reviews': '35+ Google Reviews',
-              '35 Google Reviews': '35+ Google Reviews',
-              'Read More Reviews': 'Read Our Google Reviews',
-              'https://g.page/r/Cfx0wV2BCKMxEBM/review': review_link,
-              'https://share.google/i4fjcJA9FCItV6Qxa': review_link,
-              '"reviewCount": "28"': '"reviewCount": "35"',
-              '"reviewCount":"28"': '"reviewCount":"35"',
-          }
 
           changed = []
           for path in Path('.').rglob('*.html'):
@@ -50,19 +29,56 @@ jobs:
               text = path.read_text(encoding='utf-8')
               new_text = text
 
-              for old, new in replacements.items():
-                  new_text = new_text.replace(old, new)
+              new_text = new_text.replace('28+ Google Reviews', '35+ Google Reviews')
+              new_text = new_text.replace('28+ Five-Star Reviews', '35+ Google Reviews')
+              new_text = new_text.replace('28+ 5-Star Reviews', '35+ Google Reviews')
+              new_text = new_text.replace('"reviewCount": "28"', '"reviewCount": "35"')
 
-              # Catch review count variants with optional tags/spaces around the plus sign.
-              new_text = re.sub(r'28\s*\+\s*(?:Five[- ]Star|5[- ]Star)\s+Reviews', '35+ Google Reviews', new_text, flags=re.IGNORECASE)
+              if 'Same-Day Availability Often Available' not in new_text:
+                  new_text = new_text.replace(
+                      '<span><i class="fa-solid fa-star"></i> 35+ Google Reviews</span>',
+                      '<span><i class="fa-solid fa-star"></i> 35+ Google Reviews</span>\n            <span><i class="fa-solid fa-bolt"></i> Same-Day Availability Often Available</span>',
+                      1
+                  )
 
-              # Make review buttons point to Google Maps reviews.
-              new_text = re.sub(
-                  r'(<a\b[^>]*?href=")[^"]*("[^>]*>[^<]*Read Our Google Reviews[^<]*</a>)',
-                  rf'\1{review_link}\2',
-                  new_text,
-                  flags=re.IGNORECASE
+              new_text = new_text.replace(
+                  '✓ Book instantly or text us with questions',
+                  '✓ Same-day and next-day cleanings often available'
               )
+
+              if 'Need it sooner? Call or text us' not in new_text:
+                  new_text = new_text.replace(
+                      '<div class="hero-buttons">\n            <a href="#booking" class="quote-btn">Start Instant Estimate</a>\n            <a href="sms:5802150915" class="secondary-btn">Text Us</a>\n        </div>',
+                      '<div class="hero-buttons">\n            <a href="#booking" class="quote-btn">Start Instant Estimate</a>\n            <a href="sms:5802150915" class="secondary-btn">Text Us</a>\n        </div>\n        <p class="hero-urgent-note">Need it sooner? Call or text us. We can often accommodate same-day and next-day cleanings.</p>',
+                      1
+                  )
+
+              if 'Moving tomorrow or on a tight deadline?' not in new_text:
+                  new_text = new_text.replace(
+                      '<p>Answer a few quick questions. Your price updates as you go.</p>',
+                      '<p>Answer a few quick questions. Your price updates as you go.</p>\n            <p class="booking-urgent-note"><strong>Moving tomorrow or on a tight deadline?</strong> We frequently help with last-minute cleanings. If you do not see the time you need online, call or text (580) 215-0915.</p>',
+                      1
+                  )
+
+              if '.hero-urgent-note' not in new_text and '</style>' in new_text:
+                  style = '''
+        .hero-urgent-note {
+            margin: 12px 0 0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+        .booking-urgent-note {
+            max-width: 760px;
+            margin: 12px auto 0;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+        .booking-urgent-note strong { color: var(--red); }
+'''
+                  new_text = new_text.replace('</style>', style + '\n</style>', 1)
 
               if new_text != text:
                   path.write_text(new_text, encoding='utf-8')
@@ -81,5 +97,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Fix remaining outdated review count text"
+          git commit -m "Add same day availability messaging"
           git push
