@@ -120,16 +120,18 @@
         .book-btn:hover, .quote-btn:hover { background: var(--red-dark); }
 
         .secondary-btn {
-            background: #fff;
-            color: var(--red);
+            background: var(--red-dark);
+            color: #fff;
             padding: 14px 20px;
-            border: 1px solid #eee;
+            border: 1px solid rgba(255,255,255,.18);
+            box-shadow: 0 10px 24px rgba(160,0,0,.22);
         }
+        .secondary-btn:hover { background: #7f0000; color: #fff; }
 
         .hero {
             min-height: calc(100vh - 66px);
             background:
-                linear-gradient(rgba(0,0,0,.74), rgba(0,0,0,.58)),
+                linear-gradient(rgba(0,0,0,.82), rgba(0,0,0,.66)),
                 url("images/hero/hero-cleaning-team.jpg") center center/cover no-repeat;
             display: flex;
             align-items: flex-end;
@@ -1153,6 +1155,51 @@ font-size:15px;
 line-height:1.5;
 }
 
+
+    .rp-service-summary {
+        border: 1px solid #f0d7d7;
+        background: #fffafa;
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+    .rp-service-summary h2 {
+        margin: 0 0 6px;
+        font-size: clamp(22px, 6vw, 30px);
+    }
+    .rp-service-summary p {
+        margin: 0 0 12px;
+        color: #555;
+        line-height: 1.45;
+    }
+    .rp-inclusion-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin: 12px 0;
+    }
+    .rp-inclusion-item {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 10px 12px;
+        font-weight: 800;
+        color: #222;
+    }
+    .rp-guarantee-note {
+        background: #111;
+        color: #fff;
+        border-radius: 14px;
+        padding: 11px 12px;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.35;
+        margin-top: 12px;
+    }
+    @media (min-width: 700px) {
+        .rp-inclusion-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
 </style>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -1712,14 +1759,14 @@ function gtag_report_conversion(url) {
     <div class="hero-overlay">
         <h1>Preparing Homes for Their Next Chapter.</h1>
         <div class="hero-trust">
-            <span><i class="fa-solid fa-star"></i> 35+ Google Reviews</span>
+            <span><i class="fa-solid fa-star"></i> 5.0 on Google • 35+ Ratings</span>
             <span><i class="fa-solid fa-bolt"></i> Same-Day Availability</span>
             <span><i class="fa-solid fa-house-circle-check"></i> 100+ Homes Prepared</span>
             <span><i class="fa-solid fa-shield-heart"></i> Defend Your Deposit</span>
             <span><i class="fa-solid fa-camera"></i> Picture Ready</span>
             <span><i class="fa-solid fa-building"></i> Lawton Fort Sill Chamber Member</span>
         </div>
-        <p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, and Southwest Oklahoma.</p>
+        <p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and Southwest Oklahoma.</p>
         <div class="hero-microcopy">
             <span>✓ Get a price in about 30 seconds</span>
             <span>✓ Same-day & next-day appointments often available</span>
@@ -1748,7 +1795,7 @@ function gtag_report_conversion(url) {
 
 <section class="quick-reviews" id="reviews">
     <h2>Trusted By Local Families, Renters, And Homeowners</h2>
-    <p class="section-text">⭐⭐⭐⭐⭐ Based on 35+ Google Reviews</p>
+    <p class="section-text">⭐⭐⭐⭐⭐ 5.0 on Google • 35+ Ratings</p>
     <div class="quick-review-grid">
         <div class="quick-review-card"><div class="stars">★★★★★</div><p>"Christa and her team were excellent for my move-out clean. The house looked great, and the entire process was smooth and stress-free."</p><strong>Corey M.</strong><span>Move-Out Cleaning Customer</span></div>
         <div class="quick-review-card"><div class="stars">★★★★★</div><p>"Christa was professional, detail-oriented, and did an excellent job. We were very happy with the results."</p><strong>Nina O.</strong><span>Verified Customer</span></div>
@@ -1768,35 +1815,6 @@ function gtag_report_conversion(url) {
     </div>
 </section>
 
-<section class="included-simple">
-    <h2>Factory Reset™ Move-Out & Move-In Cleaning Includes</h2>
-    <p class="section-text">Everything reasonably expected inside the home so it is ready for inspection, buyers, new tenants, or your next chapter.</p>
-    <div class="included-grid">
-        <div class="included-item">✓ Kitchen detailed top to bottom</div>
-        <div class="included-item">✓ Inside oven, microwave, and refrigerator</div>
-        <div class="included-item">✓ Cabinets and drawers cleaned</div>
-        <div class="included-item">✓ Bathrooms cleaned and sanitized</div>
-        <div class="included-item">✓ Baseboards, doors, edges, and corners</div>
-        <div class="included-item">✓ Interior windows, sills, and tracks</div>
-        <div class="included-item">✓ Floors vacuumed and mopped</div>
-        <div class="included-item">✓ Reasonable wall scuff touch-up</div>
-        <div class="included-item">✓ Basic garage sweep</div>
-    </div>
-    <p class="included-note">Beyond the Factory Reset: heavy trash removal, patios, balconies, severe mess, and specialty projects are quoted separately. Exterior windows can be added as an optional basic wash.</p>
-</section>
-
-<section class="rp-process">
-    <div class="rp-process-wrap">
-        <h2>Estimate → Book → We Clean → Move Forward</h2>
-        <p class="section-text">Simple, clear, and professional from pricing to final handoff.</p>
-        <div class="rp-process-grid">
-            <div class="rp-process-card"><i class="fa-solid fa-calculator"></i><h3>1. Estimate</h3><p>Get your cleaning price online.</p></div>
-            <div class="rp-process-card"><i class="fa-solid fa-calendar-check"></i><h3>2. Book</h3><p>Reserve your appointment online.</p></div>
-            <div class="rp-process-card"><i class="fa-solid fa-broom"></i><h3>3. We Clean</h3><p>Our team prepares the home.</p></div>
-            <div class="rp-process-card"><i class="fa-solid fa-key"></i><h3>4. Move Forward</h3><p>Hand over keys with confidence.</p></div>
-        </div>
-    </div>
-</section>
 
 <section class="faq-section" id="faq">
     <div class="faq-wrap">
@@ -1812,7 +1830,7 @@ function gtag_report_conversion(url) {
 
 <section class="contact-cta">
     <h2>Questions? Text Us Directly.</h2>
-    <p>Send your address, bedroom count, and any photos. We can help confirm the right service before you book.</p><p style="margin-top:12px;font-size:13px;font-weight:800;">Licensed & Insured • Lawton Fort Sill Chamber Member • 35+ Google Reviews</p>
+    <p>Send your address, bedroom count, and any photos. We can help confirm the right service before you book.</p><p style="margin-top:12px;font-size:13px;font-weight:800;">Licensed & Insured • 5.0 on Google • 35+ Ratings</p>
     <div class="cta-buttons">
         <a href="sms:5802150915" class="secondary-btn">Text Us</a>
         <a href="#booking" class="book-btn">Start Estimate</a>
@@ -1821,26 +1839,17 @@ function gtag_report_conversion(url) {
 
 <section class="service-area">
     <h2>Serving Southwest Oklahoma</h2>
-    <p class="section-text">Red Prairie Cleaning proudly serves Lawton, Fort Sill, Cache, Elgin, Medicine Park, and nearby Southwest Oklahoma communities.</p>
+    <p class="section-text">Red Prairie Cleaning serves Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and nearby Southwest Oklahoma communities.</p>
     <div class="areas">
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Lawton</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Fort Sill</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Cache</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Elgin</h3></div>
         <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Medicine Park</h3></div>
+        <div class="area-card"><i class="fa-solid fa-location-dot"></i><h3>Duncan</h3></div>
     </div>
 </section>
 
-
-<section class="chamber-trust" aria-label="Local business trust signal">
-    <div class="chamber-trust-card">
-        <i class="fa-solid fa-building"></i>
-        <div>
-            <h2>Proud Member of the Lawton Fort Sill Chamber of Commerce</h2>
-            <p>Red Prairie Cleaning is proud to support local homeowners, military families, property managers, and businesses throughout Southwest Oklahoma.</p>
-        </div>
-    </div>
-</section>
 
 
 <section id="blog" class="section soro-blog-section">
@@ -1919,15 +1928,94 @@ const rpUpholsteryPrices = {
 const rpMoveoutPrices = { 1: 199, 2: 299, 3: 399, 4: 499 };
 const rpMoveinPrices = { 1: 199, 2: 299, 3: 399, 4: 499 };
 
-function rpMaxSteps() { return 5; }
+function rpMaxSteps() { return 6; }
+
+function rpStepLabel() {
+  if (rpState.step <= 1) return "Choose Service";
+  if (rpState.step === 2) return "What's Included";
+  if (rpState.step === 3 || rpState.step === 4) return "Home Details";
+  if (rpState.step === 5) return "Instant Price";
+  if (rpState.step === 6) return "Contact";
+  return "Book Appointment";
+}
 
 function rpUpdateProgress() {
-  const max = rpMaxSteps();
   const stepText = document.getElementById("rpStepText");
   const fill = document.getElementById("rpProgressFill");
-  const pct = Math.round((Math.min(rpState.step, max) / max) * 100);
-  if (stepText) stepText.innerHTML = `<strong>30 second estimate</strong> · ${pct}% complete`;
+  const progressMap = { 1: 16, 2: 32, 3: 50, 4: 62, 5: 78, 6: 90, 7: 100 };
+  const pct = progressMap[rpState.step] || 16;
+  if (stepText) stepText.innerHTML = `<strong>${rpStepLabel()}</strong> · Service → Details → Price → Book`;
   if (fill) fill.style.width = `${pct}%`;
+}
+
+function rpDurationLabel() {
+  if (rpState.service === "moveout" || rpState.service === "movein") return "Estimated time: 6–10 hours • 2 cleaners";
+  if (rpState.service === "deep") return "Estimated time: up to 6 hours • 1 cleaner";
+  if (rpState.service === "maintenance") return "Estimated time: up to 4 hours • 1 cleaner";
+  if (rpState.service === "carpet") return "Estimated time varies by room count";
+  if (rpState.service === "upholstery") return "Estimated time varies by furniture item";
+  return "";
+}
+
+function rpServiceDetails(serviceKey = rpState.service) {
+  const details = {
+    moveout: {
+      title: "Factory Reset™ Move-Out Cleaning",
+      subtitle: "Best for rentals, inspections, key handoff, and property turnovers.",
+      items: ["Kitchen + appliances", "Bathrooms sanitized", "Cabinets + drawers", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
+      note: "Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an area we missed, contact us within 48 hours and we will make it right within the original scope."
+    },
+    movein: {
+      title: "Factory Reset™ Move-In Cleaning",
+      subtitle: "Best before furniture, boxes, kids, pets, and everyday life move in.",
+      items: ["Kitchen + appliances", "Bathrooms sanitized", "Cabinets + drawers", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Dust + detail reset", "Move-in ready finish"],
+      note: "Designed to help the home feel clean before you unpack. Severe mess, trash, and specialty projects are quoted separately."
+    },
+    deep: {
+      title: "Deep Cleaning",
+      subtitle: "Best for lived-in homes with buildup, grime, dust, and neglected areas.",
+      items: ["Kitchen detail", "Bathroom detail", "Dusting + surfaces", "Baseboards + doors", "Floors cleaned", "High-touch areas", "Optional carpet cleaning", "Optional windows"],
+      note: "Deep cleans are normally staffed by one cleaner and can take up to 6 hours depending on condition."
+    },
+    maintenance: {
+      title: "Maintenance Cleaning",
+      subtitle: "Best for homes already in decent shape that need routine upkeep.",
+      items: ["Kitchen surfaces", "Bathroom upkeep", "Dusting", "Vacuum + mop", "Trash touchpoints", "General tidy reset"],
+      note: "Maintenance cleans are normally staffed by one cleaner and are designed to take no more than 4 hours."
+    },
+    carpet: {
+      title: "Professional Steam Carpet Cleaning",
+      subtitle: "Hot-water extraction for carpeted rooms, move-outs, and common rental requirements.",
+      items: ["Pre-spray treatment", "Hot-water extraction", "Bedroom carpets", "Living areas", "Hallways", "$75 per carpeted room"],
+      note: "Heavy stains, pet issues, odor treatment, or unusual carpet conditions may require additional quoting."
+    },
+    upholstery: {
+      title: "Professional Upholstery Cleaning",
+      subtitle: "Fabric furniture cleaning for sofas, recliners, loveseats, dining chairs, and sectionals.",
+      items: ["Fabric inspection", "Pre-treatment", "Upholstery extraction", "Dining chairs", "Recliners", "Sofas + sectionals"],
+      note: "We inspect the fabric before cleaning. Some materials or severe stains may not be suitable for standard upholstery cleaning."
+    }
+  };
+  return details[serviceKey] || details.moveout;
+}
+
+function rpRenderServiceDetailsStep() {
+  const app = document.getElementById("rpApp");
+  const d = rpServiceDetails();
+  app.innerHTML = `
+    <div class="rp-service-summary">
+      <h2>${d.title}</h2>
+      <p>${d.subtitle}</p>
+      <div class="rp-inclusion-grid">
+        ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
+      </div>
+      <div class="rp-guarantee-note">${d.note}</div>
+    </div>
+    <div class="rp-btns">
+      <button class="rp-secondary" onclick="rpBack()">Back</button>
+      <button class="rp-primary" onclick="rpContinueFromDetails()">Continue</button>
+    </div>
+  `;
 }
 
 function rpCalculatePrice() {
@@ -1979,8 +2067,8 @@ function rpRender() {
 
   if (rpState.step === 1) {
     app.innerHTML = `
-      ${rpLivePrice("Choose your service below.")}
-      <p class="rp-tap-note">👇 Tap one option</p>
+      <h2>Choose your cleaning service</h2>
+      <p class="rp-tap-note">👇 Tap one option. We'll show what's included before asking about the home.</p>
       <div class="rp-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
@@ -2013,11 +2101,14 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 2 && (rpState.service === "moveout" || rpState.service === "movein")) {
+  if (rpState.step === 2) {
+    return rpRenderServiceDetailsStep();
+  }
+
+  if (rpState.step === 3 && (rpState.service === "moveout" || rpState.service === "movein")) {
     const isMoveIn = rpState.service === "movein";
     const priceTable = isMoveIn ? rpMoveinPrices : rpMoveoutPrices;
     app.innerHTML = `
-      ${rpLivePrice(isMoveIn ? "Select bedroom count to see your move-in price." : "Select bedroom count to see your move-out price.")}
       <h2>How many bedrooms?</h2>
       <div class="rp-pill-grid">
         ${[1,2,3,4].map(n => `<button class="rp-pill" onclick="rpSelectBedrooms(${n})">${n} Bedroom<br><small>$${priceTable[n]}</small></button>`).join("")}
@@ -2027,9 +2118,8 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 2 && rpState.service === "carpet") {
+  if (rpState.step === 3 && rpState.service === "carpet") {
     app.innerHTML = `
-      ${rpLivePrice("$75 per carpeted room.")}
       <h2>How many carpeted rooms?</h2>
       <div class="rp-pill-grid">
         ${[1,2,3,4,5,6].map(n => `<button class="rp-pill" onclick="rpSelectCarpetOnlyRooms(${n})">${n}${n === 6 ? "+" : ""}<br><small>$${n*75}${n === 6 ? "+" : ""}</small></button>`).join("")}
@@ -2039,9 +2129,8 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 2 && rpState.service === "upholstery") {
+  if (rpState.step === 3 && rpState.service === "upholstery") {
     app.innerHTML = `
-      ${rpLivePrice("Choose the furniture piece you want cleaned.")}
       <h2>What upholstery are we cleaning?</h2>
       <p class="rp-sub">Safe for most synthetic upholstery. We inspect the fabric before cleaning.</p>
       
@@ -2077,9 +2166,8 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 2 && ["deep", "maintenance"].includes(rpState.service)) {
+  if (rpState.step === 3 && ["deep", "maintenance"].includes(rpState.service)) {
     app.innerHTML = `
-      ${rpLivePrice("Starting estimate shown above.")}
       <h2>How many bedrooms?</h2>
       <div class="rp-pill-grid">
         ${[1,2,3,4,5].map(n => `<button class="rp-pill" onclick="rpSelectBedrooms(${n})">${n}${n === 5 ? "+" : ""}</button>`).join("")}
@@ -2089,10 +2177,9 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 3 && (rpState.service === "moveout" || rpState.service === "movein")) {
+  if (rpState.step === 4 && (rpState.service === "moveout" || rpState.service === "movein")) {
     const isMoveIn = rpState.service === "movein";
     app.innerHTML = `
-      ${rpLivePrice(isMoveIn ? "Optional carpet cleaning can help the home feel move-in ready." : "Optional services can complete the reset.")}
       <h2>Add carpet or exterior windows?</h2>
       <p class="rp-sub">Carpet cleaning is the main upsell. Exterior window basic wash is optional.</p>
       <div class="rp-choice-grid">
@@ -2121,9 +2208,8 @@ function rpRender() {
     return;
   }
 
-  if (rpState.step === 3 && ["deep", "maintenance"].includes(rpState.service)) {
+  if (rpState.step === 4 && ["deep", "maintenance"].includes(rpState.service)) {
     app.innerHTML = `
-      ${rpLivePrice("Bathrooms adjust the estimate.")}
       <h2>How many bathrooms?</h2>
       <div class="rp-pill-grid">
         ${[1,2,3,4].map(n => `<button class="rp-pill" onclick="rpSelectBathrooms(${n})">${n}${n === 4 ? "+" : ""}</button>`).join("")}
@@ -2133,9 +2219,9 @@ function rpRender() {
     return;
   }
 
-  if ((rpState.step === 3 && (rpState.service === "carpet" || rpState.service === "upholstery")) || rpState.step === 4) return rpRenderEstimateStep();
-  if (rpState.step === 5) return rpRenderLeadStep();
-  if (rpState.step === 6) return rpRenderCalendarStep();
+  if (rpState.step === 5) return rpRenderEstimateStep();
+  if (rpState.step === 6) return rpRenderLeadStep();
+  if (rpState.step === 7) return rpRenderCalendarStep();
 }
 
 function rpRenderEstimateStep() {
@@ -2168,6 +2254,7 @@ function rpRenderEstimateStep() {
     ` : ""}
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
+      ${rpDurationLabel() ? `<div class="rp-mini-row"><span>Time / Staffing</span><strong>${rpDurationLabel()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${(rpState.service === "moveout" || rpState.service === "movein") && rpState.bedrooms ? `<div class="rp-mini-row"><span>${rpState.service === "movein" ? "Factory Reset™ Move-In base" : "Factory Reset™ Move-Out base"}</span><strong>$${(rpState.service === "movein" ? rpMoveinPrices : rpMoveoutPrices)[Math.min(rpState.bedrooms, 4)]}</strong></div>` : ""}
@@ -2253,16 +2340,29 @@ function rpRenderCalendarStep() {
 }
 
 function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.upholsteryType = null; rpState.upholsteryLabel = ""; rpState.upholsteryPrice = 0; rpState.estimateSent = false; rpState.preBookingWebhookSent = false; rpRender(); rpScrollToCalculator(); }
-function rpSelectBedrooms(n) { rpState.bedrooms = n; rpState.step = 3; rpRender(); rpScrollToCalculator(); }
-function rpSelectBathrooms(n) { rpState.bathrooms = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
-function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpState.step = 3; rpRender(); rpScrollToCalculator(); }
-function rpSelectUpholstery(type) { const item = rpUpholsteryPrices[type]; if (!item) return; rpState.upholsteryType = type; rpState.upholsteryLabel = item.label; rpState.upholsteryPrice = item.price; rpState.step = 3; rpRender(); rpScrollToCalculator(); }
+function rpContinueFromDetails() { rpState.step = 3; rpRender(); rpScrollToCalculator(); }
+function rpSelectBedrooms(n) { rpState.bedrooms = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
+function rpSelectBathrooms(n) { rpState.bathrooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
+function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
+function rpSelectUpholstery(type) { const item = rpUpholsteryPrices[type]; if (!item) return; rpState.upholsteryType = type; rpState.upholsteryLabel = item.label; rpState.upholsteryPrice = item.price; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
 function rpToggleCarpetUpsell(checked) { rpState.carpetRooms = checked ? 1 : 0; rpRender(); }
 function rpSelectMoveoutCarpetRooms(n) { rpState.carpetRooms = n; rpRender(); }
 function rpToggleExteriorWindows(checked) { rpState.exteriorWindows = checked; rpRender(); }
-function rpGoToEstimate() { rpState.step = 4; rpRender(); rpScrollToCalculator(); }
-function rpGoToLead() { rpState.step = 5; rpRender(); rpScrollToCalculator(); }
-function rpBack() { if (rpState.step <= 1) return; if (rpState.step === 6) rpState.step = 5; else if (rpState.step === 5) rpState.step = 4; else if (rpState.step === 4 && (rpState.service === "moveout" || rpState.service === "movein")) rpState.step = 3; else if (rpState.step === 4) rpState.step = 3; else if (rpState.step === 3) rpState.step = 2; else if (rpState.step === 2) rpState.step = 1; rpRender(); rpScrollToCalculator(); }
+function rpGoToEstimate() { rpState.step = 5; rpRender(); rpScrollToCalculator(); }
+function rpGoToLead() { rpState.step = 7; rpRender(); rpScrollToCalculator(); }
+function rpBack() {
+  if (rpState.step <= 1) return;
+  if (rpState.step === 7) rpState.step = 6;
+  else if (rpState.step === 6) rpState.step = 5;
+  else if (rpState.step === 5) {
+    if (rpState.service === "carpet" || rpState.service === "upholstery") rpState.step = 3;
+    else rpState.step = 4;
+  }
+  else if (rpState.step === 4) rpState.step = 3;
+  else if (rpState.step === 3) rpState.step = 2;
+  else if (rpState.step === 2) rpState.step = 1;
+  rpRender(); rpScrollToCalculator();
+}
 
 function rpScrollToCalculator(instant = false) { const card = document.querySelector(".rp-card"); if (!card) return; const nav = document.querySelector(".navbar"); const navHeight = nav ? nav.offsetHeight : 70; const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10; window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" }); }
 
@@ -2313,7 +2413,7 @@ function rpSubmitLeadAndShowCalendar() {
   });
 
   const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Opening calendar..."; }
-  rpState.step = 6; rpRender(); rpScrollToCalculator();
+  rpState.step = 7; rpRender(); rpScrollToCalculator();
 }
 function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-script")) return; const script = document.createElement("script"); script.src = "https://link.msgsndr.com/js/form_embed.js"; script.type = "text/javascript"; script.id = "ghl-calendar-script"; document.body.appendChild(script); }
 
