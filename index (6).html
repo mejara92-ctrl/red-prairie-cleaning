@@ -1,0 +1,56 @@
+name: Urgent Homepage Copy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/urgent-homepage-copy.yml'
+      - 'urgent-copy-trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = s
+          s = s.replace('<span><i class="fa-solid fa-star"></i> 35+ Google Reviews</span>', '<span><i class="fa-solid fa-star"></i> 35+ Google Reviews</span>\n            <span><i class="fa-solid fa-bolt"></i> Same-Day Availability Often Available</span>', 1)
+          s = s.replace('✓ Book instantly or text us with questions', '✓ Same-day and next-day cleanings often available')
+          s = s.replace('<div class="hero-buttons">\n            <a href="#booking" class="quote-btn">Start Instant Estimate</a>\n            <a href="sms:5802150915" class="secondary-btn">Text Us</a>\n        </div>', '<div class="hero-buttons">\n            <a href="#booking" class="quote-btn">Start Instant Estimate</a>\n            <a href="sms:5802150915" class="secondary-btn">Text Us</a>\n        </div>\n        <p class="hero-urgent-note">Need it sooner? Call or text us. We can often accommodate same-day and next-day cleanings.</p>', 1)
+          s = s.replace('<p>Answer a few quick questions. Your price updates as you go.</p>', '<p>Answer a few quick questions. Your price updates as you go.</p>\n            <p class="booking-urgent-note"><strong>Moving tomorrow or on a tight deadline?</strong> We frequently help with last-minute cleanings. If you do not see the time you need online, call or text (580) 215-0915.</p>', 1)
+          if '.hero-urgent-note' not in s:
+              css = '''
+        .hero-urgent-note {
+            margin: 12px 0 0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+        .booking-urgent-note {
+            max-width: 760px;
+            margin: 12px auto 0;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+        .booking-urgent-note strong { color: var(--red); }
+'''
+              s = s.replace('</style>', css + '\n</style>', 1)
+          if s != old:
+              p.write_text(s, encoding='utf-8')
+          PY
+      - run: |
+          if git diff --quiet; then echo "No changes"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Add urgent homepage copy"
+          git push
