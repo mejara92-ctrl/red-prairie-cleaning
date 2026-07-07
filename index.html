@@ -1783,7 +1783,7 @@ function gtag_report_conversion(url) {
         <div class="rp-funnel-header">
             <div class="rp-estimator-kicker">Instant Price Estimator</div>
             <h2>Instant Price Estimate</h2>
-            <p>Answer a few quick questions. Your price updates as you go.</p><p style="font-weight:700;">Need your cleaning sooner? We can often accommodate same-day and next-day appointments. If you do not see the time you need online, call or text us.</p></p>
+            <p>Choose your service, see what is included, then get your instant price.</p><p style="font-weight:700;">Need your cleaning sooner? We can often accommodate same-day and next-day appointments. If you do not see the time you need online, call or text us.</p>
         </div>
         <div class="rp-card">
             <div class="rp-progress-label"><span id="rpStepText">30 second estimate</span><span>Red Prairie Cleaning</span></div>
@@ -2073,28 +2073,28 @@ function rpRender() {
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
           <strong>🚚 Factory Reset™ Move-Out Cleaning</strong>
-          <span>Our signature empty-home reset for keys, inspections, landlord walkthroughs, and property turnovers.</span>
+          <span>Perfect for renters, inspections, and turnovers.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('movein')">
           <span class="badge">Second Most Popular</span>
           <strong>🔑 Factory Reset™ Move-In Cleaning</strong>
-          <span>Get the home ready before furniture, boxes, kids, pets, and real life move in.</span>
+          <span>Start fresh before boxes and furniture arrive.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('carpet')">
           <strong>🧼 Steam Carpet Cleaning</strong>
-          <span>Hot-water extraction carpet cleaning for bedrooms, living areas, hallways, and move-out requirements.</span>
+          <span>Hot-water extraction for carpeted rooms.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('upholstery')">
           <strong>🛋️ Professional Upholstery Cleaning</strong>
-          <span>Professional fabric furniture cleaning for sofas, recliners, loveseats, dining chairs, and sectionals.</span>
+          <span>Fabric cleaning for sofas, chairs, and sectionals.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('deep')">
           <strong>✨ Deep Cleaning</strong>
-          <span>A heavier detail clean for lived-in homes with buildup, grime, dust, and neglected areas.</span>
+          <span>For buildup, grime, dust, and neglected areas.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('maintenance')">
           <strong>🏠 Maintenance Cleaning</strong>
-          <span>Routine upkeep for homes that are already in decent shape and need consistent cleaning.</span>
+          <span>For homes that need routine upkeep.</span>
         </button>
       </div>
     `;
@@ -2349,7 +2349,7 @@ function rpToggleCarpetUpsell(checked) { rpState.carpetRooms = checked ? 1 : 0; 
 function rpSelectMoveoutCarpetRooms(n) { rpState.carpetRooms = n; rpRender(); }
 function rpToggleExteriorWindows(checked) { rpState.exteriorWindows = checked; rpRender(); }
 function rpGoToEstimate() { rpState.step = 5; rpRender(); rpScrollToCalculator(); }
-function rpGoToLead() { rpState.step = 7; rpRender(); rpScrollToCalculator(); }
+function rpGoToLead() { rpState.step = 6; rpRender(); rpScrollToCalculator(); }
 function rpBack() {
   if (rpState.step <= 1) return;
   if (rpState.step === 7) rpState.step = 6;
