@@ -75,13 +75,21 @@
 
     function maxSteps() { return 5; }
 
+    function estimatePhase() {
+      var step = Number(rpState.step || 1);
+      if (step <= 1) return { label: 'Choose Service', pct: 20 };
+      if (step === 2) return { label: 'What\'s Included', pct: 40 };
+      if (step === 3 || step === 4) return { label: 'Home Details', pct: 60 };
+      if (step === 5) return { label: 'Instant Price', pct: 80 };
+      return { label: 'Book Appointment', pct: 100 };
+    }
+
     function updateProgress() {
-      var max = maxSteps();
       var stepText = document.getElementById('rpStepText');
       var fill = document.getElementById('rpProgressFill');
-      var pct = Math.round((Math.min(rpState.step || 1, max) / max) * 100);
-      if (stepText) stepText.innerHTML = '<strong>30 second estimate</strong> · ' + pct + '% complete';
-      if (fill) fill.style.width = pct + '%';
+      var phase = estimatePhase();
+      if (stepText) stepText.innerHTML = '<strong>' + phase.label + '</strong> · service → details → price → book';
+      if (fill) fill.style.width = phase.pct + '%';
     }
 
     function calculatePrice() {
@@ -121,48 +129,114 @@
       return '<div class="rp-live-price"><small>Current Estimate</small><strong>' + priceLabel() + '</strong><span>' + displayNote + '</span></div>';
     }
 
+    function serviceBlurb(serviceKey) {
+      var blurbs = {
+        moveout: 'Perfect for renters, inspections, and property turnovers.',
+        movein: 'A detailed reset before boxes, furniture, kids, pets, and real life move in.',
+        deep: 'A heavier one-time clean for lived-in homes with buildup, dust, and grime.',
+        maintenance: 'Routine upkeep for homes already in decent shape.',
+        carpet: 'Hot-water extraction for carpeted bedrooms, living areas, and hallways.',
+        upholstery: 'Fabric furniture cleaning for sofas, loveseats, recliners, chairs, and sectionals.'
+      };
+      return blurbs[serviceKey] || 'Professional cleaning from Red Prairie Cleaning.';
+    }
+
+    function serviceDuration(serviceKey) {
+      if (serviceKey === 'moveout' || serviceKey === 'movein') return 'Estimated time: 6–10 hours depending on severity · Crew: 2 cleaning professionals';
+      if (serviceKey === 'deep') return 'Estimated time: up to 6 hours · Crew: 1 cleaning professional';
+      if (serviceKey === 'maintenance') return 'Estimated time: up to 4 hours · Crew: 1 cleaning professional';
+      if (serviceKey === 'carpet') return 'Estimated time varies by room count';
+      if (serviceKey === 'upholstery') return 'Estimated time varies by furniture item';
+      return '';
+    }
+
+    function serviceIncludes(serviceKey) {
+      var lists = {
+        moveout: [
+          'Kitchen detailed top to bottom', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped inside and out', 'Bathrooms cleaned and sanitized',
+          'Baseboards, doors, edges, and corners', 'Interior windows, sills, and tracks', 'Floors vacuumed and mopped', 'Reasonable wall scuff touch-up', 'Basic garage sweep'
+        ],
+        movein: [
+          'Kitchen reset before food and dishes move in', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped before unpacking', 'Bathrooms cleaned and sanitized',
+          'Baseboards, doors, edges, and corners', 'Interior windows, sills, and tracks', 'Floors vacuumed and mopped', 'High-touch surfaces cleaned'
+        ],
+        deep: [
+          'Kitchen and bathroom detail cleaning', 'Built-up dust and grime removal', 'Baseboards, doors, and common touch points', 'Floors vacuumed and mopped',
+          'Exterior surfaces of appliances', 'General detail reset for lived-in homes'
+        ],
+        maintenance: [
+          'Kitchen maintenance cleaning', 'Bathroom maintenance cleaning', 'Dusting common surfaces', 'Floors vacuumed and mopped', 'Routine upkeep for maintained homes'
+        ],
+        carpet: [
+          'Pre-spray treatment', 'Hot-water extraction cleaning', 'Carpeted bedrooms, living areas, or hallways', 'Great for move-out requirements and traffic lanes'
+        ],
+        upholstery: [
+          'Fabric inspection before cleaning', 'Professional upholstery extraction', 'Sofas, loveseats, recliners, chairs, or sectionals', 'Helps refresh furniture and remove normal soil'
+        ]
+      };
+      return lists[serviceKey] || [];
+    }
+
+    function renderIncludedStep() {
+      var serviceMap = getServiceMap();
+      var service = serviceMap[rpState.service] || services[rpState.service] || { name: 'Cleaning', emoji: '' };
+      var includes = serviceIncludes(rpState.service).map(function (item) { return '<li>✓ ' + item + '</li>'; }).join('');
+      var trust = '';
+      if (rpState.service === 'moveout') {
+        trust = '<div class="rp-guarantee"><strong>Inspection-Ready Re-Clean Guarantee</strong><span>We clean the in-scope areas to help prevent cleanliness from being the reason a security deposit is reduced. If a landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will return to re-clean it at no charge.</span></div>';
+      } else {
+        trust = '<div class="rp-guarantee"><strong>Satisfaction Re-Clean Guarantee</strong><span>If we miss an in-scope area, contact us within 48 hours and we will return to re-clean it at no charge.</span></div>';
+      }
+      document.getElementById('rpApp').innerHTML =
+        '<div class="rp-service-intro"><p class="rp-tap-note">You selected</p><h2>' + (service.emoji || '') + ' ' + service.name + '</h2><p class="rp-sub">' + serviceBlurb(rpState.service) + '</p></div>' +
+        '<div class="rp-included"><div class="rp-included-title">What\'s Included</div><ul class="rp-checklist rp-checklist-list">' + includes + '</ul></div>' +
+        '<div class="rp-duration-note">' + serviceDuration(rpState.service) + '</div>' + trust +
+        '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button><button class="rp-primary" onclick="rpContinueFromIncludes()">Continue</button></div>';
+    }
+
     function render() {
       patchState();
       updateProgress();
       var app = document.getElementById('rpApp');
       if (!app) return;
-      var serviceMap = getServiceMap();
 
       if (rpState.step === 1 || !rpState.step) {
-        app.innerHTML = livePrice('Choose your service below.') +
+        app.innerHTML =
           '<p class="rp-tap-note">👇 Tap one option</p>' +
           '<div class="rp-grid">' +
-          '<button class="rp-option featured-option" onclick="rpSelectService(\'moveout\')"><span class="badge">Most Popular</span><strong>🚚 Factory Reset™ Move-Out Cleaning</strong><span>Our signature empty-home reset for keys, inspections, landlord walkthroughs, and property turnovers.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'movein\')"><span class="badge">Second Most Popular</span><strong>🔑 Factory Reset™ Move-In Cleaning</strong><span>Get the home ready before furniture, boxes, kids, pets, and real life move in.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'carpet\')"><strong>🧼 Steam Carpet Cleaning</strong><span>Hot-water extraction carpet cleaning for bedrooms, living areas, hallways, and move-out requirements.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'upholstery\')"><strong>🛋️ Professional Upholstery Cleaning</strong><span>Professional fabric furniture cleaning for sofas, recliners, loveseats, dining chairs, and sectionals.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'deep\')"><strong>✨ Deep Cleaning</strong><span>A heavier detail clean for lived-in homes with buildup, grime, dust, and neglected areas.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'maintenance\')"><strong>🏠 Maintenance Cleaning</strong><span>Routine upkeep for homes that are already in decent shape and need consistent cleaning.</span></button>' +
+          '<button class="rp-option featured-option" onclick="rpSelectService(\'moveout\')"><span class="badge">Most Popular</span><strong>🚚 Factory Reset™ Move-Out</strong><span>Renters, inspections & turnovers.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(\'movein\')"><span class="badge">Second Most Popular</span><strong>🔑 Factory Reset™ Move-In</strong><span>Fresh start before move-in day.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(\'carpet\')"><strong>🧼 Steam Carpet Cleaning</strong><span>$75 per carpeted room.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(\'upholstery\')"><strong>🛋️ Upholstery Cleaning</strong><span>Sofas, recliners & sectionals.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(\'deep\')"><strong>✨ Deep Cleaning</strong><span>Heavy detail clean for lived-in homes.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(\'maintenance\')"><strong>🏠 Maintenance Cleaning</strong><span>Routine upkeep for maintained homes.</span></button>' +
           '</div>';
         return;
       }
 
-      if (rpState.step === 2 && (rpState.service === 'moveout' || rpState.service === 'movein')) {
+      if (rpState.step === 2) return renderIncludedStep();
+
+      if (rpState.step === 3 && (rpState.service === 'moveout' || rpState.service === 'movein')) {
         var isMoveIn = rpState.service === 'movein';
         var table = isMoveIn ? moveinPrices : moveoutPrices;
-        app.innerHTML = livePrice(isMoveIn ? 'Select bedroom count to see your move-in price.' : 'Select bedroom count to see your move-out price.') +
-          '<h2>How many bedrooms?</h2>' +
+        app.innerHTML =
+          '<h2>How many bedrooms?</h2><p class="rp-sub">This sets the base price for your ' + (isMoveIn ? 'move-in' : 'move-out') + ' cleaning.</p>' +
           '<div class="rp-pill-grid">' + [1,2,3,4].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBedrooms(' + n + ')">' + n + ' Bedroom<br><small>$' + table[n] + '</small></button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
         return;
       }
 
-      if (rpState.step === 2 && rpState.service === 'carpet') {
-        app.innerHTML = livePrice('$75 per carpeted room.') +
-          '<h2>How many carpeted rooms?</h2>' +
+      if (rpState.step === 3 && rpState.service === 'carpet') {
+        app.innerHTML =
+          '<h2>How many carpeted rooms?</h2><p class="rp-sub">Steam carpet cleaning is $75 per carpeted room.</p>' +
           '<div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill" onclick="rpSelectCarpetOnlyRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '<br><small>$' + (n * 75) + (n === 6 ? '+' : '') + '</small></button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
         return;
       }
 
-      if (rpState.step === 2 && rpState.service === 'upholstery') {
-        app.innerHTML = livePrice('Choose the furniture piece you want cleaned.') +
-          '<h2>What upholstery are we cleaning?</h2><p class="rp-sub">Safe for most synthetic upholstery. We inspect the fabric before cleaning.</p>' +
+      if (rpState.step === 3 && rpState.service === 'upholstery') {
+        app.innerHTML =
+          '<h2>What upholstery are we cleaning?</h2><p class="rp-sub">Choose the closest furniture item.</p>' +
           '<div class="rp-grid">' +
           '<button class="rp-option" onclick="rpSelectUpholstery(\'chair\')"><strong>🪑 Dining Chair</strong><span>$100 minimum upholstery cleaning.</span></button>' +
           '<button class="rp-option" onclick="rpSelectUpholstery(\'recliner\')"><strong>💺 Recliner</strong><span>$125 professional upholstery cleaning.</span></button>' +
@@ -174,18 +248,19 @@
         return;
       }
 
-      if (rpState.step === 2 && ['deep','maintenance'].indexOf(rpState.service) >= 0) {
-        app.innerHTML = livePrice('Starting estimate shown above.') +
-          '<h2>How many bedrooms?</h2><div class="rp-pill-grid">' + [1,2,3,4,5].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBedrooms(' + n + ')">' + n + (n === 5 ? '+' : '') + '</button>'; }).join('') + '</div>' +
+      if (rpState.step === 3 && ['deep','maintenance'].indexOf(rpState.service) >= 0) {
+        app.innerHTML =
+          '<h2>How many bedrooms?</h2><p class="rp-sub">This helps estimate the size of the home.</p>' +
+          '<div class="rp-pill-grid">' + [1,2,3,4,5].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBedrooms(' + n + ')">' + n + (n === 5 ? '+' : '') + '</button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
         return;
       }
 
-      if (rpState.step === 3 && (rpState.service === 'moveout' || rpState.service === 'movein')) {
+      if (rpState.step === 4 && (rpState.service === 'moveout' || rpState.service === 'movein')) {
         var moveIn = rpState.service === 'movein';
-        app.innerHTML = livePrice(moveIn ? 'Optional carpet cleaning can help the home feel move-in ready.' : 'Optional services can complete the reset.') +
+        app.innerHTML =
           '<h2>Add carpet or exterior windows?</h2>' +
-          '<p class="rp-sub">Steam carpet cleaning is our most popular add-on. Select it to choose how many carpeted rooms.</p>' +
+          '<p class="rp-sub">Optional services can complete the reset. Skip anything you do not need.</p>' +
           '<div class="rp-choice-grid">' +
           '<label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label>' +
           '<div id="rpCarpetRoomPicker" style="' + (rpState.carpetRooms > 0 ? '' : 'display:none;') + '"><p class="rp-sub" style="margin:8px 0;">How many carpeted rooms?</p><div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill ' + (rpState.carpetRooms === n ? 'is-selected' : '') + '" onclick="rpSelectMoveoutCarpetRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '</button>'; }).join('') + '</div></div>' +
@@ -194,16 +269,17 @@
         return;
       }
 
-      if (rpState.step === 3 && ['deep','maintenance'].indexOf(rpState.service) >= 0) {
-        app.innerHTML = livePrice('Bathrooms adjust the estimate.') +
-          '<h2>How many bathrooms?</h2><div class="rp-pill-grid">' + [1,2,3,4].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBathrooms(' + n + ')">' + n + (n === 4 ? '+' : '') + '</button>'; }).join('') + '</div>' +
+      if (rpState.step === 4 && ['deep','maintenance'].indexOf(rpState.service) >= 0) {
+        app.innerHTML =
+          '<h2>How many bathrooms?</h2><p class="rp-sub">Bathrooms adjust the estimate.</p>' +
+          '<div class="rp-pill-grid">' + [1,2,3,4].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBathrooms(' + n + ')">' + n + (n === 4 ? '+' : '') + '</button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
         return;
       }
 
-      if ((rpState.step === 3 && (rpState.service === 'carpet' || rpState.service === 'upholstery')) || rpState.step === 4) return renderEstimateStep();
-      if (rpState.step === 5) return renderLeadStep();
-      if (rpState.step === 6) return renderCalendarStep();
+      if ((rpState.step === 4 && (rpState.service === 'carpet' || rpState.service === 'upholstery')) || rpState.step === 5) return renderEstimateStep();
+      if (rpState.step === 6) return renderLeadStep();
+      if (rpState.step === 7) return renderCalendarStep();
     }
 
     function renderEstimateStep() {
@@ -216,6 +292,7 @@
         (rpState.service === 'deep' ? '<div class="rp-choice-grid" style="margin-bottom:16px;"><p class="rp-tap-note" style="margin-bottom:2px;">Optional add-ons</p><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label><div id="rpCarpetRoomPicker" style="' + (rpState.carpetRooms > 0 ? '' : 'display:none;') + '"><p class="rp-sub" style="margin:8px 0;">How many carpeted rooms?</p><div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill ' + (rpState.carpetRooms === n ? 'is-selected' : '') + '" onclick="rpSelectMoveoutCarpetRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '</button>'; }).join('') + '</div></div><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.exteriorWindows ? 'checked' : '') + ' onchange="rpToggleExteriorWindows(this.checked)"><div><strong>Exterior window basic wash</strong><span>Exterior glass only. No screen removal.</span></div><div class="rp-price-chip">+$100</div></label></div>' : '') +
         '<div class="rp-invoice">' +
         '<div class="rp-mini-row"><span>Service</span><strong>' + service.name + '</strong></div>' +
+        '<div class="rp-mini-row"><span>Time / Crew</span><strong>' + serviceDuration(rpState.service) + '</strong></div>' +
         (rpState.bedrooms ? '<div class="rp-mini-row"><span>Bedrooms</span><strong>' + rpState.bedrooms + (rpState.bedrooms >= 5 ? '+' : '') + '</strong></div>' : '') +
         (rpState.bathrooms ? '<div class="rp-mini-row"><span>Bathrooms</span><strong>' + rpState.bathrooms + (rpState.bathrooms >= 4 ? '+' : '') + '</strong></div>' : '') +
         ((rpState.service === 'moveout' || rpState.service === 'movein') && rpState.bedrooms ? '<div class="rp-mini-row"><span>' + (rpState.service === 'movein' ? 'Factory Reset™ Move-In base' : 'Factory Reset™ Move-Out base') + '</span><strong>$' + (rpState.service === 'movein' ? moveinPrices : moveoutPrices)[Math.min(rpState.bedrooms, 4)] + '</strong></div>' : '') +
@@ -335,7 +412,7 @@
       if (document.getElementById('rp-canonical-estimator-style')) return;
       var style = document.createElement('style');
       style.id = 'rp-canonical-estimator-style';
-      style.textContent = '.rp-checkbox-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fafafa;border:2px solid #ddd;border-radius:16px;padding:14px;cursor:pointer}.rp-checkbox-card input{width:20px;height:20px;accent-color:#d00000}.rp-checkbox-card strong{display:block;font-size:15px}.rp-checkbox-card span{display:block;color:#555;font-size:12px}.rp-price-chip{background:#fff0f0;color:#d00000;border:1px solid #f0caca;border-radius:999px;padding:6px 10px;font-weight:900;white-space:nowrap;font-size:13px}.rp-mini-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #eee;padding:10px 0;font-size:14px}.rp-mini-row strong{text-align:right}.rp-choice-grid{display:grid;gap:10px;margin:14px 0}.rp-live-price{background:#101010;color:#fff;border-radius:20px;padding:15px;margin:0 0 12px;box-shadow:0 16px 36px rgba(0,0,0,.18)}.rp-live-price small{display:block;color:#ddd;font-weight:900;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}.rp-live-price strong{display:block;color:#fff;font-size:clamp(40px,13vw,66px);line-height:.95;letter-spacing:-.05em}.rp-live-price span{display:block;color:#eee;font-size:13.5px;margin-top:9px}.rp-option{position:relative;padding-right:48px;border:2px solid #ddd}.rp-option::after{content:"›";position:absolute;right:17px;top:50%;transform:translateY(-50%);color:#d00000;font-size:34px;font-weight:900;line-height:1}.rp-option .badge{display:inline-flex;background:#d00000;color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-bottom:6px}.rp-pill.is-selected,.rp-option.is-selected{border-color:#d00000;background:#fff5f5}';
+      style.textContent = '.rp-checkbox-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fafafa;border:2px solid #ddd;border-radius:16px;padding:14px;cursor:pointer}.rp-checkbox-card input{width:20px;height:20px;accent-color:#d00000}.rp-checkbox-card strong{display:block;font-size:15px}.rp-checkbox-card span{display:block;color:#555;font-size:12px}.rp-price-chip{background:#fff0f0;color:#d00000;border:1px solid #f0caca;border-radius:999px;padding:6px 10px;font-weight:900;white-space:nowrap;font-size:13px}.rp-mini-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #eee;padding:10px 0;font-size:14px}.rp-mini-row strong{text-align:right}.rp-choice-grid{display:grid;gap:10px;margin:14px 0}.rp-live-price{background:#101010;color:#fff;border-radius:20px;padding:15px;margin:0 0 12px;box-shadow:0 16px 36px rgba(0,0,0,.18)}.rp-live-price small{display:block;color:#ddd;font-weight:900;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}.rp-live-price strong{display:block;color:#fff;font-size:clamp(40px,13vw,66px);line-height:.95;letter-spacing:-.05em}.rp-live-price span{display:block;color:#eee;font-size:13.5px;margin-top:9px}.rp-option{position:relative;padding-right:48px;border:2px solid #ddd}.rp-option::after{content:"›";position:absolute;right:17px;top:50%;transform:translateY(-50%);color:#d00000;font-size:34px;font-weight:900;line-height:1}.rp-option .badge{display:inline-flex;background:#d00000;color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-bottom:6px}.rp-pill.is-selected,.rp-option.is-selected{border-color:#d00000;background:#fff5f5}.rp-service-intro h2{margin-bottom:8px}.rp-checklist-list{list-style:none;margin:0;padding:0}.rp-duration-note{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:14px;padding:12px 14px;font-size:13px;font-weight:800;color:#333;margin:12px 0}.rp-guarantee{display:grid;gap:4px;background:#fff5f5;border:1px solid #f0caca;border-radius:16px;padding:14px;margin:12px 0}.rp-guarantee strong{color:#b80000}.rp-guarantee span{color:#333;font-size:13px;line-height:1.45}';
       document.head.appendChild(style);
     }
 
@@ -369,20 +446,24 @@
       render();
       scrollToCalculator();
     };
-    window.rpSelectBedrooms = function (n) { rpState.bedrooms = n; rpState.step = 3; render(); scrollToCalculator(); };
-    window.rpSelectBathrooms = function (n) { rpState.bathrooms = n; rpState.step = 4; render(); scrollToCalculator(); };
-    window.rpSelectCarpetOnlyRooms = function (n) { rpState.carpetRooms = n; rpState.step = 3; render(); scrollToCalculator(); };
-    window.rpSelectUpholstery = function (type) { var item = upholsteryPrices[type]; if (!item) return; rpState.upholsteryType = type; rpState.upholsteryLabel = item.label; rpState.upholsteryPrice = item.price; rpState.step = 3; render(); scrollToCalculator(); };
+    window.rpContinueFromIncludes = function () { rpState.step = 3; render(); scrollToCalculator(); };
+    window.rpSelectBedrooms = function (n) { rpState.bedrooms = n; rpState.step = (rpState.service === 'moveout' || rpState.service === 'movein' || rpState.service === 'deep' || rpState.service === 'maintenance') ? 4 : 5; render(); scrollToCalculator(); };
+    window.rpSelectBathrooms = function (n) { rpState.bathrooms = n; rpState.step = 5; render(); scrollToCalculator(); };
+    window.rpSelectCarpetOnlyRooms = function (n) { rpState.carpetRooms = n; rpState.step = 4; render(); scrollToCalculator(); };
+    window.rpSelectUpholstery = function (type) { var item = upholsteryPrices[type]; if (!item) return; rpState.upholsteryType = type; rpState.upholsteryLabel = item.label; rpState.upholsteryPrice = item.price; rpState.step = 4; render(); scrollToCalculator(); };
     window.rpToggleCarpetUpsell = function (checked) { rpState.carpetRooms = checked ? (Number(rpState.carpetRooms) || 1) : 0; render(); };
     window.rpSelectMoveoutCarpetRooms = function (n) { rpState.carpetRooms = n; render(); };
     window.rpToggleExteriorWindows = function (checked) { rpState.exteriorWindows = checked; render(); };
-    window.rpGoToEstimate = function () { rpState.step = 4; render(); scrollToCalculator(); };
-    window.rpGoToLead = function () { rpState.step = 5; render(); scrollToCalculator(); };
+    window.rpGoToEstimate = function () { rpState.step = 5; render(); scrollToCalculator(); };
+    window.rpGoToLead = function () { rpState.step = 6; render(); scrollToCalculator(); };
     window.rpBack = function () {
       if (rpState.step <= 1) return;
-      if (rpState.step === 6) rpState.step = 5;
-      else if (rpState.step === 5) rpState.step = 4;
-      else if (rpState.step === 4 && (rpState.service === 'moveout' || rpState.service === 'movein')) rpState.step = 3;
+      if (rpState.step === 7) rpState.step = 6;
+      else if (rpState.step === 6) rpState.step = 5;
+      else if (rpState.step === 5) {
+        if (rpState.service === 'carpet' || rpState.service === 'upholstery') rpState.step = 3;
+        else rpState.step = 4;
+      }
       else if (rpState.step === 4) rpState.step = 3;
       else if (rpState.step === 3) rpState.step = 2;
       else if (rpState.step === 2) rpState.step = 1;
@@ -419,7 +500,7 @@
       window.rpSendEstimateToGoHighLevel();
       var button = document.getElementById('rpReserveBtn');
       if (button) { button.disabled = true; button.innerText = 'Opening calendar...'; }
-      rpState.step = 6;
+      rpState.step = 7;
       render();
       scrollToCalculator();
     };
