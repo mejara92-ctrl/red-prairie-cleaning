@@ -24,7 +24,7 @@
       deep: { name: 'Deep Cleaning', emoji: '✨', base: 249 },
       maintenance: { name: 'Basic Cleaning', emoji: '🏠', base: 149 },
       airbnb: { name: 'Airbnb Turnover Cleaning', emoji: '🧺', base: 0 },
-      carpet: { name: 'Professional Steam Carpet Cleaning', emoji: '🧼', base: 75 },
+      carpet: { name: 'Professional Carpet Extraction', emoji: '🧼', base: 75 },
       upholstery: { name: 'Professional Upholstery Cleaning', emoji: '🛋️', base: 0 },
       commercial: { name: 'Commercial Cleaning', emoji: '🏢', base: 0 }
     };
@@ -241,7 +241,7 @@
 
       if (rpState.step === 3 && rpState.service === 'carpet') {
         app.innerHTML =
-          '<h2>How many carpeted rooms?</h2><p class="rp-sub">Steam carpet cleaning is $75 per carpeted room.</p>' +
+          '<h2>How many carpeted rooms?</h2><p class="rp-sub">Carpet extraction cleaning is $75 per carpeted room.</p>' +
           '<div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill" onclick="rpSelectCarpetOnlyRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '<br><small>$' + (n * 75) + (n === 6 ? '+' : '') + '</small></button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
         return;
@@ -275,7 +275,7 @@
           '<h2>Add carpet or exterior windows?</h2>' +
           '<p class="rp-sub">Optional services can complete the reset. Skip anything you do not need.</p>' +
           '<div class="rp-choice-grid">' +
-          '<label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label>' +
+          '<label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Carpet extraction cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label>' +
           '<div id="rpCarpetRoomPicker" style="' + (rpState.carpetRooms > 0 ? '' : 'display:none;') + '"><p class="rp-sub" style="margin:8px 0;">How many carpeted rooms?</p><div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill ' + (rpState.carpetRooms === n ? 'is-selected' : '') + '" onclick="rpSelectMoveoutCarpetRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '</button>'; }).join('') + '</div></div>' +
           '<label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.exteriorWindows ? 'checked' : '') + ' onchange="rpToggleExteriorWindows(this.checked)"><div><strong>Exterior window basic wash</strong><span>Exterior glass only. No screen removal.</span></div><div class="rp-price-chip">+$100</div></label>' +
           '</div><div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button><button class="rp-primary" onclick="rpGoToEstimate()">See Estimate</button></div>';
@@ -302,14 +302,14 @@
       var service = serviceMap[rpState.service] || services[rpState.service] || { name: 'Cleaning' };
       app.innerHTML = livePrice('looks good. You can reserve your cleaning next.') +
         '<h2>Estimated Price</h2>' +
-        (rpState.service === 'deep' ? '<div class="rp-choice-grid" style="margin-bottom:16px;"><p class="rp-tap-note" style="margin-bottom:2px;">Optional add-ons</p><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label><div id="rpCarpetRoomPicker" style="' + (rpState.carpetRooms > 0 ? '' : 'display:none;') + '"><p class="rp-sub" style="margin:8px 0;">How many carpeted rooms?</p><div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill ' + (rpState.carpetRooms === n ? 'is-selected' : '') + '" onclick="rpSelectMoveoutCarpetRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '</button>'; }).join('') + '</div></div><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.exteriorWindows ? 'checked' : '') + ' onchange="rpToggleExteriorWindows(this.checked)"><div><strong>Exterior window basic wash</strong><span>Exterior glass only. No screen removal.</span></div><div class="rp-price-chip">+$100</div></label></div>' : '') +
+        (rpState.service === 'deep' ? '<div class="rp-choice-grid" style="margin-bottom:16px;"><p class="rp-tap-note" style="margin-bottom:2px;">Optional add-ons</p><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.carpetRooms > 0 ? 'checked' : '') + ' onchange="rpToggleCarpetUpsell(this.checked)"><div><strong>Carpet extraction cleaning</strong><span>Professional hot-water extraction.</span></div><div class="rp-price-chip">$75/room</div></label><div id="rpCarpetRoomPicker" style="' + (rpState.carpetRooms > 0 ? '' : 'display:none;') + '"><p class="rp-sub" style="margin:8px 0;">How many carpeted rooms?</p><div class="rp-pill-grid">' + [1,2,3,4,5,6].map(function (n) { return '<button class="rp-pill ' + (rpState.carpetRooms === n ? 'is-selected' : '') + '" onclick="rpSelectMoveoutCarpetRooms(' + n + ')">' + n + (n === 6 ? '+' : '') + '</button>'; }).join('') + '</div></div><label class="rp-checkbox-card"><input type="checkbox" ' + (rpState.exteriorWindows ? 'checked' : '') + ' onchange="rpToggleExteriorWindows(this.checked)"><div><strong>Exterior window basic wash</strong><span>Exterior glass only. No screen removal.</span></div><div class="rp-price-chip">+$100</div></label></div>' : '') +
         '<div class="rp-invoice">' +
         '<div class="rp-mini-row"><span>Service</span><strong>' + service.name + '</strong></div>' +
         '<div class="rp-mini-row"><span>Time / Crew</span><strong>' + serviceDuration(rpState.service) + '</strong></div>' +
         (rpState.bedrooms ? '<div class="rp-mini-row"><span>Bedrooms</span><strong>' + rpState.bedrooms + (rpState.bedrooms >= 5 ? '+' : '') + '</strong></div>' : '') +
         (rpState.bathrooms ? '<div class="rp-mini-row"><span>Bathrooms</span><strong>' + rpState.bathrooms + (rpState.bathrooms >= 4 ? '+' : '') + '</strong></div>' : '') +
         ((rpState.service === 'moveout' || rpState.service === 'movein') && rpState.bedrooms ? '<div class="rp-mini-row"><span>' + (rpState.service === 'movein' ? 'Factory Reset™ Move-In base' : 'Factory Reset™ Move-Out base') + '</span><strong>$' + (rpState.service === 'movein' ? moveinPrices : moveoutPrices)[Math.min(rpState.bedrooms, 4)] + '</strong></div>' : '') +
-        (rpState.carpetRooms ? '<div class="rp-mini-row"><span>Steam carpet cleaning</span><strong>' + rpState.carpetRooms + (rpState.carpetRooms >= 6 ? '+' : '') + ' room(s) · $' + (rpState.carpetRooms * 75) + '</strong></div>' : '') +
+        (rpState.carpetRooms ? '<div class="rp-mini-row"><span>Carpet extraction cleaning</span><strong>' + rpState.carpetRooms + (rpState.carpetRooms >= 6 ? '+' : '') + ' room(s) · $' + (rpState.carpetRooms * 75) + '</strong></div>' : '') +
         (rpState.service === 'upholstery' && rpState.upholsteryLabel ? '<div class="rp-mini-row"><span>Furniture item</span><strong>' + rpState.upholsteryLabel + ' · $' + rpState.upholsteryPrice + '</strong></div>' : '') +
         (rpState.exteriorWindows ? '<div class="rp-mini-row"><span>Exterior window basic wash</span><strong>$100</strong></div>' : '') +
         '<div class="rp-total"><span>Estimated Price</span><span>$' + total + '</span></div></div>' +
@@ -365,7 +365,7 @@
         bathrooms: rpState.bathrooms || 'N/A', carpet_rooms: rpState.carpetRooms || '0',
         exterior_windows: rpState.exteriorWindows ? 'Yes' : 'No', upholstery_type: rpState.upholsteryType || 'N/A',
         upholstery_item: rpState.upholsteryLabel || 'N/A', upholstery_price: rpState.upholsteryPrice || '0',
-        addons: [rpState.carpetRooms ? 'Steam carpet cleaning: ' + rpState.carpetRooms + ' room(s)' : '', rpState.exteriorWindows ? 'Exterior window basic wash' : '', rpState.upholsteryLabel ? 'Upholstery: ' + rpState.upholsteryLabel : ''].filter(Boolean).join(', ') || 'None',
+        addons: [rpState.carpetRooms ? 'Carpet extraction cleaning: ' + rpState.carpetRooms + ' room(s)' : '', rpState.exteriorWindows ? 'Exterior window basic wash' : '', rpState.upholsteryLabel ? 'Upholstery: ' + rpState.upholsteryLabel : ''].filter(Boolean).join(', ') || 'None',
         special_instructions: notes, customer_notes: notes, estimate_notes: jobDetails, job_details: jobDetails,
         cleaner_notes: jobDetails, submitted_at: new Date().toISOString(), page_url: window.location.href
       };

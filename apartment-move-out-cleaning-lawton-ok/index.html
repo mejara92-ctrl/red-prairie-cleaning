@@ -1969,7 +1969,7 @@ const rpServices = {
   movein: { name: "Factory Reset™ Move-In Cleaning", emoji: "🔑", base: 0 },
   deep: { name: "Deep Cleaning", emoji: "✨", base: 249 },
   maintenance: { name: "Maintenance Cleaning", emoji: "🏠", base: 149 },
-  carpet: { name: "Professional Steam Carpet Cleaning", emoji: "🧼", base: 75 },
+  carpet: { name: "Professional Carpet Extraction", emoji: "🧼", base: 75 },
   upholstery: { name: "Professional Upholstery Cleaning", emoji: "🛋️", base: 0 }
 };
 
@@ -2060,7 +2060,7 @@ function rpRender() {
           <span>Starting at $199</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('carpet')">
-          <strong>🧼 Steam Carpet Cleaning</strong>
+          <strong>🧼 Carpet Extraction Cleaning</strong>
           <span>$75 per room</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('upholstery')">
@@ -2165,7 +2165,7 @@ function rpRender() {
       <div class="rp-choice-grid">
         <label class="rp-checkbox-card">
           <input type="checkbox" ${rpState.carpetRooms > 0 ? "checked" : ""} onchange="rpToggleCarpetUpsell(this.checked)">
-          <div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div>
+          <div><strong>Carpet extraction cleaning</strong><span>Professional hot-water extraction.</span></div>
           <div class="rp-price-chip">$75/room</div>
         </label>
         <div id="rpCarpetRoomPicker" style="${rpState.carpetRooms > 0 ? "" : "display:none;"}">
@@ -2217,7 +2217,7 @@ function rpRenderEstimateStep() {
       <p class="rp-tap-note" style="margin-bottom:2px;">Optional add-ons</p>
       <label class="rp-checkbox-card">
         <input type="checkbox" ${rpState.carpetRooms > 0 ? "checked" : ""} onchange="rpToggleCarpetUpsell(this.checked)">
-        <div><strong>Steam carpet cleaning</strong><span>Professional hot-water extraction.</span></div>
+        <div><strong>Carpet extraction cleaning</strong><span>Professional hot-water extraction.</span></div>
         <div class="rp-price-chip">$75/room</div>
       </label>
       <div id="rpCarpetRoomPicker" style="${rpState.carpetRooms > 0 ? "" : "display:none;"}">
@@ -2238,7 +2238,7 @@ function rpRenderEstimateStep() {
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${(rpState.service === "moveout" || rpState.service === "movein") && rpState.bedrooms ? `<div class="rp-mini-row"><span>${rpState.service === "movein" ? "Factory Reset™ Move-In base" : "Factory Reset™ Move-Out base"}</span><strong>$${(rpState.service === "movein" ? rpMoveinPrices : rpMoveoutPrices)[Math.min(rpState.bedrooms, 4)]}</strong></div>` : ""}
-      ${rpState.carpetRooms ? `<div class="rp-mini-row"><span>Steam carpet cleaning</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""} room(s) · $${rpState.carpetRooms * 75}</strong></div>` : ""}
+      ${rpState.carpetRooms ? `<div class="rp-mini-row"><span>Carpet extraction cleaning</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""} room(s) · $${rpState.carpetRooms * 75}</strong></div>` : ""}
       ${rpState.service === "upholstery" && rpState.upholsteryLabel ? `<div class="rp-mini-row"><span>Furniture item</span><strong>${rpState.upholsteryLabel} · $${rpState.upholsteryPrice}</strong></div>` : ""}
       ${rpState.exteriorWindows ? `<div class="rp-mini-row"><span>Exterior window basic wash</span><strong>$100</strong></div>` : ""}
       <div class="rp-total"><span>Estimated Price</span><span>$${total}</span></div>
@@ -2346,7 +2346,7 @@ function rpGetEstimatePayload() {
     `Service: ${service}`, `Estimate: $${total}`, `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Carpet rooms: ${rpState.carpetRooms || "0"}`, `Exterior windows: ${rpState.exteriorWindows ? "Yes" : "No"}`, `Upholstery item: ${rpState.upholsteryLabel || "N/A"}`, `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`
   ].join(" | ");
-  return { source:"Apartment Move-Out Cleaning Lawton Landing Page Universal Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", addons:[rpState.carpetRooms ? `Steam carpet cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href, landing_page:"Apartment Move-Out Cleaning Lawton OK" };
+  return { source:"Apartment Move-Out Cleaning Lawton Landing Page Universal Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", addons:[rpState.carpetRooms ? `Carpet extraction cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href, landing_page:"Apartment Move-Out Cleaning Lawton OK" };
 }
 function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
