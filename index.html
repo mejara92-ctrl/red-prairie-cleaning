@@ -8,11 +8,11 @@
 <!-- Favicons -->
 <link href="/images/logo/favicon.png" rel="shortcut icon"/>
 <meta content="#d00000" name="theme-color"/>
-<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, professional steam carpet cleaning, and upholstery cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, and Southwest Oklahoma." name="description"/>
+<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, basic cleaning, Airbnb turnover, professional steam carpet cleaning, upholstery cleaning, and light commercial cleaning in Lawton, Fort Sill, Cache, Elgin, Medicine Park, and Southwest Oklahoma." name="description"/>
 <meta content="website" property="og:type"/>
 <meta content="Red Prairie Cleaning" property="og:site_name"/>
 <meta content="Red Prairie Cleaning | Factory Reset Move-Out Cleaning in Lawton &amp; Fort Sill" property="og:title"/>
-<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, steam carpet cleaning, and upholstery cleaning across Lawton, Fort Sill, and Southwest Oklahoma." property="og:description"/>
+<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, basic cleaning, Airbnb turnover, steam carpet cleaning, upholstery cleaning, and light commercial cleaning across Lawton, Fort Sill, and Southwest Oklahoma." property="og:description"/>
 <meta content="https://redprairiecleaning.com/" property="og:url"/>
 <meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" property="og:image"/>
 <meta content="1200" property="og:image:width"/>
@@ -20,7 +20,7 @@
 <meta content="Red Prairie Cleaning serving Lawton and surrounding communities" property="og:image:alt"/>
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="Red Prairie Cleaning | House, Move-Out &amp; Carpet Cleaning" name="twitter:title"/>
-<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, steam carpet cleaning, and upholstery cleaning across Lawton, Fort Sill, and Southwest Oklahoma." name="twitter:description"/>
+<meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, basic cleaning, Airbnb turnover, steam carpet cleaning, upholstery cleaning, and light commercial cleaning across Lawton, Fort Sill, and Southwest Oklahoma." name="twitter:description"/>
 <meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" name="twitter:image"/>
 <link as="style" href="css/style.css" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -1759,6 +1759,60 @@ function gtag_report_conversion(url) {
     @media (min-width: 900px) {
         .footer-content { grid-template-columns: 1.35fr .85fr 1fr; gap: 64px; }
     }
+
+    /* Estimator UX tighten-up: clearer cards, no badge overlap, mobile safe */
+    .rp-card { overflow: visible; }
+    .rp-progress-label { gap: 10px; flex-wrap: wrap; }
+    .rp-progress-label span:first-child { min-width: 0; }
+    .rp-estimator-help {
+        margin: 12px 0 8px; padding: 12px 14px; border: 1px solid #ffd0d0;
+        border-radius: 14px; background: #fff7f7; color: #6d0000; font-weight: 900;
+        line-height: 1.35; font-size: 14px;
+    }
+    .rp-grid.rp-service-grid { gap: 12px; }
+    .rp-option { text-align: left; }
+    .rp-option strong { padding-right: 14px; line-height: 1.25; }
+    .rp-option span:not(.badge) { padding-right: 10px; }
+    .rp-option .badge {
+        position: static; width: fit-content; max-width: calc(100% - 34px);
+        white-space: normal; line-height: 1.1; margin-bottom: 7px;
+    }
+    .rp-option::after { right: 15px; }
+    .rp-service-summary h2 { margin-bottom: 6px; }
+    .rp-service-summary > p { margin: 0 0 12px; color: #333; line-height: 1.45; }
+    .rp-inclusion-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 14px 0; }
+    .rp-inclusion-item {
+        background: #fff; border: 1px solid #e4e4e4; border-radius: 12px;
+        padding: 10px 12px; font-weight: 800; font-size: 14px;
+    }
+    .rp-guarantee-note {
+        background: #f7f7f7; border-left: 4px solid var(--red); border-radius: 12px;
+        padding: 12px 14px; color: #222; line-height: 1.5; font-size: 14px;
+    }
+    .rp-callout-card {
+        border: 2px dashed #d00000; background: #fff7f7; border-radius: 18px;
+        padding: 18px; text-align: center; margin: 12px 0 18px;
+    }
+    .rp-callout-card h3 { margin: 0 0 8px; }
+    .rp-callout-card p { margin: 0 0 14px; color: #333; line-height: 1.45; }
+    .soro-scroll-shell {
+        max-height: 560px; overflow: auto; border: 1px solid #e5e5e5; border-radius: 18px;
+        background: #fff; padding: 10px; box-shadow: 0 14px 40px rgba(0,0,0,.05);
+        scrollbar-width: thin;
+    }
+    .soro-scroll-note { margin: -18px auto 18px; color: #666; font-size: 13px; }
+    .soro-blog-section #soro-blog { min-height: 120px; align-items: flex-start; }
+    .footer-brand-mark { width: 42px; height: 42px; border-radius: 10px; margin: 0 0 10px; display: block; }
+    @media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) {
+        .rp-card { padding: 14px; }
+        .rp-option { min-height: auto; padding: 14px 42px 14px 13px; }
+        .rp-option strong { font-size: 15px; }
+        .rp-option span:not(.badge) { font-size: 12px; }
+        .rp-tap-note, .rp-estimator-help { font-size: 13px; }
+        .soro-scroll-shell { max-height: 460px; padding: 8px; }
+    }
+
 </style>
 <link href="/favicon.png" rel="icon" type="image/png"/>
 <noscript data-rp="async-css-fallback"><link href="css/style.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/></noscript></head>
@@ -1813,7 +1867,7 @@ function gtag_report_conversion(url) {
 <div class="rp-funnel-header">
 <div class="rp-estimator-kicker">Instant Price Estimator</div>
 <h2>Instant Price Estimate</h2>
-<p>Choose your service, see what is included, then get your instant price.</p>
+<p>Tap a service first. The next screen shows exactly what is included before you enter home details or book.</p>
 </div>
 <div class="rp-card">
 <div class="rp-progress-label"><span id="rpStepText">30 second estimate</span><span>Red Prairie Cleaning</span></div>
@@ -1844,7 +1898,7 @@ function gtag_report_conversion(url) {
 <h2>Quick Questions</h2>
 <details class="faq-item"><summary>Do I need to be home?</summary><p>No. Many move-out customers are already gone. You can provide access instructions, lockbox details, or coordinate with your property manager.</p></details>
 <details class="faq-item"><summary>Is the home supposed to be empty?</summary><p>For best results, yes. Empty homes clean faster and more thoroughly. We can still work around items, but heavy clutter or trash may change the scope.</p></details>
-<details class="faq-item"><summary>Do you clean carpets?</summary><p>Yes. Professional steam carpet cleaning is $75 per carpeted room and can be added during the estimate.</p></details>
+<details class="faq-item"><summary>Do you clean carpets?</summary><p>Yes. Professional carpet cleaning uses hot-water extraction, commonly called steam cleaning. It is $75 per carpeted room and can be added during the estimate.</p></details>
 <details class="faq-item"><summary>Do you remove window screens?</summary><p>No. Exterior window basic wash is $100 and does not include screen removal.</p></details>
 <details class="faq-item"><summary>Can I text instead of booking online?</summary><p>Yes. Text us at (580) 215-0915. Texting is a great option if you have photos, special access instructions, or a property manager contact.</p></details>
 <details class="faq-item"><summary>Can you handle last-minute cleanings?</summary><p>Yes. We can often accommodate same-day and next-day appointments for move-outs, deep cleanings, carpet cleaning, and property manager turnovers. If the online calendar does not show the time you need, call or text us and we will do our best to get you scheduled.</p></details></div>
@@ -1872,13 +1926,14 @@ function gtag_report_conversion(url) {
 <h2>Cleaning Tips &amp; Move-Out Guides</h2>
 <p>Expert advice on move-out cleaning, carpet care, security deposits, deep cleaning, and preparing homes for their next chapter.</p>
 </div>
-<div id="soro-blog"></div>
+<p class="soro-scroll-note">Latest guides are shown in a scrollable box so the homepage stays short.</p>
+<div class="soro-scroll-shell"><div id="soro-blog"></div></div>
 </div>
 </section></main><footer>
 <div class="footer-content">
-<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, and upholstery cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
+<div><img class="footer-brand-mark" src="/images/logo/favicon.png" width="42" height="42" alt="Red Prairie Cleaning mark"/><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan</li></ul></div>
-<div><h3>Services</h3><ul><li>Factory Reset™ Move-Out Cleaning</li><li>Factory Reset™ Move-In Cleaning</li><li>Deep Cleaning</li><li>Steam Carpet Cleaning</li><li>Upholstery Cleaning</li></ul></div>
+<div><h3>Services</h3><ul><li>Factory Reset™ Move-Out</li><li>Factory Reset™ Move-In</li><li>Deep Cleaning</li><li>Basic Cleaning</li><li>Airbnb Turnover</li><li>Steam Carpet Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">
@@ -1917,9 +1972,11 @@ const rpServices = {
   moveout: { name: "Factory Reset™ Move-Out Cleaning", emoji: "🚚", base: 0 },
   movein: { name: "Factory Reset™ Move-In Cleaning", emoji: "🔑", base: 0 },
   deep: { name: "Deep Cleaning", emoji: "✨", base: 249 },
-  maintenance: { name: "Maintenance Cleaning", emoji: "🏠", base: 149 },
-  carpet: { name: "Professional Steam Carpet Cleaning", emoji: "🧼", base: 75 },
-  upholstery: { name: "Professional Upholstery Cleaning", emoji: "🛋️", base: 0 }
+  maintenance: { name: "Basic Cleaning", emoji: "🏠", base: 149 },
+  airbnb: { name: "Airbnb Turnover Cleaning", emoji: "🧺", base: 0 },
+  carpet: { name: "Steam Carpet Cleaning", emoji: "🧼", base: 75 },
+  upholstery: { name: "Upholstery Cleaning", emoji: "🛋️", base: 0 },
+  commercial: { name: "Commercial Cleaning", emoji: "🏢", base: 0 }
 };
 
 const rpUpholsteryPrices = {
@@ -1958,6 +2015,8 @@ function rpDurationLabel() {
   if (rpState.service === "moveout" || rpState.service === "movein") return "Estimated time: 6–10 hours • 2 cleaners";
   if (rpState.service === "deep") return "Estimated time: up to 6 hours • 1 cleaner";
   if (rpState.service === "maintenance") return "Estimated time: up to 4 hours • 1 cleaner";
+  if (rpState.service === "airbnb") return "Turnover timing depends on property size and guest schedule";
+  if (rpState.service === "commercial") return "Commercial jobs are quoted after a quick call";
   if (rpState.service === "carpet") return "Estimated time varies by room count";
   if (rpState.service === "upholstery") return "Estimated time varies by furniture item";
   return "";
@@ -1984,13 +2043,25 @@ function rpServiceDetails(serviceKey = rpState.service) {
       note: "Deep cleans are normally staffed by one cleaner and can take up to 6 hours depending on condition."
     },
     maintenance: {
-      title: "Maintenance Cleaning",
+      title: "Basic Cleaning",
       subtitle: "Best for homes already in decent shape that need routine upkeep.",
       items: ["Kitchen surfaces", "Bathroom upkeep", "Dusting", "Vacuum + mop", "Trash touchpoints", "General tidy reset"],
       note: "Maintenance cleans are normally staffed by one cleaner and are designed to take no more than 4 hours."
     },
+    airbnb: {
+      title: "Airbnb Turnover Cleaning",
+      subtitle: "Best for short-term rentals that need a reliable reset between guests.",
+      items: ["Kitchen reset", "Bathroom reset", "Beds + linens by request", "Trash removal", "Restock checklist by request", "Photo-ready finish"],
+      note: "Airbnb turnover pricing depends on size, laundry expectations, restocking, and the time between guests. Text or call us and we will quote it correctly."
+    },
+    commercial: {
+      title: "Commercial Cleaning",
+      subtitle: "Small offices, make-ready spaces, and light commercial cleaning.",
+      items: ["Small office cleaning", "Bathrooms", "Breakroom / kitchenette", "Floors", "Trash", "Custom scope"],
+      note: "Commercial cleaning is call-to-quote only so we can confirm square footage, frequency, access, and expectations."
+    },
     carpet: {
-      title: "Professional Steam Carpet Cleaning",
+      title: "Steam Carpet Cleaning",
       subtitle: "Hot-water extraction for carpeted rooms, move-outs, and common rental requirements.",
       items: ["Pre-spray treatment", "Hot-water extraction", "Bedroom carpets", "Living areas", "Hallways", "$75 per carpeted room"],
       note: "Heavy stains, pet issues, odor treatment, or unusual carpet conditions may require additional quoting."
@@ -2008,18 +2079,21 @@ function rpServiceDetails(serviceKey = rpState.service) {
 function rpRenderServiceDetailsStep() {
   const app = document.getElementById("rpApp");
   const d = rpServiceDetails();
+  const quoteOnly = ["airbnb", "commercial"].includes(rpState.service);
   app.innerHTML = `
     <div class="rp-service-summary">
       <h2>${d.title}</h2>
       <p>${d.subtitle}</p>
+      <div class="rp-estimator-help">This screen is the scope preview — review exactly what is included, then continue.</div>
       <div class="rp-inclusion-grid">
         ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
       </div>
       <div class="rp-guarantee-note">${d.note}</div>
     </div>
+    ${quoteOnly ? `<div class="rp-callout-card"><h3>Call or text for this quote</h3><p>This service needs a quick conversation so we can price it fairly.</p><a class="rp-primary" href="sms:5802150915">Text Red Prairie</a></div>` : ""}
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Back</button>
-      <button class="rp-primary" onclick="rpContinueFromDetails()">Continue</button>
+      ${quoteOnly ? `<button class="rp-primary" onclick="rpGoToLead()">Send My Info</button>` : `<button class="rp-primary" onclick="rpContinueFromDetails()">Continue</button>`}
     </div>
   `;
 }
@@ -2036,6 +2110,7 @@ function rpCalculatePrice() {
   }
   if (rpState.service === "carpet") return Number(rpState.carpetRooms || 0) * 75;
   if (rpState.service === "upholstery") return Number(rpState.upholsteryPrice || 0);
+  if (rpState.service === "airbnb" || rpState.service === "commercial") return 0;
   const base = rpServices[rpState.service]?.base || 0;
   const bedrooms = Number(rpState.bedrooms || 0);
   const bathrooms = Number(rpState.bathrooms || 0);
@@ -2050,6 +2125,7 @@ function rpCalculatePrice() {
 
 function rpPriceLabel() {
   const total = rpCalculatePrice();
+  if (!total && (rpState.service === "airbnb" || rpState.service === "commercial")) return "Call/Text Quote";
   if (!total) return "$0";
   return `$${total}`;
 }
@@ -2074,33 +2150,42 @@ function rpRender() {
   if (rpState.step === 1) {
     app.innerHTML = `
       <h2>Choose your cleaning service</h2>
-      <p class="rp-tap-note">👇 Tap one option. We'll show what's included before asking about the home.</p>
-      <div class="rp-grid">
+      <p class="rp-tap-note">👇 Tap a service. The next screen shows exactly what's included before you book.</p>
+      <div class="rp-estimator-help">Not sure what is included? Tap any option first — you will see the full scope before entering your address.</div>
+      <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
-          <strong>🚚 Factory Reset™ Move-Out Cleaning</strong>
-          <span>Perfect for renters, inspections, and turnovers.</span>
+          <strong>🚚 Move-Out Cleaning</strong>
+          <span>Factory Reset™ for renters, inspections, and turnovers.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('movein')">
           <span class="badge">Second Most Popular</span>
-          <strong>🔑 Factory Reset™ Move-In Cleaning</strong>
-          <span>Start fresh before boxes and furniture arrive.</span>
-        </button>
-        <button class="rp-option" onclick="rpSelectService('carpet')">
-          <strong>🧼 Steam Carpet Cleaning</strong>
-          <span>Hot-water extraction for carpeted rooms.</span>
-        </button>
-        <button class="rp-option" onclick="rpSelectService('upholstery')">
-          <strong>🛋️ Professional Upholstery Cleaning</strong>
-          <span>Fabric cleaning for sofas, chairs, and sectionals.</span>
+          <strong>🔑 Move-In Cleaning</strong>
+          <span>Factory Reset™ before boxes and furniture arrive.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('deep')">
-          <strong>✨ Deep Cleaning</strong>
-          <span>For buildup, grime, dust, and neglected areas.</span>
+          <strong>✨ Deep Clean</strong>
+          <span>Heavy detail clean for lived-in homes.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('maintenance')">
-          <strong>🏠 Maintenance Cleaning</strong>
-          <span>For homes that need routine upkeep.</span>
+          <strong>🏠 Basic Clean</strong>
+          <span>Routine upkeep for maintained homes.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectService('airbnb')">
+          <strong>🧺 Airbnb Turnover</strong>
+          <span>Guest-ready reset. Quote depends on scope.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectService('carpet')">
+          <strong>🧼 Carpet Cleaning</strong>
+          <span>Steam cleaning / hot-water extraction.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectService('upholstery')">
+          <strong>🛋️ Upholstery Cleaning</strong>
+          <span>Sofas, chairs, recliners, and sectionals.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectService('commercial')">
+          <strong>🏢 Commercial Cleaning</strong>
+          <span>Call or text for small office / commercial quotes.</span>
         </button>
       </div>
     `;
@@ -2346,7 +2431,7 @@ function rpRenderCalendarStep() {
 }
 
 function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.upholsteryType = null; rpState.upholsteryLabel = ""; rpState.upholsteryPrice = 0; rpState.estimateSent = false; rpState.preBookingWebhookSent = false; rpRender(); rpScrollToCalculator(); }
-function rpContinueFromDetails() { rpState.step = 3; rpRender(); rpScrollToCalculator(); }
+function rpContinueFromDetails() { if (["airbnb", "commercial"].includes(rpState.service)) { rpState.step = 6; } else { rpState.step = 3; } rpRender(); rpScrollToCalculator(); }
 function rpSelectBedrooms(n) { rpState.bedrooms = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
 function rpSelectBathrooms(n) { rpState.bathrooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
 function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
@@ -2359,7 +2444,7 @@ function rpGoToLead() { rpState.step = 6; rpRender(); rpScrollToCalculator(); }
 function rpBack() {
   if (rpState.step <= 1) return;
   if (rpState.step === 7) rpState.step = 6;
-  else if (rpState.step === 6) rpState.step = 5;
+  else if (rpState.step === 6) rpState.step = (["airbnb", "commercial"].includes(rpState.service) ? 2 : 5);
   else if (rpState.step === 5) {
     if (rpState.service === "carpet" || rpState.service === "upholstery") rpState.step = 3;
     else rpState.step = 4;
@@ -2505,6 +2590,6 @@ document.addEventListener("click", function(e) { const link = e.target.closest('
   document.body.appendChild(script);
 })();
 </script>
-<script defer="" src="/js/rp-canonical-estimator.js?v=20260706-website15d"></script>
+<!-- Homepage estimator is inline so it can stay fast and customized. Landing pages still use /js/rp-canonical-estimator.js. -->
 </body>
 </html>
