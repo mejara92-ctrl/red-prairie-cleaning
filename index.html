@@ -1255,7 +1255,7 @@ line-height:1.5;
 @media (min-width: 600px) { .rp-inclusion-group ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px 20px; } }
 .rp-guarantee-note { max-width: 880px; margin: 18px auto 0; text-align: left; background: #f7f7f7; border-left: 4px solid var(--red); border-radius: 14px; padding: 16px 18px; color: #181818; font-weight: 750; line-height: 1.55; }
 @media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.rp-option span, .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
+.rp-option span:not(.badge), .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
 .rp-progress-label { color: #444 !important; }
 
 </style>
@@ -2330,7 +2330,7 @@ function rpRender() {
   if (rpState.step === 1) {
     app.innerHTML = `
       <h2>Choose your cleaning service</h2>
-      <div class="rp-estimator-help rp-service-prompt">Choose the cleaning service you need. Next, we’ll show exactly what is included before you receive pricing.</div>
+      <div class="rp-estimator-help rp-service-prompt">Next, we’ll show exactly what is included before you receive pricing.</div>
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
