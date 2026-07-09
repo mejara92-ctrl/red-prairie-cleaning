@@ -196,14 +196,14 @@
         }
         .trust-card i { color: var(--black); font-size: 24px; margin-bottom: 8px; }
         .trust-card h3 { font-size: 18px; margin: 0 0 4px; }
-        .trust-card p { margin: 0; color: var(--muted); font-size: 12px; }
+        .trust-card p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
 
         .rp-funnel { background: var(--light); color: var(--text); padding: 56px 14px; }
         .rp-funnel-wrap { max-width: 1050px; margin: 0 auto; }
         .rp-funnel-header { text-align: center; margin-bottom: 22px; }
-        .rp-mini-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 10px 0 0; }
-        .rp-mini-trust span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #666; }
-        .rp-mini-trust i { display: inline-flex; color: #999; }
+        .rp-mini-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 0; }
+        .rp-mini-trust span { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: #2a2a2a; background: #f2f2f0; border: 1px solid #e4e4e2; border-radius: 999px; padding: 7px 12px; }
+        .rp-mini-trust i { display: inline-flex; color: #2a2a2a; }
         .rp-funnel-header h2 {
             font-size: clamp(30px, 8vw, 52px);
             line-height: 1.08;
@@ -268,12 +268,12 @@
             min-height: 88px;
         }
         .rp-option:hover, .rp-option.is-selected {
-            border-color: var(--black);
+            border-color: #333;
             background: #f7f7f7;
             transform: translateY(-2px);
         }
-        .rp-option strong { display: block; font-size: 17px; margin-bottom: 4px; }
-        .rp-option span { display: block; color: #555; font-size: 13px; line-height: 1.4; }
+        .rp-option strong { display: block; font-size: 18px; margin-bottom: 6px; }
+        .rp-option span { display: block; color: #444; font-size: 14.5px; line-height: 1.5; }
 
         .rp-pill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
         .rp-pill {
@@ -286,7 +286,7 @@
             font-weight: 900;
             min-height: 48px;
         }
-        .rp-pill:hover, .rp-pill.is-selected { border-color: var(--black); background: #f7f7f7; }
+        .rp-pill:hover, .rp-pill.is-selected { border-color: #333; background: #f7f7f7; }
 
         .rp-included { background: #fafafa; border: 1px solid #ddd; border-radius: 18px; padding: 16px; margin: 18px 0; }
         .rp-included-title { font-weight: 900; margin-bottom: 10px; }
@@ -304,7 +304,7 @@
             margin: 10px 0;
             cursor: pointer;
         }
-        label.rp-addon:hover { border-color: var(--black); background: #f7f7f7; }
+        label.rp-addon:hover { border-color: #333; background: #f7f7f7; }
         label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
         .rp-addon-left { display: flex; align-items: center; color: var(--text); font-weight: 700; font-size: 14px; }
         .rp-price { color: var(--red); font-weight: 900; white-space: nowrap; }
@@ -388,7 +388,7 @@
             resize: vertical;
         }
         .rp-lead-field input:focus,
-        .rp-lead-field textarea:focus { outline: none; border-color: var(--black); }
+        .rp-lead-field textarea:focus { outline: none; border-color: #333; }
         .rp-error {
             display: none;
             background: #fff0f0;
@@ -447,7 +447,7 @@
             padding: 20px;
             box-shadow: 0 12px 28px rgba(0,0,0,.07);
         }
-        .rp-inclusion-card.featured { border-color: var(--black); box-shadow: 0 16px 38px rgba(0,0,0,.12); }
+        .rp-inclusion-card.featured { border-color: #333; box-shadow: 0 16px 38px rgba(0,0,0,.12); }
         .rp-inclusion-card h3 { font-size: 20px; margin: 0 0 8px; color: var(--text); }
         .rp-inclusion-card p { color: #555; margin: 0 0 12px; line-height: 1.55; font-size: 14px; }
         .rp-inclusion-card ul { margin: 0 0 0 18px; color: #222; padding: 0; }
@@ -723,7 +723,7 @@
         }
 
         .moveout-value {
-            border-color: var(--black) !important;
+            border-color: #333 !important;
             box-shadow: 0 18px 44px rgba(0,0,0,.14) !important;
         }
 
@@ -912,7 +912,7 @@
             flex-direction: column;
             justify-content: flex-start;
         }
-        .rp-outcome-card.featured { border-color: var(--black); box-shadow: 0 18px 44px rgba(0,0,0,.14); }
+        .rp-outcome-card.featured { border-color: #333; box-shadow: 0 18px 44px rgba(0,0,0,.14); }
         .rp-outcome-card span {
             display: inline-flex;
             width: 100%;
@@ -1132,11 +1132,12 @@
                 border: 2px solid #ddd;
             }
             .rp-option strong {
-                font-size: 15.5px;
-                margin-bottom: 2px;
+                font-size: 16.5px;
+                margin-bottom: 4px;
             }
             .rp-option span {
-                font-size: 12px;
+                font-size: 13.5px;
+                line-height: 1.45;
             }
             .rp-pill-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -1242,7 +1243,7 @@ line-height:1.5;
 .rp-service-summary { text-align: center; }
 .rp-service-summary > p { max-width: 700px; margin-left: auto; margin-right: auto; }
 .rp-inclusion-grid { max-width: 900px; margin: 18px auto !important; display: grid; grid-template-columns: 1fr; gap: 9px; }
-.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 46px; padding: 11px 13px; border-radius: 13px; background: #fff; border: 1px solid #e2e2e2; font-weight: 850; color: #1d1d1d; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 46px; padding: 11px 13px; border-radius: 13px; background: #fff; border: 1px solid #e9e9e7; font-weight: 650; color: #2a2a2a; }
 .rp-guarantee-note { max-width: 880px; margin: 18px auto 0; text-align: left; background: #f7f7f7; border-left: 4px solid var(--red); border-radius: 14px; padding: 16px 18px; color: #181818; font-weight: 750; line-height: 1.55; }
 @media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .rp-option span, .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
@@ -1568,12 +1569,12 @@ window.__rpScheduleDeferred(function(){
 
         .rp-option { position: relative; padding-right: 48px; border: 2px solid #ddd; min-height: 76px; }
         .rp-option::after { content: "›"; position: absolute; right: 17px; top: 50%; transform: translateY(-50%); color: #999; font-size: 34px; font-weight: 900; line-height: 1; }
-        .rp-option.featured-option { border-color: var(--black); background: #f7f7f7; box-shadow: 0 12px 30px rgba(0,0,0,.10); }
+        .rp-option.featured-option { border-color: #333; background: #f7f7f7; box-shadow: 0 12px 30px rgba(0,0,0,.10); }
         .rp-option .badge { display:inline-flex; background: var(--black); color:#fff; border-radius:999px; padding:5px 10px; font-size:11px; font-weight:800; letter-spacing:.02em; margin-bottom: 7px; }
         .rp-option:active, .rp-pill:active, .rp-primary:active, .quote-btn:active, .secondary-btn:active { transform: scale(.985); }
         .rp-pill { border: 2px solid #ddd; border-radius: 18px; }
         .rp-pill small { color:#555; font-weight: 800; }
-        .rp-pill.is-selected, .rp-option.is-selected { border-color: var(--black); background:#f7f7f7; }
+        .rp-pill.is-selected, .rp-option.is-selected { border-color: #333; background:#f7f7f7; }
 
         .rp-mini-row { display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid #eee; padding:10px 0; font-size:14px; }
         .rp-mini-row strong { text-align:right; }
@@ -1615,8 +1616,8 @@ window.__rpScheduleDeferred(function(){
             .rp-card h1, .rp-card h2 { font-size: clamp(25px, 7vw, 32px); margin-bottom: 6px; }
             .rp-sub { font-size: 13.5px; margin-bottom: 12px; }
             .rp-grid { gap: 9px; margin: 12px 0; }
-            .rp-option strong { font-size: 16px; margin-bottom: 2px; }
-            .rp-option span { font-size: 12px; }
+            .rp-option strong { font-size: 16.5px; margin-bottom: 4px; }
+            .rp-option span { font-size: 13.5px; line-height: 1.45; }
             .rp-pill-grid { grid-template-columns: repeat(2, 1fr); margin: 12px 0; gap: 9px; }
             .rp-pill { min-height: 58px; font-size: 17px; padding: 12px; }
             .rp-btns { margin-top: 14px; }
@@ -1921,8 +1922,8 @@ window.__rpScheduleDeferred(function(){
     @media (max-width: 520px) {
         .rp-card { padding: 14px; }
         .rp-option { min-height: auto; padding: 14px 42px 14px 13px; }
-        .rp-option strong { font-size: 15px; }
-        .rp-option span:not(.badge) { font-size: 12px; }
+        .rp-option strong { font-size: 16px; }
+        .rp-option span:not(.badge) { font-size: 13px; }
         .rp-tap-note, .rp-estimator-help { font-size: 13px; }
         .soro-scroll-shell { max-height: 460px; padding: 8px; }
     }
@@ -2000,7 +2001,6 @@ window.__rpScheduleDeferred(function(){
 <div class="rp-funnel-wrap">
 <div class="rp-funnel-header">
 <h2>Instant Price Estimate</h2>
-<p>Choose your service, review the included scope, then get your instant price.</p>
 <div class="rp-mini-trust">
 <span><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span>
 <span><i class="fa-solid fa-flag" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 21 V4"/><path d="M6 4 H18 L15 8 L18 12 H6"/></svg></i> Veteran Owned</span>
