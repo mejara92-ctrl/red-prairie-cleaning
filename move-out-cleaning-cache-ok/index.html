@@ -47,12 +47,31 @@ function gtag_report_conversion(url) {
 }
 </script>
 <!-- Microsoft Clarity -->
+<!-- Deferred-script scheduler: delays non-critical
+     scripts (analytics, chat) off the main thread during initial paint. -->
+<script>
+(function(){
+  var ran = false;
+  function schedule(fn){
+    function run(){ if (ran) return; ran = true; fn(); }
+    ['scroll','touchstart','pointerdown','keydown'].forEach(function(evt){
+      window.addEventListener(evt, run, { passive: true, once: true });
+    });
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 4000 });
+    else setTimeout(run, 4000);
+  }
+  window.__rpScheduleDeferred = schedule;
+})();
+</script>
+<!-- Microsoft Clarity (deferred: session recording isn't needed before first paint) -->
 <script type="text/javascript">
+window.__rpScheduleDeferred(function(){
 (function(c,l,a,r,i,t,y){
     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 })(window, document, "clarity", "script", "xb86ac4u38");
+});
 </script>
 <style>
 :root {
@@ -2101,6 +2120,32 @@ label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
 .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .rp-card h2 { font-size: 28px; }
 </style>
+<style>
+/* RP-SECONDARY-FIXES-CSS */
+
+footer a, footer a:visited { color: #d6d6d6 !important; text-decoration: none; }
+footer a:hover { color: #fff !important; text-decoration: underline; }
+
+
+.hero-trust a.google-review-pill,
+.hero-trust a.google-review-pill:visited {
+    background: rgba(255,255,255,.18);
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,.16);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none !important;
+    backdrop-filter: blur(8px);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.hero-trust a.google-review-pill:hover { background: rgba(255,255,255,.28); transform: translateY(-1px); }
+.hero-trust a.google-review-pill i { color: #ffcc00; }
+
+</style>
 </head>
 <body>
 <header class="navbar">
@@ -2178,11 +2223,11 @@ label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
 <div class="rp-funnel-header">
 <h2>Instant Price Estimate</h2>
 <div class="rp-mini-trust">
-<span><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span>
-<span><i class="fa-solid fa-flag" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 21 V4"/><path d="M6 4 H18 L15 8 L18 12 H6"/></svg></i> Veteran Owned</span>
-<span><i class="fa-solid fa-house-circle-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M9.5 15 L11.5 17 L15.5 13"/></svg></i> 100+ Homes Prepared</span>
-<span><i class="fa-solid fa-camera" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 L9.5 4.5 H14.5 L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></i> Picture Ready</span>
-<span><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Lawton Fort Sill Chamber Member</span>
+<span><i aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span>
+<span><i aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 21 V4"/><path d="M6 4 H18 L15 8 L18 12 H6"/></svg></i> Veteran Owned</span>
+<span><i aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M9.5 15 L11.5 17 L15.5 13"/></svg></i> 100+ Homes Prepared</span>
+<span><i aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 L9.5 4.5 H14.5 L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></i> Picture Ready</span>
+<span><i aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Lawton Fort Sill Chamber Member</span>
 </div>
 </div>
 <div class="rp-card">
@@ -2324,19 +2369,19 @@ label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
   </p>
 <div class="gallery">
 <div class="gallery-item">
-<img alt="Carpet before cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/carpet-1-before.jpg" width="1200"/>
+<img alt="Carpet before cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/carpet-1-before.webp" width="1200"/>
 <span>Carpet Before</span>
 </div>
 <div class="gallery-item">
-<img alt="Carpet after cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/carpet-1-after.jpg" width="1200"/>
+<img alt="Carpet after cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/carpet-1-after.webp" width="1200"/>
 <span>Carpet After</span>
 </div>
 <div class="gallery-item">
-<img alt="Upholstery before cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/couch-1-before.jpg" width="1200"/>
+<img alt="Upholstery before cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/couch-1-before.webp" width="1200"/>
 <span>Upholstery Before</span>
 </div>
 <div class="gallery-item">
-<img alt="Upholstery after cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/couch-1-after.jpg" width="1200"/>
+<img alt="Upholstery after cleaning" decoding="async" height="800" loading="lazy" src="../images/before-after/couch-1-after.webp" width="1200"/>
 <span>Upholstery After</span>
 </div>
 </div>
@@ -2470,8 +2515,8 @@ label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
 </div>
 <div>
 <h3>Contact</h3>
-<p>(580) 215-0915</p>
-<p>admin@redprairiecleaning.com</p>
+<p><a href="tel:5802150915">(580) 215-0915</a></p>
+<p><a href="mailto:admin@redprairiecleaning.com">admin@redprairiecleaning.com</a></p>
 <p>redprairiecleaning.com</p>
 </div>
 <div>
@@ -2484,7 +2529,8 @@ label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
 </div>
 <p class="copyright">
     © 2026 Red Prairie Cleaning. All Rights Reserved.
-  </p></footer>
+  </p><p class="footer-blog-link"><a href="https://redprairiecleaning.com/#blog">Read our move-out cleaning guides</a></p>
+</footer>
 <script>
 const rpState = {
   step: 1,
