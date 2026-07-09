@@ -1244,6 +1244,15 @@ line-height:1.5;
 .rp-service-summary > p { max-width: 700px; margin-left: auto; margin-right: auto; }
 .rp-inclusion-grid { max-width: 900px; margin: 18px auto !important; display: grid; grid-template-columns: 1fr; gap: 9px; }
 .rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 46px; padding: 11px 13px; border-radius: 13px; background: #fff; border: 1px solid #e9e9e7; font-weight: 650; color: #2a2a2a; }
+.rp-inclusion-lede { font-size: 17px; font-weight: 800; color: var(--text); text-align: center; line-height: 1.45; max-width: 620px; margin: 0 auto 26px; }
+.rp-inclusion-groups { display: flex; flex-direction: column; gap: 22px; margin: 0 0 22px; text-align: left; }
+.rp-inclusion-group h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 12.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #888; }
+.rp-inclusion-group h4::before { content: ""; width: 16px; height: 2px; background: var(--red); border-radius: 2px; flex-shrink: 0; }
+.rp-inclusion-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.rp-inclusion-group li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; font-weight: 650; color: #2a2a2a; line-height: 1.4; }
+.rp-inclusion-group li::before { content: "✓"; color: var(--red); font-weight: 900; flex-shrink: 0; margin-top: 1px; }
+.rp-inclusion-footnote { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: #777; font-style: italic; padding-top: 14px; border-top: 1px dashed #e2e2e2; margin-top: 4px; }
+@media (min-width: 600px) { .rp-inclusion-group ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px 20px; } }
 .rp-guarantee-note { max-width: 880px; margin: 18px auto 0; text-align: left; background: #f7f7f7; border-left: 4px solid var(--red); border-radius: 14px; padding: 16px 18px; color: #181818; font-weight: 750; line-height: 1.55; }
 @media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .rp-option span, .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
@@ -2180,14 +2189,25 @@ function rpServiceDetails(serviceKey = rpState.service) {
     moveout: {
       title: "Factory Reset™ Move-Out Cleaning",
       subtitle: "Best for rentals, inspections, key handoff, and property turnovers.",
-      items: ["Full top-to-bottom interior cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms fully scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Garage — quick sweep, not a full detail"],
-      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price covers the full interior from top to bottom, including all major appliances inside and outside, cabinets, bathrooms, floors, doors, and baseboards. The garage gets a quick sweep to finish, not a full detail. And if your landlord or property manager finds something we missed, just reach out within 48 hours — we'll come back and make it right, no charge, no argument."
+      lede: "A true Factory Reset™: top to bottom, inside and out, every room — no add-ons, no surprises.",
+      groups: [
+        { label: "Whole-home interior", items: ["Full top-to-bottom interior clean", "Floors vacuumed and mopped", "Interior windows and tracks", "Doors, trim, and baseboards", "Reasonable wall scuffs handled"] },
+        { label: "Kitchen and appliances", items: ["All major appliances, inside and out", "Oven, microwave, and refrigerator interiors", "Cabinets and drawers, inside and out"] },
+        { label: "Bathrooms", items: ["Fully scrubbed and sanitized", "Showers, tubs, toilets, sinks, and mirrors"] }
+      ],
+      footnote: "Garage: a quick sweep to finish — not a full detail.",
+      note: "No hidden add-ons, ever. Your quoted price covers a complete interior clean, top to bottom, inside and out. If your landlord or property manager finds something we missed, just reach out within 48 hours — we'll come back and make it right, no charge, no argument."
     },
     movein: {
       title: "Factory Reset™ Move-In Cleaning",
       subtitle: "Best before furniture, boxes, kids, pets, and everyday life move in.",
-      items: ["Full top-to-bottom interior cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms fully scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Move-in ready finish"],
-      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price covers the full interior from top to bottom, including all major appliances inside and outside, cabinets, bathrooms, floors, doors, baseboards, and more before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
+      lede: "A true Factory Reset™: top to bottom, inside and out, so day one feels brand new.",
+      groups: [
+        { label: "Whole-home interior", items: ["Full top-to-bottom interior clean", "Floors vacuumed and mopped", "Interior windows and tracks", "Doors, trim, and baseboards"] },
+        { label: "Kitchen and appliances", items: ["All major appliances, inside and out", "Oven, microwave, and refrigerator interiors", "Cabinets and drawers, inside and out"] },
+        { label: "Bathrooms", items: ["Fully scrubbed and sanitized", "Showers, tubs, toilets, sinks, and mirrors"] }
+      ],
+      note: "No hidden add-ons, ever. Your quoted price covers a complete interior clean, top to bottom, inside and out, before you unpack a single box. Severe trash, biohazards, pest issues, exterior work, or specialty projects are quoted separately."
     },
     deep: {
       title: "Deep Cleaning",
@@ -2233,14 +2253,21 @@ function rpRenderServiceDetailsStep() {
   const app = document.getElementById("rpApp");
   const d = rpServiceDetails();
   const quoteOnly = ["airbnb", "commercial"].includes(rpState.service);
+  const includedBlock = d.groups
+    ? `<p class="rp-inclusion-lede">${d.lede}</p>
+       <div class="rp-inclusion-groups">
+         ${d.groups.map(g => `<div class="rp-inclusion-group"><h4>${g.label}</h4><ul>${g.items.map(item => `<li>${item}</li>`).join("")}</ul></div>`).join("")}
+       </div>
+       ${d.footnote ? `<p class="rp-inclusion-footnote">${d.footnote}</p>` : ""}`
+    : `<div class="rp-estimator-help rp-included-headline">Everything below is included in your quoted price — no hidden add-ons for a standard inside-home cleaning.</div>
+       <div class="rp-inclusion-grid">
+         ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
+       </div>`;
   app.innerHTML = `
     <div class="rp-service-summary">
       <h2>${d.title}</h2>
       <p>${d.subtitle}</p>
-      <div class="rp-estimator-help rp-included-headline">Everything below is included in your quoted price — no hidden add-ons for a standard inside-home cleaning.</div>
-      <div class="rp-inclusion-grid">
-        ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
-      </div>
+      ${includedBlock}
       <div class="rp-guarantee-note">${d.note}</div>
     </div>
     ${quoteOnly ? `<div class="rp-callout-card"><h3>Text us for a quote</h3><p>This service is custom priced. Send your info and we will text you back with the right quote.</p><a class="rp-primary" href="sms:5802150915">Text for Quote</a></div>` : ""}
