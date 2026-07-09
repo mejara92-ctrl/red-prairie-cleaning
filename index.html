@@ -254,6 +254,7 @@
         }
         .rp-sub { color: #555; line-height: 1.55; margin-bottom: 20px; font-size: 14.5px; }
 
+        .rp-service-divider { grid-column: 1 / -1; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #999; margin: 6px 0 -2px; padding-top: 14px; border-top: 1px dashed #e2e2e2; }
         .rp-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 18px 0; }
         .rp-option {
             background: #fafafa;
@@ -2113,6 +2114,9 @@ const rpState = {
   upholsteryType: null,
   upholsteryLabel: "",
   upholsteryPrice: 0,
+  junkSize: null,
+  helpersCount: null,
+  hoursCount: null,
   fullName: "",
   phone: "",
   email: "",
@@ -2133,7 +2137,9 @@ const rpServices = {
   airbnb: { name: "Airbnb Turnover Cleaning", emoji: "🧺", base: 0 },
   carpet: { name: "Carpet Extraction Cleaning", emoji: "🧼", base: 75 },
   upholstery: { name: "Upholstery Cleaning", emoji: "🛋️", base: 0 },
-  commercial: { name: "Commercial Cleaning", emoji: "🏢", base: 0 }
+  commercial: { name: "Commercial Cleaning", emoji: "🏢", base: 0 },
+  junk: { name: "Junk Removal", emoji: "🚛", base: 0 },
+  homeservices: { name: "Home Services", emoji: "🧰", base: 0 }
 };
 
 const rpUpholsteryPrices = {
@@ -2181,6 +2187,8 @@ function rpDurationLabel() {
   if (rpState.service === "commercial") return "Commercial jobs are quoted after a quick call";
   if (rpState.service === "carpet") return "Estimated time varies by room count";
   if (rpState.service === "upholstery") return "Estimated time varies by furniture item";
+  if (rpState.service === "junk") return "On-site time varies by load size and access";
+  if (rpState.service === "homeservices") return `Estimated time: ${rpState.hoursCount || 4}${rpState.hoursCount === 8 ? "+" : ""} hours • ${rpState.helpersCount || 1}${rpState.helpersCount === 4 ? "+" : ""} team member(s)`;
   return "";
 }
 
@@ -2232,6 +2240,26 @@ function rpServiceDetails(serviceKey = rpState.service) {
       subtitle: "Small offices, make-ready spaces, and light commercial cleaning.",
       items: ["Small office cleaning", "Bathrooms", "Breakroom / kitchenette", "Floors", "Trash", "Custom scope"],
       note: "Commercial cleaning is call-to-quote only so we can confirm square footage, frequency, access, and expectations."
+    },
+    junk: {
+      title: "Junk Removal",
+      subtitle: "Haul-away for general household junk, furniture, and move-out debris.",
+      lede: "A companion service for move-out day: we haul it away so the house is completely empty and ready to hand off.",
+      groups: [
+        { label: "What we take", items: ["General household junk", "Furniture and boxes", "Move-out debris"] },
+        { label: "Always a custom quote", items: ["Construction debris, concrete, dirt, or roofing", "Hazardous or specialty disposal", "Trailer loads"] }
+      ],
+      note: "Half and full truck bed loads are priced instantly on the next step. Trailer loads and heavier debris are quoted after a quick look at the job."
+    },
+    homeservices: {
+      title: "Home Services",
+      subtitle: "Extra hands for the projects that don't need a specialized contractor.",
+      lede: "Help for the everyday jobs that pile up — organizing, unpacking, and light moving. Not a construction crew.",
+      groups: [
+        { label: "Perfect for", items: ["Home organization", "Unpacking after a move", "Garage organization", "Donation sorting", "Light furniture moving", "General household assistance"] },
+        { label: "Not included", items: ["Heavy lifting, pianos, or safes", "Construction or professional moving/packing", "Hazardous materials"] }
+      ],
+      note: "Home Services is $50 per hour, per team member, with a 4-hour minimum. Choose your team size and hours on the next step."
     },
     carpet: {
       title: "Carpet Extraction Cleaning",
@@ -2289,6 +2317,17 @@ function rpCalculatePrice() {
     return total;
   }
   if (rpState.service === "carpet") return Number(rpState.carpetRooms || 0) * 75;
+  if (rpState.service === "junk") {
+    if (rpState.junkSize === "half") return 100;
+    if (rpState.junkSize === "full") return 200;
+    return 0;
+  }
+  if (rpState.service === "homeservices") {
+    const helpers = Number(rpState.helpersCount || 0);
+    const hours = Number(rpState.hoursCount || 0);
+    if (!helpers || !hours) return 0;
+    return 50 * helpers * hours;
+  }
   if (rpState.service === "upholstery") return Number(rpState.upholsteryPrice || 0);
   if (rpState.service === "airbnb" || rpState.service === "commercial") return 0;
   const base = rpServices[rpState.service]?.base || 0;
@@ -2305,7 +2344,7 @@ function rpCalculatePrice() {
 
 function rpPriceLabel() {
   const total = rpCalculatePrice();
-  if (!total && (rpState.service === "airbnb" || rpState.service === "commercial")) return "Call/Text Quote";
+  if (!total && (rpState.service === "airbnb" || rpState.service === "commercial" || (rpState.service === "junk" && rpState.junkSize === "trailer"))) return "Call/Text Quote";
   if (!total) return "$0";
   return `$${total}`;
 }
@@ -2365,6 +2404,15 @@ function rpRender() {
         <button class="rp-option" onclick="rpSelectService('commercial')">
           <strong>🏢 Commercial Cleaning</strong>
           <span>Custom-quoted cleaning for small offices and light commercial spaces.</span>
+        </button>
+        <div class="rp-service-divider">Also available</div>
+        <button class="rp-option" onclick="rpSelectService('junk')">
+          <strong>🚛 Junk Removal</strong>
+          <span>Haul-away for furniture, boxes, and move-out debris.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectService('homeservices')">
+          <strong>🧰 Home Services</strong>
+          <span>Extra hands for organizing, unpacking, and light tasks.</span>
         </button>
       </div>
     `;
@@ -2430,6 +2478,54 @@ function rpRender() {
           <strong>🛋️ Large Sectional</strong>
           <span>$325 for 6+ seats or chaise setups.</span>
         </button>
+      </div>
+      <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
+    `;
+    return;
+  }
+
+  if (rpState.step === 3 && rpState.service === "junk") {
+    app.innerHTML = `
+      <h2>How much are we removing?</h2>
+      <div class="rp-grid">
+        <button class="rp-option" onclick="rpSelectJunkSize('half')">
+          <strong>🚚 Half Truck Bed</strong>
+          <span>$100 flat — a few items or a small clear-out.</span>
+        </button>
+        <button class="rp-option featured-option" onclick="rpSelectJunkSize('full')">
+          <span class="badge">Most Common</span>
+          <strong>🚛 Full Truck Bed</strong>
+          <span>$200 flat — furniture, multiple rooms, or a full clear-out.</span>
+        </button>
+        <button class="rp-option" onclick="rpSelectJunkSize('trailer')">
+          <strong>🚜 Trailer Load</strong>
+          <span>Custom quote — large volume or whole-home clear-outs.</span>
+        </button>
+      </div>
+      <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
+    `;
+    return;
+  }
+
+  if (rpState.step === 3 && rpState.service === "homeservices") {
+    app.innerHTML = `
+      <h2>How many team members do you need?</h2>
+      <p class="rp-sub">Most small projects only need one or two extra hands.</p>
+      <div class="rp-pill-grid">
+        ${[1,2,3,4].map(n => `<button class="rp-pill" onclick="rpSelectHelpers(${n})">${n}${n === 4 ? "+" : ""}</button>`).join("")}
+      </div>
+      <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
+    `;
+    return;
+  }
+
+  if (rpState.step === 4 && rpState.service === "homeservices") {
+    const helpers = Math.max(1, Number(rpState.helpersCount || 1));
+    app.innerHTML = `
+      <h2>How many hours?</h2>
+      <p class="rp-sub">4-hour minimum per booking. $50 per hour, per team member.</p>
+      <div class="rp-pill-grid">
+        ${[4,5,6,7,8].map(n => `<button class="rp-pill" onclick="rpSelectHours(${n})">${n}${n === 8 ? "+" : ""}<br><small>$${n * 50 * helpers}</small></button>`).join("")}
       </div>
       <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
     `;
@@ -2530,6 +2626,9 @@ function rpRenderEstimateStep() {
       ${(rpState.service === "moveout" || rpState.service === "movein") && rpState.bedrooms ? `<div class="rp-mini-row"><span>${rpState.service === "movein" ? "Factory Reset™ Move-In base" : "Factory Reset™ Move-Out base"}</span><strong>$${(rpState.service === "movein" ? rpMoveinPrices : rpMoveoutPrices)[Math.min(rpState.bedrooms, 4)]}</strong></div>` : ""}
       ${rpState.carpetRooms ? `<div class="rp-mini-row"><span>Carpet extraction cleaning</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""} room(s) · $${rpState.carpetRooms * 75}</strong></div>` : ""}
       ${rpState.service === "upholstery" && rpState.upholsteryLabel ? `<div class="rp-mini-row"><span>Furniture item</span><strong>${rpState.upholsteryLabel} · $${rpState.upholsteryPrice}</strong></div>` : ""}
+      ${rpState.service === "junk" && rpState.junkSize ? `<div class="rp-mini-row"><span>Load size</span><strong>${rpState.junkSize === "half" ? "Half Truck Bed" : rpState.junkSize === "full" ? "Full Truck Bed" : "Trailer Load"}</strong></div>` : ""}
+      ${rpState.service === "homeservices" && rpState.helpersCount ? `<div class="rp-mini-row"><span>Team members</span><strong>${rpState.helpersCount}${rpState.helpersCount === 4 ? "+" : ""}</strong></div>` : ""}
+      ${rpState.service === "homeservices" && rpState.hoursCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hoursCount}${rpState.hoursCount === 8 ? "+" : ""}</strong></div>` : ""}
       ${rpState.exteriorWindows ? `<div class="rp-mini-row"><span>Exterior window basic wash</span><strong>$100</strong></div>` : ""}
       <div class="rp-total"><span>Estimated Price</span><span>$${total}</span></div>
     </div>
@@ -2609,11 +2708,14 @@ function rpRenderCalendarStep() {
   rpLoadCalendarScript();
 }
 
-function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.upholsteryType = null; rpState.upholsteryLabel = ""; rpState.upholsteryPrice = 0; rpState.estimateSent = false; rpState.preBookingWebhookSent = false; rpRender(); rpScrollToCalculator(); }
+function rpSelectService(service) { rpState.service = service; rpState.step = 2; rpState.bedrooms = null; rpState.bathrooms = null; rpState.carpetRooms = 0; rpState.exteriorWindows = false; rpState.upholsteryType = null; rpState.upholsteryLabel = ""; rpState.upholsteryPrice = 0; rpState.junkSize = null; rpState.helpersCount = null; rpState.hoursCount = null; rpState.estimateSent = false; rpState.preBookingWebhookSent = false; rpRender(); rpScrollToCalculator(); }
 function rpContinueFromDetails() { if (["airbnb", "commercial"].includes(rpState.service)) { rpState.step = 6; } else { rpState.step = 3; } rpRender(); rpScrollToCalculator(); }
 function rpSelectBedrooms(n) { rpState.bedrooms = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
 function rpSelectBathrooms(n) { rpState.bathrooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
 function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
+function rpSelectJunkSize(size) { rpState.junkSize = size; rpState.step = (size === "trailer") ? 6 : 5; rpRender(); rpScrollToCalculator(); }
+function rpSelectHelpers(n) { rpState.helpersCount = n; rpState.step = 4; rpRender(); rpScrollToCalculator(); }
+function rpSelectHours(n) { rpState.hoursCount = n; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
 function rpSelectUpholstery(type) { const item = rpUpholsteryPrices[type]; if (!item) return; rpState.upholsteryType = type; rpState.upholsteryLabel = item.label; rpState.upholsteryPrice = item.price; rpState.step = 5; rpRender(); rpScrollToCalculator(); }
 function rpToggleCarpetUpsell(checked) { rpState.carpetRooms = checked ? 1 : 0; rpRender(); }
 function rpSelectMoveoutCarpetRooms(n) { rpState.carpetRooms = n; rpRender(); }
@@ -2623,9 +2725,13 @@ function rpGoToLead() { rpState.step = 6; rpRender(); rpScrollToCalculator(); }
 function rpBack() {
   if (rpState.step <= 1) return;
   if (rpState.step === 7) rpState.step = 6;
-  else if (rpState.step === 6) rpState.step = (["airbnb", "commercial"].includes(rpState.service) ? 2 : 5);
+  else if (rpState.step === 6) {
+    if (["airbnb", "commercial"].includes(rpState.service)) rpState.step = 2;
+    else if (rpState.service === "junk" && rpState.junkSize === "trailer") rpState.step = 3;
+    else rpState.step = 5;
+  }
   else if (rpState.step === 5) {
-    if (rpState.service === "carpet" || rpState.service === "upholstery") rpState.step = 3;
+    if (["carpet", "upholstery", "junk"].includes(rpState.service)) rpState.step = 3;
     else rpState.step = 4;
   }
   else if (rpState.step === 4) rpState.step = 3;
@@ -2647,9 +2753,11 @@ function rpGetEstimatePayload() {
   const notes = rpState.specialInstructions.trim() || "None";
   const jobDetails = [
     `Service: ${service}`, `Estimate: $${total}`, `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
-    `Carpet rooms: ${rpState.carpetRooms || "0"}`, `Exterior windows: ${rpState.exteriorWindows ? "Yes" : "No"}`, `Upholstery item: ${rpState.upholsteryLabel || "N/A"}`, `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`
+    `Carpet rooms: ${rpState.carpetRooms || "0"}`, `Exterior windows: ${rpState.exteriorWindows ? "Yes" : "No"}`, `Upholstery item: ${rpState.upholsteryLabel || "N/A"}`,
+    `Junk load size: ${rpState.junkSize || "N/A"}`, `Home Services team members: ${rpState.helpersCount || "N/A"}`, `Home Services hours: ${rpState.hoursCount || "N/A"}`,
+    `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`
   ].join(" | ");
-  return { source:"Red Prairie Website Instant Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", addons:[rpState.carpetRooms ? `Carpet extraction cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href };
+  return { source:"Red Prairie Website Instant Estimator", business:"Red Prairie Cleaning", full_name:rpState.fullName, phone:rpState.phone, email:rpState.email, address1, street_address:address1, address:address1, city, state, postal_code:postalCode, zip:postalCode, full_address:fullAddress, service, service_type:service, service_key:rpState.service, estimated_price:`$${total}`, estimated_price_number:total, price_estimate:`$${total}`, bedrooms:rpState.bedrooms || "N/A", bathrooms:rpState.bathrooms || "N/A", carpet_rooms:rpState.carpetRooms || "0", exterior_windows:rpState.exteriorWindows ? "Yes" : "No", upholstery_type:rpState.upholsteryType || "N/A", upholstery_item:rpState.upholsteryLabel || "N/A", upholstery_price:rpState.upholsteryPrice || "0", junk_size:rpState.junkSize || "N/A", helpers_count:rpState.helpersCount || "N/A", hours_count:rpState.hoursCount || "N/A", addons:[rpState.carpetRooms ? `Carpet extraction cleaning: ${rpState.carpetRooms} room(s)` : "", rpState.exteriorWindows ? "Exterior window basic wash" : "", rpState.upholsteryLabel ? `Upholstery: ${rpState.upholsteryLabel}` : ""].filter(Boolean).join(", ") || "None", special_instructions:notes, customer_notes:notes, estimate_notes:jobDetails, job_details:jobDetails, cleaner_notes:jobDetails, submitted_at:new Date().toISOString(), page_url:window.location.href };
 }
 function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
