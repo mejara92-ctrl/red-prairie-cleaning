@@ -82,7 +82,7 @@ Mobile-First Style Sheet
             min-height: calc(100vh - 66px);
             background:
                 linear-gradient(rgba(0,0,0,.74), rgba(0,0,0,.58)),
-                url("images/hero/hero-cleaning-team.jpg") center center/cover no-repeat;
+                url("images/hero/hero-cleaning-team.webp") center center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 92px 18px 42px;
@@ -609,7 +609,7 @@ Mobile-First Style Sheet
                 min-height: 92vh;
                 background:
                     linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.42), rgba(0,0,0,.25)),
-                    url("images/hero/hero-cleaning-team.jpg") center right/cover no-repeat;
+                    url("images/hero/hero-cleaning-team.webp") center right/cover no-repeat;
                 padding: 135px 7% 80px;
             }
             .hero h1 { font-size: clamp(48px, 5vw, 74px); }
