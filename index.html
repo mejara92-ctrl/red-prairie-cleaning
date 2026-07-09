@@ -84,8 +84,8 @@
             flex: 1;
         }
 
-        .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; background:#070707; padding:6px 10px; }
-        .logo img { width: 138px; height: auto; object-fit: contain; }
+        .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; background: transparent !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+        .logo img { width: 150px; height: auto; object-fit: contain; display: block; border: 0 !important; box-shadow: none !important; background: transparent !important; }
 
         .nav-links { display: none; }
         .navbar .book-btn { flex-shrink: 0; }
@@ -1192,6 +1192,25 @@ line-height:1.5;
         .rp-inclusion-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+
+
+/* v5 estimator clarity + logo cleanup */
+.logo, .navbar .logo { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.logo img, .navbar .logo img { border: 0 !important; box-shadow: none !important; background: transparent !important; display: block; width: 150px; max-width: 42vw; }
+.rp-progress-label { align-items: center; }
+.rp-progress-label strong { color: var(--red); }
+.rp-card h2 { text-align: center; letter-spacing: -0.035em; }
+.rp-service-prompt { text-align: center; font-size: clamp(15px, 3.4vw, 18px); padding: 14px 18px; margin: 12px auto 18px; max-width: 760px; }
+.rp-service-summary { text-align: center; padding: clamp(18px, 4vw, 26px); }
+.rp-service-summary > p { max-width: 760px; margin-left: auto !important; margin-right: auto !important; }
+.rp-included-headline { text-align: center; font-size: clamp(14px, 3vw, 16px); max-width: 780px; margin: 14px auto 18px; }
+.rp-inclusion-grid { max-width: 880px; margin: 16px auto !important; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 44px; }
+.rp-guarantee-note { max-width: 860px; margin-left: auto; margin-right: auto; text-align: left; }
+.footer-brand-mark { display: none !important; }
+@media (min-width: 720px) { .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -1681,6 +1700,25 @@ function gtag_report_conversion(url) {
             }
         }
 
+
+
+/* v5 estimator clarity + logo cleanup */
+.logo, .navbar .logo { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.logo img, .navbar .logo img { border: 0 !important; box-shadow: none !important; background: transparent !important; display: block; width: 150px; max-width: 42vw; }
+.rp-progress-label { align-items: center; }
+.rp-progress-label strong { color: var(--red); }
+.rp-card h2 { text-align: center; letter-spacing: -0.035em; }
+.rp-service-prompt { text-align: center; font-size: clamp(15px, 3.4vw, 18px); padding: 14px 18px; margin: 12px auto 18px; max-width: 760px; }
+.rp-service-summary { text-align: center; padding: clamp(18px, 4vw, 26px); }
+.rp-service-summary > p { max-width: 760px; margin-left: auto !important; margin-right: auto !important; }
+.rp-included-headline { text-align: center; font-size: clamp(14px, 3vw, 16px); max-width: 780px; margin: 14px auto 18px; }
+.rp-inclusion-grid { max-width: 880px; margin: 16px auto !important; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 44px; }
+.rp-guarantee-note { max-width: 860px; margin-left: auto; margin-right: auto; text-align: left; }
+.footer-brand-mark { display: none !important; }
+@media (min-width: 720px) { .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
+
 </style>
 <style>
     .image-lightbox {
@@ -1717,6 +1755,25 @@ function gtag_report_conversion(url) {
         font-weight: 900;
     }
     .gallery-item { cursor: zoom-in; }
+
+
+/* v5 estimator clarity + logo cleanup */
+.logo, .navbar .logo { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.logo img, .navbar .logo img { border: 0 !important; box-shadow: none !important; background: transparent !important; display: block; width: 150px; max-width: 42vw; }
+.rp-progress-label { align-items: center; }
+.rp-progress-label strong { color: var(--red); }
+.rp-card h2 { text-align: center; letter-spacing: -0.035em; }
+.rp-service-prompt { text-align: center; font-size: clamp(15px, 3.4vw, 18px); padding: 14px 18px; margin: 12px auto 18px; max-width: 760px; }
+.rp-service-summary { text-align: center; padding: clamp(18px, 4vw, 26px); }
+.rp-service-summary > p { max-width: 760px; margin-left: auto !important; margin-right: auto !important; }
+.rp-included-headline { text-align: center; font-size: clamp(14px, 3vw, 16px); max-width: 780px; margin: 14px auto 18px; }
+.rp-inclusion-grid { max-width: 880px; margin: 16px auto !important; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 44px; }
+.rp-guarantee-note { max-width: 860px; margin-left: auto; margin-right: auto; text-align: left; }
+.footer-brand-mark { display: none !important; }
+@media (min-width: 720px) { .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
+
 </style>
 <style id="rpc-final-polish">
     .hero-trust a.google-review-pill,
@@ -1813,6 +1870,25 @@ function gtag_report_conversion(url) {
         .soro-scroll-shell { max-height: 460px; padding: 8px; }
     }
 
+
+
+/* v5 estimator clarity + logo cleanup */
+.logo, .navbar .logo { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.logo img, .navbar .logo img { border: 0 !important; box-shadow: none !important; background: transparent !important; display: block; width: 150px; max-width: 42vw; }
+.rp-progress-label { align-items: center; }
+.rp-progress-label strong { color: var(--red); }
+.rp-card h2 { text-align: center; letter-spacing: -0.035em; }
+.rp-service-prompt { text-align: center; font-size: clamp(15px, 3.4vw, 18px); padding: 14px 18px; margin: 12px auto 18px; max-width: 760px; }
+.rp-service-summary { text-align: center; padding: clamp(18px, 4vw, 26px); }
+.rp-service-summary > p { max-width: 760px; margin-left: auto !important; margin-right: auto !important; }
+.rp-included-headline { text-align: center; font-size: clamp(14px, 3vw, 16px); max-width: 780px; margin: 14px auto 18px; }
+.rp-inclusion-grid { max-width: 880px; margin: 16px auto !important; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 44px; }
+.rp-guarantee-note { max-width: 860px; margin-left: auto; margin-right: auto; text-align: left; }
+.footer-brand-mark { display: none !important; }
+@media (min-width: 720px) { .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
+
 </style>
 <link href="/favicon.png" rel="icon" type="image/png"/>
 <noscript data-rp="async-css-fallback"><link href="css/style.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/></noscript></head>
@@ -1867,7 +1943,7 @@ function gtag_report_conversion(url) {
 <div class="rp-funnel-header">
 <div class="rp-estimator-kicker">Instant Price Estimator</div>
 <h2>Instant Price Estimate</h2>
-<p>Tap a service first. The next screen shows exactly what is included before you enter home details or book.</p>
+<p>Choose your service, review the included scope, then get your instant price.</p>
 </div>
 <div class="rp-card">
 <div class="rp-progress-label"><span id="rpStepText">30 second estimate</span><span>Red Prairie Cleaning</span></div>
@@ -1931,7 +2007,7 @@ function gtag_report_conversion(url) {
 </div>
 </section></main><footer>
 <div class="footer-content">
-<div><img class="footer-brand-mark" src="/images/logo/logo-color.webp" width="150" height="54" alt="Red Prairie Cleaning logo"/><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
+<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan</li></ul></div>
 <div><h3>Services</h3><ul><li>Factory Reset™ Move-Out</li><li>Factory Reset™ Move-In</li><li>Deep Cleaning</li><li>Basic Cleaning</li><li>Airbnb Turnover</li><li>Steam Carpet Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
 </div>
@@ -2007,7 +2083,7 @@ function rpUpdateProgress() {
   const fill = document.getElementById("rpProgressFill");
   const progressMap = { 1: 16, 2: 32, 3: 50, 4: 62, 5: 78, 6: 90, 7: 100 };
   const pct = progressMap[rpState.step] || 16;
-  if (stepText) stepText.innerHTML = `<strong>${rpStepLabel()}</strong> · Service → Details → Price → Book`;
+  if (stepText) stepText.innerHTML = `<strong>${rpStepLabel()}</strong> · Service → Included → Price → Book`;
   if (fill) fill.style.width = `${pct}%`;
 }
 
@@ -2027,14 +2103,14 @@ function rpServiceDetails(serviceKey = rpState.service) {
     moveout: {
       title: "Factory Reset™ Move-Out Cleaning",
       subtitle: "Best for rentals, inspections, key handoff, and property turnovers.",
-      items: ["Whole inside-home clean", "All appliances top to bottom", "Inside oven + microwave", "Inside refrigerator", "Cabinets + drawers inside/out", "Bathrooms sanitized", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
-      note: "No add-ons required for the normal inside-home scope: we clean the whole interior, including all major appliances top to bottom. Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will make it right."
+      items: ["Complete inside-home cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
+      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price includes the full interior from top to bottom — including all major appliances, cabinets, bathrooms, floors, doors, baseboards, and more. Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will make it right."
     },
     movein: {
       title: "Factory Reset™ Move-In Cleaning",
       subtitle: "Best before furniture, boxes, kids, pets, and everyday life move in.",
-      items: ["Whole inside-home clean", "All appliances top to bottom", "Inside oven + microwave", "Inside refrigerator", "Cabinets + drawers inside/out", "Bathrooms sanitized", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Move-in ready finish"],
-      note: "No add-ons required for the normal inside-home scope: we clean the whole interior, including all major appliances top to bottom, before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
+      items: ["Complete inside-home cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Move-in ready finish"],
+      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price includes the full interior from top to bottom — including all major appliances, cabinets, bathrooms, floors, doors, baseboards, and more before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
     },
     deep: {
       title: "Deep Cleaning",
@@ -2084,7 +2160,7 @@ function rpRenderServiceDetailsStep() {
     <div class="rp-service-summary">
       <h2>${d.title}</h2>
       <p>${d.subtitle}</p>
-      <div class="rp-estimator-help">Step 2: review exactly what is included. After this, tap Continue Booking to choose home details, see your price, and book.</div>
+      <div class="rp-estimator-help rp-included-headline">Everything below is included in your quoted price. No hidden add-ons for a standard inside-home cleaning.</div>
       <div class="rp-inclusion-grid">
         ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
       </div>
@@ -2150,8 +2226,7 @@ function rpRender() {
   if (rpState.step === 1) {
     app.innerHTML = `
       <h2>Choose your cleaning service</h2>
-      <p class="rp-tap-note">👇 Tap a service. The next screen shows exactly what is included before you enter your address or book.</p>
-      <div class="rp-estimator-help">Not sure what is included? Tap any option first. You will see the full scope, then a clear Continue Booking button.</div>
+      <div class="rp-estimator-help rp-service-prompt">Tap a service to see exactly what is included before you enter home details or book.</div>
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
