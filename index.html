@@ -194,13 +194,16 @@
             box-shadow: 0 8px 22px rgba(0,0,0,.06);
             border: 1px solid #eee;
         }
-        .trust-card i { color: var(--red); font-size: 24px; margin-bottom: 8px; }
+        .trust-card i { color: var(--black); font-size: 24px; margin-bottom: 8px; }
         .trust-card h3 { font-size: 18px; margin: 0 0 4px; }
         .trust-card p { margin: 0; color: var(--muted); font-size: 12px; }
 
         .rp-funnel { background: var(--light); color: var(--text); padding: 56px 14px; }
         .rp-funnel-wrap { max-width: 1050px; margin: 0 auto; }
         .rp-funnel-header { text-align: center; margin-bottom: 22px; }
+        .rp-mini-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 10px 0 0; }
+        .rp-mini-trust span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #666; }
+        .rp-mini-trust i { display: inline-flex; color: #999; }
         .rp-funnel-header h2 {
             font-size: clamp(30px, 8vw, 52px);
             line-height: 1.08;
@@ -217,6 +220,10 @@
             border: 1px solid var(--border);
             overflow: hidden;
         }
+        #rpApp { min-height: 430px; }
+        @keyframes rpStepIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        #rpApp > * { animation: rpStepIn .22s ease; }
+        @media (min-width: 720px) { #rpApp { min-height: 480px; } }
 
         .rp-progress-label {
             display: flex;
@@ -226,8 +233,18 @@
             font-size: 12px;
             margin-bottom: 9px;
         }
-        .rp-progress { width: 100%; height: 8px; background: #eee; border-radius: 999px; overflow: hidden; margin-bottom: 22px; }
-        .rp-progress-fill { height: 100%; width: 12.5%; background: linear-gradient(90deg, #b80000, #e00000); transition: width .25s ease; }
+        .rp-live-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--black); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; margin-bottom: 14px; }
+        .rp-live-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #33d17a; display: inline-block; }
+        .rp-stepper { display: flex; gap: 4px; margin-bottom: 12px; }
+        .rp-stepper-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .rp-stepper-dot { width: 24px; height: 24px; border-radius: 50%; background: #e9e9e7; color: #5c5c5c; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: background .2s ease, color .2s ease; }
+        .rp-stepper-name { font-size: 10px; font-weight: 700; color: #5c5c5c; transition: color .2s ease; }
+        .rp-stepper-item.is-done .rp-stepper-dot { background: var(--black); color: #fff; }
+        .rp-stepper-item.is-done .rp-stepper-name { color: var(--black); }
+        .rp-stepper-item.is-active .rp-stepper-dot { background: var(--red); color: #fff; }
+        .rp-stepper-item.is-active .rp-stepper-name { color: var(--black); }
+        .rp-progress { width: 100%; height: 5px; background: #eee; border-radius: 999px; overflow: hidden; margin-bottom: 22px; }
+        .rp-progress-fill { height: 100%; width: 12.5%; background: var(--red); transition: width .25s ease; }
 
         .rp-card h1, .rp-card h2, .rp-card h3 { color: var(--text); margin-top: 0; }
         .rp-card h1, .rp-card h2 {
@@ -251,8 +268,8 @@
             min-height: 88px;
         }
         .rp-option:hover, .rp-option.is-selected {
-            border-color: var(--red);
-            background: #fff5f5;
+            border-color: var(--black);
+            background: #f7f7f7;
             transform: translateY(-2px);
         }
         .rp-option strong { display: block; font-size: 17px; margin-bottom: 4px; }
@@ -269,7 +286,7 @@
             font-weight: 900;
             min-height: 48px;
         }
-        .rp-pill:hover, .rp-pill.is-selected { border-color: var(--red); background: #fff5f5; }
+        .rp-pill:hover, .rp-pill.is-selected { border-color: var(--black); background: #f7f7f7; }
 
         .rp-included { background: #fafafa; border: 1px solid #ddd; border-radius: 18px; padding: 16px; margin: 18px 0; }
         .rp-included-title { font-weight: 900; margin-bottom: 10px; }
@@ -287,7 +304,7 @@
             margin: 10px 0;
             cursor: pointer;
         }
-        label.rp-addon:hover { border-color: var(--red); background: #fff5f5; }
+        label.rp-addon:hover { border-color: var(--black); background: #f7f7f7; }
         label.rp-addon input { transform: scale(1.15); margin-right: 8px; }
         .rp-addon-left { display: flex; align-items: center; color: var(--text); font-weight: 700; font-size: 14px; }
         .rp-price { color: var(--red); font-weight: 900; white-space: nowrap; }
@@ -371,7 +388,7 @@
             resize: vertical;
         }
         .rp-lead-field input:focus,
-        .rp-lead-field textarea:focus { outline: none; border-color: var(--red); }
+        .rp-lead-field textarea:focus { outline: none; border-color: var(--black); }
         .rp-error {
             display: none;
             background: #fff0f0;
@@ -430,7 +447,7 @@
             padding: 20px;
             box-shadow: 0 12px 28px rgba(0,0,0,.07);
         }
-        .rp-inclusion-card.featured { border-color: var(--red); box-shadow: 0 16px 38px rgba(208,0,0,.12); }
+        .rp-inclusion-card.featured { border-color: var(--black); box-shadow: 0 16px 38px rgba(0,0,0,.12); }
         .rp-inclusion-card h3 { font-size: 20px; margin: 0 0 8px; color: var(--text); }
         .rp-inclusion-card p { color: #555; margin: 0 0 12px; line-height: 1.55; font-size: 14px; }
         .rp-inclusion-card ul { margin: 0 0 0 18px; color: #222; padding: 0; }
@@ -471,7 +488,7 @@
         .service-content { padding: 22px; }
         .service-content h3 { font-size: 22px; margin: 0 0 10px; }
         .service-content p { color: #555; margin: 0 0 14px; font-size: 14px; }
-        .service-content a { color: var(--red); font-weight: 900; }
+        .service-content a { color: var(--black); font-weight: 900; text-decoration: underline; }
 
         .gallery { display: grid; grid-template-columns: 1fr; gap: 16px; }
         .gallery-item { position: relative; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); }
@@ -480,7 +497,7 @@
             position: absolute;
             left: 14px;
             bottom: 14px;
-            background: var(--red);
+            background: var(--black);
             color: #fff;
             padding: 8px 13px;
             border-radius: 999px;
@@ -498,7 +515,7 @@
             box-shadow: 0 12px 30px rgba(0,0,0,.08);
             border: 1px solid #eee;
         }
-        .rp-process-card i { color: var(--red); font-size: 28px; margin-bottom: 10px; }
+        .rp-process-card i { color: var(--black); font-size: 28px; margin-bottom: 10px; }
         .rp-process-card h3 { margin: 0 0 8px; }
         .rp-process-card p { margin: 0; color: #555; font-size: 14px; }
 
@@ -530,7 +547,7 @@
         .review-carousel .review-card { min-width: 86%; scroll-snap-align: center; }
         .review-card p { margin: 14px 0; color: #444; font-size: 14px; }
         .review-card h4 { margin: 0; }
-        .review-card span { display: inline-block; margin-top: 6px; color: var(--red); font-weight: 900; font-size: 13px; }
+        .review-card span { display: inline-block; margin-top: 6px; color: var(--black); font-weight: 900; font-size: 13px; }
         .review-cta { display: flex; justify-content: center; margin-top: 24px; }
 
         .contact-cta, .final-cta { text-align: center; background: var(--red); color: #fff; }
@@ -546,7 +563,7 @@
             width: calc(50% - 6px);
             border: 1px solid #eee;
         }
-        .area-card i { color: var(--red); font-size: 22px; margin-bottom: 8px; }
+        .area-card i { color: var(--black); font-size: 22px; margin-bottom: 8px; }
         .area-card h3 { font-size: 14px; margin: 0; }
 
         footer { background: #070707; color: #fff; padding: 30px 18px 22px; }
@@ -706,8 +723,8 @@
         }
 
         .moveout-value {
-            border-color: var(--red) !important;
-            box-shadow: 0 18px 44px rgba(208,0,0,.14) !important;
+            border-color: var(--black) !important;
+            box-shadow: 0 18px 44px rgba(0,0,0,.14) !important;
         }
 
         .rp-typical-pricing {
@@ -895,7 +912,7 @@
             flex-direction: column;
             justify-content: flex-start;
         }
-        .rp-outcome-card.featured { border-color: var(--red); box-shadow: 0 18px 44px rgba(208,0,0,.14); }
+        .rp-outcome-card.featured { border-color: var(--black); box-shadow: 0 18px 44px rgba(0,0,0,.14); }
         .rp-outcome-card span {
             display: inline-flex;
             width: 100%;
@@ -978,7 +995,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            color: var(--red);
+            color: var(--black);
             font-weight: 900;
             font-size: 13px;
             margin: 8px 0 12px;
@@ -995,7 +1012,7 @@
             right: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--red);
+            color: #999;
             font-size: 30px;
             font-weight: 900;
             line-height: 1;
@@ -1093,7 +1110,7 @@
                 border-radius: 20px;
             }
             .rp-progress {
-                height: 10px;
+                height: 5px;
                 margin-bottom: 14px;
             }
             .rp-card h1,
@@ -1261,13 +1278,33 @@ function gtag_report_conversion(url) {
   return false;
 }
 </script>
-<!-- Microsoft Clarity -->
+<!-- Deferred-load helper: runs a callback on first user interaction (scroll/tap/key),
+     or once the browser is idle, whichever comes first, capped at 4s so it still
+     fires for readers who don't interact right away. Keeps non-critical third-party
+     scripts (analytics, chat) off the main thread during initial paint. -->
+<script>
+(function(){
+  var ran = false;
+  function schedule(fn){
+    function run(){ if (ran) return; ran = true; fn(); }
+    ['scroll','touchstart','pointerdown','keydown'].forEach(function(evt){
+      window.addEventListener(evt, run, { passive: true, once: true });
+    });
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 4000 });
+    else setTimeout(run, 4000);
+  }
+  window.__rpScheduleDeferred = schedule;
+})();
+</script>
+<!-- Microsoft Clarity (deferred: session recording isn't needed before first paint) -->
 <script type="text/javascript">
+window.__rpScheduleDeferred(function(){
 (function(c,l,a,r,i,t,y){
     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 })(window, document, "clarity", "script", "xb86ac4u38");
+});
 </script>
 <script type="application/ld+json">
 {
@@ -1527,16 +1564,16 @@ function gtag_report_conversion(url) {
         .rp-live-price strong { display: block; color: #fff; font-size: clamp(40px, 13vw, 66px); line-height: .95; letter-spacing: -.05em; }
         .rp-live-price span { display: block; color: #eee; font-size: 13.5px; margin-top: 9px; }
         .rp-estimator-kicker { display: inline-flex; align-items:center; justify-content:center; background:#fff0f0; color:var(--red); border:1px solid #f0caca; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:900; margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em; }
-        .rp-tap-note { font-weight: 900; color: var(--red); margin: 0 0 10px; font-size: 15px; }
+        .rp-tap-note { font-weight: 900; color: var(--black); margin: 0 0 10px; font-size: 15px; }
 
         .rp-option { position: relative; padding-right: 48px; border: 2px solid #ddd; min-height: 76px; }
-        .rp-option::after { content: "›"; position: absolute; right: 17px; top: 50%; transform: translateY(-50%); color: var(--red); font-size: 34px; font-weight: 900; line-height: 1; }
-        .rp-option.featured-option { border-color: var(--red); background: #fff5f5; box-shadow: 0 12px 30px rgba(208,0,0,.10); }
+        .rp-option::after { content: "›"; position: absolute; right: 17px; top: 50%; transform: translateY(-50%); color: #999; font-size: 34px; font-weight: 900; line-height: 1; }
+        .rp-option.featured-option { border-color: var(--black); background: #f7f7f7; box-shadow: 0 12px 30px rgba(0,0,0,.10); }
         .rp-option .badge { display:inline-flex; background: var(--red); color:#fff; border-radius:999px; padding:5px 9px; font-size:11px; font-weight:900; margin-bottom: 6px; }
         .rp-option:active, .rp-pill:active, .rp-primary:active, .quote-btn:active, .secondary-btn:active { transform: scale(.985); }
         .rp-pill { border: 2px solid #ddd; border-radius: 18px; }
         .rp-pill small { color:#555; font-weight: 800; }
-        .rp-pill.is-selected, .rp-option.is-selected { border-color: var(--red); background:#fff5f5; }
+        .rp-pill.is-selected, .rp-option.is-selected { border-color: var(--black); background:#f7f7f7; }
 
         .rp-mini-row { display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid #eee; padding:10px 0; font-size:14px; }
         .rp-mini-row strong { text-align:right; }
@@ -1574,7 +1611,7 @@ function gtag_report_conversion(url) {
             .hero-trust span { font-size: 11px; padding: 7px 9px; }
             .rp-funnel-header p { font-size: 13.5px; }
             .rp-card { padding: 14px; border-radius: 20px; }
-            .rp-progress { height: 10px; margin-bottom: 14px; }
+            .rp-progress { height: 5px; margin-bottom: 14px; }
             .rp-card h1, .rp-card h2 { font-size: clamp(25px, 7vw, 32px); margin-bottom: 6px; }
             .rp-sub { font-size: 13.5px; margin-bottom: 12px; }
             .rp-grid { gap: 9px; margin: 12px 0; }
@@ -1686,14 +1723,14 @@ function gtag_report_conversion(url) {
             grid-template-columns: auto 1fr;
             gap: 16px;
             align-items: center;
-            background: #fff5f5;
-            border: 1px solid #f0caca;
+            background: #f7f7f7;
+            border: 1px solid var(--border);
             border-radius: 22px;
             padding: 20px;
-            box-shadow: 0 12px 28px rgba(208,0,0,.08);
+            box-shadow: 0 12px 28px rgba(0,0,0,.06);
         }
         .chamber-trust-card i {
-            color: var(--red);
+            color: var(--black);
             font-size: 30px;
         }
         .chamber-trust-card h2 {
@@ -1915,7 +1952,7 @@ function gtag_report_conversion(url) {
 <body>
 <header class="navbar">
 <div class="nav-container">
-<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" fetchpriority="high" height="150" loading="eager" src="images/logo/logo-white.webp" width="700"/></div>
+<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" fetchpriority="high" height="112" loading="eager" src="images/logo/logo-white.webp" width="700"/></div>
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
@@ -1936,7 +1973,7 @@ function gtag_report_conversion(url) {
 
 
 
-<script>window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.src='https://app.trysoro.com/api/embed/dbe75468-6666-45e1-b76a-86835ed6fdac';s.defer=true;document.body.appendChild(s);},1800);});</script>
+<script>window.__rpScheduleDeferred(function(){var s=document.createElement('script');s.src='https://app.trysoro.com/api/embed/dbe75468-6666-45e1-b76a-86835ed6fdac';s.defer=true;document.body.appendChild(s);});</script>
 <main id="main-content"><section class="hero" id="home">
 <picture class="hero-bg" aria-hidden="true">
   <source media="(min-width: 800px)" srcset="images/hero/hero-cleaning-team-1200.webp">
@@ -1945,12 +1982,9 @@ function gtag_report_conversion(url) {
 <div class="hero-overlay">
 <h1>Preparing Homes for Their Next Chapter.</h1>
 <div class="hero-trust">
-<a class="google-review-pill" href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" rel="noopener" target="_blank"><i class="fa-solid fa-star"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="12,2 14.6,9 22,9.5 16.4,14.2 18,21.5 12,17.6 6,21.5 7.6,14.2 2,9.5 9.4,9" fill="currentColor"/></svg></i> 5.0 on Google • 37+ Ratings</a>
-<span><i class="fa-solid fa-bolt"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="13,2 4,14 11,14 9,22 20,9 12,9" fill="currentColor"/></svg></i> Same-Day Availability</span>
-<span><i class="fa-solid fa-house-circle-check"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M9.5 15 L11.5 17 L15.5 13"/></svg></i> 100+ Homes Prepared</span>
-<span><i class="fa-solid fa-shield-heart"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 14.5 C10.3 12.6 8 13.1 8 15.2 C8 17.1 12 19.2 12 19.2 C12 19.2 16 17.1 16 15.2 C16 13.1 13.7 12.6 12 14.5Z" fill="currentColor"/></svg></i> Defend Your Deposit</span>
-<span><i class="fa-solid fa-camera"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 L9.5 4.5 H14.5 L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></i> Picture Ready</span>
-<span><i class="fa-solid fa-building"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Lawton Fort Sill Chamber Member</span>
+<a class="google-review-pill" href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" rel="noopener" target="_blank"><i class="fa-solid fa-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="12,2 14.6,9 22,9.5 16.4,14.2 18,21.5 12,17.6 6,21.5 7.6,14.2 2,9.5 9.4,9" fill="currentColor"/></svg></i> 5.0 on Google • 37+ Ratings</a>
+<span><i class="fa-solid fa-bolt" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="13,2 4,14 11,14 9,22 20,9 12,9" fill="currentColor"/></svg></i> Same-Day Availability</span>
+<span><i class="fa-solid fa-shield-heart" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 14.5 C10.3 12.6 8 13.1 8 15.2 C8 17.1 12 19.2 12 19.2 C12 19.2 16 17.1 16 15.2 C16 13.1 13.7 12.6 12 14.5Z" fill="currentColor"/></svg></i> Defend Your Deposit</span>
 </div>
 <p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and Southwest Oklahoma.</p>
 <div class="hero-microcopy">
@@ -1965,12 +1999,22 @@ function gtag_report_conversion(url) {
 </section><section class="rp-funnel" id="booking">
 <div class="rp-funnel-wrap">
 <div class="rp-funnel-header">
-<div class="rp-estimator-kicker">Instant Price Estimator</div>
 <h2>Instant Price Estimate</h2>
 <p>Choose your service, review the included scope, then get your instant price.</p>
+<div class="rp-mini-trust">
+<span><i class="fa-solid fa-house-circle-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M9.5 15 L11.5 17 L15.5 13"/></svg></i> 100+ Homes Prepared</span>
+<span><i class="fa-solid fa-camera" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 L9.5 4.5 H14.5 L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></i> Picture Ready</span>
+<span><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Lawton Fort Sill Chamber Member</span>
+</div>
 </div>
 <div class="rp-card">
-<div class="rp-progress-label"><span id="rpStepText">30 second estimate</span><span>Red Prairie Cleaning</span></div>
+<div class="rp-live-badge">Live Booking Calculator</div>
+<div class="rp-stepper" id="rpStepper">
+<div class="rp-stepper-item" data-stage="1"><span class="rp-stepper-dot">1</span><span class="rp-stepper-name">Choose</span></div>
+<div class="rp-stepper-item" data-stage="2"><span class="rp-stepper-dot">2</span><span class="rp-stepper-name">Included</span></div>
+<div class="rp-stepper-item" data-stage="3"><span class="rp-stepper-dot">3</span><span class="rp-stepper-name">Price</span></div>
+<div class="rp-stepper-item" data-stage="4"><span class="rp-stepper-dot">4</span><span class="rp-stepper-name">Book</span></div>
+</div>
 <div class="rp-progress"><div class="rp-progress-fill" id="rpProgressFill"></div></div>
 <div id="rpApp"></div>
 </div>
@@ -1988,10 +2032,10 @@ function gtag_report_conversion(url) {
 <h2>See The Difference</h2>
 <p>Real transformations from our professional cleaning services.</p>
 <div class="gallery">
-<div class="gallery-item"><img alt="Dirty carpet before cleaning" decoding="async" height="800" loading="lazy" src="images/before-after/carpet-1-before.jpg" width="1200"/><span>Carpet Before</span></div>
-<div class="gallery-item"><img alt="Clean carpet after professional cleaning" decoding="async" height="800" loading="lazy" src="images/before-after/carpet-1-after.jpg" width="1200"/><span>Carpet After</span></div>
-<div class="gallery-item"><img alt="Dirty couch before upholstery cleaning" decoding="async" height="800" loading="lazy" src="images/before-after/couch-1-before.jpg" width="1200"/><span>Upholstery Before</span></div>
-<div class="gallery-item"><img alt="Clean couch after upholstery cleaning" decoding="async" height="800" loading="lazy" src="images/before-after/couch-1-after.jpg" width="1200"/><span>Upholstery After</span></div>
+<div class="gallery-item"><img alt="Dirty carpet before cleaning" decoding="async" height="467" loading="lazy" src="images/before-after/carpet-1-before.webp" width="700"/><span>Carpet Before</span></div>
+<div class="gallery-item"><img alt="Clean carpet after professional cleaning" decoding="async" height="467" loading="lazy" src="images/before-after/carpet-1-after.webp" width="700"/><span>Carpet After</span></div>
+<div class="gallery-item"><img alt="Dirty couch before upholstery cleaning" decoding="async" height="467" loading="lazy" src="images/before-after/couch-1-before.webp" width="700"/><span>Upholstery Before</span></div>
+<div class="gallery-item"><img alt="Clean couch after upholstery cleaning" decoding="async" height="467" loading="lazy" src="images/before-after/couch-1-after.webp" width="700"/><span>Upholstery After</span></div>
 </div>
 </section><section class="faq-section" id="faq">
 <div class="faq-wrap">
@@ -2013,12 +2057,12 @@ function gtag_report_conversion(url) {
 <h2>Serving Southwest Oklahoma</h2>
 <p class="section-text">Red Prairie Cleaning serves Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and nearby Southwest Oklahoma communities.</p>
 <div class="areas">
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Lawton</h3></div>
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Fort Sill</h3></div>
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Cache</h3></div>
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Elgin</h3></div>
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Medicine Park</h3></div>
-<div class="area-card"><i class="fa-solid fa-location-dot"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Duncan</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Lawton</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Fort Sill</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Cache</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Elgin</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Medicine Park</h3></div>
+<div class="area-card"><i class="fa-solid fa-location-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 21 C12 21 5 14 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14 12 21 12 21 Z" fill="currentColor"/><circle cx="12" cy="9.5" r="2.6" fill="#f7f7f7"/></svg></i><h3>Duncan</h3></div>
 </div>
 </section><section class="section soro-blog-section" id="blog">
 <div class="container">
@@ -2031,7 +2075,7 @@ function gtag_report_conversion(url) {
 </div>
 </section></main><footer>
 <div class="footer-content">
-<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
+<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan</li></ul></div>
 <div><h3>Services</h3><ul><li>Factory Reset™ Move-Out</li><li>Factory Reset™ Move-In</li><li>Deep Cleaning</li><li>Basic Cleaning</li><li>Airbnb Turnover</li><li>Carpet Extraction Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
 </div>
@@ -2102,11 +2146,16 @@ function rpStepLabel() {
 }
 
 function rpUpdateProgress() {
-  const stepText = document.getElementById("rpStepText");
   const fill = document.getElementById("rpProgressFill");
   const progressMap = { 1: 16, 2: 32, 3: 50, 4: 62, 5: 78, 6: 90, 7: 100 };
   const pct = progressMap[rpState.step] || 16;
-  if (stepText) stepText.innerHTML = `<strong>${rpStepLabel()}</strong> · Service → Included → Price → Book`;
+  const stageMap = { 1: 1, 2: 2, 3: 3, 4: 3, 5: 3, 6: 4, 7: 4 };
+  const stage = stageMap[rpState.step] || 1;
+  document.querySelectorAll("#rpStepper .rp-stepper-item").forEach(function (el) {
+    const n = parseInt(el.getAttribute("data-stage"), 10);
+    el.classList.toggle("is-active", n === stage);
+    el.classList.toggle("is-done", n < stage);
+  });
   if (fill) fill.style.width = `${pct}%`;
 }
 
