@@ -22,9 +22,11 @@
       moveout: { name: 'Factory Reset™ Move-Out Cleaning', emoji: '🚚', base: 0 },
       movein: { name: 'Factory Reset™ Move-In Cleaning', emoji: '🔑', base: 0 },
       deep: { name: 'Deep Cleaning', emoji: '✨', base: 249 },
-      maintenance: { name: 'Maintenance Cleaning', emoji: '🏠', base: 149 },
+      maintenance: { name: 'Basic Cleaning', emoji: '🏠', base: 149 },
+      airbnb: { name: 'Airbnb Turnover Cleaning', emoji: '🧺', base: 0 },
       carpet: { name: 'Professional Steam Carpet Cleaning', emoji: '🧼', base: 75 },
-      upholstery: { name: 'Professional Upholstery Cleaning', emoji: '🛋️', base: 0 }
+      upholstery: { name: 'Professional Upholstery Cleaning', emoji: '🛋️', base: 0 },
+      commercial: { name: 'Commercial Cleaning', emoji: '🏢', base: 0 }
     };
 
     var upholsteryPrices = {
@@ -131,10 +133,10 @@
 
     function serviceBlurb(serviceKey) {
       var blurbs = {
-        moveout: 'Perfect for renters, inspections, and property turnovers.',
+        moveout: 'Perfect for renters, inspections, key handoff, and property turnovers.',
         movein: 'A detailed reset before boxes, furniture, kids, pets, and real life move in.',
         deep: 'A heavier one-time clean for lived-in homes with buildup, dust, and grime.',
-        maintenance: 'Routine upkeep for homes already in decent shape.',
+        maintenance: 'Basic routine upkeep for homes already in decent shape.',
         carpet: 'Hot-water extraction for carpeted bedrooms, living areas, and hallways.',
         upholstery: 'Fabric furniture cleaning for sofas, loveseats, recliners, chairs, and sectionals.'
       };
@@ -153,11 +155,11 @@
     function serviceIncludes(serviceKey) {
       var lists = {
         moveout: [
-          'Kitchen detailed top to bottom', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped inside and out', 'Bathrooms cleaned and sanitized',
+          'Whole inside-home clean', 'All appliances top to bottom', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped inside and out', 'Bathrooms cleaned and sanitized',
           'Baseboards, doors, edges, and corners', 'Interior windows, sills, and tracks', 'Floors vacuumed and mopped', 'Reasonable wall scuff touch-up', 'Basic garage sweep'
         ],
         movein: [
-          'Kitchen reset before food and dishes move in', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped before unpacking', 'Bathrooms cleaned and sanitized',
+          'Whole inside-home clean', 'All appliances top to bottom', 'Inside oven, microwave, and refrigerator', 'Cabinets and drawers wiped before unpacking', 'Bathrooms cleaned and sanitized',
           'Baseboards, doors, edges, and corners', 'Interior windows, sills, and tracks', 'Floors vacuumed and mopped', 'High-touch surfaces cleaned'
         ],
         deep: [
@@ -191,7 +193,7 @@
         '<div class="rp-service-intro"><p class="rp-tap-note">You selected</p><h2>' + (service.emoji || '') + ' ' + service.name + '</h2><p class="rp-sub">' + serviceBlurb(rpState.service) + '</p></div>' +
         '<div class="rp-included"><div class="rp-included-title">What\'s Included</div><ul class="rp-checklist rp-checklist-list">' + includes + '</ul></div>' +
         '<div class="rp-duration-note">' + serviceDuration(rpState.service) + '</div>' + trust +
-        '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button><button class="rp-primary" onclick="rpContinueFromIncludes()">Continue</button></div>';
+        '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button><button class="rp-primary" onclick="rpContinueFromIncludes()">Continue Booking</button></div>';
     }
 
     function render() {
@@ -202,14 +204,18 @@
 
       if (rpState.step === 1 || !rpState.step) {
         app.innerHTML =
-          '<p class="rp-tap-note">👇 Tap one option</p>' +
+          '<h2>Choose your cleaning service</h2>' +
+          '<p class="rp-tap-note">👇 Tap a service. The next screen shows exactly what is included before you enter your address or book.</p>' +
+          '<div class="rp-estimator-help">Not sure what is included? Tap any option first. You will see the full scope, then a clear Continue Booking button.</div>' +
           '<div class="rp-grid">' +
-          '<button class="rp-option featured-option" onclick="rpSelectService(\'moveout\')"><span class="badge">Most Popular</span><strong>🚚 Factory Reset™ Move-Out</strong><span>Renters, inspections & turnovers.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'movein\')"><span class="badge">Second Most Popular</span><strong>🔑 Factory Reset™ Move-In</strong><span>Fresh start before move-in day.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'carpet\')"><strong>🧼 Steam Carpet Cleaning</strong><span>$75 per carpeted room.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'upholstery\')"><strong>🛋️ Upholstery Cleaning</strong><span>Sofas, recliners & sectionals.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'deep\')"><strong>✨ Deep Cleaning</strong><span>Heavy detail clean for lived-in homes.</span></button>' +
-          '<button class="rp-option" onclick="rpSelectService(\'maintenance\')"><strong>🏠 Maintenance Cleaning</strong><span>Routine upkeep for maintained homes.</span></button>' +
+          '<button class="rp-option featured-option" onclick="rpSelectService(&quot;moveout&quot;)"><span class="badge">Most Popular</span><strong>🚚 Move-Out Cleaning</strong><span>Factory Reset™ for renters, inspections & turnovers.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;movein&quot;)"><span class="badge">Second Most Popular</span><strong>🔑 Move-In Cleaning</strong><span>Factory Reset™ before boxes and furniture arrive.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;deep&quot;)"><strong>✨ Deep Clean</strong><span>Heavy detail clean for lived-in homes.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;maintenance&quot;)"><strong>🏠 Basic Clean</strong><span>Routine upkeep for maintained homes.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;airbnb&quot;)"><strong>🧺 Airbnb Turnover</strong><span>Guest-ready reset. Text for quote.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;carpet&quot;)"><strong>🧼 Carpet Cleaning</strong><span>$75 per carpeted room.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;upholstery&quot;)"><strong>🛋️ Upholstery Cleaning</strong><span>Sofas, recliners & sectionals.</span></button>' +
+          '<button class="rp-option" onclick="rpSelectService(&quot;commercial&quot;)"><strong>🏢 Commercial Cleaning</strong><span>Text for quote. Small office/light commercial.</span></button>' +
           '</div>';
         return;
       }
@@ -223,6 +229,14 @@
           '<h2>How many bedrooms?</h2><p class="rp-sub">This sets the base price for your ' + (isMoveIn ? 'move-in' : 'move-out') + ' cleaning.</p>' +
           '<div class="rp-pill-grid">' + [1,2,3,4].map(function (n) { return '<button class="rp-pill" onclick="rpSelectBedrooms(' + n + ')">' + n + ' Bedroom<br><small>$' + table[n] + '</small></button>'; }).join('') + '</div>' +
           '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>';
+        return;
+      }
+
+      if (rpState.step === 3 && (rpState.service === 'airbnb' || rpState.service === 'commercial')) {
+        app.innerHTML =
+          '<h2>Text us for a quote</h2><p class="rp-sub">This service is custom priced. Send your info and we will text you back with the right quote.</p>' +
+          '<div class="rp-guarantee"><strong>No photo upload required</strong><span>We just need your contact info and a short description of what you need.</span></div>' +
+          '<div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button><button class="rp-primary" onclick="rpGoToLead()">Text for Quote</button></div>';
         return;
       }
 
@@ -446,7 +460,7 @@
       render();
       scrollToCalculator();
     };
-    window.rpContinueFromIncludes = function () { rpState.step = 3; render(); scrollToCalculator(); };
+    window.rpContinueFromIncludes = function () { rpState.step = (rpState.service === 'airbnb' || rpState.service === 'commercial') ? 3 : 3; render(); scrollToCalculator(); };
     window.rpSelectBedrooms = function (n) { rpState.bedrooms = n; rpState.step = (rpState.service === 'moveout' || rpState.service === 'movein' || rpState.service === 'deep' || rpState.service === 'maintenance') ? 4 : 5; render(); scrollToCalculator(); };
     window.rpSelectBathrooms = function (n) { rpState.bathrooms = n; rpState.step = 5; render(); scrollToCalculator(); };
     window.rpSelectCarpetOnlyRooms = function (n) { rpState.carpetRooms = n; rpState.step = 4; render(); scrollToCalculator(); };
@@ -459,7 +473,7 @@
     window.rpBack = function () {
       if (rpState.step <= 1) return;
       if (rpState.step === 7) rpState.step = 6;
-      else if (rpState.step === 6) rpState.step = 5;
+      else if (rpState.step === 6) rpState.step = (rpState.service === 'airbnb' || rpState.service === 'commercial') ? 3 : 5;
       else if (rpState.step === 5) {
         if (rpState.service === 'carpet' || rpState.service === 'upholstery') rpState.step = 3;
         else rpState.step = 4;

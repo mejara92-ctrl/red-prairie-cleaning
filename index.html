@@ -84,7 +84,7 @@
             flex: 1;
         }
 
-        .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; }
+        .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; background:#070707; padding:6px 10px; }
         .logo img { width: 138px; height: auto; object-fit: contain; }
 
         .nav-links { display: none; }
@@ -1802,7 +1802,7 @@ function gtag_report_conversion(url) {
     }
     .soro-scroll-note { margin: -18px auto 18px; color: #666; font-size: 13px; }
     .soro-blog-section #soro-blog { min-height: 120px; align-items: flex-start; }
-    .footer-brand-mark { width: 42px; height: 42px; border-radius: 10px; margin: 0 0 10px; display: block; }
+    .footer-brand-mark { width: 150px; height: auto; border-radius: 0; margin: 0 0 14px; display: block; }
     @media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 520px) {
         .rp-card { padding: 14px; }
@@ -1819,7 +1819,7 @@ function gtag_report_conversion(url) {
 <body>
 <header class="navbar">
 <div class="nav-container">
-<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" height="240" src="images/logo/logo-color.webp" width="670"/></div>
+<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" height="240" src="images/logo/logo-white.webp" width="670"/></div>
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
@@ -1931,7 +1931,7 @@ function gtag_report_conversion(url) {
 </div>
 </section></main><footer>
 <div class="footer-content">
-<div><img class="footer-brand-mark" src="/images/logo/favicon.png" width="42" height="42" alt="Red Prairie Cleaning mark"/><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
+<div><img class="footer-brand-mark" src="/images/logo/logo-color.webp" width="150" height="54" alt="Red Prairie Cleaning logo"/><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-building"></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan</li></ul></div>
 <div><h3>Services</h3><ul><li>Factory Reset™ Move-Out</li><li>Factory Reset™ Move-In</li><li>Deep Cleaning</li><li>Basic Cleaning</li><li>Airbnb Turnover</li><li>Steam Carpet Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
 </div>
@@ -2027,26 +2027,26 @@ function rpServiceDetails(serviceKey = rpState.service) {
     moveout: {
       title: "Factory Reset™ Move-Out Cleaning",
       subtitle: "Best for rentals, inspections, key handoff, and property turnovers.",
-      items: ["Kitchen + appliances", "Bathrooms sanitized", "Cabinets + drawers", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
-      note: "Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an area we missed, contact us within 48 hours and we will make it right within the original scope."
+      items: ["Whole inside-home clean", "All appliances top to bottom", "Inside oven + microwave", "Inside refrigerator", "Cabinets + drawers inside/out", "Bathrooms sanitized", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
+      note: "No add-ons required for the normal inside-home scope: we clean the whole interior, including all major appliances top to bottom. Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will make it right."
     },
     movein: {
       title: "Factory Reset™ Move-In Cleaning",
       subtitle: "Best before furniture, boxes, kids, pets, and everyday life move in.",
-      items: ["Kitchen + appliances", "Bathrooms sanitized", "Cabinets + drawers", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Dust + detail reset", "Move-in ready finish"],
-      note: "Designed to help the home feel clean before you unpack. Severe mess, trash, and specialty projects are quoted separately."
+      items: ["Whole inside-home clean", "All appliances top to bottom", "Inside oven + microwave", "Inside refrigerator", "Cabinets + drawers inside/out", "Bathrooms sanitized", "Baseboards + doors", "Interior windows + tracks", "Floors vacuumed + mopped", "Move-in ready finish"],
+      note: "No add-ons required for the normal inside-home scope: we clean the whole interior, including all major appliances top to bottom, before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
     },
     deep: {
       title: "Deep Cleaning",
       subtitle: "Best for lived-in homes with buildup, grime, dust, and neglected areas.",
-      items: ["Kitchen detail", "Bathroom detail", "Dusting + surfaces", "Baseboards + doors", "Floors cleaned", "High-touch areas", "Optional carpet cleaning", "Optional windows"],
-      note: "Deep cleans are normally staffed by one cleaner and can take up to 6 hours depending on condition."
+      items: ["Whole inside-home detail", "Kitchen top to bottom", "Appliance exteriors", "Inside microwave", "Bathroom detail", "Dust + surfaces", "Baseboards + doors", "Floors vacuumed + mopped", "High-touch areas", "Built-up grime focus"],
+      note: "A deep clean is a heavier inside-home reset for lived-in homes. It is not a move-out clean, but it does target the areas people notice: kitchens, bathrooms, baseboards, floors, and high-touch surfaces."
     },
     maintenance: {
       title: "Basic Cleaning",
       subtitle: "Best for homes already in decent shape that need routine upkeep.",
-      items: ["Kitchen surfaces", "Bathroom upkeep", "Dusting", "Vacuum + mop", "Trash touchpoints", "General tidy reset"],
-      note: "Maintenance cleans are normally staffed by one cleaner and are designed to take no more than 4 hours."
+      items: ["Kitchen surfaces", "Bathroom upkeep", "Dusting", "Vacuum + mop", "Trash touchpoints", "General tidy reset", "Counters + sinks", "Routine home refresh"],
+      note: "Basic cleaning keeps a maintained home under control. It is lighter than a deep clean or Factory Reset™, but still covers the core living areas people use every day."
     },
     airbnb: {
       title: "Airbnb Turnover Cleaning",
@@ -2084,16 +2084,16 @@ function rpRenderServiceDetailsStep() {
     <div class="rp-service-summary">
       <h2>${d.title}</h2>
       <p>${d.subtitle}</p>
-      <div class="rp-estimator-help">This screen is the scope preview — review exactly what is included, then continue.</div>
+      <div class="rp-estimator-help">Step 2: review exactly what is included. After this, tap Continue Booking to choose home details, see your price, and book.</div>
       <div class="rp-inclusion-grid">
         ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
       </div>
       <div class="rp-guarantee-note">${d.note}</div>
     </div>
-    ${quoteOnly ? `<div class="rp-callout-card"><h3>Call or text for this quote</h3><p>This service needs a quick conversation so we can price it fairly.</p><a class="rp-primary" href="sms:5802150915">Text Red Prairie</a></div>` : ""}
+    ${quoteOnly ? `<div class="rp-callout-card"><h3>Text us for a quote</h3><p>This service is custom priced. Send your info and we will text you back with the right quote.</p><a class="rp-primary" href="sms:5802150915">Text for Quote</a></div>` : ""}
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Back</button>
-      ${quoteOnly ? `<button class="rp-primary" onclick="rpGoToLead()">Send My Info</button>` : `<button class="rp-primary" onclick="rpContinueFromDetails()">Continue</button>`}
+      ${quoteOnly ? `<button class="rp-primary" onclick="rpGoToLead()">Text for Quote</button>` : `<button class="rp-primary" onclick="rpContinueFromDetails()">Continue Booking</button>`}
     </div>
   `;
 }
@@ -2150,8 +2150,8 @@ function rpRender() {
   if (rpState.step === 1) {
     app.innerHTML = `
       <h2>Choose your cleaning service</h2>
-      <p class="rp-tap-note">👇 Tap a service. The next screen shows exactly what's included before you book.</p>
-      <div class="rp-estimator-help">Not sure what is included? Tap any option first — you will see the full scope before entering your address.</div>
+      <p class="rp-tap-note">👇 Tap a service. The next screen shows exactly what is included before you enter your address or book.</p>
+      <div class="rp-estimator-help">Not sure what is included? Tap any option first. You will see the full scope, then a clear Continue Booking button.</div>
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
@@ -2185,7 +2185,7 @@ function rpRender() {
         </button>
         <button class="rp-option" onclick="rpSelectService('commercial')">
           <strong>🏢 Commercial Cleaning</strong>
-          <span>Call or text for small office / commercial quotes.</span>
+          <span>Text for quote. Small office and light commercial cleaning.</span>
         </button>
       </div>
     `;
