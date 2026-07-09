@@ -22,12 +22,7 @@
 <meta content="Red Prairie Cleaning | House, Move-Out &amp; Carpet Cleaning" name="twitter:title"/>
 <meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, basic cleaning, Airbnb turnover, steam carpet cleaning, upholstery cleaning, and light commercial cleaning across Lawton, Fort Sill, and Southwest Oklahoma." name="twitter:description"/>
 <meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" name="twitter:image"/>
-<link as="style" href="css/style.css" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link as="style" crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/>
-<link as="image" href="images/hero/hero-cleaning-team.webp" rel="preload"/>
+<link rel="preload" as="image" href="images/hero/hero-cleaning-team-640.webp" imagesrcset="images/hero/hero-cleaning-team-640.webp 640w, images/hero/hero-cleaning-team-1200.webp 1200w" imagesizes="100vw" fetchpriority="high"/>
 <style>
         :root {
             --red: #d00000;
@@ -44,7 +39,7 @@
         html { scroll-behavior: smooth; }
         body {
             margin: 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--text);
             background: #fff;
             line-height: 1.55;
@@ -85,7 +80,7 @@
         }
 
         .logo { display: flex; align-items: center; flex-shrink: 0; min-width: 0; background: transparent !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; }
-        .logo img { width: 150px; height: auto; object-fit: contain; display: block; border: 0 !important; box-shadow: none !important; background: transparent !important; }
+        .logo img { width: 150px; max-height: 54px; height: auto; object-fit: contain; display: block; border: 0 !important; box-shadow: none !important; background: transparent !important; }
 
         .nav-links { display: none; }
         .navbar .book-btn { flex-shrink: 0; }
@@ -121,16 +116,25 @@
         .secondary-btn:hover { background: #7f0000; color: #fff; }
 
         .hero {
+            position: relative;
             min-height: calc(100vh - 66px);
-            background:
-                linear-gradient(rgba(0,0,0,.82), rgba(0,0,0,.66)),
-                url("images/hero/hero-cleaning-team.webp") center center/cover no-repeat;
+            background: #111;
             display: flex;
             align-items: flex-end;
             padding: 92px 18px 42px;
+            overflow: hidden;
         }
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(0,0,0,.82), rgba(0,0,0,.66));
+            z-index: 1;
+        }
+        .hero-bg { position: absolute; inset: 0; z-index: 0; }
+        .hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: center center; }
 
-        .hero-overlay { width: 100%; max-width: 620px; color: #fff; }
+        .hero-overlay { position: relative; z-index: 2; width: 100%; max-width: 620px; color: #fff; }
         .hero h1 {
             font-size: clamp(35px, 10vw, 58px);
             line-height: 1.04;
@@ -360,7 +364,7 @@
             border-radius: 14px;
             padding: 15px;
             font-size: 16px;
-            font-family: 'Poppins', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         .rp-lead-field textarea {
             min-height: 110px;
@@ -657,11 +661,12 @@
             .navbar .book-btn { padding: 13px 24px; font-size: 15px; }
             .hero {
                 min-height: 92vh;
-                background:
-                    linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.42), rgba(0,0,0,.25)),
-                    url("images/hero/hero-cleaning-team.webp") center right/cover no-repeat;
                 padding: 135px 7% 80px;
             }
+            .hero::before {
+                background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.42), rgba(0,0,0,.25));
+            }
+            .hero-bg img { object-position: center right; }
             .hero h1 { font-size: clamp(48px, 5vw, 74px); }
             .hero p { font-size: 18px; }
             .rp-card { padding: 34px; border-radius: 28px; }
@@ -1210,6 +1215,21 @@ line-height:1.5;
 .footer-brand-mark { display: none !important; }
 @media (min-width: 720px) { .rp-grid.rp-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
+
+
+/* Final speed + estimator UX polish */
+.logo, .logo * { border: 0 !important; box-shadow: none !important; background: transparent !important; outline: 0 !important; }
+.rp-funnel-header p { max-width: 620px; }
+.rp-service-prompt { background: #fff7f7; border: 1px solid #f0b8b8; color: #a40000; font-weight: 900; text-align: center; font-size: clamp(15px, 3.4vw, 18px); padding: 16px 18px; margin: 14px auto 20px; max-width: 760px; border-radius: 14px; }
+.rp-included-headline { background: #fff7f7; border: 1px solid #f0b8b8; color: #9a0000; font-weight: 900; text-align: center; font-size: clamp(14px, 3vw, 16px); max-width: 780px; margin: 14px auto 18px; border-radius: 14px; padding: 14px 16px; }
+.rp-service-summary { text-align: center; }
+.rp-service-summary > p { max-width: 700px; margin-left: auto; margin-right: auto; }
+.rp-inclusion-grid { max-width: 900px; margin: 18px auto !important; display: grid; grid-template-columns: 1fr; gap: 9px; }
+.rp-inclusion-item { text-align: left; display: flex; align-items: center; min-height: 46px; padding: 11px 13px; border-radius: 13px; background: #fff; border: 1px solid #e2e2e2; font-weight: 850; color: #1d1d1d; }
+.rp-guarantee-note { max-width: 880px; margin: 18px auto 0; text-align: left; background: #f7f7f7; border-left: 4px solid var(--red); border-radius: 14px; padding: 16px 18px; color: #181818; font-weight: 750; line-height: 1.55; }
+@media (min-width: 720px) { .rp-inclusion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.rp-option span, .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
+.rp-progress-label { color: #444 !important; }
 
 </style>
 <!-- Google tag (gtag.js) -->
@@ -1891,11 +1911,11 @@ function gtag_report_conversion(url) {
 
 </style>
 <link href="/favicon.png" rel="icon" type="image/png"/>
-<noscript data-rp="async-css-fallback"><link href="css/style.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/></noscript></head>
+</head>
 <body>
 <header class="navbar">
 <div class="nav-container">
-<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" height="240" src="images/logo/logo-white.webp" width="670"/></div>
+<div class="logo"><img alt="Red Prairie Cleaning Logo" decoding="async" fetchpriority="high" height="150" loading="eager" src="images/logo/logo-white.webp" width="700"/></div>
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
@@ -1918,6 +1938,10 @@ function gtag_report_conversion(url) {
 
 <script>window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.src='https://app.trysoro.com/api/embed/dbe75468-6666-45e1-b76a-86835ed6fdac';s.defer=true;document.body.appendChild(s);},1800);});</script>
 <main id="main-content"><section class="hero" id="home">
+<picture class="hero-bg" aria-hidden="true">
+  <source media="(min-width: 800px)" srcset="images/hero/hero-cleaning-team-1200.webp">
+  <img src="images/hero/hero-cleaning-team-640.webp" width="640" height="427" alt="" fetchpriority="high" loading="eager" decoding="async">
+</picture>
 <div class="hero-overlay">
 <h1>Preparing Homes for Their Next Chapter.</h1>
 <div class="hero-trust">
@@ -2017,8 +2041,7 @@ function gtag_report_conversion(url) {
 <a class="secondary-btn" href="sms:5802150915">Text</a>
 </div>
 <div aria-hidden="true" class="image-lightbox" id="imageLightbox">
-<button aria-label="Close image preview" type="button">×</button>
-<img alt="Expanded cleaning result" decoding="async" loading="lazy" src=""/>
+
 </div>
 <script>
 const RP_PREBOOKING_WEBHOOK_DISABLED = true;
@@ -2103,14 +2126,14 @@ function rpServiceDetails(serviceKey = rpState.service) {
     moveout: {
       title: "Factory Reset™ Move-Out Cleaning",
       subtitle: "Best for rentals, inspections, key handoff, and property turnovers.",
-      items: ["Complete inside-home cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
-      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price includes the full interior from top to bottom — including all major appliances, cabinets, bathrooms, floors, doors, baseboards, and more. Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will make it right."
+      items: ["Full top-to-bottom interior cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms fully scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Reasonable wall scuffs", "Basic garage sweep"],
+      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price covers the full interior from top to bottom, including all major appliances inside and outside, cabinets, bathrooms, floors, doors, baseboards, and more. Inspection-Ready Re-Clean Promise: if your landlord or property manager identifies an in-scope area we missed, contact us within 48 hours and we will make it right."
     },
     movein: {
       title: "Factory Reset™ Move-In Cleaning",
       subtitle: "Best before furniture, boxes, kids, pets, and everyday life move in.",
-      items: ["Complete inside-home cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Move-in ready finish"],
-      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price includes the full interior from top to bottom — including all major appliances, cabinets, bathrooms, floors, doors, baseboards, and more before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
+      items: ["Full top-to-bottom interior cleaning", "All major appliances — inside + outside", "Oven, microwave + refrigerator interiors", "Cabinets + drawers — inside + outside", "Bathrooms fully scrubbed + sanitized", "Showers, tubs, toilets, sinks + mirrors", "Interior windows + tracks", "Doors, trim + baseboards", "Floors vacuumed + mopped", "Move-in ready finish"],
+      note: "No hidden add-ons for a standard inside-home cleaning. Your quoted price covers the full interior from top to bottom, including all major appliances inside and outside, cabinets, bathrooms, floors, doors, baseboards, and more before you unpack. Severe trash, biohazards, pest mess, exterior work, or specialty projects are quoted separately."
     },
     deep: {
       title: "Deep Cleaning",
@@ -2160,7 +2183,7 @@ function rpRenderServiceDetailsStep() {
     <div class="rp-service-summary">
       <h2>${d.title}</h2>
       <p>${d.subtitle}</p>
-      <div class="rp-estimator-help rp-included-headline">Everything below is included in your quoted price. No hidden add-ons for a standard inside-home cleaning.</div>
+      <div class="rp-estimator-help rp-included-headline">Everything below is included in your quoted price — no hidden add-ons for a standard inside-home cleaning.</div>
       <div class="rp-inclusion-grid">
         ${d.items.map(item => `<div class="rp-inclusion-item">✓ ${item}</div>`).join("")}
       </div>
@@ -2226,7 +2249,7 @@ function rpRender() {
   if (rpState.step === 1) {
     app.innerHTML = `
       <h2>Choose your cleaning service</h2>
-      <div class="rp-estimator-help rp-service-prompt">Tap a service to see exactly what is included before you enter home details or book.</div>
+      <div class="rp-estimator-help rp-service-prompt">Choose the cleaning service you need. Next, we’ll show exactly what is included before you receive pricing.</div>
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>

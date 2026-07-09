@@ -155,11 +155,11 @@
     function serviceIncludes(serviceKey) {
       var lists = {
         moveout: [
-          'Complete inside-home cleaning', 'All major appliances — inside + outside', 'Oven, microwave + refrigerator interiors', 'Cabinets + drawers — inside + outside', 'Bathrooms scrubbed + sanitized',
+          'Full top-to-bottom interior cleaning', 'All major appliances — inside + outside', 'Oven, microwave + refrigerator interiors', 'Cabinets + drawers — inside + outside', 'Bathrooms fully scrubbed + sanitized',
           'Showers, tubs, toilets, sinks + mirrors', 'Doors, trim + baseboards', 'Interior windows + tracks', 'Floors vacuumed + mopped', 'Reasonable wall scuffs', 'Basic garage sweep'
         ],
         movein: [
-          'Complete inside-home cleaning', 'All major appliances — inside + outside', 'Oven, microwave + refrigerator interiors', 'Cabinets + drawers — inside + outside', 'Bathrooms scrubbed + sanitized',
+          'Full top-to-bottom interior cleaning', 'All major appliances — inside + outside', 'Oven, microwave + refrigerator interiors', 'Cabinets + drawers — inside + outside', 'Bathrooms fully scrubbed + sanitized',
           'Showers, tubs, toilets, sinks + mirrors', 'Doors, trim + baseboards', 'Interior windows + tracks', 'Floors vacuumed + mopped', 'Move-in ready finish'
         ],
         deep: [
@@ -205,7 +205,7 @@
       if (rpState.step === 1 || !rpState.step) {
         app.innerHTML =
           '<h2>Choose your cleaning service</h2>' +
-          '<div class="rp-estimator-help rp-service-prompt">Tap a service to see exactly what is included before you enter home details or book.</div>' +
+          '<div class="rp-estimator-help rp-service-prompt">Choose the cleaning service you need. Next, we’ll show exactly what is included before you receive pricing.</div>' +
           '<div class="rp-grid">' +
           '<button class="rp-option featured-option" onclick="rpSelectService(&quot;moveout&quot;)"><span class="badge">Most Popular</span><strong>🚚 Move-Out Cleaning</strong><span>Factory Reset™ for renters, inspections & turnovers.</span></button>' +
           '<button class="rp-option" onclick="rpSelectService(&quot;movein&quot;)"><span class="badge">Second Most Popular</span><strong>🔑 Move-In Cleaning</strong><span>Factory Reset™ before boxes and furniture arrive.</span></button>' +
