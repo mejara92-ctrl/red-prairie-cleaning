@@ -2,6 +2,16 @@
 
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8D3WCS17S"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y8D3WCS17S');
+</script>
+
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Red Prairie Cleaning | Factory Reset Move-Out Cleaning in Lawton &amp; Fort Sill</title>
@@ -22,7 +32,7 @@
 <meta content="Red Prairie Cleaning | House, Move-Out &amp; Carpet Cleaning" name="twitter:title"/>
 <meta content="Factory Reset move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, basic cleaning, Airbnb turnover, carpet extraction cleaning, upholstery cleaning, and light commercial cleaning across Lawton, Fort Sill, and Southwest Oklahoma." name="twitter:description"/>
 <meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" name="twitter:image"/>
-<link rel="preload" as="image" href="images/hero/hero-cleaning-team-640.webp" imagesrcset="images/hero/hero-cleaning-team-640.webp 640w, images/hero/hero-cleaning-team-1200.webp 1200w" imagesizes="100vw" fetchpriority="high"/>
+<link rel="preload" as="image" href="images/services/move-out-cleaning-640.webp" imagesrcset="images/services/move-out-cleaning-640.webp 640w, images/services/move-out-cleaning.webp 1200w" imagesizes="100vw" fetchpriority="high"/>
 <style>
         :root {
             --red: #d00000;
@@ -1958,6 +1968,108 @@ window.__rpScheduleDeferred(function(){
 @media (max-width: 640px) { .logo img, .navbar .logo img { width: 138px !important; } .rp-card h2 { font-size: 28px; } }
 
 </style>
+<style id="rp-vertical-rhythm">
+    /* Vertical rhythm normalization: every major "chapter" section (hero,
+       estimator, reviews, before/after, faq, contact-cta, service-area, blog)
+       gets the same deliberate outer padding scale, so scroll pacing feels
+       consistent instead of some sections ballooning and others feeling
+       clipped. Internal card/content spacing is untouched. Footer keeps a
+       smaller, distinct scale since it's a utility close, not a chapter. */
+    .hero, .rp-funnel, .quick-reviews, .before-after, .faq-section,
+    .contact-cta, .service-area, .soro-blog-section {
+        padding-top: 64px;
+        padding-bottom: 64px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    /* Hero previously forced itself to 74-86% of viewport height on larger
+       screens regardless of content, which made it feel dramatically taller
+       than every section after it. Let it size to its own content instead,
+       same as it already did on mobile. */
+    .hero { min-height: auto; }
+
+    /* Preserve the sticky mobile CTA bar clearance on contact-cta specifically. */
+    .contact-cta { padding-bottom: 82px; }
+
+    @media (min-width: 700px) {
+        .hero, .rp-funnel, .quick-reviews, .before-after, .faq-section,
+        .contact-cta, .service-area, .soro-blog-section {
+            padding-top: 88px;
+            padding-bottom: 88px;
+            padding-left: 6%;
+            padding-right: 6%;
+        }
+        .hero { min-height: auto; }
+    }
+    @media (min-width: 1000px) {
+        .hero, .rp-funnel, .quick-reviews, .before-after, .faq-section,
+        .contact-cta, .service-area, .soro-blog-section {
+            padding-top: 104px;
+            padding-bottom: 104px;
+        }
+        .hero { min-height: auto; }
+    }
+
+    footer { padding: 56px 20px 32px; }
+    @media (min-width: 700px) { footer { padding: 72px 6% 40px; } }
+</style>
+<style id="rp-scroll-composition">
+    /* Viewport composition for common mobile/tablet devices: use gentle
+       (non-mandatory) scroll snapping so that when a scroll gesture ends
+       naturally, the viewport settles on the top of a section rather than
+       stopping mid-card or mid-headline. "Proximity" (not "mandatory") is
+       deliberate — it never fights or traps the user inside a long section,
+       it only nudges the rest position toward a clean section start when
+       the scroll already comes to rest nearby. scroll-margin-top matches
+       the sticky nav height so a snapped section isn't hidden behind it. */
+    @media (max-width: 999px) {
+        html { scroll-snap-type: y proximity; }
+        .hero, .rp-funnel, .quick-reviews, .before-after, .faq-section,
+        .contact-cta, .service-area, .soro-blog-section, footer {
+            scroll-snap-align: start;
+            scroll-margin-top: 66px;
+        }
+    }
+</style>
+<style id="rp-hero-funnel-transition">
+    /* Hero -> Estimator transition: the first two screens should read as one
+       continuous move ("landing, then booking begins") instead of two
+       stacked sections. Three things do the work together: (1) the hero's
+       bottom padding and the estimator's top padding are both tightened so
+       there's far less dead space at the seam, (2) a gradient fade at the
+       bottom of the hero photo blends into the estimator's background color
+       instead of cutting hard from dark photo to flat gray, and (3) the
+       card is pulled up slightly snug against its header so it reads as one
+       lifted unit rather than content that just starts underneath. Layout,
+       structure, and the estimator itself are untouched. */
+    .hero { padding-bottom: 28px; }
+    .hero::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        height: 120px;
+        background: linear-gradient(to bottom, rgba(246,246,246,0), #f6f6f6);
+        z-index: 1;
+        pointer-events: none;
+    }
+    .rp-funnel { padding-top: 22px; }
+    .rp-funnel-header { margin-bottom: 16px; }
+    .rp-card {
+        margin-top: -6px;
+        box-shadow: 0 22px 50px rgba(0,0,0,.16);
+    }
+
+    @media (min-width: 700px) {
+        .hero { padding-bottom: 36px; }
+        .hero::after { height: 150px; }
+        .rp-funnel { padding-top: 30px; }
+    }
+    @media (min-width: 1000px) {
+        .hero { padding-bottom: 44px; }
+        .hero::after { height: 180px; }
+        .rp-funnel { padding-top: 38px; }
+    }
+</style>
 <link href="/favicon.png" rel="icon" type="image/png"/>
 </head>
 <body>
@@ -1987,8 +2099,8 @@ window.__rpScheduleDeferred(function(){
 <script>window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.src='https://app.trysoro.com/api/embed/dbe75468-6666-45e1-b76a-86835ed6fdac';s.defer=true;document.body.appendChild(s);},800);});</script>
 <main id="main-content"><section class="hero" id="home">
 <picture class="hero-bg" aria-hidden="true">
-  <source media="(min-width: 800px)" srcset="images/hero/hero-cleaning-team-1200.webp">
-  <img src="images/hero/hero-cleaning-team-640.webp" width="640" height="427" alt="" fetchpriority="high" loading="eager" decoding="async">
+  <source media="(min-width: 800px)" srcset="images/services/move-out-cleaning.webp">
+  <img src="images/services/move-out-cleaning-640.webp" width="640" height="427" alt="" fetchpriority="high" loading="eager" decoding="async">
 </picture>
 <div class="hero-overlay">
 <h1>Preparing Homes for Their Next Chapter.</h1>
