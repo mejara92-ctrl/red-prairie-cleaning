@@ -2053,6 +2053,15 @@ window.__rpScheduleDeferred(function(){
     }
 </style>
 <style id="rp-estimator-v2">
+    .rp-discount-card { border-color: #cfae4a !important; background: #fffaf0; }
+    .rp-discount-row { color: #8a6d1a; font-weight: 900; }
+    .rp-discount-row span:first-child { color: #8a6d1a; }
+    @media (max-width: 699px) {
+        .rp-service-grid .rp-option { padding: 13px 44px 13px 14px; min-height: 74px; }
+        .rp-service-grid { gap: 9px !important; margin: 12px 0 !important; }
+        .rp-card { padding: 16px !important; }
+        .rp-funnel-header { margin-bottom: 10px !important; }
+    }
     .rp-guarantee-note {
         display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 800;
         color: #1a7a3c; background: #eefaf1; border: 1px solid #cdeed8; border-radius: 12px;
@@ -2144,9 +2153,6 @@ window.__rpScheduleDeferred(function(){
 <span><i class="fa-solid fa-shield-heart" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 14.5 C10.3 12.6 8 13.1 8 15.2 C8 17.1 12 19.2 12 19.2 C12 19.2 16 17.1 16 15.2 C16 13.1 13.7 12.6 12 14.5Z" fill="currentColor"/></svg></i> Defend Your Deposit</span>
 <span><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span>
 <span><i class="fa-solid fa-flag" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 21 V4"/><path d="M6 4 H18 L15 8 L18 12 H6"/></svg></i> Veteran Owned</span>
-<span><i class="fa-solid fa-house-circle-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M9.5 15 L11.5 17 L15.5 13"/></svg></i> 100+ Homes Prepared</span>
-<span><i class="fa-solid fa-camera" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 L9.5 4.5 H14.5 L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></i> Picture Ready</span>
-<span><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Lawton Fort Sill Chamber Member</span>
 </div>
 <p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and Southwest Oklahoma.</p>
 <div class="hero-microcopy">
@@ -2268,6 +2274,7 @@ const rpState = {
   airbnbRestocking: false,
   airbnbSameDay: false,
   handymanInterest: false,
+  militaryDiscount: false,
   fullName: "",
   phone: "",
   email: "",
@@ -2281,7 +2288,7 @@ const rpState = {
 };
 
 const rpServices = {
-  moveout:     { name: "Factory Reset™ Moving Clean",       emoji: "🏠" },
+  moveout:     { name: "Factory Reset™ Move-Out Clean",     emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Maintenance Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
@@ -2328,7 +2335,7 @@ const rpServiceAddons = {
 // What's included at no extra charge, shown on the "what's included" screen.
 const rpIncludes = {
   moveout: {
-    paragraph: "A top-to-bottom, inside-and-out clean that covers the full interior — no add-ons required. Built to get your deposit back, get the home photo-ready, or get it move-in ready for new tenants. Works best in an empty home — schedule it after your move-out or before your move-in for full access to every room."
+    paragraph: "A top-to-bottom, inside-and-out clean — appliances, cabinets, every surface, top to bottom, side to side, no add-ons required. Built to get your deposit back at move-out, and just as thorough for getting a home move-in ready. Works best in an empty home — schedule it after you're out, or before you move in."
   },
   deep: {
     paragraph: "A thorough reset that goes past your everyday routine — inside the oven and microwave, every bathroom, floors, and baseboards. Ideal before hosting, after a big mess, or just to hit reset on the whole house."
@@ -2446,15 +2453,22 @@ function rpCalculatePrice() {
   return 0;
 }
 
+function rpFinalPrice() {
+  const subtotal = rpCalculatePrice();
+  if (!subtotal) return subtotal;
+  if (rpState.service === "airbnb") return subtotal; // custom quote, no number to discount
+  return rpState.militaryDiscount ? Math.round(subtotal * 0.9) : subtotal;
+}
+
 function rpPriceLabel() {
-  const total = rpCalculatePrice();
+  const total = rpFinalPrice();
   if (rpState.service === "airbnb") return "Custom Quote";
   if (!total) return "$0";
   return `$${total}`;
 }
 
 function rpLivePrice(note = "Choose a service to begin.") {
-  const total = rpCalculatePrice();
+  const total = rpFinalPrice();
   const displayNote = total ? `✓ Nice — ${note}` : note;
   return `
     <div class="rp-live-price">
@@ -2480,16 +2494,16 @@ function rpRender() {
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
-          <strong>🏠 Factory Reset™ Moving Clean</strong>
-          <span>Full top-to-bottom cleaning for move-outs and move-ins.</span>
+          <strong>🏠 Factory Reset™ Move-Out Clean</strong>
+          <span>Full top-to-bottom cleaning to help renters get their deposit back — also perfect for move-ins.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('deep')">
           <strong>🧼 Deep Cleaning</strong>
-          <span>A thorough clean for homes that need extra attention.</span>
+          <span>A deeper clean for kitchens, bathrooms, and floors — perfect before hosting or after time away.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('maintenance')">
           <strong>✨ Maintenance Cleaning</strong>
-          <span>Recurring upkeep cleaning to keep a well-maintained home spotless.</span>
+          <span>Consistent cleaning on a schedule that fits your life — weekly, biweekly, or monthly.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('carpet')">
           <strong>🧽 Carpet Cleaning</strong>
@@ -2546,7 +2560,7 @@ function rpRender() {
       <div class="rp-grid">
         <button class="rp-option" onclick="rpSelectCondition('Normal')"><strong>🙂 Normal</strong><span>Regularly maintained, nothing unusual.</span></button>
         <button class="rp-option" onclick="rpSelectCondition('Needs Extra Attention')"><strong>🧹 Needs Extra Attention</strong><span>A bit more buildup than average.</span></button>
-        <button class="rp-option" onclick="rpSelectCondition('Heavy Build-Up')"><strong>🧽 Heavy Build-Up</strong><span>Significant grime, buildup, or neglect.</span></button>
+        <button class="rp-option" onclick="rpSelectCondition('Heavy Build-Up')"><strong>🧽 Heavy Build-Up</strong><span>Years of buildup or a home that hasn't been deep cleaned in a while.</span></button>
       </div>
       <div class="rp-btns"><button class="rp-secondary" onclick="rpBack()">Back</button></div>
     `;
@@ -2765,13 +2779,20 @@ function rpAddonSummaryRows() {
 
 function rpRenderEstimateStep() {
   const app = document.getElementById("rpApp");
-  const total = rpCalculatePrice();
+  const subtotal = rpCalculatePrice();
+  const final = rpFinalPrice();
   const service = rpServices[rpState.service];
   const isQuoteOnly = rpState.service === "airbnb";
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
+  const discountActive = rpState.militaryDiscount && !isQuoteOnly && subtotal > 0;
   app.innerHTML = `
     ${rpLivePrice(isQuoteOnly ? "our team will confirm your exact price." : "looks good. You can reserve your cleaning next.")}
     <div class="rp-guarantee-note">✓ Satisfaction Guaranteed — if we miss something, just tell us and we'll make it right.</div>
+    ${!isQuoteOnly ? `
+    <label class="rp-checkbox-card rp-discount-card">
+      <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
+      <div><strong>🎖️ Military or First Responder?</strong><span>Save 10% as a thank-you for your service.</span></div>
+    </label>` : ""}
     <h2>Quote Summary</h2>
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
@@ -2789,6 +2810,7 @@ function rpRenderEstimateStep() {
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
       ${rpState.handymanInterest ? `<div class="rp-mini-row"><span>Handyman &amp; Turnover interest</span><strong>Yes</strong></div>` : ""}
+      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>🎖️ Military &amp; First Responder Discount (10%)</span><strong>-$${subtotal - final}</strong></div>` : ""}
     </div>
     <div class="rp-notice">Final price may change for severe mess, heavy trash, unusual access issues, biohazard conditions, or work beyond scope.</div>
     ${showHandymanHere ? `
@@ -2800,7 +2822,7 @@ function rpRenderEstimateStep() {
       <button class="rp-secondary" onclick="rpBack()">Edit</button>
       <button class="rp-primary" onclick="rpAdvance()">Continue To Contact & Time</button>
     </div>
-    <p class="rp-fineprint">Prefer texting? Tap Text Us and send a screenshot of this estimate.</p>
+    <p class="rp-fineprint">Prefer texting? <a href="sms:5802150915">Text us</a> a screenshot of this estimate instead.</p>
   `;
 }
 
@@ -2834,7 +2856,7 @@ function rpBuildCalendarUrl() {
   const parts = rpState.fullName.trim().split(/\s+/).filter(Boolean);
   const firstName = parts.shift() || "";
   const lastName = parts.join(" ");
-  const total = rpCalculatePrice();
+  const total = rpFinalPrice();
   const jobDetails = rpGetEstimatePayload().job_details;
 
   const params = {
@@ -2913,6 +2935,7 @@ function rpToggleAirbnbLaundry(checked) { rpState.airbnbLaundry = checked; rpRen
 function rpToggleAirbnbRestocking(checked) { rpState.airbnbRestocking = checked; rpRender(); }
 function rpToggleAirbnbSameDay(checked) { rpState.airbnbSameDay = checked; rpRender(); }
 function rpToggleHandyman(checked) { rpState.handymanInterest = checked; }
+function rpToggleMilitaryDiscount(checked) { rpState.militaryDiscount = checked; rpRender(); }
 
 function rpExpandAddon(key) { rpState.expandedAddon = key; rpRender(); }
 function rpCollapseAddon() { rpState.expandedAddon = null; rpRender(); }
@@ -2936,7 +2959,9 @@ function rpBack() {
 function rpScrollToCalculator(instant = false) { const card = document.querySelector(".rp-card"); if (!card) return; const nav = document.querySelector(".navbar"); const navHeight = nav ? nav.offsetHeight : 70; const y = card.getBoundingClientRect().top + window.pageYOffset - navHeight - 10; window.scrollTo({ top: Math.max(0, y), behavior: instant ? "auto" : "smooth" }); }
 
 function rpGetEstimatePayload() {
-  const total = rpCalculatePrice();
+  const subtotal = rpCalculatePrice();
+  const total = rpFinalPrice();
+  const discountApplied = rpState.militaryDiscount && rpState.service !== "airbnb" && subtotal > 0;
   const service = rpServices[rpState.service]?.name || "Not selected";
   const address1 = rpState.address1.trim();
   const city = rpState.city.trim();
@@ -2959,6 +2984,7 @@ function rpGetEstimatePayload() {
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
+    `Military/First Responder Discount: ${discountApplied ? `Yes (-$${subtotal - total})` : "No"}`,
     `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`
   ].join(" | ");
   return {
@@ -2981,6 +3007,9 @@ function rpGetEstimatePayload() {
     airbnb_laundry: rpState.airbnbLaundry ? "Yes" : "No", airbnb_restocking: rpState.airbnbRestocking ? "Yes" : "No", airbnb_same_day: rpState.airbnbSameDay ? "Yes" : "No",
     exterior_windows_tier: rpState.windowsTier || "N/A",
     handyman_interest: rpState.handymanInterest ? "Yes" : "No",
+    military_discount: discountApplied ? "Yes" : "No",
+    subtotal_before_discount: discountApplied ? `$${subtotal}` : (rpState.service === "airbnb" ? "Custom Quote" : `$${subtotal}`),
+    discount_amount: discountApplied ? `$${subtotal - total}` : "$0",
     special_instructions: notes, customer_notes: notes, estimate_notes: jobDetails, job_details: jobDetails, cleaner_notes: jobDetails,
     submitted_at: new Date().toISOString(), page_url: window.location.href
   };
@@ -2997,6 +3026,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
