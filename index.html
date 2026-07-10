@@ -2013,24 +2013,6 @@ window.__rpScheduleDeferred(function(){
     footer { padding: 56px 20px 32px; }
     @media (min-width: 700px) { footer { padding: 72px 6% 40px; } }
 </style>
-<style id="rp-scroll-composition">
-    /* Viewport composition for common mobile/tablet devices: use gentle
-       (non-mandatory) scroll snapping so that when a scroll gesture ends
-       naturally, the viewport settles on the top of a section rather than
-       stopping mid-card or mid-headline. "Proximity" (not "mandatory") is
-       deliberate — it never fights or traps the user inside a long section,
-       it only nudges the rest position toward a clean section start when
-       the scroll already comes to rest nearby. scroll-margin-top matches
-       the sticky nav height so a snapped section isn't hidden behind it. */
-    @media (max-width: 999px) {
-        html { scroll-snap-type: y proximity; }
-        .hero, .rp-funnel, .quick-reviews, .before-after, .faq-section,
-        .contact-cta, .service-area, .soro-blog-section, footer {
-            scroll-snap-align: start;
-            scroll-margin-top: 66px;
-        }
-    }
-</style>
 <style id="rp-hero-funnel-transition">
     /* Hero -> Estimator transition: the first two screens should read as one
        continuous move ("landing, then booking begins") instead of two
@@ -2071,6 +2053,14 @@ window.__rpScheduleDeferred(function(){
     }
 </style>
 <style id="rp-estimator-v2">
+    .rp-guarantee-note {
+        display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 800;
+        color: #1a7a3c; background: #eefaf1; border: 1px solid #cdeed8; border-radius: 12px;
+        padding: 10px 14px; margin: 0 0 16px; text-align: center; justify-content: center;
+    }
+    .rp-guarantee-note-small {
+        font-size: 12.5px; font-weight: 700; color: #1a7a3c; text-align: center; margin: 12px 0 4px;
+    }
     .rp-includes-list { list-style: none; padding: 0; margin: 4px 0 18px; }
     .rp-includes-list li {
         padding: 11px 14px 11px 40px; margin-bottom: 8px; background: #f7f7f7;
@@ -2291,12 +2281,11 @@ const rpState = {
 };
 
 const rpServices = {
-  moveout:     { name: "Factory Reset™ Move-Out Cleaning", emoji: "🏠" },
-  movein:      { name: "Factory Reset™ Move-In Cleaning",  emoji: "🔑" },
+  moveout:     { name: "Factory Reset™ Moving Clean",       emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Maintenance Cleaning",             emoji: "✨" },
-  airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" },
-  carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" }
+  carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
+  airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
 
 // Bedroom-tier base pricing. Move-Out, Move-In, and Deep Cleaning all share
@@ -2332,7 +2321,6 @@ const rpAddonCatalog = {
 // Which add-ons show for which primary service, per the spec.
 const rpServiceAddons = {
   moveout:     ["carpet", "junk", "windows", "garage"],
-  movein:      ["carpet", "junk", "windows", "garage"],
   deep:        ["fridge", "carpet", "laundry", "windows", "garage"],
   maintenance: ["laundry", "windows"]
 };
@@ -2340,50 +2328,19 @@ const rpServiceAddons = {
 // What's included at no extra charge, shown on the "what's included" screen.
 const rpIncludes = {
   moveout: {
-    categories: [
-      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Refrigerator", "Cabinets & Drawers", "Counters & Sink"] },
-      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors", "Floors"] },
-      { title: "Whole Home", items: ["Baseboards", "Window Sills", "Doors & Trim", "Floors", "Dusting"] }
-    ],
-    value: "Everything needed to leave your home inspection-ready."
-  },
-  movein: {
-    categories: [
-      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Refrigerator", "Cabinets & Drawers", "Counters & Sink"] },
-      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors", "Floors"] },
-      { title: "Whole Home", items: ["Baseboards", "Window Sills", "Doors & Trim", "Floors", "Dusting"] }
-    ],
-    value: "Everything needed for your new home to feel brand new from day one."
+    paragraph: "A top-to-bottom, inside-and-out clean that covers the full interior — no add-ons required. Built to get your deposit back, get the home photo-ready, or get it move-in ready for new tenants. Works best in an empty home — schedule it after your move-out or before your move-in for full access to every room."
   },
   deep: {
-    categories: [
-      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Counters & Sink", "Cabinet Exteriors"] },
-      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors"] },
-      { title: "Whole Home", items: ["Baseboards", "Floors", "Dusting"] }
-    ],
-    value: "A thorough refresh that targets the areas everyday cleaning misses."
+    paragraph: "A thorough reset that goes past your everyday routine — inside the oven and microwave, every bathroom, floors, and baseboards. Ideal before hosting, after a big mess, or just to hit reset on the whole house."
   },
   maintenance: {
-    categories: [
-      { title: "Kitchen Touch-Up", items: ["Counters & Sink", "Exterior Wipe-Down"] },
-      { title: "Bathroom Touch-Up", items: ["Toilets", "Sinks", "Mirrors"] },
-      { title: "Whole Home", items: ["Dusting", "Vacuum & Mop", "General Tidy Reset"] }
-    ],
-    value: "Consistent upkeep that keeps your home guest-ready between visits."
+    paragraph: "Consistent upkeep that keeps your home spotless between visits, on whatever schedule fits your life."
   },
   carpet: {
-    categories: [
-      { title: "Carpet Treatment", items: ["Pre-Spray Treatment", "Hot-Water Extraction", "Spot Treatment"] }
-    ],
-    value: "Professional extraction that lifts embedded dirt, stains, and odors everyday vacuuming can't reach."
+    paragraph: "Professional hot-water extraction that lifts embedded dirt, stains, and odors regular vacuuming can't reach."
   },
   airbnb: {
-    categories: [
-      { title: "Kitchen Reset", items: ["Kitchen Reset", "Dishware Check"] },
-      { title: "Bathroom Reset", items: ["Bathroom Reset", "Restock Check"] },
-      { title: "Guest-Ready Finish", items: ["Photo-Ready Staging", "Linens Check"] }
-    ],
-    value: "A fast, guest-ready reset between every checkout and check-in."
+    paragraph: "A fast, guest-ready reset between every checkout and check-in."
   }
 };
 
@@ -2392,7 +2349,6 @@ const rpIncludes = {
 // picker) always comes first and isn't part of these arrays.
 const rpFlows = {
   moveout:     ["includes", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  movein:      ["includes", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   deep:        ["includes", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   maintenance: ["includes", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["includes", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
@@ -2521,16 +2477,11 @@ function rpRender() {
   if (rpState.step === "service") {
     app.innerHTML = `
       <h2>What type of cleaning do you need?</h2>
-      <div class="rp-estimator-help rp-service-prompt">One tap to get started — we'll only ask what's relevant to your service.</div>
       <div class="rp-grid rp-service-grid">
         <button class="rp-option featured-option" onclick="rpSelectService('moveout')">
           <span class="badge">Most Popular</span>
-          <strong>🏠 Factory Reset™ Move-Out</strong>
-          <span>Full top-to-bottom cleaning to help renters get their deposit back.</span>
-        </button>
-        <button class="rp-option" onclick="rpSelectService('movein')">
-          <strong>🔑 Factory Reset™ Move-In</strong>
-          <span>Full top-to-bottom cleaning so your new home feels brand new.</span>
+          <strong>🏠 Factory Reset™ Moving Clean</strong>
+          <span>Full top-to-bottom cleaning for move-outs and move-ins.</span>
         </button>
         <button class="rp-option" onclick="rpSelectService('deep')">
           <strong>🧼 Deep Cleaning</strong>
@@ -2540,36 +2491,22 @@ function rpRender() {
           <strong>✨ Maintenance Cleaning</strong>
           <span>Recurring upkeep cleaning to keep a well-maintained home spotless.</span>
         </button>
-        <button class="rp-option" onclick="rpSelectService('airbnb')">
-          <strong>🛏 Airbnb Turnover</strong>
-          <span>Fast, guest-ready cleaning between every checkout and check-in.</span>
-        </button>
         <button class="rp-option" onclick="rpSelectService('carpet')">
           <strong>🧽 Carpet Cleaning</strong>
           <span>Professional hot-water extraction that lifts stains, dirt, and odors.</span>
         </button>
       </div>
-      <p class="rp-fineprint">Need upholstery or commercial cleaning instead? <a href="sms:5802150915">Text us</a> and we'll take care of it.</p>
+      <p class="rp-fineprint">Need Airbnb turnover, upholstery, or commercial cleaning instead? <a href="sms:5802150915">Text us</a> and we'll take care of it.</p>
     `;
     return;
   }
 
   if (rpState.step === "includes") {
     const service = rpServices[rpState.service];
-    const data = rpIncludes[rpState.service] || { categories: [], value: "" };
+    const data = rpIncludes[rpState.service] || { paragraph: "" };
     app.innerHTML = `
       <h2>${service.emoji} ${service.name}</h2>
-      <div class="rp-includes-categories">
-        ${data.categories.map(cat => `
-          <div class="rp-includes-category">
-            <h3>${cat.title}</h3>
-            <ul class="rp-includes-list">
-              ${cat.items.map(item => `<li>${item}</li>`).join("")}
-            </ul>
-          </div>
-        `).join("")}
-      </div>
-      <p class="rp-includes-value">${data.value}</p>
+      <p class="rp-includes-value">${data.paragraph}</p>
       <div class="rp-btns">
         <button class="rp-secondary" onclick="rpBack()">Back</button>
         <button class="rp-primary" onclick="rpAdvance()">Continue Building My Quote</button>
@@ -2734,9 +2671,10 @@ function rpRender() {
       }
       if (key === "windows") {
         return `
+          <p class="rp-fineprint" style="margin:0 0 10px;">Premium adds screen removal for a fuller clean.</p>
           <div class="rp-choice-grid">
-            <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>$100</small></button>
-            <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>$200</small></button>
+            <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $100</small></button>
+            <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $200</small></button>
           </div>`;
       }
       if (key === "garage") {
@@ -2833,6 +2771,7 @@ function rpRenderEstimateStep() {
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
   app.innerHTML = `
     ${rpLivePrice(isQuoteOnly ? "our team will confirm your exact price." : "looks good. You can reserve your cleaning next.")}
+    <div class="rp-guarantee-note">✓ Satisfaction Guaranteed — if we miss something, just tell us and we'll make it right.</div>
     <h2>Quote Summary</h2>
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
@@ -2881,6 +2820,7 @@ function rpRenderLeadStep() {
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions, or anything we should know.">${rpState.specialInstructions || ""}</textarea></div>
     </div>
     <div id="rpFormError" class="rp-error">Please enter your name, phone, email, street address, city, and ZIP code.</div>
+    <p class="rp-guarantee-note-small">We stand behind every clean — booked with confidence.</p>
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Back</button>
       <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose Appointment Time</button>
@@ -3057,6 +2997,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
