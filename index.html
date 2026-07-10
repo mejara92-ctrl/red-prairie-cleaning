@@ -2080,6 +2080,19 @@ window.__rpScheduleDeferred(function(){
         content: "✓"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
         color: var(--red); font-weight: 900;
     }
+    .rp-includes-categories { margin: 4px 0 4px; }
+    .rp-includes-category { margin-bottom: 18px; }
+    .rp-includes-category h3 {
+        font-size: 14px; text-transform: uppercase; letter-spacing: .04em;
+        color: var(--red); font-weight: 900; margin: 0 0 8px;
+    }
+    .rp-includes-category .rp-includes-list { margin-bottom: 0; }
+    .rp-includes-value {
+        font-size: 15px; font-weight: 700; color: #333; text-align: center;
+        padding: 14px 16px; background: #fff7f6; border: 1px solid #f5d9d6;
+        border-radius: 14px; margin: 10px 0 18px;
+    }
+    .rp-handyman-card { margin-top: 14px; }
 
     .rp-addon-stack { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 16px; }
     .rp-addon-card {
@@ -2326,12 +2339,52 @@ const rpServiceAddons = {
 
 // What's included at no extra charge, shown on the "what's included" screen.
 const rpIncludes = {
-  moveout:     ["Oven", "Microwave", "Refrigerator", "Cabinets", "Drawers", "Baseboards", "Window Sills", "Complete Factory Reset"],
-  movein:      ["Oven", "Microwave", "Refrigerator", "Cabinets", "Drawers", "Baseboards", "Window Sills", "Complete Factory Reset"],
-  deep:        ["Oven", "Microwave"],
-  maintenance: ["Kitchen surfaces", "Bathroom upkeep", "Dusting", "Vacuum + mop", "General tidy reset"],
-  carpet:      ["Pre-spray treatment", "Hot-water extraction"],
-  airbnb:      ["Kitchen reset", "Bathroom reset", "Photo-ready finish"]
+  moveout: {
+    categories: [
+      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Refrigerator", "Cabinets & Drawers", "Counters & Sink"] },
+      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors", "Floors"] },
+      { title: "Whole Home", items: ["Baseboards", "Window Sills", "Doors & Trim", "Floors", "Dusting"] }
+    ],
+    value: "Everything needed to leave your home inspection-ready."
+  },
+  movein: {
+    categories: [
+      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Refrigerator", "Cabinets & Drawers", "Counters & Sink"] },
+      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors", "Floors"] },
+      { title: "Whole Home", items: ["Baseboards", "Window Sills", "Doors & Trim", "Floors", "Dusting"] }
+    ],
+    value: "Everything needed for your new home to feel brand new from day one."
+  },
+  deep: {
+    categories: [
+      { title: "Kitchen Reset", items: ["Oven", "Microwave", "Counters & Sink", "Cabinet Exteriors"] },
+      { title: "Bathroom Reset", items: ["Showers", "Toilets", "Vanities", "Mirrors"] },
+      { title: "Whole Home", items: ["Baseboards", "Floors", "Dusting"] }
+    ],
+    value: "A thorough refresh that targets the areas everyday cleaning misses."
+  },
+  maintenance: {
+    categories: [
+      { title: "Kitchen Touch-Up", items: ["Counters & Sink", "Exterior Wipe-Down"] },
+      { title: "Bathroom Touch-Up", items: ["Toilets", "Sinks", "Mirrors"] },
+      { title: "Whole Home", items: ["Dusting", "Vacuum & Mop", "General Tidy Reset"] }
+    ],
+    value: "Consistent upkeep that keeps your home guest-ready between visits."
+  },
+  carpet: {
+    categories: [
+      { title: "Carpet Treatment", items: ["Pre-Spray Treatment", "Hot-Water Extraction", "Spot Treatment"] }
+    ],
+    value: "Professional extraction that lifts embedded dirt, stains, and odors everyday vacuuming can't reach."
+  },
+  airbnb: {
+    categories: [
+      { title: "Kitchen Reset", items: ["Kitchen Reset", "Dishware Check"] },
+      { title: "Bathroom Reset", items: ["Bathroom Reset", "Restock Check"] },
+      { title: "Guest-Ready Finish", items: ["Photo-Ready Staging", "Linens Check"] }
+    ],
+    value: "A fast, guest-ready reset between every checkout and check-in."
+  }
 };
 
 // One screen = one question. Each service walks its own short path, then
@@ -2389,12 +2442,19 @@ function rpUpdateProgress() {
   if (fill) fill.style.width = `${pct}%`;
 }
 
-function rpDurationLabel() {
-  if (rpState.service === "moveout" || rpState.service === "movein") return "Estimated time: 6–10 hours • 2 cleaners";
-  if (rpState.service === "deep") return "Estimated time: up to 6 hours • 1 cleaner";
-  if (rpState.service === "maintenance") return "Estimated time: up to 4 hours • 1 cleaner";
-  if (rpState.service === "airbnb") return "Turnover timing depends on property size and guest schedule";
-  if (rpState.service === "carpet") return "Estimated time varies by room count";
+function rpTimeEstimate() {
+  if (rpState.service === "moveout" || rpState.service === "movein") return "6–10 hours";
+  if (rpState.service === "deep") return "Up to 6 hours";
+  if (rpState.service === "maintenance") return "Up to 4 hours";
+  if (rpState.service === "airbnb") return "Varies by property size";
+  if (rpState.service === "carpet") return "Varies by room count";
+  return "";
+}
+function rpTeamSize() {
+  if (rpState.service === "moveout" || rpState.service === "movein") return "2 cleaners";
+  if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
+  if (rpState.service === "airbnb") return "1–2 cleaners";
+  if (rpState.service === "carpet") return "1 technician";
   return "";
 }
 
@@ -2496,12 +2556,20 @@ function rpRender() {
 
   if (rpState.step === "includes") {
     const service = rpServices[rpState.service];
-    const items = rpIncludes[rpState.service] || [];
+    const data = rpIncludes[rpState.service] || { categories: [], value: "" };
     app.innerHTML = `
-      <h2>${service.emoji} ${service.name} Includes</h2>
-      <ul class="rp-includes-list">
-        ${items.map(item => `<li>${item}</li>`).join("")}
-      </ul>
+      <h2>${service.emoji} ${service.name}</h2>
+      <div class="rp-includes-categories">
+        ${data.categories.map(cat => `
+          <div class="rp-includes-category">
+            <h3>${cat.title}</h3>
+            <ul class="rp-includes-list">
+              ${cat.items.map(item => `<li>${item}</li>`).join("")}
+            </ul>
+          </div>
+        `).join("")}
+      </div>
+      <p class="rp-includes-value">${data.value}</p>
       <div class="rp-btns">
         <button class="rp-secondary" onclick="rpBack()">Back</button>
         <button class="rp-primary" onclick="rpAdvance()">Continue Building My Quote</button>
@@ -2726,6 +2794,10 @@ function rpRender() {
     app.innerHTML = `
       <h2>Would you like to add anything while we're there?</h2>
       <div class="rp-addon-stack">${cards}</div>
+      <label class="rp-checkbox-card rp-handyman-card">
+        <input type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
+        <div><strong>Need anything else while we're there?</strong><span>I'm interested in Handyman &amp; Turnover Services — drywall patching, minor repairs, caulking, filter changes, smoke detector batteries, make-ready work, and other small property turnover services.</span></div>
+      </label>
       <div class="rp-btns">
         <button class="rp-secondary" onclick="rpBack()">Back</button>
         <button class="rp-primary" onclick="rpAdvance()">See Estimate</button>
@@ -2758,26 +2830,33 @@ function rpRenderEstimateStep() {
   const total = rpCalculatePrice();
   const service = rpServices[rpState.service];
   const isQuoteOnly = rpState.service === "airbnb";
+  const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
   app.innerHTML = `
     ${rpLivePrice(isQuoteOnly ? "our team will confirm your exact price." : "looks good. You can reserve your cleaning next.")}
-    <h2>${isQuoteOnly ? "Your Turnover Details" : "Estimated Price"}</h2>
+    <h2>Quote Summary</h2>
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
-      ${rpDurationLabel() ? `<div class="rp-mini-row"><span>Time / Staffing</span><strong>${rpDurationLabel()}</strong></div>` : ""}
+      ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
+      ${rpTeamSize() ? `<div class="rp-mini-row"><span>Team Size</span><strong>${rpTeamSize()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpState.frequency}</strong></div>` : ""}
-      ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""} · $${Math.max(2, rpState.carpetRooms) * 75}</strong></div>` : ""}
+      ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.heavySoil ? `<div class="rp-mini-row"><span>Heavy soil/staining</span><strong>Noted</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.petOdor ? `<div class="rp-mini-row"><span>Pet odor</span><strong>Noted</strong></div>` : ""}
       ${isQuoteOnly && rpState.airbnbLaundry ? `<div class="rp-mini-row"><span>Laundry</span><strong>Requested</strong></div>` : ""}
       ${isQuoteOnly && rpState.airbnbRestocking ? `<div class="rp-mini-row"><span>Restocking</span><strong>Requested</strong></div>` : ""}
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
-      <div class="rp-total"><span>${isQuoteOnly ? "Estimated Price" : "Estimated Price"}</span><span>${isQuoteOnly ? "Custom Quote" : `$${total}`}</span></div>
+      ${rpState.handymanInterest ? `<div class="rp-mini-row"><span>Handyman &amp; Turnover interest</span><strong>Yes</strong></div>` : ""}
     </div>
     <div class="rp-notice">Final price may change for severe mess, heavy trash, unusual access issues, biohazard conditions, or work beyond scope.</div>
+    ${showHandymanHere ? `
+    <label class="rp-checkbox-card rp-handyman-card">
+      <input type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
+      <div><strong>Need anything else while we're there?</strong><span>I'm interested in Handyman &amp; Turnover Services — drywall patching, minor repairs, caulking, filter changes, smoke detector batteries, make-ready work, and other small property turnover services.</span></div>
+    </label>` : ""}
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Edit</button>
       <button class="rp-primary" onclick="rpAdvance()">Continue To Contact & Time</button>
@@ -2801,10 +2880,6 @@ function rpRenderLeadStep() {
       <div class="rp-lead-field"><label for="rpPostalCode">ZIP Code *</label><input id="rpPostalCode" type="text" value="${rpState.postalCode}" placeholder="73505" inputmode="numeric"></div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions, or anything we should know.">${rpState.specialInstructions || ""}</textarea></div>
     </div>
-    <label class="rp-checkbox-card" style="margin-top:14px;">
-      <input type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
-      <div><strong>Need anything else while we're there?</strong><span>I'm interested in Handyman &amp; Turnover Services — drywall patching, minor repairs, caulking, filter changes, smoke detector batteries, make-ready work, and other small property turnover services.</span></div>
-    </label>
     <div id="rpFormError" class="rp-error">Please enter your name, phone, email, street address, city, and ZIP code.</div>
     <div class="rp-btns">
       <button class="rp-secondary" onclick="rpBack()">Back</button>
@@ -2982,6 +3057,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
