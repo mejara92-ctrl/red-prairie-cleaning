@@ -3,23 +3,31 @@
 <html lang="en">
 <head>
 <script>
-/* Mobile homepage -> /book redirect. Flip RP_MOBILE_HOMEPAGE_REDIRECT to
+/* redprairiecleaning.com -> /book, for everyone. Flip RP_HOMEPAGE_REDIRECT to
    false to disable without removing this block. Only fires on the exact
-   homepage, only for mobile viewports, and only once per browser session
-   (sessionStorage) so a visitor who deliberately comes back to "/" after
-   being sent to /book isn't bounced right back. */
+   homepage, and only once per browser session (sessionStorage) so a visitor
+   who deliberately comes back to "/" after being sent to /book isn't
+   bounced right back.
+
+   This stays a CLIENT-SIDE redirect on purpose, not a server 301. /book is
+   intentionally noindex — a hard server redirect would tell Google the
+   homepage itself now resolves to a noindex page, which risks Google
+   dropping the homepage from search results over time (including brand
+   searches for "Red Prairie Cleaning"). A JS redirect sends real visitors
+   to /book while leaving the homepage's actual indexed content untouched
+   for crawlers. */
 (function () {
-  var RP_MOBILE_HOMEPAGE_REDIRECT = true;
-  if (!RP_MOBILE_HOMEPAGE_REDIRECT) return;
+  var RP_HOMEPAGE_REDIRECT = true;
+  if (!RP_HOMEPAGE_REDIRECT) return;
   var path = window.location.pathname;
   if (path !== "/" && path !== "/index.html") return;
-  if (!(window.matchMedia && window.matchMedia("(max-width: 768px)").matches)) return;
   try {
     if (sessionStorage.getItem("rpSkipHomepageRedirect")) return;
     sessionStorage.setItem("rpSkipHomepageRedirect", "1");
   } catch (e) { /* storage unavailable — still redirect once, just without loop protection */ }
+  var deviceType = (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) ? "mobile" : "desktop";
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: "mobile_homepage_redirect", destination: "/book" });
+  window.dataLayer.push({ event: "homepage_redirect", destination: "/book", device_type: deviceType });
   window.location.replace("/book" + window.location.search);
 })();
 </script>
