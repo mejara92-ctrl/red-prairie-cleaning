@@ -1,0 +1,147 @@
+/* Red Prairie legacy-site bridge — v15
+   Brings the homepage and SEO landing pages into the warm Prairie Glass palette
+   while preserving their existing layouts and SEO content. */
+:root {
+  --rp-legacy-paper: #f7f1e7;
+  --rp-legacy-paper-deep: #eadfce;
+  --rp-legacy-surface: #fffdf9;
+  --rp-legacy-line: rgba(70, 52, 37, .14);
+  --rp-legacy-ink: #181512;
+  --light: #efe5d6 !important;
+  --border: #ded0bd !important;
+}
+
+html,
+body {
+  background: var(--rp-legacy-paper) !important;
+  color: var(--rp-legacy-ink);
+}
+
+.navbar {
+  background: rgba(247, 241, 231, .94) !important;
+  border-bottom: 1px solid rgba(70, 52, 37, .09);
+  box-shadow: 0 8px 28px rgba(48, 32, 19, .10) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.navbar .nav-container {
+  min-height: 66px;
+}
+
+/* Exact compact wordmark language used by /book. */
+.navbar .rp-site-wordmark,
+.navbar .logo.rp-site-wordmark {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start;
+  gap: 8px;
+  width: auto !important;
+  min-width: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--rp-legacy-ink);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.navbar .rp-site-wordmark .rp-site-mark {
+  display: block !important;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px;
+  max-width: 30px !important;
+  max-height: 30px !important;
+  object-fit: contain;
+  border: 0 !important;
+  border-radius: 9px;
+  background: transparent !important;
+  box-shadow: 0 5px 12px rgba(159, 32, 39, .18) !important;
+}
+
+.navbar .rp-site-wordmark-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  line-height: 1;
+}
+
+.navbar .rp-site-wordmark-copy strong {
+  color: var(--rp-legacy-ink);
+  font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .075em;
+  white-space: nowrap;
+}
+
+.navbar .rp-site-wordmark-copy strong b {
+  color: #9f2027;
+}
+
+.navbar .rp-site-wordmark-copy small {
+  margin-top: 4px;
+  color: #71685f;
+  font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .28em;
+  white-space: nowrap;
+}
+
+/* Warm major content bands and common card surfaces. */
+.quick-reviews,
+.faq-section,
+.reviews,
+.before-after,
+.service-area,
+.category,
+.trust-bar,
+.checklist,
+.rp-comparison {
+  background-color: var(--rp-legacy-paper) !important;
+}
+
+.quick-review-card,
+.included-item,
+.faq-item,
+.faq details,
+.card,
+.room,
+.tip,
+.trust-card,
+.guide-card,
+.category-card,
+.check-item,
+.rp-inclusion-item,
+.rp-compare-table,
+.rp-booking-widget {
+  background-color: var(--rp-legacy-surface) !important;
+  border-color: var(--rp-legacy-line) !important;
+}
+
+/* Keep the old hidden estimator warm if it is re-enabled during rollback. */
+.rp-card,
+.rp-option,
+.rp-notice,
+.rp-guarantee-note,
+.rp-addon-card,
+.rp-booking-widget {
+  background-color: var(--rp-legacy-surface) !important;
+}
+
+@media (max-width: 520px) {
+  .navbar .rp-site-wordmark { gap: 7px; }
+  .navbar .rp-site-wordmark .rp-site-mark {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px;
+    max-width: 28px !important;
+    max-height: 28px !important;
+  }
+  .navbar .rp-site-wordmark-copy strong { font-size: 12px; }
+  .navbar .book-btn { padding-inline: 12px; }
+}

@@ -1,0 +1,5 @@
+Red Prairie Cleaning v16
+
+- Added Microsoft Clarity project xb86ac4u38 to booking-confirmation.html.
+- Clarity now records the complete funnel through the confirmation page.
+- No other site behavior or styling was changed.

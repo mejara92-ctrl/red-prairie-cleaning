@@ -932,9 +932,8 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
   box-shadow:0 24px 60px rgba(59,39,23,.10),inset 0 1px 0 rgba(255,255,255,.50);
   backdrop-filter:blur(16px) saturate(1.1);-webkit-backdrop-filter:blur(16px) saturate(1.1)
 }
-.rp-screen:not(.step-service) .rp-center::before,
-.rp-screen.step-calendar .rp-screen-scroll>div::before{
-  content:"PRIVATE HOME CONSULTATION";display:block;margin:0 0 13px;color:#8f2b31;
+.rp-screen:not(.step-service) .rp-center::before{
+  content:"BUILDING YOUR ESTIMATE";display:block;margin:0 0 13px;color:#8f2b31;
   font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase
 }
 .rp-screen .rp-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
@@ -954,7 +953,7 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 .rp-screen.step-lead .rp-center::before{content:"YOUR APPOINTMENT DETAILS"}
 .rp-screen.step-addons .rp-center::before{content:"PERSONALIZE YOUR CLEAN"}
 .rp-screen.step-calendar .rp-screen-scroll{padding-top:18px}
-.rp-screen.step-calendar .rp-screen-scroll>div::before{content:"FINAL STEP · LIVE AVAILABILITY"}
+.rp-screen.step-calendar .rp-screen-scroll>div::before{display:none;content:none}
 .rp-calendar-assurance{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0 14px}
 .rp-calendar-assurance span{padding:8px 5px;border:1px solid rgba(122,88,58,.1);border-radius:12px;background:rgba(255,255,255,.62);font-size:9px;font-weight:800;text-align:center;color:#66594d}
 @media(max-height:760px){
@@ -1378,6 +1377,20 @@ details.rp-includes,
 .rp-addon-sheet-body .rp-pill { min-height: 58px; padding: 9px 7px; font-size: 12px; }
 .rp-addon-sheet-body .rp-pill small { font-size: 9.5px; }
 .rp-addon-sheet-body .rp-tap-note { margin: 0 0 10px; color: #5e5147; font-size: 10.5px; line-height: 1.4; }
+.rp-addon-remove {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 10px;
+  border: 1px solid rgba(159,32,39,.22);
+  border-radius: 12px;
+  background: rgba(255,253,249,.50);
+  color: var(--red-dark);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.rp-addon-remove:active { transform: scale(.985); background: rgba(255,253,249,.78); }
+
 
 /* Compact FAQ: all closed questions plus the return button fit a normal phone viewport. */
 .rp-faq-scroll { overflow: hidden; padding: 11px 12px calc(12px + env(safe-area-inset-bottom)); }
@@ -1681,7 +1694,7 @@ details.rp-includes,
 .rp-checkbox-card,
 .rp-discount-card,
 .rp-notice {
-  background: linear-gradient(150deg, rgba(252,247,239,.93), rgba(244,235,220,.88)) !important;
+  background: var(--rp-master-glass) !important;
 }
 .rp-screen:not(.step-service) .rp-center,
 .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { border-radius: 28px; }
@@ -1770,14 +1783,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   padding: 17px 14px 14px;
 }
 .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell::before {
-  content: "FINAL STEP · LIVE AVAILABILITY";
-  display: block;
-  margin: 0 0 8px;
-  color: #8f2b31;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .14em;
-  text-transform: uppercase;
+  content: none;
+  display: none;
 }
 .step-calendar h2 { font-size: clamp(29px, 7vw, 36px); margin-bottom: 5px; }
 .step-calendar .rp-sub { margin-bottom: 9px; font-size: 12.5px; line-height: 1.4; }
@@ -1964,6 +1971,184 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 .rp-booking-mini-review span { min-width: 0; font-size: 10.5px; font-weight: 800; line-height: 1.25; }
 .rp-booking-mini-review strong { color: var(--red-dark); font-family: "DM Serif Display", Georgia, serif; font-size: 20px; font-weight: 400; }
 
+
+/* ========================================================================
+   V17 — ONE PRAIRIE GLASS SYSTEM
+   Every neutral panel shares the same cream glass. Red remains reserved for
+   the estimate reveal, selected states, and primary actions.
+   ======================================================================== */
+:root {
+  --rp-master-glass: linear-gradient(150deg, rgba(249,242,232,.88), rgba(235,220,201,.78));
+  --rp-master-border: rgba(255,249,239,.58);
+  --rp-master-shadow: 0 16px 40px rgba(34,22,15,.14), inset 0 1px 0 rgba(255,255,255,.62);
+  --rp-master-blur: blur(18px) saturate(1.08);
+}
+
+/* One neutral surface recipe. */
+.rp-sheet,
+.rp-screen:not(.step-service) .rp-center,
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell,
+.rp-row,
+.rp-invoice,
+.rp-estimate-support,
+.rp-checkbox-card,
+.rp-discount-card,
+.rp-make-ready-card,
+.rp-recurring-summary,
+.rp-help,
+.rp-pill,
+.rp-booking-review,
+.rp-booking-mini-review,
+.rp-native-status,
+.rp-selected-date,
+.rp-addon-sheet,
+.rp-lead-field input,
+.rp-lead-field textarea,
+.rp-screen-footer,
+.rp-calendar-assurance span,
+.rp-month-nav button,
+.rp-cal-day.is-available,
+.rp-time-btn,
+.rp-preferred-time,
+.rp-faq-page details {
+  background: var(--rp-master-glass) !important;
+  border-color: var(--rp-master-border) !important;
+  box-shadow: var(--rp-master-shadow) !important;
+  backdrop-filter: var(--rp-master-blur) !important;
+  -webkit-backdrop-filter: var(--rp-master-blur) !important;
+}
+
+/* Selected controls and red actions are the intentional exceptions. */
+.rp-row.is-featured,
+.rp-row.is-selected { background: linear-gradient(150deg, rgba(247,232,221,.84), rgba(231,205,191,.72)) !important; }
+.rp-pill.is-selected,
+.rp-time-btn.is-selected,
+.rp-cal-day.is-selected {
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a) !important;
+  border-color: rgba(255,241,222,.38) !important;
+  color: #fff8ef !important;
+}
+
+/* Default consultation label. */
+.rp-screen:not(.step-service) .rp-center::before { content: "BUILDING YOUR ESTIMATE"; }
+.rp-screen.step-lead .rp-center::before { content: "YOUR APPOINTMENT DETAILS"; }
+.rp-screen.step-addons .rp-center::before { content: "PERSONALIZE YOUR CLEAN"; }
+
+/* Add-ons: readable, scrollable, and never clipped behind the estimate dock. */
+.step-addons .rp-screen-scroll {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-bottom: 20px !important;
+}
+.step-addons .rp-center { overflow: visible !important; }
+.step-addons .rp-row { min-height: 54px; }
+.step-addons .rp-row-desc,
+.step-addons .rp-make-ready-copy span { font-size: 10px !important; line-height: 1.3 !important; color: #65584d; }
+.step-addons .rp-row-sum {
+  min-width: 92px;
+  white-space: normal;
+  font-size: 10.5px;
+  line-height: 1.15;
+  padding: 6px 8px;
+}
+.step-addons .rp-row-sum em { font-size: 8.5px; line-height: 1.2; }
+.rp-addon-section-label {
+  margin: 10px 3px 6px;
+  color: #8f2b31;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+
+.rp-added-inline {
+  display: block;
+  margin-top: 4px;
+  color: var(--red-dark);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.step-addons .rp-row.is-selected .rp-row-chev {
+  color: #fff8ef;
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a);
+}
+
+/* Estimate: the red reveal touches the progress bar and support choices share one panel. */
+.step-estimate .rp-screen-scroll { padding: 0 16px 18px !important; }
+.step-estimate .rp-quote-band {
+  margin: 0 -16px 14px !important;
+  border-radius: 0 0 28px 28px !important;
+}
+.rp-estimate-support {
+  margin-top: 9px;
+  border: 1px solid var(--rp-master-border);
+  border-radius: 20px;
+  padding: 0 15px;
+}
+.rp-estimate-support details.rp-includes {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.rp-discount-inline {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 0 13px;
+  border-top: 1px solid rgba(75,55,40,.10);
+  cursor: pointer;
+}
+.rp-discount-inline input {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  flex: 0 0 auto;
+  accent-color: var(--red);
+}
+.rp-discount-inline strong { display: block; font-size: 13px; line-height: 1.3; }
+.rp-discount-inline small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+.step-estimate .rp-screen-footer,
+.step-lead .rp-screen-footer,
+.step-addons .rp-screen-footer,
+.step-calendar .rp-screen-footer {
+  background: var(--rp-master-glass) !important;
+}
+.step-estimate .rp-dock-notice {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Lead form: the same glass, with enough room for the final notes field. */
+.step-lead .rp-screen-scroll { padding-bottom: 26px !important; }
+
+/* Calendar: one instruction, two reassurances, and a more visible fallback. */
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell::before { display: none !important; content: none !important; }
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { padding-top: 20px; }
+.step-calendar .rp-calendar-assurance { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.rp-preferred-time {
+  padding: 10px 12px;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+.rp-preferred-time strong { color: var(--ink); }
+
+@media (max-height: 720px) {
+  .step-addons .rp-row-desc,
+  .step-addons .rp-make-ready-copy span { font-size: 9.4px !important; }
+  .step-estimate .rp-quote-band { margin-bottom: 10px !important; }
+  .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { padding-top: 14px; }
+}
+
 </style>
 </head>
 <body>
@@ -2000,7 +2185,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <details><summary>How should I prepare?</summary><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></details>
       <details><summary>What do the optional add-ons cover?</summary><p>Tap any add-on for its exact scope and price. Garage floor washing requires an empty garage; window screens, larger junk loads, and overgrown yards have separate options.</p></details>
       <details><summary>How long will the cleaning take?</summary><p>Your estimate shows the expected time and team size. Actual time varies with the home, access, and condition.</p></details>
-      <details><summary>What if something is missed?</summary><p>Contact us promptly. The Red Prairie Promise means we review covered cleaning concerns and make them right.</p></details>
+      <details><summary>What if something is missed?</summary><p>If we miss something in the selected scope, contact us promptly and we’ll return to fix it.</p></details>
       <p class="rp-faq-footnote">Serving Lawton, Fort Sill, Elgin, Cache, and nearby areas. Military and first responders save 10%.</p>
 
       <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
@@ -2059,7 +2244,7 @@ const rpState = {
 };
 
 const rpServices = {
-  moveout:     { name: "Factory Reset™ Move-Out Clean",     emoji: "🏠" },
+  moveout:     { name: "Factory Reset™ Move-Out Cleaning",     emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Maintenance Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
@@ -2332,7 +2517,6 @@ function rpStepNumber() {
   return 2 + rpStepIndex();
 }
 function rpStepLabel() {
-  if (rpState.step === "calendar") return "Last step";
   return `Step ${rpStepNumber()} of ${rpTotalSteps()}`;
 }
 function rpUpdateProgress() {
@@ -2404,9 +2588,9 @@ function rpScreenHtml() {
       </div>
       <div class="rp-sheet">
         <div class="rp-sheet-handle"></div>
-        <p class="rp-start-service-q">What would you like us to transform?</p>
+        <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout')", icon:"home", title:"Factory Reset™ Move-Out Clean", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout')", icon:"home", title:"Factory Reset™ Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
           ${rpRowBtn({ onclick:"rpSelectService('deep')", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance')", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet')", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
@@ -2436,7 +2620,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bathrooms?</h2>
-      <p class="rp-sub">Helps us plan the visit — it doesn't change your price.</p>
+      <p class="rp-sub">Helps us plan your cleaning. Your price stays the same.</p>
       <div class="rp-rows">
         ${[1,2,3,4].map(n => rpRowBtn({
           onclick:`rpSelectBathrooms(${n})`,
@@ -2450,11 +2634,11 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>What condition is the home in?</h2>
-      <p class="rp-sub">Helps us prepare the right team — it doesn't change your instant price.</p>
+      <p class="rp-sub">Helps us send the right team. Your instant price stays the same.</p>
       <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectCondition('Normal')", title:"Normal", desc:"Regularly maintained, nothing unusual." })}
+        ${rpRowBtn({ onclick:"rpSelectCondition('Standard Condition')", title:"Standard Condition", desc:"Regularly maintained, nothing unusual." })}
         ${rpRowBtn({ onclick:"rpSelectCondition('Needs Extra Attention')", title:"Needs Extra Attention", desc:"A bit more buildup than average." })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Build-Up')", title:"Heavy Build-Up", desc:"Years of buildup, or no deep clean in a while." })}
+        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Buildup')", title:"Heavy Buildup", desc:"Significant buildup, grease, grime, or neglected areas." })}
       </div>
     </div>` };
   }
@@ -2502,7 +2686,7 @@ function rpScreenHtml() {
         <input type="checkbox" ${rpState.petOdor ? "checked" : ""} onchange="rpTogglePetOdor(this.checked)">
         <div><strong>Pet odor</strong><span>Odor treatment may need special attention.</span></div>
       </label>
-    </div>`, footer: `<button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>` };
+    </div>`, footer: `<button class="rp-primary" onclick="rpAdvance()">Review My Estimate</button>` };
   }
 
   if (rpState.step === "airbnbdetails") {
@@ -2630,8 +2814,8 @@ function rpAddonsScreen(eyebrow) {
       return `
         <button class="rp-row is-selected" onclick="rpExpandAddon('${key}')">
           ${rpChip(meta.icon)}
-          <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span><span class="rp-row-desc">${meta.desc}</span></span>
-          <span class="rp-row-sum">✓ ${summaryFor(key)} <em>Change</em></span>
+          <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span><span class="rp-row-desc">${meta.desc}</span><span class="rp-added-inline">✓ Added · ${summaryFor(key)} · Tap to change or remove</span></span>
+          <span class="rp-row-chev">${rpIcon("chev","rp-ic rp-ic-sm")}</span>
         </button>`;
     }
     return rpRowBtn({ onclick:`rpExpandAddon('${key}')`, icon: meta.icon, title: meta.label, desc: meta.desc });
@@ -2647,15 +2831,19 @@ function rpAddonsScreen(eyebrow) {
         <span><small>OPTIONAL UPGRADE</small><strong>${activeMeta.label}</strong><em>${activeMeta.desc}</em></span>
         <button type="button" onclick="rpCollapseAddon()" aria-label="Close">×</button>
       </div>
-      <div class="rp-addon-sheet-body">${bodyFor(activeKey)}</div>
+      <div class="rp-addon-sheet-body">
+          ${bodyFor(activeKey)}
+          ${isSelected[activeKey] ? `<button class="rp-addon-remove" type="button" onclick="rpClearAddon('${activeKey}')">Remove this add-on</button>` : ""}
+        </div>
     </section>` : "";
 
   return { scroll: `<div class="rp-center">
     ${eyebrow}
-    <h2>Add anything while we're there?</h2>
-    <p class="rp-sub">All optional — tap to see pricing.</p>
+    <h2>Would you like any add-ons?</h2>
+    <p class="rp-sub">Optional — select any that apply. Tap again to remove.</p>
     <div class="rp-rows">${cards}</div>
-    <label class="rp-make-ready-card rp-mt">
+    <p class="rp-addon-section-label">Need help beyond cleaning?</p>
+    <label class="rp-make-ready-card">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
       <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs.</span></span>
@@ -2663,7 +2851,7 @@ function rpAddonsScreen(eyebrow) {
     </label>
   </div>${optionSheet}`, footer: `
     <div class="rp-live-chip"><span>Current estimate</span><strong>${rpPriceLabel()}</strong></div>
-    <button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>
+    <button class="rp-primary" onclick="rpAdvance()">Review My Estimate</button>
   ` };
 }
 
@@ -2700,7 +2888,7 @@ function rpEstimateScreen(eyebrow) {
         <strong>${rpPriceLabel()}</strong>
         <span>${service.name}</span>
       </div>
-      <div class="rp-guarantee">${rpIcon("check","rp-ic rp-ic-sm")} The Red Prairie Promise — we make it right.</div>
+      <div class="rp-guarantee">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
     </div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
@@ -2725,18 +2913,21 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.handymanInterest ? `<div class="rp-mini-row"><span>Handyman &amp; Turnover interest</span><strong>Yes</strong></div>` : ""}
       ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder (10%)</span><strong>-$${subtotal - final}</strong></div>` : ""}
     </div>
-    ${includes ? `
-    <details class="rp-includes">
-      <summary>What's included</summary>
-      <div class="rp-includes-body">
-        <p class="rp-includes-intro">${includes.intro}</p>
-      </div>
-    </details>` : ""}
-    ${!isQuoteOnly ? `
-    <label class="rp-checkbox-card rp-discount-card rp-mt">
-      <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
-      <div><strong>Military or First Responder?</strong><span>Save 10% as a thank-you for your service.</span></div>
-    </label>` : ""}
+    ${(includes || !isQuoteOnly) ? `
+    <div class="rp-estimate-support">
+      ${includes ? `
+      <details class="rp-includes">
+        <summary>What's included</summary>
+        <div class="rp-includes-body">
+          <p class="rp-includes-intro">${includes.intro}</p>
+        </div>
+      </details>` : ""}
+      ${!isQuoteOnly ? `
+      <label class="rp-discount-inline">
+        <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
+        <span><strong>Military or First Responder?</strong><small>Save 10% as a thank-you for your service.</small></span>
+      </label>` : ""}
+    </div>` : ""}
     ${showHandymanHere ? `
     <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
@@ -2915,8 +3106,9 @@ function rpCalendarMonthGrid() {
   }
   return cells.join("");
 }
-function rpPreferredTimeMessage() {
-  return `<p class="rp-preferred-time">Don’t see a time that works? <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a> — we may still be able to fit you in.</p>`;
+function rpPreferredTimeMessage(kind = "time") {
+  const need = kind === "date" ? "date" : "time";
+  return `<p class="rp-preferred-time"><strong>Don’t see the ${need} you need?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a>—we may still be able to fit you in.</p>`;
 }
 function rpCalendarScreen(eyebrow) {
   const dates = rpAvailableDateKeys();
@@ -2941,7 +3133,7 @@ function rpCalendarScreen(eyebrow) {
       <div class="rp-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
       <div class="rp-month-grid">${rpCalendarMonthGrid()}</div>
       <div class="rp-calendar-key"><span><i class="available"></i>Available</span><span><i class="today"></i>Today</span></div>
-      ${rpPreferredTimeMessage()}
+      ${rpPreferredTimeMessage("date")}
       ${!monthDates.length && !rpState.slotsLoading ? `<p class="rp-booking-error is-visible">No online openings are showing in this month. Try the next month or call/text us.</p>` : ""}
     </div>`;
   } else {
@@ -2959,13 +3151,12 @@ function rpCalendarScreen(eyebrow) {
   const heading = onTimeStage ? "Choose your arrival time" : "Choose your cleaning date";
   const sub = onTimeStage
     ? "Select a live opening. We’ll reserve it instantly when you confirm."
-    : "Pick an available day from the live Red Prairie calendar.";
+    : "Tap any available day below.";
 
   return { scroll: `<div class="rp-calendar-shell">
-    ${eyebrow}
     <h2>${heading}</h2>
     <p class="rp-sub">${sub}</p>
-    <div class="rp-calendar-assurance"><span>No deposit</span><span>30-min arrival window</span><span>Instant confirmation</span></div>
+    <div class="rp-calendar-assurance"><span>No deposit</span><span>Instant confirmation</span></div>
     ${body}
   </div>`, footer: onTimeStage && !rpState.slotsLoading && !rpState.slotsError ? `
     <div class="rp-calendar-footer-meta"><span>${rpState.selectedStartTime ? `${rpFormatLongDate(rpState.selectedDate)} · ${rpFormatTime(rpState.selectedStartTime)}` : "Choose an arrival time"}</span><strong>${rpPriceLabel()}</strong></div>
@@ -3085,6 +3276,18 @@ function rpToggleMilitaryDiscount(checked) { rpState.militaryDiscount = checked;
 
 function rpExpandAddon(key) { rpState.expandedAddon = key; rpRefresh(); }
 function rpCollapseAddon() { rpState.expandedAddon = null; rpRefresh(); }
+function rpClearAddon(key) {
+  if (key === "carpet") rpState.addonCarpetRooms = 0;
+  else if (key === "junk") rpState.junkSize = null;
+  else if (key === "windows") rpState.windowsTier = null;
+  else if (key === "garage") rpState.garageWash = false;
+  else if (key === "yard") rpState.yardTier = null;
+  else if (key === "laundry") rpState.laundryLoads = 0;
+  else if (key === "fridge") rpState.fridgeAddon = false;
+  rpState.expandedAddon = null;
+  rpTrack("addon_removed", { addon: key });
+  rpRefresh();
+}
 function rpSelectAddonCarpetRooms(n) { rpState.addonCarpetRooms = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectAddonJunk(size) { rpState.junkSize = size; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectAddonWindows(tier) { rpState.windowsTier = tier; rpState.expandedAddon = null; rpRefresh(); }
@@ -3164,7 +3367,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
