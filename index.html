@@ -15,12 +15,20 @@
    dropping the homepage from search results over time (including brand
    searches for "Red Prairie Cleaning"). A JS redirect sends real visitors
    to /book while leaving the homepage's actual indexed content untouched
-   for crawlers. */
+   for crawlers.
+
+   Crawlers are explicitly exempted below. This matters more than it looks:
+   the homepage runs a daily-refreshed SEO blog widget (Soro) that injects
+   content client-side after the page finishes loading. If a crawler's
+   render pass followed this redirect, it would be sent to /book before the
+   blog content ever loads — silently defeating the whole point of that
+   tool. Bots see the real homepage; humans go straight to /book. */
 (function () {
   var RP_HOMEPAGE_REDIRECT = true;
   if (!RP_HOMEPAGE_REDIRECT) return;
   var path = window.location.pathname;
   if (path !== "/" && path !== "/index.html") return;
+  if (/bot|crawl|spider|slurp|googlebot|bingbot|duckduckbot|baiduspider|yandex|facebookexternalhit|twitterbot|linkedinbot|slackbot|telegrambot|whatsapp|embedly|quora|pinterest|w3c_validator|lighthouse|pagespeed|headlesschrome/i.test(navigator.userAgent)) return;
   try {
     if (sessionStorage.getItem("rpSkipHomepageRedirect")) return;
     sessionStorage.setItem("rpSkipHomepageRedirect", "1");
