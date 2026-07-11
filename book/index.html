@@ -1404,6 +1404,207 @@ details.rp-includes,
 }
 .rp-faq-scroll { flex: 0 1 auto; }
 
+
+
+/* ========================================================================
+   NATIVE RED PRAIRIE BOOKING — replaces the third-party calendar iframe
+   ======================================================================== */
+.rp-native-calendar {
+  display: grid;
+  gap: 12px;
+}
+.rp-native-status {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  padding: 24px 14px;
+  border: 1px solid rgba(255,246,232,.38);
+  border-radius: 22px;
+  background: linear-gradient(150deg,rgba(248,240,229,.68),rgba(243,232,216,.44));
+  box-shadow: 0 18px 42px rgba(59,39,23,.09), inset 0 1px 0 rgba(255,255,255,.48);
+  backdrop-filter: blur(16px) saturate(1.08);
+  -webkit-backdrop-filter: blur(16px) saturate(1.08);
+}
+.rp-native-spinner {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  border: 3px solid rgba(159,32,39,.16);
+  border-top-color: var(--red);
+  animation: rpSpin .8s linear infinite;
+}
+@keyframes rpSpin { to { transform: rotate(360deg); } }
+.rp-native-section-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0 2px 7px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.rp-native-section-label span:last-child {
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 700;
+}
+.rp-date-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(72px, 1fr);
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 7px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rp-date-strip::-webkit-scrollbar { display: none; }
+.rp-date-btn {
+  min-height: 72px;
+  border: 1px solid rgba(115,82,55,.14);
+  border-radius: 17px;
+  background: linear-gradient(145deg,rgba(250,243,233,.84),rgba(246,236,222,.70));
+  box-shadow: 0 8px 20px rgba(65,43,25,.08), inset 0 1px 0 rgba(255,255,255,.58);
+  color: var(--ink);
+  padding: 8px 7px;
+  scroll-snap-align: start;
+  transition: transform .14s, border-color .16s, background .16s, box-shadow .16s;
+}
+.rp-date-btn small {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  color: var(--muted);
+}
+.rp-date-btn strong {
+  display: block;
+  margin-top: 3px;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 400;
+}
+.rp-date-btn em {
+  display: block;
+  margin-top: 5px;
+  font-style: normal;
+  font-size: 9px;
+  color: var(--red);
+  font-weight: 800;
+}
+.rp-date-btn:active { transform: scale(.97); }
+.rp-date-btn.is-selected {
+  border-color: rgba(159,32,39,.82);
+  color: #fff8ef;
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a);
+  box-shadow: 0 12px 26px rgba(105,19,25,.24), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.rp-date-btn.is-selected small,
+.rp-date-btn.is-selected em { color: rgba(255,248,239,.78); }
+.rp-time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.rp-time-btn {
+  min-height: 48px;
+  border: 1px solid rgba(115,82,55,.14);
+  border-radius: 15px;
+  background: linear-gradient(145deg,rgba(250,243,233,.84),rgba(246,236,222,.70));
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 7px 17px rgba(65,43,25,.07), inset 0 1px 0 rgba(255,255,255,.55);
+  transition: transform .14s, border-color .16s, background .16s, box-shadow .16s;
+}
+.rp-time-btn:active { transform: scale(.97); }
+.rp-time-btn.is-selected {
+  border-color: rgba(159,32,39,.88);
+  color: #fff8ef;
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a);
+  box-shadow: 0 10px 22px rgba(105,19,25,.22), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.rp-booking-review {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 7px 14px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid rgba(159,32,39,.20);
+  border-radius: 18px;
+  background: linear-gradient(145deg,rgba(249,238,228,.86),rgba(241,224,211,.72));
+  box-shadow: 0 10px 24px rgba(69,35,24,.09), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.rp-booking-review span { color: var(--muted); font-size: 10.5px; }
+.rp-booking-review strong { color: var(--ink); font-size: 12px; text-align: right; }
+.rp-booking-error {
+  display: none;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(159,32,39,.24);
+  background: rgba(255,235,231,.84);
+  color: var(--red-dark);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.rp-booking-error.is-visible { display: block; }
+.rp-calendar-retry {
+  border: 0;
+  color: var(--red);
+  background: transparent;
+  font-weight: 800;
+  padding: 8px 10px;
+}
+.rp-native-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.rp-native-summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 4px rgba(111,128,111,.12);
+}
+.rp-screen.step-calendar .rp-screen-scroll { padding-bottom: 12px; }
+.rp-screen.step-calendar .rp-screen-scroll>div { width: 100%; max-width: 510px; margin: auto; }
+.rp-screen.step-calendar .rp-sub { margin-bottom: 12px; }
+.rp-screen.step-calendar .rp-calendar-assurance { margin-top: 0; margin-bottom: 12px; }
+.rp-screen.step-calendar .rp-screen-footer {
+  background: linear-gradient(180deg,rgba(247,239,226,.05),rgba(247,239,226,.78) 26%,rgba(244,232,216,.92) 100%);
+}
+.rp-calendar-footer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0 3px 9px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+.rp-calendar-footer-meta strong { color: var(--ink); font-size: 11px; }
+@media (max-height: 750px) {
+  .rp-date-btn { min-height: 64px; }
+  .rp-date-btn strong { font-size: 22px; }
+  .rp-time-btn { min-height: 44px; }
+  .rp-screen.step-calendar .rp-calendar-assurance { margin-bottom: 9px; }
+}
+
 </style>
 </head>
 <body>
@@ -1484,6 +1685,13 @@ const rpState = {
   state: "OK",
   postalCode: "",
   specialInstructions: "",
+  selectedDate: "",
+  selectedStartTime: "",
+  availableSlots: {},
+  slotsLoading: false,
+  slotsError: "",
+  bookingSubmitting: false,
+  bookingError: "",
   estimateSent: false,
   preBookingWebhookSent: false
 };
@@ -2135,46 +2343,89 @@ function rpLeadScreen(eyebrow) {
   ` };
 }
 
-function rpBuildCalendarUrl() {
-  const url = new URL("https://api.leadconnectorhq.com/widget/booking/1VXLRmyHfLdsHa4rTKJ2");
-  const parts = rpState.fullName.trim().split(/\s+/).filter(Boolean);
-  const firstName = parts.shift() || "";
-  const lastName = parts.join(" ");
-  const total = rpFinalPrice();
-  const jobDetails = rpGetEstimatePayload().job_details;
+const RP_BOOKING_API = "https://rpc-booking-api.aged-breeze-c9a5.workers.dev";
 
-  const params = {
-    first_name: firstName,
-    last_name: lastName,
-    name: rpState.fullName,
-    email: rpState.email,
-    phone: rpState.phone,
-    address: rpState.address1,
-    city: rpState.city,
-    state: "OK",
-    postal_code: rpState.postalCode,
-    service: rpServices[rpState.service]?.name || "Cleaning",
-    estimated_price: rpState.service === "airbnb" ? "Custom Quote" : `$${total}`,
-    job_details: jobDetails
-  };
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value) url.searchParams.set(key, value);
-  });
-  return url.toString();
+function rpDateKeyFromIso(iso) {
+  return String(iso || "").slice(0, 10);
 }
-
+function rpFormatDayLabel(dateKey) {
+  const date = new Date(`${dateKey}T12:00:00`);
+  return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+}
+function rpFormatMonthDay(dateKey) {
+  const date = new Date(`${dateKey}T12:00:00`);
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+}
+function rpFormatLongDate(dateKey) {
+  if (!dateKey) return "Choose a date";
+  const date = new Date(`${dateKey}T12:00:00`);
+  return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(date);
+}
+function rpFormatTime(iso) {
+  if (!iso) return "Choose a time";
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/Chicago"
+  }).format(new Date(iso));
+}
+function rpAvailableDateKeys() {
+  return Object.keys(rpState.availableSlots || {})
+    .filter((key) => Array.isArray(rpState.availableSlots[key]?.slots) && rpState.availableSlots[key].slots.length)
+    .sort();
+}
+function rpSlotsForSelectedDate() {
+  if (!rpState.selectedDate) return [];
+  const raw = rpState.availableSlots?.[rpState.selectedDate]?.slots || [];
+  return raw.filter((slot) => {
+    const match = String(slot).match(/T(\d{2}):/);
+    const hour = match ? Number(match[1]) : NaN;
+    return Number.isFinite(hour) && hour >= 9 && hour <= 17;
+  });
+}
 function rpCalendarScreen(eyebrow) {
+  const dates = rpAvailableDateKeys();
+  const slots = rpSlotsForSelectedDate();
+  let calendarBody = "";
+
+  if (rpState.slotsLoading) {
+    calendarBody = `<div class="rp-native-status"><div><div class="rp-native-spinner"></div><strong>Checking live availability…</strong><p>Finding the best open times for your cleaning.</p></div></div>`;
+  } else if (rpState.slotsError) {
+    calendarBody = `<div class="rp-native-status"><div><strong>We couldn't load the calendar.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button></div></div>`;
+  } else if (!dates.length) {
+    calendarBody = `<div class="rp-native-status"><div><strong>No online openings found.</strong><p>Text us at (580) 215-0915 and we'll check same-day, weekend, or custom availability.</p><a class="rp-primary" href="sms:5802150915" style="margin-top:14px">Text Us for a Time</a></div></div>`;
+  } else {
+    const dateButtons = dates.slice(0, 14).map((dateKey) => {
+      const day = new Date(`${dateKey}T12:00:00`).getDate();
+      const count = rpState.availableSlots[dateKey].slots.length;
+      return `<button class="rp-date-btn ${rpState.selectedDate === dateKey ? "is-selected" : ""}" onclick="rpSelectBookingDate('${dateKey}')"><small>${rpFormatDayLabel(dateKey)}</small><strong>${day}</strong><em>${count} time${count === 1 ? "" : "s"}</em></button>`;
+    }).join("");
+    const timeButtons = slots.map((slot) => `<button class="rp-time-btn ${rpState.selectedStartTime === slot ? "is-selected" : ""}" onclick="rpSelectBookingTime('${slot}')">${rpFormatTime(slot)}</button>`).join("");
+
+    calendarBody = `<div class="rp-native-calendar">
+      <div>
+        <div class="rp-native-section-label"><span>Choose your date</span><span>Live availability</span></div>
+        <div class="rp-date-strip">${dateButtons}</div>
+      </div>
+      <div>
+        <div class="rp-native-section-label"><span>Choose an arrival time</span><span>30-minute arrival window</span></div>
+        <div class="rp-time-grid">${timeButtons || `<div class="rp-help" style="grid-column:1/-1;margin:0">Choose a date to see available times.</div>`}</div>
+      </div>
+      ${rpState.selectedStartTime ? `<div class="rp-booking-review"><span>Cleaning</span><strong>${rpServices[rpState.service]?.name || "Cleaning"}</strong><span>Date</span><strong>${rpFormatLongDate(rpState.selectedDate)}</strong><span>Arrival</span><strong>${rpFormatTime(rpState.selectedStartTime)}</strong><span>Estimate</span><strong>${rpPriceLabel()}</strong></div>` : ""}
+      <p id="rpBookingError" class="rp-booking-error ${rpState.bookingError ? "is-visible" : ""}">${rpState.bookingError || ""}</p>
+    </div>`;
+  }
+
   return { scroll: `<div>
     ${eyebrow}
     <h2>Pick your date &amp; time</h2>
-    <p class="rp-sub">Choose the time that works best. Your spot is not reserved until you finish this final step.</p>
+    <p class="rp-sub">Choose a live opening. Your appointment is confirmed instantly when you finish this final step.</p>
     <div class="rp-calendar-assurance"><span>No deposit</span><span>30-min arrival window</span><span>Instant confirmation</span></div>
-    <div class="rp-booking-widget">
-      <iframe src="${rpBuildCalendarUrl()}" style="width:100%; border:none; overflow:hidden; min-height:760px;" scrolling="no" id="1VXLRmyHfLdsHa4rTKJ2_book" title="Red Prairie Cleaning booking calendar"></iframe>
-    </div>
-    <p class="rp-calendar-fallback">Finished choosing a time but still see a loader? <a href="/booking-confirmation.html">Continue to confirmation</a></p>
-  </div>`, onMount: rpMountCalendar };
+    ${calendarBody}
+  </div>`, footer: rpState.slotsLoading || rpState.slotsError || !dates.length ? "" : `
+    <div class="rp-calendar-footer-meta"><span>${rpState.selectedStartTime ? `${rpFormatLongDate(rpState.selectedDate)} · ${rpFormatTime(rpState.selectedStartTime)}` : "Select a date and time"}</span><strong>${rpPriceLabel()}</strong></div>
+    <button id="rpConfirmBookingBtn" class="rp-primary" onclick="rpConfirmNativeBooking()" ${!rpState.selectedStartTime || rpState.bookingSubmitting ? "disabled" : ""}>${rpState.bookingSubmitting ? "Confirming Your Cleaning…" : "Confirm My Cleaning"}</button>
+    <p class="rp-footer-note">You’ll receive your confirmation by text and email.</p>` , onMount: rpMountNativeCalendar };
 }
 
 /* =========================================================================
@@ -2351,7 +2602,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -2378,70 +2629,130 @@ function rpSubmitLeadAndShowCalendar() {
   rpSendEstimateToGoHighLevel({
     booking_status: "Estimate Submitted - Appointment Time Not Selected Yet",
     booking_source: "website_estimator_before_calendar",
-    customer_action_needed: "Customer still needs to choose appointment time in embedded calendar",
-    should_send_booking_confirmation: "No - wait for GHL calendar appointment booked trigger"
+    customer_action_needed: "Customer still needs to choose an appointment time",
+    should_send_booking_confirmation: "No - wait for confirmed appointment creation"
   });
 
   rpTrack("lead_submitted", { estimate: rpPriceLabel() });
 
-  const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Opening calendar..."; }
+  const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Loading availability..."; }
   rpGoToStep("calendar", "forward");
 }
 
 const rpConfirmationPath = "/booking-confirmation.html";
-let rpCalendarLoadCount = 0;
-let rpCalendarMountedAt = 0;
-let rpBookingRedirected = false;
-function rpRedirectToConfirmation(reason) {
-  if (rpBookingRedirected || rpState.step !== "calendar") return;
-  rpBookingRedirected = true;
-  rpTrack("booking_completed", { completion_signal: reason || "calendar" });
-  window.location.assign(rpConfirmationPath);
+function rpIsoDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
-function rpLooksLikeBookingSuccess(data) {
-  let text = "";
-  try { text = typeof data === "string" ? data : JSON.stringify(data || {}); } catch (_) {}
-  text = text.toLowerCase();
-  const hasBooking = /(appointment|booking|calendar)/.test(text);
-  const hasSuccess = /(booked|confirmed|complete|completed|success|appointmentid|appointment_id)/.test(text);
-  const falseSignal = /(cancelled|canceled|failed|error)/.test(text);
-  return hasBooking && hasSuccess && !falseSignal;
+function rpNativeRange() {
+  const start = new Date();
+  const end = new Date(start);
+  end.setDate(end.getDate() + 20);
+  return { start: rpIsoDate(start), end: rpIsoDate(end) };
 }
-window.addEventListener("message", function(event) {
-  const origin = String(event.origin || "");
-  if (!/(leadconnectorhq|msgsndr|gohighlevel)/i.test(origin)) return;
-  if (rpLooksLikeBookingSuccess(event.data)) rpRedirectToConfirmation("postmessage");
-});
-function rpLoadCalendarScript() {
-  if (document.getElementById("ghl-calendar-script")) return;
-  const script = document.createElement("script");
-  script.src = "https://link.msgsndr.com/js/form_embed.js";
-  script.type = "text/javascript";
-  script.id = "ghl-calendar-script";
-  document.body.appendChild(script);
-}
-function rpMountCalendar() {
-  rpCalendarMountedAt = Date.now();
-  rpCalendarLoadCount = 0;
-  rpLoadCalendarScript();
-  const frame = document.getElementById("1VXLRmyHfLdsHa4rTKJ2_book");
-  if (!frame) return;
-  frame.addEventListener("load", function() {
-    rpCalendarLoadCount += 1;
-    /* The widget is a single-page app. A later full iframe navigation is its
-       hosted confirmation route; move the parent page to our branded confirmation. */
-    if (rpCalendarLoadCount > 1 && Date.now() - rpCalendarMountedAt > 7000) {
-      setTimeout(function(){ rpRedirectToConfirmation("iframe_navigation"); }, 900);
+async function rpLoadNativeSlots(force = false) {
+  if (rpState.slotsLoading) return;
+  if (!force && Object.keys(rpState.availableSlots || {}).length) return;
+  rpState.slotsLoading = true;
+  rpState.slotsError = "";
+  rpState.bookingError = "";
+  rpRefresh();
+  try {
+    const range = rpNativeRange();
+    const url = `${RP_BOOKING_API}/slots?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`;
+    const response = await fetch(url, { method: "GET", headers: { Accept: "application/json" } });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || "Live availability is temporarily unavailable.");
+    const data = result.data || {};
+    delete data.traceId;
+    rpState.availableSlots = data;
+    const dates = rpAvailableDateKeys();
+    if (!dates.includes(rpState.selectedDate)) {
+      rpState.selectedDate = dates[0] || "";
+      rpState.selectedStartTime = "";
     }
-  });
+  } catch (error) {
+    rpState.slotsError = error instanceof Error ? error.message : "Live availability is temporarily unavailable.";
+  } finally {
+    rpState.slotsLoading = false;
+    if (rpState.step === "calendar") rpRefresh();
+  }
+}
+function rpMountNativeCalendar() {
+  rpLoadNativeSlots(false);
+}
+function rpSelectBookingDate(dateKey) {
+  rpState.selectedDate = dateKey;
+  if (rpDateKeyFromIso(rpState.selectedStartTime) !== dateKey) rpState.selectedStartTime = "";
+  rpState.bookingError = "";
+  rpTrack("booking_date_selected", { date: dateKey });
+  rpRefresh();
+}
+function rpSelectBookingTime(startTime) {
+  rpState.selectedStartTime = startTime;
+  rpState.bookingError = "";
+  rpTrack("booking_time_selected", { start_time: startTime });
+  rpRefresh();
+}
+function rpSplitCustomerName(fullName) {
+  const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts.shift() || "Customer",
+    lastName: parts.join(" ") || "Customer"
+  };
+}
+async function rpConfirmNativeBooking() {
+  if (!rpState.selectedStartTime || rpState.bookingSubmitting) return;
+  rpState.bookingSubmitting = true;
+  rpState.bookingError = "";
+  rpRefresh();
+  const name = rpSplitCustomerName(rpState.fullName);
+  const details = rpGetEstimatePayload();
+  try {
+    const response = await fetch(`${RP_BOOKING_API}/book`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName: name.firstName,
+        lastName: name.lastName,
+        email: rpState.email,
+        phone: rpState.phone,
+        address1: rpState.address1,
+        city: rpState.city,
+        state: rpState.state || "OK",
+        postalCode: rpState.postalCode,
+        startTime: rpState.selectedStartTime,
+        service: rpServices[rpState.service]?.name || "Cleaning",
+        estimate: rpFinalPrice(),
+        notes: details.job_details,
+        companyWebsite: "",
+        dryRun: false
+      })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || "We couldn't confirm that appointment.");
+    rpTrack("booking_completed", { completion_signal: "native_api", start_time: rpState.selectedStartTime, estimate: rpPriceLabel() });
+    window.location.assign(result.redirectUrl || rpConfirmationPath);
+  } catch (error) {
+    rpState.bookingError = error instanceof Error ? error.message : "We couldn't confirm that appointment. Please choose another time or text us.";
+    if (/no longer available/i.test(rpState.bookingError)) {
+      rpState.selectedStartTime = "";
+      rpState.availableSlots = {};
+      setTimeout(() => rpLoadNativeSlots(true), 150);
+    }
+    rpState.bookingSubmitting = false;
+    if (rpState.step === "calendar") rpRefresh();
+    rpTrack("booking_error", { message: rpState.bookingError });
+  }
 }
 
 /*
   IMPORTANT:
   This page must NOT fire the customer text automation from the estimate/contact step.
-  The website only passes estimate/contact details into the embedded GHL calendar URL.
-  Booking confirmation texts/emails should be triggered by the GHL calendar appointment
-  booked/confirmed event after the customer selects a calendar time.
+  The website creates the confirmed GHL appointment only after the customer selects a live date and time.
+  Booking confirmation texts/emails should be triggered by the confirmed appointment event.
 */
 
 /* Boot */
