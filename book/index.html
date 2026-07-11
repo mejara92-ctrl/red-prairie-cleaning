@@ -1973,47 +1973,62 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 
 
 /* ========================================================================
-   V17 — ONE PRAIRIE GLASS SYSTEM
-   Every neutral panel shares the same cream glass. Red remains reserved for
-   the estimate reveal, selected states, and primary actions.
+   V18 — AUTHORITATIVE PRAIRIE GLASS SYSTEM
+   One translucent visual language across the funnel. Main panels and nested
+   controls use the same warm glass recipe at role-appropriate opacity so the
+   photo remains visible instead of turning into opaque vanilla panes.
    ======================================================================== */
 :root {
-  --rp-master-glass: linear-gradient(150deg, rgba(249,242,232,.88), rgba(235,220,201,.78));
-  --rp-master-border: rgba(255,249,239,.58);
-  --rp-master-shadow: 0 16px 40px rgba(34,22,15,.14), inset 0 1px 0 rgba(255,255,255,.62);
-  --rp-master-blur: blur(18px) saturate(1.08);
+  --rp-master-glass: linear-gradient(150deg, rgba(249,242,232,.64), rgba(235,220,201,.48));
+  --rp-master-control: linear-gradient(150deg, rgba(255,249,240,.38), rgba(239,224,207,.27));
+  --rp-master-border: rgba(255,249,239,.50);
+  --rp-master-control-border: rgba(255,249,239,.42);
+  --rp-master-shadow: 0 15px 36px rgba(34,22,15,.14), inset 0 1px 0 rgba(255,255,255,.54);
+  --rp-master-control-shadow: 0 8px 20px rgba(34,22,15,.10), inset 0 1px 0 rgba(255,255,255,.44);
+  --rp-master-blur: blur(20px) saturate(1.10);
+  --rp-glass: var(--rp-master-glass);
+  --rp-glass-soft: var(--rp-master-control);
+  --rp-glass-border: var(--rp-master-border);
 }
 
-/* One neutral surface recipe. */
+/* Primary glass panels. */
 .rp-sheet,
 .rp-screen:not(.step-service) .rp-center,
 .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell,
-.rp-row,
 .rp-invoice,
 .rp-estimate-support,
+.rp-recurring-summary,
+.rp-addon-sheet,
+.rp-screen-footer,
+.rp-native-status {
+  background: var(--rp-master-glass) !important;
+  border-color: var(--rp-master-border) !important;
+  box-shadow: var(--rp-master-shadow) !important;
+  backdrop-filter: var(--rp-master-blur) !important;
+  -webkit-backdrop-filter: var(--rp-master-blur) !important;
+}
+
+/* Nested controls remain true glass instead of layering another opaque panel. */
+.rp-row,
 .rp-checkbox-card,
 .rp-discount-card,
 .rp-make-ready-card,
-.rp-recurring-summary,
 .rp-help,
 .rp-pill,
 .rp-booking-review,
 .rp-booking-mini-review,
-.rp-native-status,
 .rp-selected-date,
-.rp-addon-sheet,
 .rp-lead-field input,
 .rp-lead-field textarea,
-.rp-screen-footer,
 .rp-calendar-assurance span,
 .rp-month-nav button,
 .rp-cal-day.is-available,
 .rp-time-btn,
 .rp-preferred-time,
 .rp-faq-page details {
-  background: var(--rp-master-glass) !important;
-  border-color: var(--rp-master-border) !important;
-  box-shadow: var(--rp-master-shadow) !important;
+  background: var(--rp-master-control) !important;
+  border-color: var(--rp-master-control-border) !important;
+  box-shadow: var(--rp-master-control-shadow) !important;
   backdrop-filter: var(--rp-master-blur) !important;
   -webkit-backdrop-filter: var(--rp-master-blur) !important;
 }
@@ -2147,6 +2162,101 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   .step-addons .rp-make-ready-copy span { font-size: 9.4px !important; }
   .step-estimate .rp-quote-band { margin-bottom: 10px !important; }
   .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { padding-top: 14px; }
+}
+
+
+/* V18 approved punch-list refinements. */
+.step-service .rp-start-service-q {
+  margin-left: 63px;
+  margin-bottom: 18px;
+}
+.step-service .rp-row .badge { top: -11px; right: 12px; }
+.step-bedrooms .rp-row-val { margin-right: 4px; }
+.rp-row.is-committed {
+  border-color: rgba(159,32,39,.86) !important;
+  background: linear-gradient(150deg, rgba(248,224,213,.72), rgba(225,188,171,.54)) !important;
+  box-shadow: 0 11px 27px rgba(126,30,35,.17), inset 3px 0 0 var(--red), inset 0 1px 0 rgba(255,255,255,.50) !important;
+  transform: scale(.982);
+}
+.rp-row.is-committed .rp-row-chev,
+.rp-row.is-committed .rp-ic-chip {
+  color: #fff8ef;
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a) !important;
+}
+
+.step-addons .rp-screen-scroll {
+  padding-bottom: 112px !important;
+  scroll-padding-bottom: 112px;
+}
+.step-addons .rp-center { margin-block: 0 auto; }
+.step-addons .rp-screen-footer {
+  margin: 0 14px calc(7px + env(safe-area-inset-bottom));
+  padding: 7px 8px 8px;
+  border-radius: 18px;
+}
+.step-addons .rp-live-chip { margin: 0 5px 5px; min-height: 31px; }
+.step-addons .rp-screen-footer .rp-primary { min-height: 46px; padding-block: 10px; }
+.step-addons .rp-row-desc,
+.step-addons .rp-make-ready-copy span {
+  color: #51463d !important;
+}
+
+.step-estimate .rp-screen-scroll {
+  padding-bottom: 112px !important;
+  scroll-padding-bottom: 112px;
+}
+.step-estimate .rp-screen-footer {
+  margin: 0 14px calc(7px + env(safe-area-inset-bottom));
+  padding: 7px 9px 8px;
+  border-radius: 18px;
+}
+.step-estimate .rp-screen-footer .rp-primary { min-height: 46px; padding-block: 10px; }
+.step-estimate .rp-screen-footer .rp-dock-notice {
+  margin: 0 5px 6px;
+  font-size: 10.2px;
+  line-height: 1.4;
+  color: #463a32;
+}
+.rp-separate-quote-row strong { text-align: right; }
+.rp-separate-quote-row strong small {
+  display: block;
+  margin-top: 2px;
+  color: var(--red-dark);
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.step-lead .rp-screen-scroll {
+  padding-bottom: 112px !important;
+  scroll-padding-bottom: 112px;
+}
+.step-lead .rp-screen-footer {
+  margin: 0 14px calc(7px + env(safe-area-inset-bottom));
+  padding: 7px 9px 8px;
+  border-radius: 18px;
+}
+.step-lead .rp-live-chip { margin: 0 5px 5px; min-height: 31px; }
+.step-lead .rp-screen-footer .rp-primary { min-height: 46px; padding-block: 10px; }
+
+.rp-preferred-time {
+  color: #493f37 !important;
+  font-size: 10.8px !important;
+  line-height: 1.48 !important;
+}
+
+.rp-privacy-note { color: #5a4d43 !important; }
+.rp-privacy-note .rp-ic-sm { color: #61766a !important; }
+.rp-lead-field input:focus,
+.rp-lead-field textarea:focus {
+  background: var(--rp-master-control) !important;
+  border-color: rgba(159,32,39,.55) !important;
+  box-shadow: 0 0 0 3px rgba(159,32,39,.10), var(--rp-master-control-shadow) !important;
+}
+
+@media (max-width: 370px) {
+  .step-service .rp-start-service-q { margin-left: 54px; font-size: 18px; }
 }
 
 </style>
@@ -2557,9 +2667,9 @@ function rpBack() {
 /* =========================================================================
    SCREENS — one screen, one decision, vertically balanced.
    ========================================================================= */
-function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge }) {
+function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, selected = false }) {
   return `
-    <button class="rp-row ${featured ? "is-featured" : ""}" onclick="${onclick}">
+    <button type="button" class="rp-row ${featured ? "is-featured" : ""} ${selected ? "is-selected" : ""}" aria-pressed="${selected ? "true" : "false"}" onclick="${onclick}">
       ${badge ? `<span class="badge">${badge}</span>` : ""}
       ${icon ? rpChip(icon) : ""}
       <span class="rp-row-main">
@@ -2590,10 +2700,10 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout')", icon:"home", title:"Factory Reset™ Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
-          ${rpRowBtn({ onclick:"rpSelectService('deep')", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance')", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet')", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Factory Reset™ Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
+          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
+          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
+          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -2608,9 +2718,10 @@ function rpScreenHtml() {
       <div class="rp-q-gap"></div>
       <div class="rp-rows">
         ${[1,2,3,4,5].map(n => rpRowBtn({
-          onclick:`rpSelectBedrooms(${n})`,
+          onclick:`rpSelectBedrooms(${n}, this)`,
           title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-          val: isTiered ? `$${rpTierPrices[n]}` : ""
+          val: isTiered ? `$${rpTierPrices[n]}` : "",
+          selected: rpState.bedrooms === n
         })).join("")}
       </div>
     </div>` };
@@ -2623,8 +2734,9 @@ function rpScreenHtml() {
       <p class="rp-sub">Helps us plan your cleaning. Your price stays the same.</p>
       <div class="rp-rows">
         ${[1,2,3,4].map(n => rpRowBtn({
-          onclick:`rpSelectBathrooms(${n})`,
-          title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`
+          onclick:`rpSelectBathrooms(${n}, this)`,
+          title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
+          selected: rpState.bathrooms === n
         })).join("")}
       </div>
     </div>` };
@@ -2636,9 +2748,9 @@ function rpScreenHtml() {
       <h2>What condition is the home in?</h2>
       <p class="rp-sub">Helps us send the right team. Your instant price stays the same.</p>
       <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectCondition('Standard Condition')", title:"Standard Condition", desc:"Regularly maintained, nothing unusual." })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Needs Extra Attention')", title:"Needs Extra Attention", desc:"A bit more buildup than average." })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Buildup')", title:"Heavy Buildup", desc:"Significant buildup, grease, grime, or neglected areas." })}
+        ${rpRowBtn({ onclick:"rpSelectCondition('Standard Condition', this)", title:"Standard Condition", desc:"Regularly maintained, nothing unusual.", selected: rpState.condition === "Standard Condition" })}
+        ${rpRowBtn({ onclick:"rpSelectCondition('Needs Extra Attention', this)", title:"Needs Extra Attention", desc:"More buildup than a regularly maintained home.", selected: rpState.condition === "Needs Extra Attention" })}
+        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Buildup', this)", title:"Heavy Buildup", desc:"Significant buildup, grease, grime, or neglected areas.", selected: rpState.condition === "Heavy Buildup" })}
       </div>
     </div>` };
   }
@@ -2649,10 +2761,10 @@ function rpScreenHtml() {
       <h2>How often would you like cleanings?</h2>
       <p class="rp-sub">Recurring plans save you money — cancel or reschedule anytime, no contract.</p>
       <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly')", title:"Weekly", desc:"Our most popular recurring plan.", val:"Save 20%" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly')", title:"Biweekly", desc:"Every two weeks.", val:"Save 15%" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly')", title:"Monthly", desc:"Once-a-month upkeep.", val:"Save 10%" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('One-Time')", title:"One-Time", desc:"A single visit, no recurring plan." })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly', this)", title:"Weekly", desc:"Our most popular recurring plan.", val:"Save 20%", selected: rpState.frequency === "Weekly" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly', this)", title:"Biweekly", desc:"Every two weeks.", val:"Save 15%", selected: rpState.frequency === "Biweekly" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly', this)", title:"Monthly", desc:"Once-a-month upkeep.", val:"Save 10%", selected: rpState.frequency === "Monthly" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('One-Time', this)", title:"One-Time", desc:"A single visit, no recurring plan.", selected: rpState.frequency === "One-Time" })}
       </div>
       <p class="rp-fineprint">Recurring plans are billed per visit — no long-term contract, and you can cancel or change your schedule anytime.</p>
     </div>` };
@@ -2665,9 +2777,10 @@ function rpScreenHtml() {
       <p class="rp-sub">$75 per room · 2-room minimum</p>
       <div class="rp-rows">
         ${[2,3,4,5,6].map(n => rpRowBtn({
-          onclick:`rpSelectCarpetOnlyRooms(${n})`,
+          onclick:`rpSelectCarpetOnlyRooms(${n}, this)`,
           title:`${n}${n===6?"+":""} rooms`,
-          val:`$${n*75}${n===6?"+":""}`
+          val:`$${n*75}${n===6?"+":""}`,
+          selected: rpState.carpetRooms === n
         })).join("")}
       </div>
     </div>` };
@@ -2846,7 +2959,7 @@ function rpAddonsScreen(eyebrow) {
     <label class="rp-make-ready-card">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
-      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs.</span></span>
+      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs. Quoted separately.</span></span>
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>
   </div>${optionSheet}`, footer: `
@@ -2910,7 +3023,7 @@ function rpEstimateScreen(eyebrow) {
       ${isQuoteOnly && rpState.airbnbRestocking ? `<div class="rp-mini-row"><span>Restocking</span><strong>Requested</strong></div>` : ""}
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
-      ${rpState.handymanInterest ? `<div class="rp-mini-row"><span>Handyman &amp; Turnover interest</span><strong>Yes</strong></div>` : ""}
+      ${rpState.handymanInterest ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional service request</span><strong>Make-ready repairs<small>Quoted separately · not included</small></strong></div>` : ""}
       ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder (10%)</span><strong>-$${subtotal - final}</strong></div>` : ""}
     </div>
     ${(includes || !isQuoteOnly) ? `
@@ -2932,7 +3045,7 @@ function rpEstimateScreen(eyebrow) {
     <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
-      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs.</span></span>
+      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs. Quoted separately.</span></span>
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>` : ""}
   </div>`, footer: `
@@ -3201,14 +3314,14 @@ function rpRender(direction) {
 }
 
 /* Same-screen refresh without transition or duplicate screen_view. */
-function rpRefresh() {
+function rpRefresh(resetScroll = false) {
   const host = document.getElementById("rpScreens");
   if (!host) return;
   const def = rpScreenHtml();
   const current = host.querySelector(".rp-screen:last-child");
   if (!current) return;
   const scrollEl = current.querySelector(".rp-screen-scroll");
-  const prevScrollTop = scrollEl ? scrollEl.scrollTop : 0;
+  const prevScrollTop = resetScroll ? 0 : (scrollEl ? scrollEl.scrollTop : 0);
   current.innerHTML = `
     ${def.bg || ""}
     <div class="rp-screen-scroll">${def.scroll || ""}</div>
@@ -3253,19 +3366,29 @@ function rpResetServiceState() {
   rpState.preBookingWebhookSent = false;
 }
 
-function rpSelectService(service) {
-  rpTrack("screen_continue", { to_screen: (rpFlows[service] || [])[0], choice: service });
-  rpState.service = service;
-  rpResetServiceState();
-  const flow = rpFlows[service] || [];
-  rpState.step = flow[0] || "estimate";
-  rpRender("forward");
+function rpCommitChoice(element, callback) {
+  if (!element) { callback(); return; }
+  if (element.dataset.committing === "true") return;
+  element.dataset.committing = "true";
+  element.classList.add("is-committed");
+  element.setAttribute("aria-pressed", "true");
+  window.setTimeout(callback, 115);
 }
-function rpSelectBedrooms(n) { rpState.bedrooms = n; rpAdvance(); }
-function rpSelectBathrooms(n) { rpState.bathrooms = n; rpAdvance(); }
-function rpSelectCondition(label) { rpState.condition = label; rpAdvance(); }
-function rpSelectFrequency(label) { rpState.frequency = label; rpAdvance(); }
-function rpSelectCarpetOnlyRooms(n) { rpState.carpetRooms = n; rpAdvance(); }
+function rpSelectService(service, element) {
+  rpCommitChoice(element, () => {
+    rpTrack("screen_continue", { to_screen: (rpFlows[service] || [])[0], choice: service });
+    rpState.service = service;
+    rpResetServiceState();
+    const flow = rpFlows[service] || [];
+    rpState.step = flow[0] || "estimate";
+    rpRender("forward");
+  });
+}
+function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.bedrooms = n; rpAdvance(); }); }
+function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
+function rpSelectCondition(label, element) { rpCommitChoice(element, () => { rpState.condition = label; rpAdvance(); }); }
+function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpState.frequency = label; rpAdvance(); }); }
+function rpSelectCarpetOnlyRooms(n, element) { rpCommitChoice(element, () => { rpState.carpetRooms = n; rpAdvance(); }); }
 function rpToggleHeavySoil(checked) { rpState.heavySoil = checked; rpRefresh(); }
 function rpTogglePetOdor(checked) { rpState.petOdor = checked; rpRefresh(); }
 function rpToggleAirbnbLaundry(checked) { rpState.airbnbLaundry = checked; rpRefresh(); }
@@ -3326,7 +3449,7 @@ function rpGetEstimatePayload() {
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit()} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
-    `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
+    `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${subtotal - total})` : "No"}`,
     `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
   ].join(" | ");
@@ -3367,7 +3490,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3496,13 +3619,13 @@ function rpSelectBookingDate(dateKey) {
   rpState.calendarStage = "time";
   rpState.bookingError = "";
   rpTrack("booking_date_selected", { date: dateKey });
-  rpRefresh();
+  rpRefresh(true);
 }
 function rpChooseDifferentDate() {
   rpState.calendarStage = "date";
   rpState.selectedStartTime = "";
   rpState.bookingError = "";
-  rpRefresh();
+  rpRefresh(true);
 }
 function rpSelectBookingTime(startTime) {
   rpState.selectedStartTime = startTime;

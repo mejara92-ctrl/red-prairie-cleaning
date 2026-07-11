@@ -1,0 +1,75 @@
+RED PRAIRIE CLEANING — V18 CHANGELOG
+
+Primary goal
+- Restore the premium translucent Prairie Glass look without returning to inconsistent or opaque vanilla panels.
+- Execute the approved Step 1–8 punch list.
+
+Prairie Glass
+- Replaced the opaque V17 master surface with one authoritative V18 Prairie Glass system.
+- Main panels now use warm semi-transparent glass with 20px blur, a thin light border, and a softer shadow.
+- Nested option rows, form fields, calendar controls, and action docks use a matching lighter glass control surface so stacked panels do not compound into opaque cream blocks.
+- Red estimate reveals, selected controls, and primary buttons remain intentionally solid.
+- Form focus states now stay within the same glass system instead of becoming opaque.
+
+Step 1
+- Kept “What do you need cleaned?” left-aligned and aligned it with the service-card text.
+- Added breathing room around the Most Popular badge.
+- Service choices remain full-width buttons.
+
+Steps 2–4
+- Added a brief selected/pressed state before advancing.
+- Previous bedroom, bathroom, condition, frequency, and carpet-room choices are visibly restored when the user goes back.
+- Added slight right-side breathing room to bedroom price pills.
+- Changed the Needs Extra Attention description to “More buildup than a regularly maintained home.”
+
+Step 5 — Add-ons
+- Increased bottom scroll space so Make-Ready Repairs can move completely above the action dock.
+- Shortened the action dock while keeping the price and CTA prominent.
+- Increased small-description contrast.
+- Preserved the selected “✓ Added” state and the reopen/remove workflow.
+- Verified add-on removal immediately deducts the price.
+- Clarified that make-ready repairs are quoted separately.
+
+Step 6 — Estimate
+- Added enough scroll space for the entire Military/First Responder section.
+- Shortened the action dock and improved disclaimer readability.
+- Replaced “Handyman & Turnover interest — Yes” with:
+  “Additional service request — Make-ready repairs — Quoted separately · not included.”
+- Updated office booking notes to clearly state that make-ready repairs are separately quoted and not included in the cleaning estimate.
+- Kept the red estimate reveal and Red Prairie Promise unchanged.
+
+Step 7 — Customer details
+- Added bottom scroll space so the notes field can move fully above the action dock and mobile keyboard.
+- Kept the action dock lighter and more compact.
+- Improved privacy-note contrast.
+- Preserved exact per-field validation and scroll-to-first-error behavior.
+
+Step 8 — Calendar
+- Kept the simplified calendar copy and two reassurance chips.
+- Improved the Call/Text fallback readability.
+- Available dates remain full-square buttons; unavailable dates remain disabled.
+- Selecting a date now resets the scroll position so the available-time screen appears immediately at the top.
+
+Functional verification
+- JavaScript syntax passed.
+- CSS brace balance passed.
+- Full row tapping and 115ms selection feedback passed.
+- Back-navigation selection restoration passed.
+- Add-on select, reopen, remove, and price reset passed.
+- Make-ready separate-quote summary and booking-note text passed.
+- Customer validation passed for name, phone, email, street, city, and ZIP.
+- Calendar available/disabled date behavior and time-stage scroll reset passed.
+- Pricing checks passed:
+  Move-out/deep tiers $199/$299/$399/$499/$599;
+  carpet 2-room minimum $150;
+  maintenance and recurring calculations unchanged;
+  military discount unchanged;
+  $150 garage wash adds and removes correctly.
+- GA4, Google Ads, and Clarity remain installed on /book.
+- Clarity and the booking conversion remain installed on the confirmation page.
+
+Packaging
+- Root-ready ZIP. Upload the ZIP contents directly to the site root.
+
+Not performed
+- No real appointment was submitted to the live Cloudflare Worker or GoHighLevel.

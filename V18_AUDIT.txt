@@ -1,0 +1,43 @@
+RED PRAIRIE CLEANING — V18 AUDIT
+
+RESULT
+No launch-blocking issue was found in the modified /book funnel during static and local-browser testing.
+
+STATIC CHECKS
+- book/index.html inline JavaScript: PASS
+- booking-confirmation.html inline JavaScript: PASS
+- homepage inline JavaScript: PASS
+- /book CSS brace balance: PASS
+- Duplicate static IDs in /book: NONE
+- Required local /book assets: PRESENT
+- GA4 G-Y8D3WCS17S on /book: PRESENT
+- Google Ads AW-17734105967 on /book: PRESENT
+- Microsoft Clarity xb86ac4u38 on /book: PRESENT
+- Microsoft Clarity on confirmation page: PRESENT
+- Booking conversion MPr1CO_h68YcEO_2o4hC on confirmation page: PRESENT
+
+LOCAL MOBILE BROWSER CHECKS — 390 × 844
+- Steps 1–8 rendered without JavaScript errors: PASS
+- Prairie Glass translucency visible across panels and controls: PASS
+- Full option rows are BUTTON elements: PASS
+- Immediate pressed/selected feedback before navigation: PASS
+- Back navigation restores prior visual selection: PASS
+- Make-Ready Repairs fully scrollable above action dock: PASS
+- Military discount fully scrollable above action dock: PASS
+- Notes field fully scrollable above action dock: PASS
+- Add-on select/reopen/remove and price deduction: PASS
+- Form validation highlights each invalid field and reports first error: PASS
+- Available calendar dates selectable and unavailable dates disabled: PASS
+- Date selection opens time choices with scroll reset to top: PASS
+
+PRICING REGRESSION CHECKS
+- Move-out tiers: 199 / 299 / 399 / 499 / 599: PASS
+- Deep-clean tiers: 199 / 299 / 399 / 499 / 599: PASS
+- Carpet two-room minimum: 150: PASS
+- Maintenance one-time 3 bed / 2 bath: 224: PASS
+- Weekly maintenance calculation and monthly total unchanged: PASS
+- 10% military/first responder discount unchanged: PASS
+- Garage floor wash adds 150 and removes back to base: PASS
+
+KNOWN LIMITATION
+A real appointment was not submitted to the live Cloudflare Worker or GoHighLevel. Complete one internal end-to-end booking after deployment to verify the production API, CRM appointment, confirmation redirect, and live conversion receipt.
