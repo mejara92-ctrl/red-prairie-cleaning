@@ -1,0 +1,7 @@
+RED PRAIRIE CLEANING — V19 CHANGELOG
+
+1. Laundry add-on now asks how many loads the customer wants (1–6).
+2. Laundry pricing, estimate summary, and booking payload now include the selected load count at $35 per load.
+3. The /book opening screen now clearly states: Serving Lawton, Fort Sill, Elgin, Cache & surrounding areas.
+4. Mirrored the laundry logic in the homepage estimator code to prevent future pricing/flow inconsistencies.
+5. JavaScript syntax and required-content checks passed for both /book and the homepage.

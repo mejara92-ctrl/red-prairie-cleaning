@@ -1312,6 +1312,33 @@ line-height:1.5;
 .rp-option span:not(.badge), .rp-sub, .section-text, .services > p, .before-after > p, .booking > p { color: #444 !important; }
 .rp-progress-label { color: #444 !important; }
 
+
+.rp-service-area-line {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 10px 0 13px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 999px;
+  background: rgba(30,20,14,.36);
+  color: #fffaf3;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: .01em;
+  box-shadow: 0 5px 16px rgba(0,0,0,.13);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.rp-service-area-line::before {
+  content: "●";
+  margin-right: 7px;
+  color: #f4c66b;
+  font-size: 8px;
+}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -2708,7 +2735,7 @@ function rpRender() {
       if (key === "junk") return rpState.junkSize === "half" ? "Half Truck · $100" : rpState.junkSize === "full" ? "Full Truck · $200" : "Custom Quote";
       if (key === "windows") return rpState.windowsTier === "basic" ? "Basic Wash · $100" : "Premium Wash · $200";
       if (key === "garage") return "$100";
-      if (key === "laundry") return "$35/load";
+      if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
       if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
       if (key === "yard") {
         const yardLabels = { normal: "Yard Refresh · $100", overgrown: "Overgrown Yard · $150", xl: "XL Yard · $200", xlOvergrown: "XL Overgrown Yard · Starting at $250" };
@@ -2759,9 +2786,9 @@ function rpRender() {
       }
       if (key === "laundry") {
         return `
-          <div class="rp-choice-grid">
-            <button class="rp-pill ${rpState.laundryLoads > 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(true)">Yes<br><small>$35/load</small></button>
-            <button class="rp-pill ${rpState.laundryLoads === 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(false)">No</button>
+          <p class="rp-tap-note">How many loads? <span style="color:var(--faint)">· $35 per load</span></p>
+          <div class="rp-pill-grid">
+            ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.laundryLoads === n ? "is-selected" : ""}" onclick="rpSelectLaundryLoads(${n})">${n}<br><small>load${n===1?"":"s"}</small></button>`).join("")}
           </div>`;
       }
       if (key === "fridge") {
@@ -2831,7 +2858,7 @@ function rpAddonSummaryRows() {
   if (rpState.windowsTier === "basic") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Basic Wash · $100</strong></div>`);
   if (rpState.windowsTier === "premium") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Premium Wash · $200</strong></div>`);
   if (rpState.garageWash) rows.push(`<div class="rp-mini-row"><span>Garage Floor Wash</span><strong>$100</strong></div>`);
-  if (rpState.laundryLoads) rows.push(`<div class="rp-mini-row"><span>Laundry Service</span><strong>$${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}</strong></div>`);
+  if (rpState.laundryLoads) rows.push(`<div class="rp-mini-row"><span>Laundry Service (${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"})</span><strong>$${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}</strong></div>`);
   if (rpState.fridgeAddon) rows.push(`<div class="rp-mini-row"><span>Refrigerator Interior</span><strong>$${rpAddonCatalog.fridge.price}</strong></div>`);
   if (rpState.yardTier === "normal") rows.push(`<div class="rp-mini-row"><span>🌱 Yard Refresh</span><strong>$100</strong></div>`);
   if (rpState.yardTier === "overgrown") rows.push(`<div class="rp-mini-row"><span>🌿 Overgrown Yard Refresh</span><strong>$150</strong></div>`);
@@ -3008,7 +3035,8 @@ function rpSelectAddonJunk(size) { rpState.junkSize = size; rpState.expandedAddo
 function rpSelectAddonWindows(tier) { rpState.windowsTier = tier; rpState.expandedAddon = null; rpRender(); }
 function rpSelectGarageWash(yes) { rpState.garageWash = yes; rpState.expandedAddon = null; rpRender(); }
 function rpSelectYardTier(tier) { rpState.yardTier = tier; rpState.expandedAddon = null; rpRender(); }
-function rpSelectLaundry(yes) { rpState.laundryLoads = yes ? 1 : 0; rpState.expandedAddon = null; rpRender(); }
+function rpSelectLaundryLoads(n) { rpState.laundryLoads = n; rpState.expandedAddon = null; rpRender(); }
+function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
 function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRender(); }
 
 function rpBack() {
@@ -3039,7 +3067,7 @@ function rpGetEstimatePayload() {
     rpState.junkSize ? `Junk Haul: ${rpState.junkSize}` : "",
     rpState.windowsTier ? `Exterior Windows: ${rpState.windowsTier}` : "",
     rpState.garageWash ? "Garage Floor Wash" : "",
-    rpState.laundryLoads ? "Laundry Service" : "",
+    rpState.laundryLoads ? `Laundry Service: ${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"}` : "",
     rpState.fridgeAddon ? "Refrigerator Interior" : "",
     rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : ""
   ].filter(Boolean).join(", ") || "None";
@@ -3047,7 +3075,7 @@ function rpGetEstimatePayload() {
     `Service: ${service}`, `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`, `Frequency: ${rpState.frequency || "N/A"}`,
-    `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
+    `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${subtotal - total})` : "No"}`,
@@ -3064,6 +3092,7 @@ function rpGetEstimatePayload() {
     exterior_windows: rpState.windowsTier ? "Yes" : "No",
     upholstery_type: "N/A", upholstery_item: "N/A", upholstery_price: "0",
     junk_size: rpState.junkSize || "N/A",
+    laundry_loads: rpState.laundryLoads || "0",
     helpers_count: "N/A", hours_count: "N/A",
     addons: addonsList,
     // New decision-tree answers and add-on detail, added as additional fields

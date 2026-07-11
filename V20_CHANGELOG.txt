@@ -1,0 +1,5 @@
+RED PRAIRIE CLEANING — PREMIUM BOOKING V20
+
+1. Updated the /book opening service-area line to: Serving Lawton, Fort Sill, Elgin, Cache, and surrounding Southwest Oklahoma communities.
+2. Updated the FAQ service-area note to use the same clear Oklahoma wording.
+3. Preserved all V19 laundry load-selection, pricing, estimate, and booking payload improvements.
