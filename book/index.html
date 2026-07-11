@@ -820,17 +820,6 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 }
 .rp-privacy-note .rp-ic-sm { min-width: 15px; margin-top: 1px; color: var(--sage); }
 
-/* Calendar */
-.rp-booking-widget {
-  margin: 0 -6px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-.rp-booking-widget iframe { width: 100%; border: none; min-height: 720px; background: #fff; }
-
 /* Compact-height safeguards */
 @media (max-height: 760px) {
   :root { --header-h: 56px; }
@@ -934,11 +923,8 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 .rp-screen.step-addons .rp-center::before{content:"PERSONALIZE YOUR CLEAN"}
 .rp-screen.step-calendar .rp-screen-scroll{padding-top:18px}
 .rp-screen.step-calendar .rp-screen-scroll>div::before{content:"FINAL STEP · LIVE AVAILABILITY"}
-.rp-screen.step-calendar .rp-booking-widget{border-radius:24px;border-color:rgba(117,77,45,.15);box-shadow:0 20px 50px rgba(54,35,20,.13)}
 .rp-calendar-assurance{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0 14px}
 .rp-calendar-assurance span{padding:8px 5px;border:1px solid rgba(122,88,58,.1);border-radius:12px;background:rgba(255,255,255,.62);font-size:9px;font-weight:800;text-align:center;color:#66594d}
-.rp-calendar-fallback{text-align:center;margin:12px 4px 2px;font-size:11px;color:var(--muted)}
-.rp-calendar-fallback a{color:var(--red);font-weight:800}
 @media(max-height:760px){
  .rp-screen:not(.step-service) .rp-screen-scroll{padding-top:16px}
  .rp-screen:not(.step-service) .rp-center,.rp-screen.step-calendar .rp-screen-scroll>div{padding:17px 14px 14px;border-radius:22px}
@@ -1605,6 +1591,331 @@ details.rp-includes,
   .rp-screen.step-calendar .rp-calendar-assurance { margin-bottom: 9px; }
 }
 
+
+
+/* ========================================================================
+   UNIFIED PRAIRIE GLASS + PREMIUM MONTH CALENDAR
+   Final visual consistency and mobile form stability pass.
+   ======================================================================== */
+:root {
+  --rp-master-glass: linear-gradient(150deg, rgba(244,235,222,.68), rgba(228,211,192,.52));
+  --rp-master-border: rgba(255,247,235,.42);
+  --rp-master-shadow: 0 20px 52px rgba(34,22,15,.15), inset 0 1px 0 rgba(255,255,255,.48);
+  --rp-master-blur: blur(18px) saturate(1.08);
+}
+.rp-app { height: var(--rp-app-height, 100dvh); }
+
+/* The bedroom panel is the visual source of truth for every non-red surface. */
+.rp-sheet,
+.rp-screen:not(.step-service) .rp-center,
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell,
+.rp-row,
+.rp-invoice,
+details.rp-includes,
+.rp-checkbox-card,
+.rp-discount-card,
+.rp-make-ready-card,
+.rp-notice,
+.rp-help,
+.rp-pill,
+.rp-booking-review,
+.rp-native-status,
+.rp-selected-date,
+.rp-faq-page details,
+.rp-addon-sheet,
+.rp-lead-field input,
+.rp-lead-field textarea,
+.rp-screen-footer {
+  background: var(--rp-master-glass) !important;
+  border-color: var(--rp-master-border) !important;
+  box-shadow: var(--rp-master-shadow) !important;
+  backdrop-filter: var(--rp-master-blur) !important;
+  -webkit-backdrop-filter: var(--rp-master-blur) !important;
+}
+.rp-sheet { border-radius: 30px; }
+.rp-screen:not(.step-service) .rp-center,
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { border-radius: 28px; }
+.rp-row { box-shadow: 0 9px 24px rgba(48,32,19,.09), inset 0 1px 0 rgba(255,255,255,.42) !important; }
+.rp-row.is-featured,
+.rp-row.is-selected { background: linear-gradient(150deg, rgba(247,232,221,.76), rgba(231,205,191,.60)) !important; }
+
+/* One compact floating dock everywhere — no beige/tan page-ending block. */
+.rp-screen-footer {
+  margin: 0 12px calc(9px + env(safe-area-inset-bottom));
+  padding: 9px 10px 10px;
+  border: 1px solid var(--rp-master-border);
+  border-radius: 20px;
+  flex: 0 0 auto;
+}
+.rp-screen-footer::before { display: none !important; }
+.rp-screen-footer .rp-footer-note { margin-bottom: 0; }
+.step-addons .rp-screen-footer,
+.step-estimate .rp-screen-footer,
+.step-lead .rp-screen-footer,
+.step-calendar .rp-screen-footer { background: var(--rp-master-glass) !important; }
+
+/* Add-ons stay compact and aligned above the dock. */
+.step-addons .rp-screen-scroll { padding: 9px 16px 7px; overflow: hidden; }
+.step-addons .rp-center { padding: 13px 11px 11px; }
+.step-addons .rp-center::before { margin-bottom: 6px; }
+.step-addons .rp-eyebrow { margin-bottom: 5px; }
+.step-addons h2 { font-size: clamp(26px, 6.2vw, 31px); margin-bottom: 3px; }
+.step-addons .rp-sub { margin-bottom: 7px; }
+.step-addons .rp-rows { gap: 5px; }
+.step-addons .rp-row { min-height: 49px; padding: 5px 9px; border-radius: 15px; }
+.step-addons .rp-ic-chip { width: 38px; height: 38px; min-width: 38px; border-radius: 12px; }
+.step-addons .rp-row-title { font-size: 13px; }
+.step-addons .rp-row-desc { font-size: 8.6px; line-height: 1.25; }
+.step-addons .rp-row-sum { font-size: 9.4px; padding: 5px 7px; }
+.step-addons .rp-make-ready-card { min-height: 51px; margin-top: 5px; padding: 5px 9px; border-radius: 15px; }
+.step-addons .rp-make-ready-copy strong { font-size: 12.5px; }
+.step-addons .rp-make-ready-copy span { font-size: 8.6px; line-height: 1.24; }
+.rp-addon-sheet { background: linear-gradient(150deg, rgba(244,235,222,.88), rgba(228,211,192,.80)) !important; }
+
+/* Estimate: keep the premium red reveal, remove decorative lettering, unify every support bubble. */
+.rp-quote-band::after { display: none !important; content: none !important; }
+.step-estimate .rp-invoice,
+.step-estimate details.rp-includes,
+.step-estimate .rp-checkbox-card,
+.step-estimate .rp-make-ready-card { margin-inline: 0; }
+.step-estimate .rp-dock-notice {
+  color: #493f37 !important;
+  font-size: 9.4px !important;
+  line-height: 1.35 !important;
+}
+
+/* Customer details: 16px prevents iOS zoom; warm autofill prevents blue inputs. */
+.step-lead .rp-screen-scroll { overflow-y: auto; scroll-padding: 18px 0 170px; padding-bottom: 16px; }
+.step-lead .rp-center { margin-block: auto; }
+.rp-lead-field input,
+.rp-lead-field textarea {
+  min-height: 45px;
+  font-size: 16px !important;
+  background-color: rgba(244,235,222,.54) !important;
+  color: var(--ink) !important;
+  -webkit-text-fill-color: var(--ink) !important;
+  caret-color: var(--red);
+}
+.rp-lead-field textarea { min-height: 58px; resize: none; }
+.rp-lead-field input:focus,
+.rp-lead-field textarea:focus {
+  background: linear-gradient(150deg, rgba(249,241,230,.80), rgba(235,218,199,.68)) !important;
+  box-shadow: 0 0 0 3px rgba(159,32,39,.10), 0 13px 30px rgba(48,32,19,.12) !important;
+}
+.rp-lead-field input:-webkit-autofill,
+.rp-lead-field input:-webkit-autofill:hover,
+.rp-lead-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(240,226,208,.94) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+body.rp-keyboard-open .step-lead .rp-screen-footer { display: none; }
+body.rp-keyboard-open .step-lead .rp-center { margin-block: 0; }
+body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-bottom: 32px; }
+
+/* Calendar outer shell uses the same glass as every consultation panel. */
+.rp-screen.step-calendar .rp-screen-scroll { padding: 12px 16px 10px; }
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell {
+  width: 100%;
+  max-width: 510px;
+  margin: auto;
+  padding: 17px 14px 14px;
+}
+.rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell::before {
+  content: "FINAL STEP · LIVE AVAILABILITY";
+  display: block;
+  margin: 0 0 8px;
+  color: #8f2b31;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.step-calendar h2 { font-size: clamp(29px, 7vw, 36px); margin-bottom: 5px; }
+.step-calendar .rp-sub { margin-bottom: 9px; font-size: 12.5px; line-height: 1.4; }
+.step-calendar .rp-calendar-assurance { margin: 8px 0 11px; gap: 6px; }
+.step-calendar .rp-calendar-assurance span {
+  padding: 7px 4px;
+  background: var(--rp-master-glass);
+  border: 1px solid var(--rp-master-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+  font-size: 8.5px;
+}
+
+/* Premium real month calendar. */
+.rp-month-calendar { display: grid; gap: 9px; }
+.rp-month-nav {
+  display: grid;
+  grid-template-columns: 38px 1fr 38px;
+  align-items: center;
+  gap: 8px;
+}
+.rp-month-nav strong {
+  text-align: center;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -.015em;
+}
+.rp-month-nav button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--rp-master-border);
+  border-radius: 12px;
+  background: var(--rp-master-glass);
+  color: var(--red);
+  font-size: 25px;
+  line-height: 1;
+  box-shadow: 0 6px 15px rgba(48,32,19,.08), inset 0 1px 0 rgba(255,255,255,.44);
+}
+.rp-month-nav button:disabled { opacity: .24; cursor: default; }
+.rp-weekdays,
+.rp-month-grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 4px; }
+.rp-weekdays span {
+  text-align: center;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.rp-cal-blank { aspect-ratio: 1; }
+.rp-cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(245,236,223,.34);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform .13s, background .16s, border-color .16s, color .16s;
+}
+.rp-cal-day span { position: relative; z-index: 1; }
+.rp-cal-day i {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+  transform: translateX(-50%);
+}
+.rp-cal-day.is-available {
+  background: var(--rp-master-glass);
+  border-color: rgba(119,83,54,.14);
+  box-shadow: 0 5px 13px rgba(48,32,19,.065), inset 0 1px 0 rgba(255,255,255,.38);
+}
+.rp-cal-day.is-available:active { transform: scale(.94); }
+.rp-cal-day.is-unavailable { color: rgba(64,53,44,.28); }
+.rp-cal-day.is-today { border-color: rgba(198,161,100,.82); box-shadow: 0 0 0 2px rgba(198,161,100,.14); }
+.rp-cal-day.is-selected {
+  color: #fff8ef;
+  border-color: rgba(255,241,222,.38);
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a);
+  box-shadow: 0 10px 22px rgba(105,19,25,.23), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.rp-cal-day.is-selected i { background: #fff2df; }
+.rp-calendar-key { display: flex; justify-content: center; gap: 16px; color: var(--muted); font-size: 8.8px; font-weight: 700; }
+.rp-calendar-key span { display: inline-flex; align-items: center; gap: 5px; }
+.rp-calendar-key i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.rp-calendar-key i.available { background: var(--red); }
+.rp-calendar-key i.today { border: 1.5px solid var(--gold); background: transparent; }
+.rp-preferred-time {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255,247,235,.32);
+  border-radius: 12px;
+  background: rgba(242,229,211,.36);
+  color: #5d5147;
+  font-size: 9.7px;
+  line-height: 1.4;
+  text-align: center;
+}
+.rp-preferred-time a { color: var(--red); font-weight: 800; }
+
+/* Separate, calm time-selection stage. */
+.rp-time-picker { display: grid; gap: 10px; }
+.rp-selected-date {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid var(--rp-master-border);
+  border-radius: 16px;
+  text-align: left;
+}
+.rp-selected-date small { display: block; color: var(--red); font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.rp-selected-date strong { display: block; margin-top: 3px; font-size: 13px; }
+.rp-selected-date em { color: var(--red); font-size: 10px; font-style: normal; font-weight: 800; }
+.rp-time-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.rp-time-btn {
+  min-height: 47px;
+  background: var(--rp-master-glass) !important;
+  border-color: var(--rp-master-border) !important;
+  box-shadow: 0 7px 17px rgba(48,32,19,.08), inset 0 1px 0 rgba(255,255,255,.42) !important;
+}
+.rp-time-btn.is-selected {
+  color: #fff8ef;
+  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a) !important;
+  border-color: rgba(255,241,222,.34) !important;
+}
+.rp-booking-review { padding: 10px 12px; }
+.rp-calendar-footer-meta { margin: 0 4px 7px; }
+
+@media (max-height: 720px) {
+  .rp-screen.step-calendar .rp-screen-scroll { padding-top: 7px; }
+  .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { padding: 12px 11px 11px; }
+  .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell::before { margin-bottom: 5px; }
+  .step-calendar h2 { font-size: 27px; }
+  .step-calendar .rp-sub { margin-bottom: 6px; font-size: 11.5px; }
+  .step-calendar .rp-calendar-assurance { margin: 6px 0 8px; }
+  .rp-month-calendar { gap: 6px; }
+  .rp-month-nav button { width: 34px; height: 34px; }
+  .rp-month-nav { grid-template-columns: 34px 1fr 34px; }
+  .rp-cal-day { border-radius: 10px; font-size: 11px; }
+  .rp-cal-day i { bottom: 3px; }
+  .rp-preferred-time { padding: 6px 8px; font-size: 8.8px; }
+  .rp-time-btn { min-height: 43px; }
+}
+@media (max-width: 370px) {
+  .rp-weekdays, .rp-month-grid { gap: 3px; }
+  .rp-cal-day { border-radius: 9px; }
+  .rp-lead-row-contact { grid-template-columns: 1fr; }
+}
+
+
+/* Final compactness refinements after viewport testing. */
+.step-estimate .rp-screen-footer .rp-dock-notice {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+}
+.step-lead .rp-footer-note,
+.step-calendar .rp-footer-note { display: none; }
+.rp-booking-mini-review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 45px;
+  padding: 9px 12px;
+  border: 1px solid var(--rp-master-border);
+  border-radius: 14px;
+  background: var(--rp-master-glass);
+  box-shadow: 0 7px 17px rgba(48,32,19,.07), inset 0 1px 0 rgba(255,255,255,.4);
+  backdrop-filter: var(--rp-master-blur);
+  -webkit-backdrop-filter: var(--rp-master-blur);
+}
+.rp-booking-mini-review span { min-width: 0; font-size: 10.5px; font-weight: 800; line-height: 1.25; }
+.rp-booking-mini-review strong { color: var(--red-dark); font-family: "DM Serif Display", Georgia, serif; font-size: 20px; font-weight: 400; }
+
 </style>
 </head>
 <body>
@@ -1687,6 +1998,9 @@ const rpState = {
   specialInstructions: "",
   selectedDate: "",
   selectedStartTime: "",
+  calendarStage: "date",
+  calendarMonth: "",
+  loadedMonths: {},
   availableSlots: {},
   slotsLoading: false,
   slotsError: "",
@@ -1887,12 +2201,18 @@ function rpCloseFaq() {
   if (rpFaqReturnFocus && typeof rpFaqReturnFocus.focus === "function") rpFaqReturnFocus.focus({ preventScroll: true });
   rpTrack("faq_close");
 }
+function rpRevealExpandedDetails(details) {
+  window.setTimeout(function() {
+    const scroller = details.closest(".rp-screen-scroll");
+    if (!scroller) return;
+    const targetTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    scroller.scrollTo({ top: targetTop, behavior: "smooth" });
+  }, 80);
+}
 document.addEventListener("toggle", function(event) {
   const details = event.target;
   if (details && details.matches && details.matches("details.rp-includes") && details.open) {
-    requestAnimationFrame(function() {
-      details.scrollIntoView({ behavior: "smooth", block: "end" });
-    });
+    rpRevealExpandedDetails(details);
   }
 }, true);
 
@@ -1937,6 +2257,13 @@ function rpAdvance() {
 }
 function rpBack() {
   if (rpState.step === "service") return;
+  if (rpState.step === "calendar" && rpState.calendarStage === "time") {
+    rpTrack("screen_back", { from_calendar_stage: "time", to_calendar_stage: "date" });
+    rpState.calendarStage = "date";
+    rpState.selectedStartTime = "";
+    rpRefresh();
+    return;
+  }
   rpTrack("screen_back");
   const flow = rpCurrentFlow();
   const idx = rpStepIndex();
@@ -2316,26 +2643,41 @@ function rpEstimateScreen(eyebrow) {
     <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>` };
 }
 
+function rpEscapeAttr(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+function rpCaptureLeadField(field, value) {
+  rpState[field] = value;
+}
+function rpLeadFieldFocus(element) {
+  window.setTimeout(() => {
+    try { element.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (error) {}
+  }, 180);
+}
 function rpLeadScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Almost done</h2>
-    <p class="rp-sub">So your booking has the right contact and property info.</p>
+    <p class="rp-sub">Add the contact and property details we need to confirm your cleaning.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-row rp-lead-row-contact">
-        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpState.fullName}" placeholder="Your name"></div>
-        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpState.phone}" placeholder="(580) 000-0000"></div>
+        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpState.email}" placeholder="you@email.com"></div>
-      <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpState.address1}" placeholder="123 Main St"></div>
+      <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@email.com" oninput="rpCaptureLeadField('email',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" oninput="rpCaptureLeadField('address1',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-row">
-        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpState.city}" placeholder="Lawton"></div>
-        <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpState.postalCode}" placeholder="73505" inputmode="numeric"></div>
+        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…">${rpState.specialInstructions || ""}</textarea></div>
+      <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
     </div>
     <div id="rpFormError" class="rp-error">Please enter your name, phone, email, street address, city, and ZIP code.</div>
-    <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Only used to confirm your booking — no spam, ever. Licensed, insured &amp; veteran-owned.</span></p>
+    <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
   </div>`, footer: `
     <div class="rp-live-chip"><span>Your estimate</span><strong>${rpPriceLabel()}</strong></div>
     <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose My Date &amp; Time</button>
@@ -2348,18 +2690,66 @@ const RP_BOOKING_API = "https://rpc-booking-api.aged-breeze-c9a5.workers.dev";
 function rpDateKeyFromIso(iso) {
   return String(iso || "").slice(0, 10);
 }
-function rpFormatDayLabel(dateKey) {
-  const date = new Date(`${dateKey}T12:00:00`);
-  return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+function rpCentralDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date).reduce((acc, part) => {
+    if (part.type !== "literal") acc[part.type] = part.value;
+    return acc;
+  }, {});
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
-function rpFormatMonthDay(dateKey) {
-  const date = new Date(`${dateKey}T12:00:00`);
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+function rpDateFromKey(dateKey) {
+  return new Date(`${dateKey}T12:00:00`);
+}
+function rpIsoDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function rpAddDaysKey(dateKey, days) {
+  const date = rpDateFromKey(dateKey);
+  date.setDate(date.getDate() + days);
+  return rpIsoDate(date);
+}
+function rpMonthKeyFromDateKey(dateKey) {
+  return `${String(dateKey).slice(0, 7)}-01`;
+}
+function rpMonthShift(monthKey, delta) {
+  const date = rpDateFromKey(monthKey);
+  date.setDate(1);
+  date.setMonth(date.getMonth() + delta);
+  return rpIsoDate(date);
+}
+function rpMonthBounds(monthKey) {
+  const first = rpDateFromKey(monthKey);
+  first.setDate(1);
+  const last = new Date(first);
+  last.setMonth(last.getMonth() + 1, 0);
+  return { first: rpIsoDate(first), last: rpIsoDate(last) };
+}
+function rpBookingBounds() {
+  const start = rpCentralDateKey();
+  return { start, end: rpAddDaysKey(start, 60) };
+}
+function rpClampCalendarMonth(monthKey) {
+  const bounds = rpBookingBounds();
+  const minMonth = rpMonthKeyFromDateKey(bounds.start);
+  const maxMonth = rpMonthKeyFromDateKey(bounds.end);
+  if (!monthKey || monthKey < minMonth) return minMonth;
+  if (monthKey > maxMonth) return maxMonth;
+  return monthKey;
 }
 function rpFormatLongDate(dateKey) {
   if (!dateKey) return "Choose a date";
-  const date = new Date(`${dateKey}T12:00:00`);
-  return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(date);
+  return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" }).format(rpDateFromKey(dateKey));
+}
+function rpFormatMonthTitle(monthKey) {
+  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(rpDateFromKey(monthKey));
 }
 function rpFormatTime(iso) {
   if (!iso) return "Choose a time";
@@ -2369,63 +2759,109 @@ function rpFormatTime(iso) {
     timeZone: "America/Chicago"
   }).format(new Date(iso));
 }
-function rpAvailableDateKeys() {
-  return Object.keys(rpState.availableSlots || {})
-    .filter((key) => Array.isArray(rpState.availableSlots[key]?.slots) && rpState.availableSlots[key].slots.length)
-    .sort();
-}
-function rpSlotsForSelectedDate() {
-  if (!rpState.selectedDate) return [];
-  const raw = rpState.availableSlots?.[rpState.selectedDate]?.slots || [];
+function rpSlotsForDate(dateKey) {
+  const raw = rpState.availableSlots?.[dateKey]?.slots || [];
   return raw.filter((slot) => {
     const match = String(slot).match(/T(\d{2}):/);
     const hour = match ? Number(match[1]) : NaN;
     return Number.isFinite(hour) && hour >= 9 && hour <= 17;
   });
 }
+function rpAvailableDateKeys() {
+  return Object.keys(rpState.availableSlots || {})
+    .filter((key) => rpSlotsForDate(key).length > 0)
+    .sort();
+}
+function rpSlotsForSelectedDate() {
+  return rpState.selectedDate ? rpSlotsForDate(rpState.selectedDate) : [];
+}
+function rpDateHasSlots(dateKey) {
+  return rpSlotsForDate(dateKey).length > 0;
+}
+function rpCanMoveCalendarMonth(delta) {
+  const current = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
+  const target = rpMonthShift(current, delta);
+  return target === rpClampCalendarMonth(target) && target !== current;
+}
+function rpCalendarMonthGrid() {
+  const monthKey = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
+  const date = rpDateFromKey(monthKey);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1, 12).getDay();
+  const daysInMonth = new Date(year, month + 1, 0, 12).getDate();
+  const bounds = rpBookingBounds();
+  const today = bounds.start;
+  const cells = [];
+  for (let i = 0; i < firstDay; i += 1) cells.push(`<span class="rp-cal-blank" aria-hidden="true"></span>`);
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const inWindow = dateKey >= bounds.start && dateKey <= bounds.end;
+    const available = inWindow && rpDateHasSlots(dateKey);
+    const selected = rpState.selectedDate === dateKey;
+    const isToday = dateKey === today;
+    const classes = ["rp-cal-day", available ? "is-available" : "is-unavailable", selected ? "is-selected" : "", isToday ? "is-today" : ""].filter(Boolean).join(" ");
+    const label = available ? `${rpFormatLongDate(dateKey)}, available` : `${rpFormatLongDate(dateKey)}, unavailable`;
+    cells.push(`<button class="${classes}" type="button" ${available ? `onclick="rpSelectBookingDate('${dateKey}')"` : "disabled"} aria-label="${label}"><span>${day}</span>${available ? `<i aria-hidden="true"></i>` : ""}</button>`);
+  }
+  return cells.join("");
+}
+function rpPreferredTimeMessage() {
+  return `<p class="rp-preferred-time">Don’t see a time that works? <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a> — we may still be able to fit you in.</p>`;
+}
 function rpCalendarScreen(eyebrow) {
   const dates = rpAvailableDateKeys();
   const slots = rpSlotsForSelectedDate();
-  let calendarBody = "";
+  const monthKey = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
+  rpState.calendarMonth = monthKey;
+  const monthDates = dates.filter((dateKey) => rpMonthKeyFromDateKey(dateKey) === monthKey);
+  const onTimeStage = rpState.calendarStage === "time" && !!rpState.selectedDate;
+  let body = "";
 
   if (rpState.slotsLoading) {
-    calendarBody = `<div class="rp-native-status"><div><div class="rp-native-spinner"></div><strong>Checking live availability…</strong><p>Finding the best open times for your cleaning.</p></div></div>`;
+    body = `<div class="rp-native-status"><div><div class="rp-native-spinner"></div><strong>Checking live availability…</strong><p>Finding the best openings for your cleaning.</p></div></div>`;
   } else if (rpState.slotsError) {
-    calendarBody = `<div class="rp-native-status"><div><strong>We couldn't load the calendar.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button></div></div>`;
-  } else if (!dates.length) {
-    calendarBody = `<div class="rp-native-status"><div><strong>No online openings found.</strong><p>Text us at (580) 215-0915 and we'll check same-day, weekend, or custom availability.</p><a class="rp-primary" href="sms:5802150915" style="margin-top:14px">Text Us for a Time</a></div></div>`;
+    body = `<div class="rp-native-status"><div><strong>We couldn't load the calendar.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button></div></div>`;
+  } else if (!onTimeStage) {
+    body = `<div class="rp-month-calendar">
+      <div class="rp-month-nav">
+        <button type="button" onclick="rpChangeCalendarMonth(-1)" ${rpCanMoveCalendarMonth(-1) ? "" : "disabled"} aria-label="Previous month">‹</button>
+        <strong>${rpFormatMonthTitle(monthKey)}</strong>
+        <button type="button" onclick="rpChangeCalendarMonth(1)" ${rpCanMoveCalendarMonth(1) ? "" : "disabled"} aria-label="Next month">›</button>
+      </div>
+      <div class="rp-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="rp-month-grid">${rpCalendarMonthGrid()}</div>
+      <div class="rp-calendar-key"><span><i class="available"></i>Available</span><span><i class="today"></i>Today</span></div>
+      ${rpPreferredTimeMessage()}
+      ${!monthDates.length && !rpState.slotsLoading ? `<p class="rp-booking-error is-visible">No online openings are showing in this month. Try the next month or call/text us.</p>` : ""}
+    </div>`;
   } else {
-    const dateButtons = dates.slice(0, 14).map((dateKey) => {
-      const day = new Date(`${dateKey}T12:00:00`).getDate();
-      const count = rpState.availableSlots[dateKey].slots.length;
-      return `<button class="rp-date-btn ${rpState.selectedDate === dateKey ? "is-selected" : ""}" onclick="rpSelectBookingDate('${dateKey}')"><small>${rpFormatDayLabel(dateKey)}</small><strong>${day}</strong><em>${count} time${count === 1 ? "" : "s"}</em></button>`;
-    }).join("");
     const timeButtons = slots.map((slot) => `<button class="rp-time-btn ${rpState.selectedStartTime === slot ? "is-selected" : ""}" onclick="rpSelectBookingTime('${slot}')">${rpFormatTime(slot)}</button>`).join("");
-
-    calendarBody = `<div class="rp-native-calendar">
-      <div>
-        <div class="rp-native-section-label"><span>Choose your date</span><span>Live availability</span></div>
-        <div class="rp-date-strip">${dateButtons}</div>
-      </div>
-      <div>
-        <div class="rp-native-section-label"><span>Choose an arrival time</span><span>30-minute arrival window</span></div>
-        <div class="rp-time-grid">${timeButtons || `<div class="rp-help" style="grid-column:1/-1;margin:0">Choose a date to see available times.</div>`}</div>
-      </div>
-      ${rpState.selectedStartTime ? `<div class="rp-booking-review"><span>Cleaning</span><strong>${rpServices[rpState.service]?.name || "Cleaning"}</strong><span>Date</span><strong>${rpFormatLongDate(rpState.selectedDate)}</strong><span>Arrival</span><strong>${rpFormatTime(rpState.selectedStartTime)}</strong><span>Estimate</span><strong>${rpPriceLabel()}</strong></div>` : ""}
+    body = `<div class="rp-time-picker">
+      <button class="rp-selected-date" type="button" onclick="rpChooseDifferentDate()"><span><small>Your selected date</small><strong>${rpFormatLongDate(rpState.selectedDate)}</strong></span><em>Change</em></button>
+      <div class="rp-native-section-label"><span>Available arrival times</span><span>30-minute arrival window</span></div>
+      <div class="rp-time-grid">${timeButtons || `<div class="rp-help" style="grid-column:1/-1;margin:0">No online times remain for this date. Choose another date or contact us.</div>`}</div>
+      ${rpPreferredTimeMessage()}
+      ${rpState.selectedStartTime ? `<div class="rp-booking-mini-review"><span>${rpServices[rpState.service]?.name || "Cleaning"}</span><strong>${rpPriceLabel()}</strong></div>` : ""}
       <p id="rpBookingError" class="rp-booking-error ${rpState.bookingError ? "is-visible" : ""}">${rpState.bookingError || ""}</p>
     </div>`;
   }
 
-  return { scroll: `<div>
+  const heading = onTimeStage ? "Choose your arrival time" : "Choose your cleaning date";
+  const sub = onTimeStage
+    ? "Select a live opening. We’ll reserve it instantly when you confirm."
+    : "Pick an available day from the live Red Prairie calendar.";
+
+  return { scroll: `<div class="rp-calendar-shell">
     ${eyebrow}
-    <h2>Pick your date &amp; time</h2>
-    <p class="rp-sub">Choose a live opening. Your appointment is confirmed instantly when you finish this final step.</p>
+    <h2>${heading}</h2>
+    <p class="rp-sub">${sub}</p>
     <div class="rp-calendar-assurance"><span>No deposit</span><span>30-min arrival window</span><span>Instant confirmation</span></div>
-    ${calendarBody}
-  </div>`, footer: rpState.slotsLoading || rpState.slotsError || !dates.length ? "" : `
-    <div class="rp-calendar-footer-meta"><span>${rpState.selectedStartTime ? `${rpFormatLongDate(rpState.selectedDate)} · ${rpFormatTime(rpState.selectedStartTime)}` : "Select a date and time"}</span><strong>${rpPriceLabel()}</strong></div>
+    ${body}
+  </div>`, footer: onTimeStage && !rpState.slotsLoading && !rpState.slotsError ? `
+    <div class="rp-calendar-footer-meta"><span>${rpState.selectedStartTime ? `${rpFormatLongDate(rpState.selectedDate)} · ${rpFormatTime(rpState.selectedStartTime)}` : "Choose an arrival time"}</span><strong>${rpPriceLabel()}</strong></div>
     <button id="rpConfirmBookingBtn" class="rp-primary" onclick="rpConfirmNativeBooking()" ${!rpState.selectedStartTime || rpState.bookingSubmitting ? "disabled" : ""}>${rpState.bookingSubmitting ? "Confirming Your Cleaning…" : "Confirm My Cleaning"}</button>
-    <p class="rp-footer-note">You’ll receive your confirmation by text and email.</p>` , onMount: rpMountNativeCalendar };
+    <p class="rp-footer-note">You’ll receive confirmation by text and email.</p>` : "", onMount: rpMountNativeCalendar };
 }
 
 /* =========================================================================
@@ -2504,6 +2940,15 @@ function rpResetServiceState() {
   rpState.airbnbLaundry = false;
   rpState.airbnbRestocking = false;
   rpState.airbnbSameDay = false;
+  rpState.selectedDate = "";
+  rpState.selectedStartTime = "";
+  rpState.calendarStage = "date";
+  rpState.calendarMonth = "";
+  rpState.loadedMonths = {};
+  rpState.availableSlots = {};
+  rpState.slotsLoading = false;
+  rpState.slotsError = "";
+  rpState.bookingError = "";
   rpState.estimateSent = false;
   rpState.preBookingWebhookSent = false;
 }
@@ -2602,7 +3047,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -2635,44 +3080,44 @@ function rpSubmitLeadAndShowCalendar() {
 
   rpTrack("lead_submitted", { estimate: rpPriceLabel() });
 
+  rpState.calendarStage = "date";
+  rpState.calendarMonth = rpMonthKeyFromDateKey(rpCentralDateKey());
+  rpState.selectedDate = "";
+  rpState.selectedStartTime = "";
+  rpState.bookingError = "";
   const button = document.getElementById("rpReserveBtn"); if (button) { button.disabled = true; button.innerText = "Loading availability..."; }
   rpGoToStep("calendar", "forward");
 }
 
 const rpConfirmationPath = "/booking-confirmation.html";
-function rpIsoDate(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-function rpNativeRange() {
-  const start = new Date();
-  const end = new Date(start);
-  end.setDate(end.getDate() + 20);
-  return { start: rpIsoDate(start), end: rpIsoDate(end) };
+function rpCurrentMonthRequestRange() {
+  const monthKey = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
+  const month = rpMonthBounds(monthKey);
+  const booking = rpBookingBounds();
+  return {
+    monthKey,
+    start: month.first < booking.start ? booking.start : month.first,
+    end: month.last > booking.end ? booking.end : month.last
+  };
 }
 async function rpLoadNativeSlots(force = false) {
   if (rpState.slotsLoading) return;
-  if (!force && Object.keys(rpState.availableSlots || {}).length) return;
+  rpState.calendarMonth = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
+  const range = rpCurrentMonthRequestRange();
+  if (!force && rpState.loadedMonths?.[range.monthKey]) return;
   rpState.slotsLoading = true;
   rpState.slotsError = "";
   rpState.bookingError = "";
   rpRefresh();
   try {
-    const range = rpNativeRange();
     const url = `${RP_BOOKING_API}/slots?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`;
     const response = await fetch(url, { method: "GET", headers: { Accept: "application/json" } });
     const result = await response.json();
     if (!response.ok || !result.ok) throw new Error(result.error || "Live availability is temporarily unavailable.");
     const data = result.data || {};
     delete data.traceId;
-    rpState.availableSlots = data;
-    const dates = rpAvailableDateKeys();
-    if (!dates.includes(rpState.selectedDate)) {
-      rpState.selectedDate = dates[0] || "";
-      rpState.selectedStartTime = "";
-    }
+    rpState.availableSlots = Object.assign({}, rpState.availableSlots || {}, data);
+    rpState.loadedMonths = Object.assign({}, rpState.loadedMonths || {}, { [range.monthKey]: true });
   } catch (error) {
     rpState.slotsError = error instanceof Error ? error.message : "Live availability is temporarily unavailable.";
   } finally {
@@ -2681,13 +3126,33 @@ async function rpLoadNativeSlots(force = false) {
   }
 }
 function rpMountNativeCalendar() {
+  if (!rpState.calendarMonth) rpState.calendarMonth = rpMonthKeyFromDateKey(rpCentralDateKey());
+  rpLoadNativeSlots(false);
+}
+function rpChangeCalendarMonth(delta) {
+  if (!rpCanMoveCalendarMonth(delta)) return;
+  rpState.calendarMonth = rpClampCalendarMonth(rpMonthShift(rpState.calendarMonth, delta));
+  rpState.selectedDate = "";
+  rpState.selectedStartTime = "";
+  rpState.calendarStage = "date";
+  rpState.bookingError = "";
+  rpTrack("booking_month_changed", { month: rpState.calendarMonth });
+  rpRefresh();
   rpLoadNativeSlots(false);
 }
 function rpSelectBookingDate(dateKey) {
+  if (!rpDateHasSlots(dateKey)) return;
   rpState.selectedDate = dateKey;
-  if (rpDateKeyFromIso(rpState.selectedStartTime) !== dateKey) rpState.selectedStartTime = "";
+  rpState.selectedStartTime = "";
+  rpState.calendarStage = "time";
   rpState.bookingError = "";
   rpTrack("booking_date_selected", { date: dateKey });
+  rpRefresh();
+}
+function rpChooseDifferentDate() {
+  rpState.calendarStage = "date";
+  rpState.selectedStartTime = "";
+  rpState.bookingError = "";
   rpRefresh();
 }
 function rpSelectBookingTime(startTime) {
@@ -2754,6 +3219,21 @@ async function rpConfirmNativeBooking() {
   The website creates the confirmed GHL appointment only after the customer selects a live date and time.
   Booking confirmation texts/emails should be triggered by the confirmed appointment event.
 */
+
+/* Mobile keyboard and dynamic viewport stability */
+let rpBaseViewportHeight = Math.max(window.innerHeight, window.visualViewport?.height || 0);
+function rpSyncAppViewport() {
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  rpBaseViewportHeight = Math.max(rpBaseViewportHeight, viewportHeight);
+  document.documentElement.style.setProperty("--rp-app-height", `${Math.round(viewportHeight)}px`);
+  document.body.classList.toggle("rp-keyboard-open", rpBaseViewportHeight - viewportHeight > 140);
+}
+rpSyncAppViewport();
+window.addEventListener("resize", rpSyncAppViewport, { passive: true });
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", rpSyncAppViewport, { passive: true });
+  window.visualViewport.addEventListener("scroll", rpSyncAppViewport, { passive: true });
+}
 
 /* Boot */
 rpRender();
