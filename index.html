@@ -2053,6 +2053,11 @@ window.__rpScheduleDeferred(function(){
     }
 </style>
 <style id="rp-estimator-v2">
+    .rp-hero-text-link { text-align: center; margin: 10px 0 0; }
+    .rp-hero-text-link a {
+        color: #fff; font-weight: 800; font-size: 14px; text-decoration: underline;
+        text-underline-offset: 3px; opacity: .92;
+    }
     #rpStepper.rp-stepper {
         display: block; text-align: center; font-size: 12.5px; font-weight: 800;
         text-transform: uppercase; letter-spacing: .03em; color: var(--red);
@@ -2135,7 +2140,7 @@ window.__rpScheduleDeferred(function(){
 <li><a href="#faq">FAQ</a></li>
 </ul>
 </nav>
-<a class="book-btn" href="sms:5802150915">Text Us</a>
+<a class="book-btn" href="#booking">Book Now</a>
 </div>
 </header>
 
@@ -2153,23 +2158,21 @@ window.__rpScheduleDeferred(function(){
   <img src="images/services/move-out-cleaning-640.webp" width="640" height="427" alt="" fetchpriority="high" loading="eager" decoding="async">
 </picture>
 <div class="hero-overlay">
-<h1>Preparing Homes for Their Next Chapter.</h1>
+<h1>Move-Out Cleaning That Protects Your Deposit — Or Your Sale.</h1>
 <div class="hero-trust">
 <a class="google-review-pill" href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" rel="noopener" target="_blank"><i class="fa-solid fa-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="12,2 14.6,9 22,9.5 16.4,14.2 18,21.5 12,17.6 6,21.5 7.6,14.2 2,9.5 9.4,9" fill="currentColor"/></svg></i> 5.0 on Google • 37+ Ratings</a>
 <span><i class="fa-solid fa-bolt" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><polygon points="13,2 4,14 11,14 9,22 20,9 12,9" fill="currentColor"/></svg></i> Same-Day Availability</span>
-<span><i class="fa-solid fa-shield-heart" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 14.5 C10.3 12.6 8 13.1 8 15.2 C8 17.1 12 19.2 12 19.2 C12 19.2 16 17.1 16 15.2 C16 13.1 13.7 12.6 12 14.5Z" fill="currentColor"/></svg></i> Defend Your Deposit</span>
-<span><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span>
-<span><i class="fa-solid fa-flag" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 21 V4"/><path d="M6 4 H18 L15 8 L18 12 H6"/></svg></i> Veteran Owned</span>
+<span><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed, Insured &amp; Veteran-Owned</span>
 </div>
-<p>Instant move-out pricing for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and Southwest Oklahoma.</p>
+<p>Instant cleaning pricing for Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and Southwest Oklahoma.</p>
 <div class="hero-microcopy">
-<span>✓ Get a price in about 30 seconds</span>
+<span>✓ Get a price in about a minute</span>
 <span>✓ Same-day &amp; next-day appointments often available</span>
 </div>
 <div class="hero-buttons">
 <a class="quote-btn" href="#booking">Start Instant Estimate</a>
-<a class="secondary-btn" href="sms:5802150915">Text Us</a>
 </div>
+<p class="rp-hero-text-link"><a href="sms:5802150915">Prefer to text? Tap here →</a></p>
 </div>
 </section><section class="rp-funnel" id="booking">
 <div class="rp-funnel-wrap">
@@ -3040,6 +3043,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
