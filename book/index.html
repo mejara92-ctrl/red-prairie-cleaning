@@ -839,6 +839,527 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
  .rp-screen:not(.step-service) .rp-center::before,.rp-screen.step-calendar .rp-screen-scroll>div::before{margin-bottom:8px}
 }
 
+
+/* ========================================================================
+   MASTERPIECE V8 — Red Prairie Atelier consultation system
+   Richer choice architecture, custom emblem cards, stage-specific scenery.
+   ======================================================================== */
+:root{
+  --wine:#8f1822;
+  --wine-deep:#5c0e15;
+  --wine-bright:#c9343d;
+  --clay:#c7735c;
+  --champagne:#d8b77b;
+  --cream:#fffaf1;
+  --cream-deep:#f0dfc9;
+  --forest:#526451;
+}
+
+/* Make every interior step feel like a designed room, not a blank form. */
+.rp-screen:not(.step-service){
+  background:
+    radial-gradient(110% 76% at 94% -8%,rgba(216,183,123,.34),transparent 54%),
+    radial-gradient(94% 64% at -15% 104%,rgba(143,24,34,.17),transparent 58%),
+    linear-gradient(156deg,#fffaf1 0%,#f7ecdd 48%,#ead7c1 100%);
+}
+.rp-screen:not(.step-service)::before{
+  opacity:1;
+  background:
+    linear-gradient(180deg,rgba(255,251,244,.85),rgba(250,241,228,.91)),
+    url('/images/hero/front-photo-fullbleed-648.webp') center 34%/cover no-repeat;
+  filter:saturate(.82) contrast(.96);
+}
+.rp-screen:not(.step-service)::after{
+  inset:0;
+  height:auto;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 84% 20%,rgba(255,255,255,.76) 0 8%,transparent 8.5%),
+    radial-gradient(circle at 17% 80%,rgba(199,115,92,.11) 0 14%,transparent 14.5%),
+    repeating-radial-gradient(ellipse at 110% 112%,transparent 0 45px,rgba(143,24,34,.035) 46px 47px,transparent 48px 86px),
+    linear-gradient(168deg,transparent 0 57%,rgba(255,255,255,.40) 57.2% 65%,transparent 65.2%);
+  filter:none;
+}
+.rp-screen.step-bathrooms::after{
+  background:
+    radial-gradient(circle at 83% 23%,rgba(216,183,123,.20) 0 9%,transparent 9.5%),
+    radial-gradient(circle at 92% 33%,rgba(255,255,255,.48) 0 4%,transparent 4.5%),
+    radial-gradient(circle at 18% 84%,rgba(111,128,111,.12) 0 14%,transparent 14.5%),
+    repeating-radial-gradient(ellipse at 110% 112%,transparent 0 44px,rgba(143,24,34,.035) 45px 46px,transparent 47px 84px);
+}
+.rp-screen.step-condition::after{
+  background:
+    radial-gradient(circle at 80% 17%,rgba(199,115,92,.20),transparent 26%),
+    radial-gradient(circle at 14% 82%,rgba(82,100,81,.13),transparent 28%),
+    repeating-linear-gradient(135deg,transparent 0 34px,rgba(143,24,34,.028) 35px 36px);
+}
+.rp-screen.step-addons::after{
+  background:
+    radial-gradient(circle at 88% 10%,rgba(216,183,123,.24),transparent 27%),
+    radial-gradient(circle at 6% 88%,rgba(143,24,34,.12),transparent 30%),
+    repeating-radial-gradient(circle at 104% 108%,transparent 0 34px,rgba(143,24,34,.032) 35px 36px,transparent 37px 68px);
+}
+.rp-screen.step-lead::after,.rp-screen.step-calendar::after{
+  background:
+    radial-gradient(circle at 86% 16%,rgba(216,183,123,.22),transparent 26%),
+    radial-gradient(circle at 13% 88%,rgba(82,100,81,.11),transparent 30%),
+    linear-gradient(160deg,transparent 0 61%,rgba(255,255,255,.34) 61.2% 69%,transparent 69.2%);
+}
+.rp-screen:not(.step-service) .rp-screen-scroll{padding:22px 18px 24px;}
+.rp-screen:not(.step-service) .rp-center{
+  margin-block:auto;
+  max-width:520px;
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.rp-screen:not(.step-service) .rp-center::before{display:none!important;}
+
+/* Editorial consultation panel */
+.rp-consult-panel{
+  position:relative;
+  overflow:hidden;
+  padding:22px 18px 18px;
+  border:1px solid rgba(100,67,40,.14);
+  border-radius:30px;
+  background:
+    linear-gradient(145deg,rgba(255,253,248,.94),rgba(250,241,227,.82)),
+    rgba(255,250,242,.86);
+  box-shadow:
+    0 28px 70px rgba(65,40,21,.13),
+    0 5px 16px rgba(65,40,21,.06),
+    inset 0 1px 0 rgba(255,255,255,.98);
+  backdrop-filter:blur(18px) saturate(1.12);
+  -webkit-backdrop-filter:blur(18px) saturate(1.12);
+}
+.rp-consult-panel::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;height:5px;
+  background:linear-gradient(90deg,var(--wine-deep),var(--wine-bright) 52%,var(--clay) 76%,var(--champagne));
+}
+.rp-consult-panel::after{
+  content:"RP";
+  position:absolute;
+  right:-12px;
+  top:-25px;
+  font-family:"DM Serif Display",Georgia,serif;
+  font-size:118px;
+  line-height:1;
+  letter-spacing:-.09em;
+  color:rgba(143,24,34,.035);
+  pointer-events:none;
+}
+.rp-panel-ribbon{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 9px;
+  color:var(--wine);
+  font-size:8.5px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+}
+.rp-panel-ribbon span{display:inline-flex;align-items:center;gap:8px;}
+.rp-panel-ribbon span::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--wine),var(--clay));}
+.rp-panel-ribbon b{
+  color:#7c6e61;
+  font-size:8px;
+  padding:5px 8px;
+  border:1px solid rgba(100,67,40,.10);
+  border-radius:999px;
+  background:rgba(255,255,255,.55);
+}
+.rp-consult-panel .rp-eyebrow{margin:0 0 7px;color:#a85b51;font-size:9px;}
+.rp-consult-panel .rp-eyebrow::before{display:none;}
+.rp-consult-panel h2{position:relative;z-index:2;margin-bottom:7px;font-size:clamp(29px,7.4vw,38px);}
+.rp-consult-panel .rp-sub{position:relative;z-index:2;margin-bottom:15px;font-size:12.5px;line-height:1.48;max-width:38ch;}
+.rp-consult-note{
+  display:flex;align-items:center;gap:7px;
+  margin:0 0 13px;
+  font-size:10.5px;font-weight:750;color:#75695e;
+}
+.rp-consult-note i{width:7px;height:7px;border-radius:50%;background:var(--forest);box-shadow:0 0 0 4px rgba(82,100,81,.11);}
+
+/* Rich emblem system */
+.rp-emblem{
+  position:relative;
+  width:52px;height:52px;min-width:52px;
+  display:grid;place-items:center;
+  border-radius:18px;
+  color:var(--wine);
+  background:
+    radial-gradient(circle at 30% 20%,rgba(255,255,255,.96),transparent 33%),
+    linear-gradient(145deg,#fffdf8 0%,#f4e5d3 100%);
+  border:1px solid rgba(126,84,48,.14);
+  box-shadow:
+    0 9px 20px rgba(67,40,20,.10),
+    inset 0 1px 0 #fff,
+    inset 0 -7px 16px rgba(186,126,91,.05);
+}
+.rp-emblem::before{
+  content:"";position:absolute;inset:5px;border-radius:14px;
+  border:1px solid rgba(143,24,34,.10);
+}
+.rp-emblem::after{
+  content:"";position:absolute;right:5px;top:5px;width:7px;height:7px;border-radius:50%;
+  background:linear-gradient(145deg,#f8d79a,#bd8b3d);
+  box-shadow:0 0 0 3px rgba(216,183,123,.14);
+}
+.rp-emblem .rp-ic{width:23px;height:23px;stroke-width:1.65;position:relative;z-index:2;}
+.rp-emblem.is-dark{
+  color:#fff8ee;
+  background:linear-gradient(145deg,var(--wine-bright),var(--wine-deep));
+  border-color:rgba(92,14,21,.42);
+  box-shadow:0 12px 24px rgba(103,16,23,.22),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.rp-emblem.is-dark::before{border-color:rgba(255,255,255,.18);}
+
+/* Service menu: outcome-led premium product cards */
+.rp-sheet{padding:17px 14px 14px;border-radius:32px;background:rgba(255,251,244,.965);}
+.rp-sheet .rp-start-service-q{font-size:20px;margin-bottom:11px;}
+.rp-service-stack{display:grid;gap:8px;position:relative;z-index:2;}
+.rp-service-card{
+  width:100%;min-height:66px;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:11px;
+  padding:9px 10px;
+  text-align:left;
+  border:1px solid rgba(103,68,39,.13);
+  border-radius:19px;
+  background:
+    radial-gradient(170px 100px at 103% -10%,rgba(216,183,123,.15),transparent 72%),
+    linear-gradient(145deg,rgba(255,255,255,.97),rgba(252,245,235,.92));
+  box-shadow:0 10px 24px rgba(54,34,18,.085),inset 0 1px 0 #fff;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.rp-service-card::before{
+  content:"";position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:0 4px 4px 0;
+  background:linear-gradient(180deg,var(--wine-bright),var(--wine-deep));opacity:.18;
+  transition:opacity .18s,width .18s;
+}
+.rp-service-card:hover,.rp-service-card:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(143,24,34,.36);
+  box-shadow:0 16px 32px rgba(54,34,18,.14),0 0 0 3px rgba(143,24,34,.045),inset 0 1px 0 #fff;
+}
+.rp-service-card:hover::before{opacity:1;width:4px;}
+.rp-service-card.is-featured{
+  border-color:rgba(143,24,34,.50);
+  background:
+    radial-gradient(180px 100px at 100% 0%,rgba(199,115,92,.15),transparent 72%),
+    linear-gradient(145deg,#fffdf8,#fff1ec);
+  box-shadow:0 14px 30px rgba(115,21,28,.13),inset 0 1px 0 #fff;
+}
+.rp-service-card.is-featured::before{opacity:1;width:4px;}
+.rp-service-card .rp-emblem{width:46px;height:46px;min-width:46px;border-radius:16px;}
+.rp-service-card .rp-emblem .rp-ic{width:21px;height:21px;}
+.rp-service-copy{position:relative;z-index:2;min-width:0;flex:1;display:flex;flex-direction:column;}
+.rp-service-copy small{font-size:7.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#a85b51;margin-bottom:2px;}
+.rp-service-copy strong{font-size:13px;line-height:1.22;letter-spacing:-.015em;}
+.rp-service-copy span{font-size:9.5px;line-height:1.28;color:#75695e;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-service-action{
+  position:relative;z-index:2;
+  width:32px;height:32px;min-width:32px;border-radius:50%;display:grid;place-items:center;
+  color:var(--wine);background:linear-gradient(145deg,#fff7f4,#f4ddd7);
+  border:1px solid rgba(143,24,34,.08);box-shadow:inset 0 1px 0 #fff;
+}
+.rp-service-action .rp-ic{width:15px;height:15px;}
+.rp-service-watermark{
+  position:absolute;right:28px;bottom:-18px;color:rgba(143,24,34,.035);transform:rotate(-8deg);pointer-events:none;
+}
+.rp-service-watermark .rp-ic{width:76px;height:76px;stroke-width:1.1;}
+.rp-service-badge{
+  position:absolute;right:12px;top:-8px;z-index:5;
+  padding:4px 9px;border-radius:999px;
+  color:#fff8eb;background:linear-gradient(135deg,#2b2520,#4a3d32);
+  border:1px solid rgba(216,183,123,.54);
+  box-shadow:0 6px 15px rgba(24,17,12,.19);
+  font-size:7.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+}
+.rp-live-status{position:relative;overflow:hidden;}
+.rp-live-status i{width:7px;height:7px;border-radius:50%;background:#7aa47c;box-shadow:0 0 0 3px rgba(122,164,124,.18);}
+.rp-live-status::after{content:"";position:absolute;inset:-100% auto -100% -30%;width:28%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.20),transparent);transform:skewX(-18deg);animation:rpLiveSweep 4.6s ease-in-out infinite;}
+@keyframes rpLiveSweep{0%,68%{left:-30%}88%,100%{left:125%}}
+
+/* Luxe decision cards */
+.rp-choice-stack{position:relative;z-index:2;display:grid;gap:9px;}
+.rp-luxe-card{
+  width:100%;min-height:66px;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:12px;
+  padding:9px 10px;
+  text-align:left;
+  border:1px solid rgba(100,67,40,.13);
+  border-radius:20px;
+  background:
+    radial-gradient(140px 90px at 104% -20%,rgba(216,183,123,.13),transparent 74%),
+    linear-gradient(145deg,rgba(255,255,255,.97),rgba(250,242,232,.90));
+  box-shadow:0 11px 24px rgba(57,35,18,.085),inset 0 1px 0 #fff;
+  transition:transform .17s ease,border-color .17s ease,box-shadow .17s ease,background .17s ease;
+}
+.rp-luxe-card::before{
+  content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 4px 4px 0;
+  background:linear-gradient(180deg,var(--wine-bright),var(--clay));opacity:.20;transition:opacity .17s,width .17s;
+}
+.rp-luxe-card:hover,.rp-luxe-card:focus-visible{
+  transform:translateY(-2px);border-color:rgba(143,24,34,.34);
+  box-shadow:0 16px 34px rgba(57,35,18,.13),0 0 0 3px rgba(143,24,34,.045),inset 0 1px 0 #fff;
+}
+.rp-luxe-card:hover::before{opacity:1;width:4px;}
+.rp-luxe-card.is-chosen,.rp-service-card.is-chosen,.rp-bath-card.is-chosen,.rp-condition-card.is-chosen{
+  border-color:var(--wine)!important;
+  background:linear-gradient(145deg,#fff9f5,#f8dfd8)!important;
+  transform:translateY(-1px) scale(.992)!important;
+  box-shadow:0 15px 34px rgba(143,24,34,.17),0 0 0 3px rgba(143,24,34,.08),inset 0 1px 0 #fff!important;
+}
+.rp-luxe-card.is-chosen::before,.rp-service-card.is-chosen::before{opacity:1;width:5px;}
+.rp-luxe-card.is-chosen .rp-number-medal,.rp-service-card.is-chosen .rp-emblem{
+  color:#fff;background:linear-gradient(145deg,var(--wine-bright),var(--wine-deep));
+}
+.rp-number-medal{
+  width:52px;height:52px;min-width:52px;border-radius:18px;
+  display:grid;place-items:center;
+  font-family:"DM Serif Display",Georgia,serif;font-size:26px;line-height:1;color:var(--wine);
+  background:linear-gradient(145deg,#fffdf8,#f2e0cb);
+  border:1px solid rgba(126,84,48,.14);
+  box-shadow:0 8px 18px rgba(67,40,20,.09),inset 0 1px 0 #fff;
+  transition:background .17s,color .17s;
+}
+.rp-luxe-copy{position:relative;z-index:2;flex:1;min-width:0;}
+.rp-luxe-copy small{display:block;font-size:7.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#a85b51;margin-bottom:2px;}
+.rp-luxe-copy strong{display:block;font-size:14px;line-height:1.24;letter-spacing:-.012em;}
+.rp-luxe-copy span{display:block;font-size:10px;line-height:1.34;color:#776b61;margin-top:2px;}
+.rp-price-seal{
+  position:relative;z-index:2;min-width:66px;padding:7px 8px;border-radius:14px;text-align:center;
+  background:linear-gradient(145deg,#2c2621,#473a31);color:#fff8ec;
+  border:1px solid rgba(216,183,123,.44);box-shadow:0 7px 16px rgba(40,28,19,.15),inset 0 1px 0 rgba(255,255,255,.11);
+}
+.rp-price-seal small{display:block;font-size:6.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#d9c4a2;}
+.rp-price-seal strong{display:block;font-family:"DM Serif Display",Georgia,serif;font-size:18px;font-weight:400;line-height:1.05;margin-top:1px;}
+.rp-card-arrow{
+  width:28px;height:28px;min-width:28px;border-radius:50%;display:grid;place-items:center;
+  color:var(--wine);background:linear-gradient(145deg,#fff5f2,#f3ddd7);border:1px solid rgba(143,24,34,.08);
+}
+.rp-card-arrow .rp-ic{width:14px;height:14px;}
+.rp-card-badge{
+  position:absolute;right:9px;top:7px;font-size:6.8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;
+  padding:3px 6px;border-radius:999px;background:#eee0c4;color:#6d4a20;border:1px solid rgba(143,103,52,.12);
+}
+
+/* Bathroom gallery tiles */
+.rp-bath-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rp-bath-card{
+  min-height:114px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;
+  padding:13px;border-radius:22px;text-align:left;
+  border:1px solid rgba(100,67,40,.13);
+  background:
+    radial-gradient(circle at 86% 18%,rgba(216,183,123,.20) 0 13%,transparent 13.5%),
+    radial-gradient(circle at 72% 30%,rgba(255,255,255,.84) 0 6%,transparent 6.5%),
+    linear-gradient(145deg,rgba(255,255,255,.97),rgba(245,235,222,.91));
+  box-shadow:0 12px 26px rgba(57,35,18,.085),inset 0 1px 0 #fff;
+  transition:transform .17s,border-color .17s,box-shadow .17s;
+}
+.rp-bath-card:hover{transform:translateY(-2px);border-color:rgba(143,24,34,.34);box-shadow:0 17px 34px rgba(57,35,18,.13),inset 0 1px 0 #fff;}
+.rp-bath-top{display:flex;align-items:flex-start;justify-content:space-between;width:100%;}
+.rp-bath-number{font-family:"DM Serif Display",Georgia,serif;font-size:43px;line-height:.9;color:var(--wine);letter-spacing:-.05em;}
+.rp-bath-orbs{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;max-width:46px;}
+.rp-bath-orbs i{width:8px;height:8px;border-radius:50%;background:linear-gradient(145deg,#d59a83,#9f2027);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);}
+.rp-bath-copy strong{display:block;font-size:13px;}
+.rp-bath-copy span{display:block;font-size:9.5px;color:#786c61;margin-top:2px;}
+
+/* Condition cards — reassuring visual scale, not judgemental photos */
+.rp-condition-stack{position:relative;z-index:2;display:grid;gap:10px;}
+.rp-condition-card{
+  width:100%;min-height:78px;display:grid;grid-template-columns:62px 1fr auto;align-items:center;gap:11px;
+  position:relative;overflow:hidden;padding:10px 11px;border-radius:21px;text-align:left;
+  border:1px solid rgba(100,67,40,.13);
+  background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(249,240,229,.91));
+  box-shadow:0 11px 25px rgba(57,35,18,.085),inset 0 1px 0 #fff;
+  transition:transform .17s,border-color .17s,box-shadow .17s;
+}
+.rp-condition-card:hover{transform:translateY(-2px);border-color:rgba(143,24,34,.34);box-shadow:0 16px 34px rgba(57,35,18,.13),inset 0 1px 0 #fff;}
+.rp-condition-meter{height:52px;border-radius:17px;padding:10px 9px;display:flex;align-items:flex-end;gap:4px;background:linear-gradient(145deg,#fffdf8,#f1dfca);border:1px solid rgba(126,84,48,.13);}
+.rp-condition-meter i{width:10px;border-radius:5px 5px 3px 3px;background:#ded2c2;box-shadow:inset 0 1px 0 rgba(255,255,255,.65);}
+.rp-condition-meter i:nth-child(1){height:11px}.rp-condition-meter i:nth-child(2){height:20px}.rp-condition-meter i:nth-child(3){height:30px}
+.rp-condition-card.level-1 .rp-condition-meter i:nth-child(1),
+.rp-condition-card.level-2 .rp-condition-meter i:nth-child(-n+2),
+.rp-condition-card.level-3 .rp-condition-meter i{background:linear-gradient(180deg,var(--clay),var(--wine));}
+.rp-condition-copy strong{display:block;font-size:14px;line-height:1.2;}
+.rp-condition-copy span{display:block;font-size:10px;line-height:1.34;color:#786c61;margin-top:3px;}
+.rp-condition-tag{font-size:7px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;padding:5px 7px;border-radius:999px;background:#f0e3d3;color:#80634e;white-space:nowrap;}
+
+/* Add-ons become premium upgrades, not another stack of generic rows. */
+.rp-addon-stack{display:grid;gap:8px;position:relative;z-index:2;}
+.rp-addon-card{
+  width:100%;min-height:64px;position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:10px;padding:8px 10px;text-align:left;
+  border:1px solid rgba(100,67,40,.13);border-radius:19px;
+  background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(249,240,229,.91));
+  box-shadow:0 10px 23px rgba(57,35,18,.08),inset 0 1px 0 #fff;
+  transition:transform .17s,border-color .17s,box-shadow .17s;
+}
+.rp-addon-card:hover{transform:translateY(-2px);border-color:rgba(143,24,34,.34);box-shadow:0 15px 32px rgba(57,35,18,.13),inset 0 1px 0 #fff;}
+.rp-addon-card .rp-emblem{width:44px;height:44px;min-width:44px;border-radius:15px;}
+.rp-addon-card .rp-emblem .rp-ic{width:20px;height:20px;}
+.rp-addon-copy{flex:1;min-width:0;}
+.rp-addon-copy strong{display:block;font-size:13px;line-height:1.2;}
+.rp-addon-copy span{display:block;font-size:9.4px;line-height:1.3;color:#786c61;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-addon-price{font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:#7a5541;padding:6px 7px;border-radius:999px;background:#f2e3d1;border:1px solid rgba(126,84,48,.09);white-space:nowrap;}
+.rp-addon-card.is-selected{border-color:rgba(143,24,34,.48);background:linear-gradient(145deg,#fff9f5,#f8e4de);box-shadow:0 13px 28px rgba(143,24,34,.12),inset 4px 0 0 var(--wine);}
+.rp-addon-card.is-selected .rp-emblem{color:#fff;background:linear-gradient(145deg,var(--wine-bright),var(--wine-deep));}
+.rp-addon-summary{font-size:9px;font-weight:850;color:var(--wine);text-align:right;white-space:nowrap;}
+.rp-addon-summary small{display:block;font-size:7px;color:#887a6e;text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+.rp-expand{
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(255,253,248,.98),rgba(249,237,224,.95));
+  border-color:rgba(143,24,34,.40);
+  box-shadow:0 17px 38px rgba(80,38,26,.13),inset 4px 0 0 var(--wine),inset 0 1px 0 #fff;
+}
+.rp-expand-head{padding:11px 12px;}
+.rp-expand-head .rp-emblem{width:44px;height:44px;min-width:44px;border-radius:15px;}
+.rp-expand-body{padding:0 12px 13px;}
+.rp-pill{
+  border-radius:15px;
+  background:linear-gradient(145deg,#fff,#f7ecdf);
+  box-shadow:0 7px 15px rgba(57,35,18,.055),inset 0 1px 0 #fff;
+}
+.rp-pill.is-selected{background:linear-gradient(145deg,var(--wine-bright),var(--wine-deep));box-shadow:0 10px 19px rgba(107,16,23,.20),inset 0 1px 0 rgba(255,255,255,.20);}
+
+/* Premium checkbox/toggle experiences */
+.rp-checkbox-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(248,238,225,.91));
+  border-radius:20px;border-color:rgba(100,67,40,.13);
+  box-shadow:0 10px 23px rgba(57,35,18,.075),inset 0 1px 0 #fff;
+}
+.rp-checkbox-card::after{content:"";position:absolute;right:-24px;bottom:-28px;width:76px;height:76px;border-radius:50%;border:1px solid rgba(143,24,34,.045);box-shadow:0 0 0 14px rgba(143,24,34,.025);}
+.rp-checkbox-card input{appearance:none;-webkit-appearance:none;width:23px;height:23px;border-radius:8px;border:1.5px solid rgba(143,24,34,.32);background:#fff;display:grid;place-items:center;}
+.rp-checkbox-card input::after{content:"✓";font-size:14px;font-weight:900;color:#fff;transform:scale(0);transition:transform .15s ease;}
+.rp-checkbox-card input:checked{background:linear-gradient(145deg,var(--wine-bright),var(--wine-deep));border-color:var(--wine);}
+.rp-checkbox-card input:checked::after{transform:scale(1);}
+
+/* Primary CTA now feels like a premium reservation action. */
+.rp-primary{
+  min-height:58px;border-radius:19px;
+  background:
+    radial-gradient(120px 70px at 16% -20%,rgba(255,255,255,.22),transparent 72%),
+    linear-gradient(135deg,#d33c45 0%,#a51d28 45%,#6d1018 100%);
+  border:1px solid rgba(83,8,14,.44);
+  box-shadow:0 16px 34px rgba(103,16,23,.30),0 4px 9px rgba(103,16,23,.14),inset 0 1px 0 rgba(255,255,255,.30),inset 0 -7px 14px rgba(59,5,10,.12);
+  text-shadow:0 1px 2px rgba(65,5,10,.24);
+}
+.rp-primary::before{background:linear-gradient(110deg,transparent 18%,rgba(255,255,255,.24) 44%,transparent 68%);}
+.rp-primary::after{
+  content:"→";
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
+  font-size:17px;
+}
+.rp-primary:hover{transform:translateY(-2px);box-shadow:0 20px 40px rgba(103,16,23,.35),0 5px 12px rgba(103,16,23,.15),inset 0 1px 0 rgba(255,255,255,.30);}
+.rp-live-chip{padding:0 4px;}
+.rp-live-chip strong{color:var(--wine);}
+
+/* Existing estimate and lead screens inherit the stronger wrapper. */
+.rp-screen.step-estimate .rp-screen-scroll{padding-top:18px;}
+.rp-screen.step-estimate .rp-center{max-width:520px;}
+.rp-screen.step-lead .rp-consult-panel{padding-bottom:15px;}
+.rp-lead-field input,.rp-lead-field textarea{background:linear-gradient(145deg,#fff,#fbf3e8);border-radius:16px;box-shadow:0 7px 16px rgba(57,35,18,.045),inset 0 1px 0 #fff;}
+.rp-privacy-note{padding:8px 10px;border-radius:13px;background:rgba(255,255,255,.45);border:1px solid rgba(100,67,40,.08);}
+
+/* Gentle choice confirmation before the next consultation step. */
+@keyframes rpChoiceCheck{0%{transform:scale(.88)}60%{transform:scale(1.025)}100%{transform:scale(.99)}}
+.is-chosen{animation:rpChoiceCheck .19s ease both;pointer-events:none;}
+
+@media(max-height:760px){
+  .rp-screen:not(.step-service) .rp-screen-scroll{padding:12px 14px 14px;}
+  .rp-consult-panel{padding:17px 14px 14px;border-radius:25px;}
+  .rp-panel-ribbon{margin-bottom:6px;}
+  .rp-consult-panel h2{font-size:28px;margin-bottom:5px;}
+  .rp-consult-panel .rp-sub{font-size:11.5px;margin-bottom:11px;line-height:1.38;}
+  .rp-choice-stack,.rp-condition-stack{gap:7px;}
+  .rp-luxe-card{min-height:57px;padding:7px 8px;border-radius:17px;gap:9px;}
+  .rp-number-medal{width:44px;height:44px;min-width:44px;border-radius:15px;font-size:23px;}
+  .rp-luxe-copy strong{font-size:13px;}.rp-luxe-copy span{font-size:9px;}
+  .rp-price-seal{min-width:61px;padding:6px 7px;}.rp-price-seal strong{font-size:16px;}
+  .rp-bath-card{min-height:96px;padding:11px;border-radius:19px;}
+  .rp-bath-number{font-size:37px;}
+  .rp-condition-card{min-height:66px;padding:8px 9px;grid-template-columns:54px 1fr auto;gap:9px;border-radius:18px;}
+  .rp-condition-meter{height:46px;border-radius:14px;padding:8px 7px;}
+  .rp-addon-stack{gap:6px;}.rp-addon-card{min-height:54px;padding:6px 8px;border-radius:17px;}
+  .rp-addon-card .rp-emblem{width:39px;height:39px;min-width:39px;border-radius:13px;}
+  .rp-addon-copy strong{font-size:12px;}.rp-addon-copy span{font-size:8.6px;}
+  .rp-service-card{min-height:56px;padding:7px 8px;border-radius:17px;}
+  .rp-service-card .rp-emblem{width:40px;height:40px;min-width:40px;border-radius:14px;}
+  .rp-service-copy strong{font-size:12.5px;}.rp-service-copy span{display:block!important;font-size:8.5px;}
+  .rp-sheet{padding:13px 12px 11px;}.rp-sheet .rp-start-service-q{font-size:18px;margin-bottom:8px;}
+  .rp-sheet .rp-fineprint{display:none;}
+  .rp-primary{min-height:52px;}
+}
+@media(max-width:390px){
+  .rp-screen:not(.step-service) .rp-screen-scroll{padding-left:13px;padding-right:13px;}
+  .rp-consult-panel{padding-left:13px;padding-right:13px;}
+  .rp-luxe-card{gap:8px;}
+  .rp-number-medal{width:46px;height:46px;min-width:46px;}
+  .rp-luxe-copy span{font-size:9.2px;}
+  .rp-price-seal{min-width:60px;}
+  .rp-condition-tag{display:none;}
+}
+
+
+/* Keep the two densest screens inside the one-screen consultation promise. */
+.rp-screen.step-addons .rp-screen-scroll{padding-top:10px;padding-bottom:8px;}
+.rp-screen.step-addons .rp-consult-panel{padding:16px 13px 12px;border-radius:25px;}
+.rp-screen.step-addons .rp-panel-ribbon{margin-bottom:5px;}
+.rp-screen.step-addons .rp-consult-panel .rp-eyebrow{margin-bottom:3px;}
+.rp-screen.step-addons .rp-consult-panel h2{font-size:29px;line-height:.98;margin-bottom:4px;}
+.rp-screen.step-addons .rp-consult-panel .rp-sub{font-size:10.8px;line-height:1.35;margin-bottom:9px;}
+.rp-screen.step-addons .rp-addon-stack{gap:5px;}
+.rp-screen.step-addons .rp-addon-card{min-height:49px;padding:5px 7px;border-radius:16px;gap:8px;}
+.rp-screen.step-addons .rp-addon-card .rp-emblem{width:36px;height:36px;min-width:36px;border-radius:12px;}
+.rp-screen.step-addons .rp-addon-card .rp-emblem .rp-ic{width:17px;height:17px;}
+.rp-screen.step-addons .rp-addon-copy strong{font-size:11.7px;}
+.rp-screen.step-addons .rp-addon-copy span{font-size:8.1px;margin-top:1px;}
+.rp-screen.step-addons .rp-addon-price{font-size:7px;padding:5px 6px;}
+.rp-screen.step-addons .rp-checkbox-card{padding:8px 9px;margin-top:6px;border-radius:16px;gap:9px;}
+.rp-screen.step-addons .rp-checkbox-card input{width:19px;height:19px;border-radius:6px;}
+.rp-screen.step-addons .rp-checkbox-card strong{font-size:11.7px;}
+.rp-screen.step-addons .rp-checkbox-card span{font-size:8.8px;line-height:1.25;margin-top:1px;}
+
+.rp-screen.step-lead .rp-screen-scroll{padding-top:10px;padding-bottom:8px;}
+.rp-screen.step-lead .rp-consult-panel{padding:16px 13px 11px;border-radius:25px;}
+.rp-screen.step-lead .rp-panel-ribbon{margin-bottom:4px;}
+.rp-screen.step-lead .rp-consult-panel .rp-eyebrow{margin-bottom:2px;}
+.rp-screen.step-lead .rp-consult-panel h2{font-size:28px;line-height:1;margin-bottom:3px;}
+.rp-screen.step-lead .rp-consult-panel .rp-sub{font-size:10.8px;line-height:1.3;margin-bottom:8px;}
+.rp-screen.step-lead .rp-lead-form{gap:5px;}
+.rp-screen.step-lead .rp-lead-field label{font-size:8px;margin-bottom:2px;}
+.rp-screen.step-lead .rp-lead-field input,
+.rp-screen.step-lead .rp-lead-field textarea{padding:7px 9px;border-radius:12px;font-size:13px;}
+.rp-screen.step-lead .rp-lead-field textarea{min-height:35px;max-height:42px;}
+.rp-screen.step-lead .rp-lead-row{gap:5px;}
+.rp-screen.step-lead .rp-privacy-note{font-size:8.7px;line-height:1.3;margin-top:6px;padding:6px 8px;}
+
+@media(max-height:760px){
+  .rp-screen.step-addons .rp-panel-ribbon b,.rp-screen.step-lead .rp-panel-ribbon b{display:none;}
+  .rp-screen.step-addons .rp-consult-panel .rp-eyebrow,.rp-screen.step-lead .rp-consult-panel .rp-eyebrow{display:none;}
+  .rp-screen.step-addons .rp-screen-scroll,.rp-screen.step-lead .rp-screen-scroll{padding-top:6px;padding-bottom:5px;}
+  .rp-screen.step-addons .rp-consult-panel,.rp-screen.step-lead .rp-consult-panel{padding-top:13px;padding-bottom:9px;}
+  .rp-screen.step-addons .rp-panel-ribbon,.rp-screen.step-lead .rp-panel-ribbon{margin-bottom:4px;}
+  .rp-screen.step-addons .rp-consult-panel h2{font-size:26px;}
+  .rp-screen.step-addons .rp-consult-panel .rp-sub{margin-bottom:6px;}
+  .rp-screen.step-addons .rp-addon-card{min-height:45px;}
+  .rp-screen.step-addons .rp-addon-card .rp-emblem{width:32px;height:32px;min-width:32px;}
+  .rp-screen.step-addons .rp-addon-copy span{display:none;}
+  .rp-screen.step-addons .rp-checkbox-card span{display:none;}
+  .rp-screen.step-lead .rp-consult-panel h2{font-size:25px;}
+  .rp-screen.step-lead .rp-consult-panel .rp-sub{margin-bottom:5px;}
+  .rp-screen.step-lead .rp-lead-form{gap:3px;}
+  .rp-screen.step-lead .rp-lead-field input,.rp-screen.step-lead .rp-lead-field textarea{padding:6px 8px;font-size:12px;}
+  .rp-screen.step-lead .rp-privacy-note{display:none;}
+}
+
 </style>
 </head>
 <body>
@@ -1113,7 +1634,7 @@ function rpBack() {
    ========================================================================= */
 function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge }) {
   return `
-    <button class="rp-row ${featured ? "is-featured" : ""}" onclick="${onclick}">
+    <button type="button" class="rp-row ${featured ? "is-featured" : ""}" onclick="${onclick}">
       ${badge ? `<span class="badge">${badge}</span>` : ""}
       ${icon ? rpChip(icon) : ""}
       <span class="rp-row-main">
@@ -1122,6 +1643,59 @@ function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge })
       </span>
       ${val ? `<span class="rp-row-val">${val}${valNote ? `<small>${valNote}</small>` : ""}</span>` : `<span class="rp-row-chev">${rpIcon("chev","rp-ic rp-ic-sm")}</span>`}
     </button>`;
+}
+function rpEmblem(icon, dark = false) {
+  return `<span class="rp-emblem ${dark ? "is-dark" : ""}">${rpIcon(icon)}</span>`;
+}
+function rpChoose(button, action) {
+  if (!button || button.dataset.committing === "1") return;
+  button.dataset.committing = "1";
+  button.classList.add("is-chosen");
+  try { if (navigator.vibrate) navigator.vibrate(8); } catch (_) {}
+  window.setTimeout(action, 175);
+}
+function rpPanel({eyebrow, label, title, sub = "", note = "", body = ""}) {
+  return `<div class="rp-center"><section class="rp-consult-panel">
+    <div class="rp-panel-ribbon"><span>${label}</span><b>${rpStepLabel()}</b></div>
+    ${eyebrow}
+    <h2>${title}</h2>
+    ${sub ? `<p class="rp-sub">${sub}</p>` : ""}
+    ${note ? `<p class="rp-consult-note"><i></i>${note}</p>` : ""}
+    ${body}
+  </section></div>`;
+}
+function rpServiceCard({service, icon, kicker, title, desc, featured = false, badge = ""}) {
+  return `<button type="button" class="rp-service-card ${featured ? "is-featured" : ""}" onclick="rpChoose(this,()=>rpSelectService('${service}'))">
+    ${badge ? `<span class="rp-service-badge">${badge}</span>` : ""}
+    ${rpEmblem(icon, featured)}
+    <span class="rp-service-copy"><small>${kicker}</small><strong>${title}</strong><span>${desc}</span></span>
+    <span class="rp-service-action">${rpIcon("chev")}</span>
+    <span class="rp-service-watermark">${rpIcon(icon)}</span>
+  </button>`;
+}
+function rpNumberChoice({number, label, desc, price = "", kicker = "Home size", badge = "", onclick}) {
+  return `<button type="button" class="rp-luxe-card" onclick="rpChoose(this,()=>${onclick})">
+    ${badge ? `<span class="rp-card-badge">${badge}</span>` : ""}
+    <span class="rp-number-medal">${number}</span>
+    <span class="rp-luxe-copy"><small>${kicker}</small><strong>${label}</strong><span>${desc}</span></span>
+    ${price ? `<span class="rp-price-seal"><small>Your price</small><strong>${price}</strong></span>` : `<span class="rp-card-arrow">${rpIcon("chev")}</span>`}
+  </button>`;
+}
+function rpBathroomChoice(n) {
+  const label = `${n}${n === 4 ? "+" : ""} bathroom${n > 1 ? "s" : ""}`;
+  const desc = ["Simple visit planning","Our most common layout","Extra time reserved","Large or multi-level home"][n-1];
+  const orbs = Array.from({length:n},()=>"<i></i>").join("");
+  return `<button type="button" class="rp-bath-card" onclick="rpChoose(this,()=>rpSelectBathrooms(${n}))">
+    <span class="rp-bath-top"><span class="rp-bath-number">${n}${n === 4 ? "+" : ""}</span><span class="rp-bath-orbs">${orbs}</span></span>
+    <span class="rp-bath-copy"><strong>${label}</strong><span>${desc}</span></span>
+  </button>`;
+}
+function rpConditionChoice({level, value, title, desc, tag}) {
+  return `<button type="button" class="rp-condition-card level-${level}" onclick="rpChoose(this,()=>rpSelectCondition('${value}'))">
+    <span class="rp-condition-meter"><i></i><i></i><i></i></span>
+    <span class="rp-condition-copy"><strong>${title}</strong><span>${desc}</span></span>
+    <span class="rp-condition-tag">${tag}</span>
+  </button>`;
 }
 
 function rpScreenHtml() {
@@ -1137,128 +1711,85 @@ function rpScreenHtml() {
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 37+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
-          <span>${rpIcon("zap","rp-ic rp-ic-sm")} Veteran-Owned</span>
+          <span class="rp-live-status"><i></i> Same-Day Openings</span>
         </div>
       </div>
       <div class="rp-sheet">
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What would you like us to transform?</p>
-        <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout')", icon:"home", title:"Factory Reset™ Move-Out Clean", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
-          ${rpRowBtn({ onclick:"rpSelectService('deep')", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance')", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet')", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
+        <div class="rp-service-stack">
+          ${rpServiceCard({service:"moveout",icon:"home",kicker:"Inspection ready",title:"Factory Reset™ Move-Out Clean",desc:"Protect your deposit with a complete top-to-bottom reset.",featured:true,badge:"Most Popular"})}
+          ${rpServiceCard({service:"deep",icon:"droplet",kicker:"Whole-home reset",title:"Deep Cleaning",desc:"A meticulous clean for the home that needs everything handled."})}
+          ${rpServiceCard({service:"maintenance",icon:"repeat",kicker:"Consistently spotless",title:"Maintenance Cleaning",desc:"Reliable recurring care that keeps your home beautifully maintained."})}
+          ${rpServiceCard({service:"carpet",icon:"layers",kicker:"Professional extraction",title:"Carpet Cleaning",desc:"Lift embedded dirt, stains, and odors with pro equipment."})}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — junk hauling, windows, Airbnb turnover, lawn care &amp; more.</p>
-      </div>
-    `};
+      </div>`
+    };
   }
 
   if (rpState.step === "bedrooms") {
     const isTiered = ["moveout", "movein", "deep"].includes(rpState.service);
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How many bedrooms?</h2>
-      <div class="rp-q-gap"></div>
-      <div class="rp-rows">
-        ${[1,2,3,4,5].map(n => rpRowBtn({
-          onclick:`rpSelectBedrooms(${n})`,
-          title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-          val: isTiered ? `$${rpTierPrices[n]}` : ""
-        })).join("")}
-      </div>
-    </div>` };
+    const descriptions = {
+      1:"Apartment, cottage, or compact home",
+      2:"Townhome or smaller family home",
+      3:"Our most commonly booked home size",
+      4:"Larger family home with more living space",
+      5:"Extra-large home — five bedrooms or more"
+    };
+    const cards = [1,2,3,4,5].map(n => rpNumberChoice({
+      number:`${n}${n===5?"+":""}`,
+      label:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
+      desc:descriptions[n],
+      price:isTiered ? `$${rpTierPrices[n]}` : "",
+      badge:n===3 ? "Most common" : "",
+      onclick:`rpSelectBedrooms(${n})`
+    })).join("");
+    return { scroll: rpPanel({eyebrow,label:"Size your service",title:"How many bedrooms?",sub:"Choose the closest match. We’ll reserve the right amount of time for your home.",body:`<div class="rp-choice-stack">${cards}</div>`}) };
   }
 
   if (rpState.step === "bathrooms") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How many bathrooms?</h2>
-      <p class="rp-sub">Helps us plan the visit — it doesn't change your price.</p>
-      <div class="rp-rows">
-        ${[1,2,3,4].map(n => rpRowBtn({
-          onclick:`rpSelectBathrooms(${n})`,
-          title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`
-        })).join("")}
-      </div>
-    </div>` };
+    return { scroll: rpPanel({eyebrow,label:"Plan the visit",title:"How many bathrooms?",sub:"This helps us build the right cleaning plan. It doesn’t change your instant price.",note:"No surprise bathroom fees",body:`<div class="rp-bath-grid">${[1,2,3,4].map(rpBathroomChoice).join("")}</div>`}) };
   }
 
   if (rpState.step === "condition") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>What condition is the home in?</h2>
-      <p class="rp-sub">Helps us prepare the right team — it doesn't change your instant price.</p>
-      <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectCondition('Normal')", title:"Normal", desc:"Regularly maintained, nothing unusual." })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Needs Extra Attention')", title:"Needs Extra Attention", desc:"A bit more buildup than average." })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Build-Up')", title:"Heavy Build-Up", desc:"Years of buildup, or no deep clean in a while." })}
-      </div>
-    </div>` };
+    return { scroll: rpPanel({eyebrow,label:"Prepare your team",title:"What condition is the home in?",sub:"No judgment. This simply helps us arrive prepared with the right products, tools, and expectations.",body:`<div class="rp-condition-stack">
+      ${rpConditionChoice({level:1,value:"Normal",title:"Well Maintained",desc:"Regularly cleaned with ordinary day-to-day buildup.",tag:"Standard"})}
+      ${rpConditionChoice({level:2,value:"Needs Extra Attention",title:"Needs Extra Attention",desc:"Noticeable buildup in several areas or a busy season of life.",tag:"More detail"})}
+      ${rpConditionChoice({level:3,value:"Heavy Build-Up",title:"Heavy Reset",desc:"Long-term buildup or the home hasn’t had a deep clean in a while.",tag:"Full reset"})}
+    </div>`}) };
   }
 
   if (rpState.step === "frequency") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How often would you like cleanings?</h2>
-      <div class="rp-q-gap"></div>
-      <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly')", title:"Weekly", desc:"Our most popular recurring plan." })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly')", title:"Biweekly", desc:"Every two weeks." })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly')", title:"Monthly", desc:"Once-a-month upkeep." })}
-      </div>
-    </div>` };
+    const cards = [
+      {icon:"star",title:"Weekly",desc:"The always-ready-home plan.",badge:"Best result",value:"Weekly"},
+      {icon:"repeat",title:"Biweekly",desc:"The ideal balance for most households.",badge:"Most popular",value:"Biweekly"},
+      {icon:"home",title:"Monthly",desc:"A dependable once-a-month refresh.",badge:"",value:"Monthly"}
+    ].map(item=>`<button type="button" class="rp-luxe-card" onclick="rpChoose(this,()=>rpSelectFrequency('${item.value}'))">
+      ${item.badge?`<span class="rp-card-badge">${item.badge}</span>`:""}${rpEmblem(item.icon)}
+      <span class="rp-luxe-copy"><small>Recurring care</small><strong>${item.title}</strong><span>${item.desc}</span></span>
+      <span class="rp-card-arrow">${rpIcon("chev")}</span>
+    </button>`).join("");
+    return { scroll: rpPanel({eyebrow,label:"Choose your rhythm",title:"How often would you like cleanings?",sub:"Select the cadence that fits your home and lifestyle.",body:`<div class="rp-choice-stack">${cards}</div>`}) };
   }
 
   if (rpState.step === "rooms") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How many rooms need carpet cleaning?</h2>
-      <p class="rp-sub">$75 per room · 2-room minimum</p>
-      <div class="rp-rows">
-        ${[2,3,4,5,6].map(n => rpRowBtn({
-          onclick:`rpSelectCarpetOnlyRooms(${n})`,
-          title:`${n}${n===6?"+":""} rooms`,
-          val:`$${n*75}${n===6?"+":""}`
-        })).join("")}
-      </div>
-    </div>` };
+    const descriptions={2:"Two-room minimum",3:"Three rooms or equivalent area",4:"Four rooms or equivalent area",5:"Five rooms or equivalent area",6:"Six or more rooms"};
+    const cards=[2,3,4,5,6].map(n=>rpNumberChoice({number:`${n}${n===6?"+":""}`,label:`${n}${n===6?"+":""} rooms`,desc:descriptions[n],price:`$${n*75}${n===6?"+":""}`,kicker:"Carpet area",onclick:`rpSelectCarpetOnlyRooms(${n})`})).join("");
+    return { scroll: rpPanel({eyebrow,label:"Measure the project",title:"How many rooms need carpet cleaning?",sub:"Professional hot-water extraction at $75 per room, with a two-room minimum.",body:`<div class="rp-choice-stack">${cards}</div>`}) };
   }
 
   if (rpState.step === "carpetdetails") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>A couple quick details</h2>
-      <div class="rp-q-gap"></div>
-      <label class="rp-checkbox-card">
-        <input type="checkbox" ${rpState.heavySoil ? "checked" : ""} onchange="rpToggleHeavySoil(this.checked)">
-        <div><strong>Heavy soil or staining</strong><span>Deep, ground-in dirt or visible stains.</span></div>
-      </label>
-      <label class="rp-checkbox-card rp-mt">
-        <input type="checkbox" ${rpState.petOdor ? "checked" : ""} onchange="rpTogglePetOdor(this.checked)">
-        <div><strong>Pet odor</strong><span>Odor treatment may need special attention.</span></div>
-      </label>
-    </div>`, footer: `<button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>` };
+    return { scroll: rpPanel({eyebrow,label:"Tailor the treatment",title:"A couple quick details",sub:"Tell us what the carpet is dealing with so we arrive ready.",body:`
+      <label class="rp-checkbox-card"><input type="checkbox" ${rpState.heavySoil ? "checked" : ""} onchange="rpToggleHeavySoil(this.checked)"><div><strong>Heavy soil or staining</strong><span>Deep, ground-in dirt or clearly visible stains.</span></div></label>
+      <label class="rp-checkbox-card rp-mt"><input type="checkbox" ${rpState.petOdor ? "checked" : ""} onchange="rpTogglePetOdor(this.checked)"><div><strong>Pet odor</strong><span>Odor treatment may need special attention.</span></div></label>`}), footer:`<button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>` };
   }
 
   if (rpState.step === "airbnbdetails") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>A few turnover details</h2>
-      <div class="rp-q-gap"></div>
-      <label class="rp-checkbox-card">
-        <input type="checkbox" ${rpState.airbnbLaundry ? "checked" : ""} onchange="rpToggleAirbnbLaundry(this.checked)">
-        <div><strong>Laundry</strong><span>Wash and reset linens between guests.</span></div>
-      </label>
-      <label class="rp-checkbox-card rp-mt">
-        <input type="checkbox" ${rpState.airbnbRestocking ? "checked" : ""} onchange="rpToggleAirbnbRestocking(this.checked)">
-        <div><strong>Restocking</strong><span>Guest supplies restocked by request.</span></div>
-      </label>
-      <label class="rp-checkbox-card rp-mt">
-        <input type="checkbox" ${rpState.airbnbSameDay ? "checked" : ""} onchange="rpToggleAirbnbSameDay(this.checked)">
-        <div><strong>Same-day turnover</strong><span>Checkout and check-in on the same day.</span></div>
-      </label>
-    </div>`, footer: `<button class="rp-primary" onclick="rpAdvance()">See My Quote</button>` };
+    return { scroll: rpPanel({eyebrow,label:"Build the turnover",title:"A few turnover details",sub:"Choose the support your property needs between guests.",body:`
+      <label class="rp-checkbox-card"><input type="checkbox" ${rpState.airbnbLaundry ? "checked" : ""} onchange="rpToggleAirbnbLaundry(this.checked)"><div><strong>Laundry</strong><span>Wash and reset linens between guests.</span></div></label>
+      <label class="rp-checkbox-card rp-mt"><input type="checkbox" ${rpState.airbnbRestocking ? "checked" : ""} onchange="rpToggleAirbnbRestocking(this.checked)"><div><strong>Restocking</strong><span>Guest supplies restocked by request.</span></div></label>
+      <label class="rp-checkbox-card rp-mt"><input type="checkbox" ${rpState.airbnbSameDay ? "checked" : ""} onchange="rpToggleAirbnbSameDay(this.checked)"><div><strong>Same-day turnover</strong><span>Checkout and check-in on the same day.</span></div></label>`}), footer:`<button class="rp-primary" onclick="rpAdvance()">See My Quote</button>` };
   }
 
   if (rpState.step === "addons") return rpAddonsScreen(eyebrow);
@@ -1280,13 +1811,13 @@ function rpAddonsScreen(eyebrow) {
     yard: !!rpState.yardTier
   };
   const cardMeta = {
-    carpet:  { icon: "layers", label: "Carpet Cleaning" },
-    junk:    { icon: "truck",  label: "Junk Haul" },
-    windows: { icon: "window", label: "Exterior Windows" },
-    garage:  { icon: "car",    label: "Garage Floor Wash" },
-    laundry: { icon: "washer", label: "Laundry Service" },
-    fridge:  { icon: "fridge", label: "Refrigerator Interior" },
-    yard:    { icon: "leaf",   label: "Yard Refresh" }
+    carpet:  { icon:"layers", label:"Carpet Cleaning", desc:"Bundle professional extraction with your clean.", price:"From $50" },
+    junk:    { icon:"truck", label:"Junk Haul", desc:"Clear the leftover clutter in the same visit.", price:"From $100" },
+    windows: { icon:"window", label:"Exterior Windows", desc:"Finish the property with brighter exterior glass.", price:"From $100" },
+    garage:  { icon:"car", label:"Garage Floor Wash", desc:"Wash away dirt and vehicle residue.", price:"$100" },
+    laundry: { icon:"washer", label:"Laundry Service", desc:"Washed, dried, and folded while we clean.", price:"$35/load" },
+    fridge:  { icon:"fridge", label:"Refrigerator Interior", desc:"Detailed shelves, drawers, and interior surfaces.", price:"$50" },
+    yard:    { icon:"leaf", label:"Yard Refresh", desc:"Mow, trim, and blow for a finished property.", price:"From $100" }
   };
   function summaryFor(key) {
     if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
@@ -1296,107 +1827,30 @@ function rpAddonsScreen(eyebrow) {
     if (key === "laundry") return "$35/load";
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
     if (key === "yard") {
-      const yardLabels = { normal: "Yard Refresh · $100", overgrown: "Overgrown · $150", xl: "XL Yard · $200", xlOvergrown: "XL Overgrown · from $250" };
+      const yardLabels = { normal:"Yard Refresh · $100", overgrown:"Overgrown · $150", xl:"XL Yard · $200", xlOvergrown:"XL Overgrown · from $250" };
       return yardLabels[rpState.yardTier] || "";
     }
     return "";
   }
   function bodyFor(key) {
-    if (key === "carpet") {
-      return `
-        <p class="rp-tap-note">How many rooms? <span style="color:var(--faint)">· $50 per room</span></p>
-        <div class="rp-pill-grid">
-          ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.addonCarpetRooms === n ? "is-selected" : ""}" onclick="rpSelectAddonCarpetRooms(${n})">${n}${n===6?"+":""}</button>`).join("")}
-        </div>`;
-    }
-    if (key === "junk") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.junkSize === "half" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('half')">Half Truck<br><small>$100</small></button>
-          <button class="rp-pill ${rpState.junkSize === "full" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('full')">Full Truck<br><small>$200</small></button>
-          <button class="rp-pill ${rpState.junkSize === "custom" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('custom')">Large<br><small>Custom Quote</small></button>
-        </div>`;
-    }
-    if (key === "windows") {
-      return `
-        <p class="rp-tap-note">Premium adds screen removal for a fuller clean.</p>
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $100</small></button>
-          <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $200</small></button>
-        </div>`;
-    }
-    if (key === "garage") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Yes<br><small>$100</small></button>
-          <button class="rp-pill ${!rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(false)">No</button>
-        </div>`;
-    }
-    if (key === "yard") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.yardTier === "normal" ? "is-selected" : ""}" onclick="rpSelectYardTier('normal')">Yard Refresh<br><small>Mow, trim &amp; blow · $100</small></button>
-          <button class="rp-pill ${rpState.yardTier === "overgrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('overgrown')">Overgrown<br><small>Tall grass &amp; heavy trim · $150</small></button>
-          <button class="rp-pill ${rpState.yardTier === "xl" ? "is-selected" : ""}" onclick="rpSelectYardTier('xl')">XL Yard<br><small>Large lot · $200</small></button>
-          <button class="rp-pill ${rpState.yardTier === "xlOvergrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('xlOvergrown')">XL Overgrown<br><small>From $250, confirmed on-site</small></button>
-        </div>`;
-    }
-    if (key === "laundry") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.laundryLoads > 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(true)">Yes<br><small>$35/load</small></button>
-          <button class="rp-pill ${rpState.laundryLoads === 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(false)">No</button>
-        </div>`;
-    }
-    if (key === "fridge") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(true)">Yes<br><small>$${rpAddonCatalog.fridge.price}</small></button>
-          <button class="rp-pill ${!rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(false)">No</button>
-        </div>`;
-    }
+    if (key === "carpet") return `<p class="rp-tap-note">How many rooms? <span style="color:var(--faint)">· $50 per room</span></p><div class="rp-pill-grid">${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.addonCarpetRooms === n ? "is-selected" : ""}" onclick="rpSelectAddonCarpetRooms(${n})">${n}${n===6?"+":""}</button>`).join("")}</div>`;
+    if (key === "junk") return `<div class="rp-choice-grid"><button class="rp-pill ${rpState.junkSize === "half" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('half')">Half Truck<br><small>$100</small></button><button class="rp-pill ${rpState.junkSize === "full" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('full')">Full Truck<br><small>$200</small></button><button class="rp-pill ${rpState.junkSize === "custom" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('custom')">Large<br><small>Custom Quote</small></button></div>`;
+    if (key === "windows") return `<p class="rp-tap-note">Premium adds screen removal for a fuller clean.</p><div class="rp-choice-grid"><button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $100</small></button><button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $200</small></button></div>`;
+    if (key === "garage") return `<div class="rp-choice-grid"><button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Yes<br><small>$100</small></button><button class="rp-pill ${!rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(false)">No</button></div>`;
+    if (key === "yard") return `<div class="rp-choice-grid"><button class="rp-pill ${rpState.yardTier === "normal" ? "is-selected" : ""}" onclick="rpSelectYardTier('normal')">Yard Refresh<br><small>Mow, trim &amp; blow · $100</small></button><button class="rp-pill ${rpState.yardTier === "overgrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('overgrown')">Overgrown<br><small>Tall grass &amp; heavy trim · $150</small></button><button class="rp-pill ${rpState.yardTier === "xl" ? "is-selected" : ""}" onclick="rpSelectYardTier('xl')">XL Yard<br><small>Large lot · $200</small></button><button class="rp-pill ${rpState.yardTier === "xlOvergrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('xlOvergrown')">XL Overgrown<br><small>From $250, confirmed on-site</small></button></div>`;
+    if (key === "laundry") return `<div class="rp-choice-grid"><button class="rp-pill ${rpState.laundryLoads > 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(true)">Yes<br><small>$35/load</small></button><button class="rp-pill ${rpState.laundryLoads === 0 ? "is-selected" : ""}" onclick="rpSelectLaundry(false)">No</button></div>`;
+    if (key === "fridge") return `<div class="rp-choice-grid"><button class="rp-pill ${rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(true)">Yes<br><small>$${rpAddonCatalog.fridge.price}</small></button><button class="rp-pill ${!rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(false)">No</button></div>`;
     return "";
   }
-
   const cards = keys.map(key => {
     const meta = cardMeta[key];
     const expanded = rpState.expandedAddon === key;
     const selected = isSelected[key];
-    if (expanded) {
-      return `
-        <div class="rp-expand">
-          <button class="rp-expand-head" onclick="rpCollapseAddon()">
-            ${rpChip(meta.icon)}
-            <span class="rp-row-title">${meta.label}</span>
-            <span class="rp-row-chev" style="transform:rotate(-90deg)">${rpIcon("chev","rp-ic rp-ic-sm")}</span>
-          </button>
-          <div class="rp-expand-body">${bodyFor(key)}</div>
-        </div>`;
-    }
-    if (selected) {
-      return `
-        <button class="rp-row is-selected" onclick="rpExpandAddon('${key}')">
-          ${rpChip(meta.icon)}
-          <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span></span>
-          <span class="rp-row-sum">✓ ${summaryFor(key)} <em>Change</em></span>
-        </button>`;
-    }
-    return rpRowBtn({ onclick:`rpExpandAddon('${key}')`, icon: meta.icon, title: meta.label });
+    if (expanded) return `<div class="rp-expand"><button class="rp-expand-head" onclick="rpCollapseAddon()">${rpEmblem(meta.icon,true)}<span class="rp-row-title">${meta.label}</span><span class="rp-row-chev" style="transform:rotate(-90deg)">${rpIcon("chev","rp-ic rp-ic-sm")}</span></button><div class="rp-expand-body">${bodyFor(key)}</div></div>`;
+    if (selected) return `<button class="rp-addon-card is-selected" onclick="rpExpandAddon('${key}')">${rpEmblem(meta.icon,true)}<span class="rp-addon-copy"><strong>${meta.label}</strong><span>${meta.desc}</span></span><span class="rp-addon-summary">✓ ${summaryFor(key)}<small>Tap to change</small></span></button>`;
+    return `<button class="rp-addon-card" onclick="rpExpandAddon('${key}')">${rpEmblem(meta.icon)}<span class="rp-addon-copy"><strong>${meta.label}</strong><span>${meta.desc}</span></span><span class="rp-addon-price">${meta.price}</span></button>`;
   }).join("");
-
-  return { scroll: `<div class="rp-center">
-    ${eyebrow}
-    <h2>Add anything while we're there?</h2>
-    <p class="rp-sub">All optional — tap to see pricing.</p>
-    <div class="rp-rows">${cards}</div>
-    <label class="rp-checkbox-card rp-mt">
-      <input type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
-      <div><strong>Interested in Handyman &amp; Turnover Services?</strong><span>Drywall patching, minor repairs, caulking, filter changes, and other make-ready work. We'll follow up — no charge added.</span></div>
-    </label>
-  </div>`, footer: `
-    <div class="rp-live-chip"><span>Current estimate</span><strong>${rpPriceLabel()}</strong></div>
-    <button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>
-  ` };
+  return { scroll: rpPanel({eyebrow,label:"Personalize your clean",title:"Add anything while we’re there?",sub:"Optional upgrades, thoughtfully bundled into the same visit.",body:`<div class="rp-addon-stack">${cards}</div><label class="rp-checkbox-card rp-mt"><input type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)"><div><strong>Handyman &amp; turnover help</strong><span>Minor repairs, caulking, filters, and make-ready work. We’ll follow up — nothing added yet.</span></div></label>`}), footer:`<div class="rp-live-chip"><span>Current estimate</span><strong>${rpPriceLabel()}</strong></div><button class="rp-primary" onclick="rpAdvance()">See My Estimate</button>` };
 }
 
 function rpAddonSummaryRows() {
@@ -1471,30 +1925,16 @@ function rpEstimateScreen(eyebrow) {
 }
 
 function rpLeadScreen(eyebrow) {
-  return { scroll: `<div class="rp-center">
-    ${eyebrow}
-    <h2>Almost done</h2>
-    <p class="rp-sub">So your booking has the right contact and property info.</p>
+  return { scroll: rpPanel({eyebrow,label:"Reserve your appointment",title:"Almost done",sub:"Add the contact and property details we need to prepare your booking.",body:`
     <div class="rp-lead-form">
-      <div class="rp-lead-row rp-lead-row-contact">
-        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpState.fullName}" placeholder="Your name"></div>
-        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpState.phone}" placeholder="(580) 000-0000"></div>
-      </div>
+      <div class="rp-lead-row rp-lead-row-contact"><div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpState.fullName}" placeholder="Your name"></div><div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpState.phone}" placeholder="(580) 000-0000"></div></div>
       <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpState.email}" placeholder="you@email.com"></div>
       <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpState.address1}" placeholder="123 Main St"></div>
-      <div class="rp-lead-row">
-        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpState.city}" placeholder="Lawton"></div>
-        <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpState.postalCode}" placeholder="73505" inputmode="numeric"></div>
-      </div>
+      <div class="rp-lead-row"><div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpState.city}" placeholder="Lawton"></div><div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpState.postalCode}" placeholder="73505" inputmode="numeric"></div></div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…">${rpState.specialInstructions || ""}</textarea></div>
     </div>
     <div id="rpFormError" class="rp-error">Please enter your name, phone, email, street address, city, and ZIP code.</div>
-    <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Only used to confirm your booking — no spam, ever. Licensed, insured &amp; veteran-owned.</span></p>
-  </div>`, footer: `
-    <div class="rp-live-chip"><span>Your estimate</span><strong>${rpPriceLabel()}</strong></div>
-    <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose My Date &amp; Time</button>
-    <p class="rp-footer-note">Confirmation sends only after your appointment time is booked.</p>
-  ` };
+    <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Only used to confirm your booking — no spam, ever. Licensed, insured, and locally operated.</span></p>`}), footer:`<div class="rp-live-chip"><span>Your estimate</span><strong>${rpPriceLabel()}</strong></div><button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose My Date &amp; Time</button><p class="rp-footer-note">Confirmation sends only after your appointment time is booked.</p>` };
 }
 
 function rpBuildCalendarUrl() {
