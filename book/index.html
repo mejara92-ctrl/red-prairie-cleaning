@@ -63,7 +63,9 @@ window.__rpScheduleDeferred(function(){
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
 :root {
   --red: #9f2027;
@@ -266,9 +268,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .rp-primary::after { transition: transform .22s ease; }
   .rp-primary:hover::after { transform: translateX(4px); }
 }
-@keyframes rpInFwd  { from { transform: translate3d(34px,0,0) scale(.985); opacity: 0; filter: blur(3px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes rpInFwd  { from { transform: translate3d(34px,0,0) scale(.985); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes rpOutFwd { from { transform: none; opacity: 1; } to { transform: translate3d(-18px,0,0) scale(.992); opacity: 0; } }
-@keyframes rpInBack { from { transform: translate3d(-34px,0,0) scale(.985); opacity: 0; filter: blur(3px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes rpInBack { from { transform: translate3d(-34px,0,0) scale(.985); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes rpOutBack{ from { transform: none; opacity: 1; } to { transform: translate3d(18px,0,0) scale(.992); opacity: 0; } }
 @keyframes rpRise   { from { transform: translateY(13px); opacity: 0; } to { transform: none; opacity: 1; } }
 
@@ -3162,7 +3164,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
