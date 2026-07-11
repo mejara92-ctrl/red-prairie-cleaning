@@ -939,6 +939,306 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 }
 .rp-hero-onphoto .rp-trust span:last-child .rp-ic-sm { color: #dceccf; }
 
+
+/* Targeted clarity pass: add-on descriptions, included scope, and FAQ */
+.rp-wordmark { cursor: pointer; }
+.rp-wordmark:active { transform: scale(.98); }
+.rp-inline-link {
+  border: 0; padding: 0; background: none; color: var(--red); font-weight: 800;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.step-addons .rp-screen-scroll { padding-top: 18px; }
+.step-addons .rp-center { padding-top: 18px; padding-bottom: 16px; }
+.step-addons h2 { font-size: clamp(29px, 7vw, 35px); margin-bottom: 5px; }
+.step-addons .rp-sub { margin-bottom: 12px; }
+.step-addons .rp-rows { gap: 8px; }
+.step-addons .rp-row { min-height: 62px; padding-top: 8px; padding-bottom: 8px; }
+.step-addons .rp-row-desc {
+  display: block; margin-top: 2px; font-size: 9.6px; line-height: 1.2;
+  color: #76695e; white-space: nowrap;
+}
+.step-addons .rp-expand-head { align-items: center; }
+.step-addons .rp-expand-head .rp-row-main { padding-right: 4px; }
+.step-addons .rp-row.is-selected .rp-row-desc { color: #76645c; }
+
+/* The included scope should read like a clear card, not text on the photo. */
+details.rp-includes {
+  background: linear-gradient(150deg, rgba(250,245,236,.97), rgba(245,235,222,.95));
+  border-color: rgba(116,80,50,.18);
+  box-shadow: 0 13px 30px rgba(48,32,19,.13), inset 0 1px 0 rgba(255,255,255,.82);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+details.rp-includes summary { color: var(--ink); }
+.rp-includes-body { padding: 0 0 15px; }
+.rp-includes-intro {
+  margin: 0 0 10px !important; color: #51463d !important; font-size: 12px !important;
+  line-height: 1.5 !important; font-weight: 650;
+}
+details.rp-includes ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+details.rp-includes li {
+  position: relative; padding-left: 18px; color: #66594d; font-size: 11.5px; line-height: 1.42;
+}
+details.rp-includes li::before {
+  content: "✓"; position: absolute; left: 0; top: 0; color: var(--red); font-weight: 900;
+}
+.rp-faq-link-card {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  margin-top: 10px; padding: 12px 14px; text-align: left;
+  color: var(--ink); background: linear-gradient(145deg, rgba(248,240,229,.94), rgba(239,225,207,.90));
+  border: 1px solid rgba(116,80,50,.17); border-radius: 17px;
+  box-shadow: 0 9px 22px rgba(48,32,19,.09), inset 0 1px 0 rgba(255,255,255,.72);
+}
+.rp-faq-link-card strong { display: block; font-size: 12.5px; }
+.rp-faq-link-card small { display: block; margin-top: 2px; color: var(--muted); font-size: 10.5px; line-height: 1.35; }
+.rp-faq-link-card b { flex: 0 0 auto; color: var(--red); font-size: 10.5px; letter-spacing: .08em; }
+.rp-faq-link-card:active { transform: scale(.987); }
+
+.rp-faq-page {
+  position: absolute; inset: 0; z-index: 80; display: flex; flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(28,19,15,.26), rgba(28,19,15,.12)),
+    url('/images/hero/front-photo-fullbleed-648.webp') center 36%/cover no-repeat;
+}
+.rp-faq-page[hidden] { display: none; }
+.rp-faq-head {
+  min-height: var(--header-h); display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 10px;
+  padding: 0 12px; color: var(--ink); background: rgba(247,241,231,.94);
+  border-bottom: 1px solid rgba(70,52,37,.10); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.rp-faq-head > div { text-align: center; line-height: 1.05; }
+.rp-faq-head small { display: block; color: var(--red); font-size: 7px; font-weight: 900; letter-spacing: .18em; }
+.rp-faq-head strong { display: block; margin-top: 4px; font-family: "DM Serif Display", Georgia, serif; font-size: 17px; font-weight: 400; }
+.rp-faq-head a { color: var(--red); font-size: 12px; font-weight: 800; padding: 8px 9px; border: 1px solid rgba(159,32,39,.14); border-radius: 11px; background: rgba(255,255,255,.50); }
+.rp-faq-back { width: 40px; height: 40px; border-radius: 13px; border: 1px solid rgba(70,52,37,.12); background: rgba(255,255,255,.58); font-size: 20px; }
+.rp-faq-scroll {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px calc(28px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(247,239,227,.84), rgba(239,225,207,.90));
+  backdrop-filter: blur(14px) saturate(1.08); -webkit-backdrop-filter: blur(14px) saturate(1.08);
+}
+.rp-faq-kicker { margin: 0 0 8px; color: var(--red); font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+.rp-faq-page h2 { margin-bottom: 8px; font-size: 31px; }
+.rp-faq-intro { margin: 0 0 20px; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.rp-faq-page h3 { margin: 22px 2px 8px; color: #7c262c; font-size: 10px; text-transform: uppercase; letter-spacing: .16em; }
+.rp-faq-page details {
+  margin-bottom: 8px; padding: 0 14px; border-radius: 16px;
+  background: linear-gradient(145deg, rgba(252,246,237,.95), rgba(244,233,218,.92));
+  border: 1px solid rgba(107,75,50,.16); box-shadow: 0 8px 20px rgba(48,32,19,.08), inset 0 1px 0 rgba(255,255,255,.72);
+}
+.rp-faq-page summary {
+  position: relative; padding: 14px 28px 14px 0; list-style: none; cursor: pointer;
+  font-size: 12.5px; font-weight: 800; line-height: 1.35;
+}
+.rp-faq-page summary::-webkit-details-marker { display: none; }
+.rp-faq-page summary::after { content: "+"; position: absolute; right: 1px; top: 11px; color: var(--red); font-size: 20px; font-weight: 400; }
+.rp-faq-page details[open] summary::after { content: "–"; }
+.rp-faq-page details p { margin: -2px 0 14px; color: var(--muted); font-size: 11.5px; line-height: 1.55; }
+.rp-faq-return { margin-top: 20px; }
+
+@media (max-height: 760px) {
+  .step-addons .rp-screen-scroll { padding-top: 10px; }
+  .step-addons .rp-center { padding: 14px 13px 12px; }
+  .step-addons .rp-row { min-height: 58px; }
+  .step-addons .rp-row-desc { font-size: 9px; }
+  .rp-faq-link-card { padding: 10px 12px; }
+}
+
+
+/* Final salvage pass: compact alignment, header FAQ, and readable included scope */
+.rp-head {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.rp-wordmark { justify-self: center; }
+.rp-head-actions { display: flex; align-items: center; gap: 6px; }
+.rp-head-faq,
+.rp-head-text {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 9px;
+  border-radius: 11px;
+  border: 1px solid rgba(159,32,39,.14);
+  background: rgba(255,255,255,.45);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+.rp-head-faq:active,
+.rp-head-text:active { background: var(--surface); transform: scale(.96); }
+
+/* Keep the add-on consultation inside one clean visual column. */
+.step-addons .rp-screen-scroll {
+  padding: 10px 18px 8px;
+}
+.step-addons .rp-center {
+  width: 100%;
+  max-width: 510px;
+  margin-block: 0;
+  padding: 14px 12px 12px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.step-addons .rp-center::before { margin-bottom: 7px; }
+.step-addons .rp-eyebrow { margin-bottom: 6px; }
+.step-addons h2 {
+  margin-bottom: 4px;
+  font-size: clamp(27px, 6.6vw, 32px);
+  line-height: 1.01;
+}
+.step-addons .rp-sub {
+  margin-bottom: 9px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.step-addons .rp-rows { width: 100%; gap: 7px; }
+.step-addons .rp-row,
+.step-addons .rp-expand,
+.step-addons .rp-make-ready-card {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+.step-addons .rp-row {
+  min-height: 54px;
+  padding: 7px 10px;
+  gap: 10px;
+}
+.step-addons .rp-ic-chip,
+.step-addons .rp-make-ready-card .rp-ic-chip {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 13px;
+}
+.step-addons .rp-row-title {
+  font-size: 13px;
+  line-height: 1.2;
+}
+.step-addons .rp-row-desc {
+  margin-top: 2px;
+  font-size: 9.2px;
+  line-height: 1.18;
+  white-space: normal;
+}
+.step-addons .rp-row-chev {
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+}
+.step-addons .rp-make-ready-card {
+  min-height: 58px;
+  margin-top: 7px;
+  padding: 7px 10px;
+  gap: 10px;
+}
+.step-addons .rp-make-ready-copy strong {
+  font-size: 12.5px;
+  line-height: 1.18;
+}
+.step-addons .rp-make-ready-copy span {
+  margin-top: 2px;
+  font-size: 9.2px;
+  line-height: 1.2;
+}
+.step-addons .rp-make-ready-check {
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+}
+
+/* The included explanation is one concise, readable paragraph. */
+details.rp-includes {
+  background: linear-gradient(150deg, rgba(250,245,236,.98), rgba(245,235,222,.97));
+  border-color: rgba(116,80,50,.18);
+  box-shadow: 0 13px 30px rgba(48,32,19,.13), inset 0 1px 0 rgba(255,255,255,.82);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+details.rp-includes summary { color: var(--ink); }
+.rp-includes-body { padding: 0 14px 10px; }
+.rp-includes-intro {
+  margin: 0 !important;
+  color: #51463d !important;
+  font-size: 11.2px !important;
+  line-height: 1.4 !important;
+  font-weight: 650;
+}
+details.rp-includes ul { display: none; }
+.rp-faq-link-card { display: none; }
+
+/* FAQ lives in a compact overlay opened from the header. */
+.rp-faq-page {
+  padding: 10px;
+  align-items: stretch;
+  justify-content: center;
+  background: rgba(20,14,11,.54);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.rp-faq-head,
+.rp-faq-scroll {
+  width: min(100%, 560px);
+  margin-inline: auto;
+}
+.rp-faq-head {
+  min-height: 58px;
+  border-radius: 22px 22px 0 0;
+  grid-template-columns: 40px 1fr auto;
+  background: rgba(247,241,231,.98);
+}
+.rp-faq-scroll {
+  max-height: calc(100dvh - 88px);
+  padding: 15px 14px calc(18px + env(safe-area-inset-bottom));
+  border-radius: 0 0 22px 22px;
+  background: linear-gradient(180deg, rgba(247,239,227,.98), rgba(239,225,207,.98));
+}
+.rp-faq-kicker { margin-bottom: 4px; }
+.rp-faq-intro {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.rp-faq-page details {
+  margin-bottom: 6px;
+  padding: 0 12px;
+  border-radius: 14px;
+}
+.rp-faq-page summary {
+  padding: 11px 25px 11px 0;
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+.rp-faq-page summary::after { top: 8px; }
+.rp-faq-page details p {
+  margin: -1px 0 11px;
+  font-size: 10.5px;
+  line-height: 1.48;
+}
+.rp-faq-return { margin-top: 10px; min-height: 48px; }
+
+@media (max-width: 390px) {
+  .rp-head { gap: 5px; }
+  .rp-head-actions { gap: 4px; }
+  .rp-head-faq, .rp-head-text { padding-inline: 7px; font-size: 10.5px; }
+  .step-addons .rp-screen-scroll { padding-inline: 14px; }
+}
+@media (max-height: 760px) {
+  .step-addons .rp-screen-scroll { padding-top: 6px; }
+  .step-addons .rp-center { padding: 10px 10px 9px; }
+  .step-addons .rp-center::before { margin-bottom: 5px; }
+  .step-addons h2 { font-size: 26px; }
+  .step-addons .rp-sub { margin-bottom: 6px; }
+  .step-addons .rp-rows { gap: 5px; }
+  .step-addons .rp-row { min-height: 50px; padding-block: 5px; }
+  .step-addons .rp-make-ready-card { min-height: 53px; margin-top: 5px; padding-block: 5px; }
+  .step-addons .rp-row-desc, .step-addons .rp-make-ready-copy span { font-size: 8.8px; }
+}
+
 </style>
 </head>
 <body>
@@ -948,14 +1248,43 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
     <button class="rp-head-btn is-hidden" id="rpBackBtn" onclick="rpBack()" aria-label="Go back">
       <svg class="rp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5.5 8.5 12 15 18.5"/></svg>
     </button>
-    <div class="rp-wordmark" aria-label="Red Prairie Cleaning">
+    <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage" onclick="rpTrack('home_logo_tap',{placement:'book_header'})">
       <img src="/images/logo/favicon.png" width="32" height="32" alt="">
       <span><strong><b>RED</b> PRAIRIE</strong><small>CLEANING</small></span>
+    </a>
+    <div class="rp-head-actions">
+      <button class="rp-head-faq" type="button" onclick="rpOpenFaq('header')" aria-label="Open frequently asked questions">FAQ</button>
+      <a class="rp-head-text" href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'header'})">Text us</a>
     </div>
-    <a class="rp-head-text" href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'header'})">Text us</a>
   </header>
   <div class="rp-progress"><div class="rp-progress-fill" id="rpProgressFill"></div></div>
   <main class="rp-screens" id="rpScreens" aria-live="polite"></main>
+  <section class="rp-faq-page" id="rpFaqPage" hidden aria-hidden="true" aria-label="Frequently asked questions">
+    <header class="rp-faq-head">
+      <button class="rp-faq-back" type="button" onclick="rpCloseFaq()" aria-label="Return to booking">←</button>
+      <div><small>RED PRAIRIE CLEANING</small><strong>Quick Answers</strong></div>
+      <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'faq'})">Text us</a>
+    </header>
+    <div class="rp-faq-scroll">
+      <p class="rp-faq-kicker">QUICK ANSWERS</p>
+      <p class="rp-faq-intro">Tap a question. Your estimate and selections stay saved.</p>
+
+      <details><summary>Is the instant estimate the final price?</summary><p>It is based on the size, condition, and options selected. We contact you before changing it for severe buildup, heavy trash, unusual access, biohazards, or work outside the selected scope.</p></details>
+      <details><summary>Do you require a deposit?</summary><p>No deposit is required to select an appointment time.</p></details>
+      <details><summary>Do you offer same-day service?</summary><p>Same-day openings are often available. Choose an available time online or text us for an urgent appointment.</p></details>
+      <details><summary>How long will the cleaning take?</summary><p>Your estimate shows the expected time and team size. Actual time varies with the home and its condition.</p></details>
+      <details><summary>What is the arrival window?</summary><p>We use a 30-minute arrival window so the team can complete the prior appointment properly and travel safely.</p></details>
+      <details><summary>Do I need to be home?</summary><p>No. You can provide a key, lockbox, property-manager contact, or other access instructions.</p></details>
+      <details><summary>How should I prepare the home?</summary><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></details>
+      <details><summary>Are carpet cleaning and exterior windows included?</summary><p>They are separate optional services. Carpet extraction is priced by room; exterior windows have basic and premium options.</p></details>
+      <details><summary>Can you remove junk or handle small repairs?</summary><p>Yes. Select Junk Haul for trash, furniture, and light debris. Select Make-Ready Repairs to request a follow-up for patches, caulking, and minor turnover work.</p></details>
+      <details><summary>What if something is missed?</summary><p>Contact us promptly. The Red Prairie Promise means we review covered cleaning concerns and make them right.</p></details>
+      <details><summary>Where do you provide service?</summary><p>Lawton, Fort Sill, Elgin, Cache, and nearby Southwest Oklahoma communities.</p></details>
+      <details><summary>Do you offer a military or first-responder discount?</summary><p>Yes. Eligible customers can select the 10% discount on the estimate screen.</p></details>
+
+      <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -1032,19 +1361,19 @@ const rpServiceAddons = {
 
 const rpIncludes = {
   moveout: {
-    paragraph: "A top-to-bottom, inside-and-out clean — appliances, cabinets, every surface, top to bottom, side to side, no add-ons required. Built to get your deposit back at move-out, and just as thorough for getting a home move-in ready. Works best in an empty home — schedule it after you're out, or before you move in."
+    intro: "Everything inside the empty home, cleaned top to bottom—including appliances inside and out, cabinets, drawers, closets, baseboards, doors, fixtures, floors, and reachable surfaces."
   },
   deep: {
-    paragraph: "A thorough reset that goes past your everyday routine — inside the oven and microwave, every bathroom, floors, and baseboards. Ideal before hosting, after a big mess, or just to hit reset on the whole house."
+    intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave."
   },
   maintenance: {
-    paragraph: "Consistent upkeep that keeps your home spotless between visits, on whatever schedule fits your life."
+    intro: "A complete routine clean of kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh."
   },
   carpet: {
-    paragraph: "Professional hot-water extraction that lifts embedded dirt, stains, and odors regular vacuuming can't reach."
+    intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select."
   },
   airbnb: {
-    paragraph: "A fast, guest-ready reset between every checkout and check-in."
+    intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request."
   }
 };
 
@@ -1168,6 +1497,43 @@ function rpTrack(event, extra = {}) {
   try { if (window.clarity) window.clarity("event", event + "_" + payload.screen); } catch (e) {}
 }
 
+let rpFaqReturnFocus = null;
+function rpOpenFaq(source = "unknown") {
+  const page = document.getElementById("rpFaqPage");
+  if (!page) return;
+  rpFaqReturnFocus = document.activeElement;
+  page.hidden = false;
+  page.setAttribute("aria-hidden", "false");
+  const scroll = page.querySelector(".rp-faq-scroll");
+  if (scroll) scroll.scrollTop = 0;
+  const back = page.querySelector(".rp-faq-back");
+  if (back) back.focus({ preventScroll: true });
+  rpTrack("faq_open", { source });
+}
+function rpCloseFaq() {
+  const page = document.getElementById("rpFaqPage");
+  if (!page) return;
+  page.hidden = true;
+  page.setAttribute("aria-hidden", "true");
+  if (rpFaqReturnFocus && typeof rpFaqReturnFocus.focus === "function") rpFaqReturnFocus.focus({ preventScroll: true });
+  rpTrack("faq_close");
+}
+document.addEventListener("toggle", function(event) {
+  const details = event.target;
+  if (details && details.matches && details.matches("details.rp-includes") && details.open) {
+    requestAnimationFrame(function() {
+      details.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+  }
+}, true);
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    const page = document.getElementById("rpFaqPage");
+    if (page && !page.hidden) rpCloseFaq();
+  }
+});
+
 /* =========================================================================
    NAVIGATION
    ========================================================================= */
@@ -1251,7 +1617,7 @@ function rpScreenHtml() {
           ${rpRowBtn({ onclick:"rpSelectService('maintenance')", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet')", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
         </div>
-        <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — junk hauling, windows, Airbnb turnover, lawn care &amp; more.</p>
+        <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
     `};
   }
@@ -1382,13 +1748,13 @@ function rpAddonsScreen(eyebrow) {
     yard: !!rpState.yardTier
   };
   const cardMeta = {
-    carpet:  { icon: "layers", label: "Carpet Cleaning" },
-    junk:    { icon: "truck",  label: "Junk Haul" },
-    windows: { icon: "window", label: "Exterior Windows" },
-    garage:  { icon: "car",    label: "Garage Floor Wash" },
-    laundry: { icon: "washer", label: "Laundry Service" },
-    fridge:  { icon: "fridge", label: "Refrigerator Interior" },
-    yard:    { icon: "leaf",   label: "Yard Refresh" }
+    carpet:  { icon: "layers", label: "Carpet Cleaning", desc: "Hot-water extraction for a deeper carpet clean." },
+    junk:    { icon: "truck",  label: "Junk Haul", desc: "Bagged trash, furniture, and light debris removed." },
+    windows: { icon: "window", label: "Exterior Windows", desc: "Exterior glass wash; screens available separately." },
+    garage:  { icon: "car",    label: "Garage Floor Wash", desc: "Sweep and wash the concrete garage floor." },
+    laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
+    fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
+    yard:    { icon: "leaf",   label: "Yard Refresh", desc: "Mow, trim, edge, and clear hard surfaces." }
   };
   function summaryFor(key) {
     if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
@@ -1469,7 +1835,7 @@ function rpAddonsScreen(eyebrow) {
         <div class="rp-expand">
           <button class="rp-expand-head" onclick="rpCollapseAddon()">
             ${rpChip(meta.icon)}
-            <span class="rp-row-title">${meta.label}</span>
+            <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span><span class="rp-row-desc">${meta.desc}</span></span>
             <span class="rp-row-chev" style="transform:rotate(-90deg)">${rpIcon("chev","rp-ic rp-ic-sm")}</span>
           </button>
           <div class="rp-expand-body">${bodyFor(key)}</div>
@@ -1479,11 +1845,11 @@ function rpAddonsScreen(eyebrow) {
       return `
         <button class="rp-row is-selected" onclick="rpExpandAddon('${key}')">
           ${rpChip(meta.icon)}
-          <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span></span>
+          <span class="rp-row-main"><span class="rp-row-title">${meta.label}</span><span class="rp-row-desc">${meta.desc}</span></span>
           <span class="rp-row-sum">✓ ${summaryFor(key)} <em>Change</em></span>
         </button>`;
     }
-    return rpRowBtn({ onclick:`rpExpandAddon('${key}')`, icon: meta.icon, title: meta.label });
+    return rpRowBtn({ onclick:`rpExpandAddon('${key}')`, icon: meta.icon, title: meta.label, desc: meta.desc });
   }).join("");
 
   return { scroll: `<div class="rp-center">
@@ -1494,7 +1860,7 @@ function rpAddonsScreen(eyebrow) {
     <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
-      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs Too?</strong><span>Drywall patches, caulking, minor repairs and turnover work. Request a follow-up — no charge added.</span></span>
+      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs.</span></span>
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>
   </div>`, footer: `
@@ -1558,7 +1924,9 @@ function rpEstimateScreen(eyebrow) {
     ${includes ? `
     <details class="rp-includes">
       <summary>What's included</summary>
-      <p>${includes.paragraph}</p>
+      <div class="rp-includes-body">
+        <p class="rp-includes-intro">${includes.intro}</p>
+      </div>
     </details>` : ""}
     ${!isQuoteOnly ? `
     <label class="rp-checkbox-card rp-discount-card rp-mt">
@@ -1569,7 +1937,7 @@ function rpEstimateScreen(eyebrow) {
     <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
-      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs Too?</strong><span>Drywall patches, caulking, minor repairs and turnover work. Request a follow-up.</span></span>
+      <span class="rp-make-ready-copy"><strong>Need Make-Ready Repairs?</strong><span>Minor patches, caulking, and turnover repairs.</span></span>
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>` : ""}
     <p class="rp-notice">Final price may change for severe mess, heavy trash, unusual access issues, biohazard conditions, or work beyond scope. Prefer texting? <a href="sms:5802150915" style="color:var(--red);font-weight:700" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a> a screenshot of this estimate instead.</p>
@@ -1826,6 +2194,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
