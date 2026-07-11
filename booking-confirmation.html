@@ -13,7 +13,8 @@
 </script>
 
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="robots" content="noindex,follow"/>
 <title>Booking Confirmed | Red Prairie Cleaning</title>
 <!-- Google tag (gtag.js) -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=AW-17734105967"></script>
@@ -35,142 +36,192 @@
     }
   });
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="/favicon.png" rel="icon" type="image/png"/>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+:root {
+  --red: #9f2027;
+  --red-bright: #bd3036;
+  --red-dark: #6f1118;
+  --ink: #181512;
+  --ink-soft: #37312b;
+  --muted: #71685f;
+  --faint: #9d9287;
+  --paper: #f7f1e7;
+  --paper-deep: #eadfce;
+  --surface: #fffdf9;
+  --line: rgba(70, 52, 37, .14);
+  --gold: #c6a164;
+  --green: #2f7448;
+  --radius-lg: 26px;
+  --radius-md: 18px;
+  --shadow-lg: 0 28px 80px rgba(48, 32, 19, .18);
+  --shadow-sm: 0 7px 18px rgba(48, 32, 19, .07);
 }
-
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
 body {
-    background: #f7f7f7;
-    color: #222;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+  margin: 0;
+  font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(198,161,100,.24), transparent 30%),
+    radial-gradient(circle at 88% 85%, rgba(159,32,39,.14), transparent 34%),
+    linear-gradient(135deg, #ece4d7 0%, #ddd1c0 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.45;
 }
+a { text-decoration: none; color: inherit; }
+h1, h2 { font-family: "DM Serif Display", Georgia, "Times New Roman", serif; font-weight: 400; color: var(--ink); margin: 0; }
 
+/* Header — same wordmark pattern as /book */
+.rp-head {
+  height: 62px; min-height: 62px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 16px;
+  background: rgba(247,241,231,.84);
+  border-bottom: 1px solid rgba(70,52,37,.08);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+}
+.rp-wordmark { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.rp-wordmark img { width: 30px; height: 30px; display: block; border-radius: 9px; box-shadow: 0 5px 12px rgba(159,32,39,.18); }
+.rp-wordmark span { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.rp-wordmark strong { font-size: 13px; font-weight: 800; letter-spacing: .075em; color: var(--ink); white-space: nowrap; }
+.rp-wordmark strong b { color: var(--red); }
+.rp-wordmark small { margin-top: 4px; font-size: 7px; font-weight: 800; letter-spacing: .28em; color: var(--muted); }
+
+/* Body */
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px 40px;
+}
 .card {
-    background: white;
-    max-width: 650px;
-    width: 100%;
-    border-radius: 18px;
-    padding: 45px 35px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(150deg, rgba(255,253,249,.94), rgba(248,240,229,.90));
+  border: 1px solid rgba(255,246,232,.6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.6);
+  padding: 34px 26px 28px;
+  text-align: center;
 }
-
 .checkmark {
-    width: 80px;
-    height: 80px;
-    background: #d90429;
-    color: white;
-    font-size: 42px;
-    border-radius: 50%;
-    margin: 0 auto 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 68px; height: 68px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #c5333d 0%, #a31f28 46%, #7d131b 100%);
+  border: 1px solid rgba(255,242,225,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 8px 18px rgba(90,24,27,.24);
+  display: flex; align-items: center; justify-content: center;
 }
-
-h1 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
-
-.subtitle {
-    color: #555;
-    font-size: 1.1rem;
-    margin-bottom: 35px;
-    line-height: 1.6;
-}
+.checkmark svg { width: 30px; height: 30px; stroke: #fff4e7; }
+h1 { font-size: clamp(28px, 7vw, 34px); margin-bottom: 10px; letter-spacing: -.02em; }
+.subtitle { color: var(--muted); font-size: 14.5px; line-height: 1.6; margin: 0 0 26px; max-width: 38ch; margin-inline: auto; }
+.subtitle strong { color: var(--ink); }
 
 .steps {
-    text-align: left;
-    background: #fafafa;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
+  text-align: left;
+  background: rgba(255,253,249,.72);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px 18px 14px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.7);
 }
-
 .steps h2 {
-    font-size: 1.2rem;
-    margin-bottom: 15px;
+  font-family: "Manrope", sans-serif;
+  font-size: 8.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 12px;
 }
-
-.steps ul {
-    list-style: none;
-}
-
+.steps ul { list-style: none; margin: 0; padding: 0; }
 .steps li {
-    margin-bottom: 12px;
-    font-size: 1rem;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px; line-height: 1.5; color: var(--ink-soft);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(70,52,37,.08);
 }
-
-.contact {
-    border-top: 1px solid #eee;
-    padding-top: 25px;
+.steps li:last-child { border-bottom: none; }
+.steps li .dot {
+  flex: 0 0 auto;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #c5333d 0%, #a31f28 46%, #7d131b 100%);
+  color: #fff4e7;
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
 }
-
+.no-deposit {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 22px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(47,116,72,.10);
+  border: 1px solid rgba(47,116,72,.22);
+  color: var(--green);
+  font-size: 11px; font-weight: 800; letter-spacing: .02em;
+}
+.contact { border-top: 1px solid var(--line); padding-top: 22px; }
+.contact p { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
 .phone {
-    color: #d90429;
-    font-size: 1.4rem;
-    font-weight: bold;
-    text-decoration: none;
+  display: inline-block;
+  color: #fff;
+  background: linear-gradient(135deg,#c32b35 0%,#9d1822 53%,#74121a 100%);
+  box-shadow: 0 13px 28px rgba(121,19,27,.24), inset 0 1px 0 rgba(255,255,255,.24);
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-size: 16px; font-weight: 800; letter-spacing: -.01em;
 }
+.small { margin-top: 16px; color: var(--faint); font-size: 12px; line-height: 1.55; }
 
-.small {
-    margin-top: 12px;
-    color: #666;
-    line-height: 1.5;
-}
-
-@media(max-width: 600px) {
-    .card {
-        padding: 35px 25px;
-    }
-
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    .subtitle {
-        font-size: 1rem;
-    }
+@media (max-width: 420px) {
+  .card { padding: 28px 20px 22px; }
+  .steps { padding: 15px 14px 11px; }
 }
 </style>
-<link href="/favicon.png" rel="icon" type="image/png"/>
-<noscript data-rp="async-css-fallback"><link href="css/style.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/></noscript></head>
-<body><main id="main-content"><div class="card">
-<div class="checkmark">✓</div>
-<h1>You're Booked!</h1>
-<p class="subtitle">
-        Thank you for choosing <strong>Red Prairie Cleaning</strong>.
-        Your appointment request and reservation deposit have been received.
-    </p>
-<div class="steps">
-<h2>What Happens Next?</h2>
-<ul>
-<li>✅ We review your appointment details.</li>
-<li>📱 We will text or call to confirm your cleaning.</li>
-<li>🏠 Our team arrives ready to make your home shine.</li>
-<li>💳 Your $50 reservation deposit will be applied toward your final invoice.</li>
-</ul>
-</div>
-<div class="contact">
-<p>Need to update your appointment?</p>
-<br/>
-<a class="phone" href="tel:5802150915">
-            (580) 215-0915
-        </a>
-<p class="small">
-            We appreciate your trust in our local cleaning team and look forward to serving your home.
-        </p>
-</div>
-</div></main>
+</head>
+<body>
+<header class="rp-head">
+  <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage">
+    <img src="/images/logo/favicon.png" width="30" height="30" alt="">
+    <span><strong><b>RED</b> PRAIRIE</strong><small>CLEANING</small></span>
+  </a>
+</header>
+<main id="main-content">
+  <div class="card">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg>
+    </div>
+    <h1>You're Booked!</h1>
+    <p class="subtitle">Thank you for choosing <strong>Red Prairie Cleaning</strong>. Your cleaning is reserved and confirmed on our calendar.</p>
 
+    <span class="no-deposit">✓ No deposit required</span>
+
+    <div class="steps">
+      <h2>What Happens Next</h2>
+      <ul>
+        <li><span class="dot">1</span> We review your appointment details.</li>
+        <li><span class="dot">2</span> We'll text or call to confirm before your visit.</li>
+        <li><span class="dot">3</span> Our team arrives ready to make your home shine.</li>
+        <li><span class="dot">4</span> You pay after the job is done — nothing due today.</li>
+      </ul>
+    </div>
+
+    <div class="contact">
+      <p>Need to update your appointment?</p>
+      <a class="phone" href="tel:5802150915">(580) 215-0915</a>
+      <p class="small">We appreciate your trust in our local cleaning team and look forward to serving your home.</p>
+    </div>
+  </div>
+</main>
 </body>
 </html>

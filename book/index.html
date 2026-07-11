@@ -280,7 +280,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   gap: 8px;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: .17em;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--red);
   margin: 0 0 11px;
@@ -332,7 +332,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(18,13,10,.76) 0%, rgba(18,13,10,.46) 32%, rgba(18,13,10,.14) 55%, rgba(18,13,10,.24) 100%),
+    linear-gradient(180deg, rgba(18,13,10,.92) 0%, rgba(18,13,10,.5) 26%, rgba(18,13,10,.14) 55%, rgba(18,13,10,.24) 100%),
     linear-gradient(120deg, rgba(111,17,24,.25), transparent 56%);
 }
 .rp-bg-photo::after {
@@ -342,7 +342,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   background: radial-gradient(circle at 78% 12%, rgba(234,185,123,.22), transparent 34%);
   mix-blend-mode: screen;
 }
-.rp-screen.has-photo-bg .rp-screen-scroll { position: relative; z-index: 3; padding: 18px 20px 22px; }
+.rp-screen.has-photo-bg .rp-screen-scroll { position: relative; z-index: 3; padding: 6px 20px 22px; }
 
 .rp-hero-onphoto { padding: 5px 5px 112px; max-width: 500px; }
 .rp-hero-onphoto .rp-eyebrow.red { color: #f4d4c5; text-shadow: 0 1px 14px rgba(0,0,0,.34); }
@@ -466,7 +466,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   color: #fff8eb;
   border: 1px solid rgba(198,161,100,.45);
   box-shadow: 0 5px 14px rgba(24,21,18,.18);
-  font-size: 8.5px; font-weight: 800; letter-spacing: .12em;
+  font-size: 8.5px; font-weight: 800; letter-spacing: .14em;
   padding: 4px 9px; border-radius: 999px; text-transform: uppercase;
 }
 .rp-row-sum { font-size: 11.5px; font-weight: 800; color: var(--red); text-align: right; white-space: nowrap; position: relative; z-index: 1; padding: 7px 10px; border-radius: 999px; background: rgba(255,247,238,.68); border: 1px solid rgba(167,126,93,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.52); }
@@ -509,7 +509,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
   transition: border-color .15s, transform .12s, background .15s, color .15s;
 }
-.rp-pill small { display: block; font-weight: 650; font-size: 10.5px; color: var(--muted); }
+.rp-pill small { display: block; font-weight: 700; font-size: 10.5px; color: var(--muted); }
 .rp-pill:active { transform: scale(.96); border-color: var(--red); }
 .rp-pill.is-selected { border-color: var(--red); background: linear-gradient(145deg, var(--red-bright), var(--red-dark)); color: #fff; }
 .rp-pill.is-selected small { color: rgba(255,255,255,.78); }
@@ -705,7 +705,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 .rp-quote-hero { position: relative; z-index: 1; padding: 3px 0 0; }
 .rp-quote-hero small {
-  display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .20em;
+  display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .14em;
   text-transform: uppercase; color: rgba(255,247,236,.64); margin-bottom: 6px;
 }
 .rp-quote-hero strong {
@@ -733,6 +733,30 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   backdrop-filter: blur(8px);
 }
 .rp-guarantee .rp-ic-sm { color: #f0cf91; }
+.rp-recurring-summary {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,253,249,.90);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.92);
+}
+.rp-recurring-total {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%;
+  font-size: 12.5px; color: var(--muted);
+}
+.rp-recurring-total strong { color: var(--ink); font-weight: 800; font-size: 15px; }
+.rp-no-contract {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(47,116,72,.10);
+  border: 1px solid rgba(47,116,72,.22);
+  color: var(--green);
+  font-size: 10.5px; font-weight: 800; letter-spacing: .01em;
+}
 .rp-invoice {
   background: rgba(255,253,249,.90);
   border: 1px solid var(--line);
@@ -798,6 +822,11 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
   transition: border-color .15s, box-shadow .15s, background .15s;
 }
 .rp-lead-field input::placeholder, .rp-lead-field textarea::placeholder { color: #aaa096; font-weight: 500; }
+.rp-lead-field input.is-invalid,
+.rp-lead-field textarea.is-invalid {
+  border-color: #b3272c !important;
+  background: rgba(251,232,229,.9) !important;
+}
 .rp-lead-field input:focus, .rp-lead-field textarea:focus {
   outline: none;
   border-color: rgba(159,32,39,.58);
@@ -895,6 +924,7 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 .rp-screen:not(.step-service) .rp-screen-scroll{padding-top:clamp(28px,7vh,72px)}
 .rp-screen:not(.step-service) .rp-center,
 .rp-screen.step-calendar .rp-screen-scroll>div{
+  margin-block:0;
   position:relative;background:linear-gradient(150deg,rgba(248,240,229,.66),rgba(243,232,216,.40));
   border:1px solid rgba(255,246,232,.42);border-radius:28px;padding:24px 18px 20px;
   box-shadow:0 24px 60px rgba(59,39,23,.10),inset 0 1px 0 rgba(255,255,255,.50);
@@ -903,7 +933,7 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
 .rp-screen:not(.step-service) .rp-center::before,
 .rp-screen.step-calendar .rp-screen-scroll>div::before{
   content:"PRIVATE HOME CONSULTATION";display:block;margin:0 0 13px;color:#8f2b31;
-  font-size:8.5px;font-weight:900;letter-spacing:.18em;text-transform:uppercase
+  font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase
 }
 .rp-screen .rp-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .rp-screen .rp-eyebrow::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,#a42831,#d78977)}
@@ -971,14 +1001,14 @@ details.rp-includes summary { color: var(--ink); }
 .rp-includes-body { padding: 0 0 15px; }
 .rp-includes-intro {
   margin: 0 0 10px !important; color: #51463d !important; font-size: 12px !important;
-  line-height: 1.5 !important; font-weight: 650;
+  line-height: 1.5 !important; font-weight: 700;
 }
 details.rp-includes ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
 details.rp-includes li {
   position: relative; padding-left: 18px; color: #66594d; font-size: 11.5px; line-height: 1.42;
 }
 details.rp-includes li::before {
-  content: "✓"; position: absolute; left: 0; top: 0; color: var(--red); font-weight: 900;
+  content: "✓"; position: absolute; left: 0; top: 0; color: var(--red); font-weight: 800;
 }
 .rp-faq-link-card {
   width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px;
@@ -1005,7 +1035,7 @@ details.rp-includes li::before {
   border-bottom: 1px solid rgba(70,52,37,.10); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
 }
 .rp-faq-head > div { text-align: center; line-height: 1.05; }
-.rp-faq-head small { display: block; color: var(--red); font-size: 7px; font-weight: 900; letter-spacing: .18em; }
+.rp-faq-head small { display: block; color: var(--red); font-size: 7px; font-weight: 800; letter-spacing: .14em; }
 .rp-faq-head strong { display: block; margin-top: 4px; font-family: "DM Serif Display", Georgia, serif; font-size: 17px; font-weight: 400; }
 .rp-faq-head a { color: var(--red); font-size: 12px; font-weight: 800; padding: 8px 9px; border: 1px solid rgba(159,32,39,.14); border-radius: 11px; background: rgba(255,255,255,.50); }
 .rp-faq-back { width: 40px; height: 40px; border-radius: 13px; border: 1px solid rgba(70,52,37,.12); background: rgba(255,255,255,.58); font-size: 20px; }
@@ -1014,10 +1044,10 @@ details.rp-includes li::before {
   background: linear-gradient(180deg, rgba(247,239,227,.84), rgba(239,225,207,.90));
   backdrop-filter: blur(14px) saturate(1.08); -webkit-backdrop-filter: blur(14px) saturate(1.08);
 }
-.rp-faq-kicker { margin: 0 0 8px; color: var(--red); font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+.rp-faq-kicker { margin: 0 0 8px; color: var(--red); font-size: 9px; font-weight: 800; letter-spacing: .14em; }
 .rp-faq-page h2 { margin-bottom: 8px; font-size: 31px; }
 .rp-faq-intro { margin: 0 0 20px; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
-.rp-faq-page h3 { margin: 22px 2px 8px; color: #7c262c; font-size: 10px; text-transform: uppercase; letter-spacing: .16em; }
+.rp-faq-page h3 { margin: 22px 2px 8px; color: #7c262c; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; }
 .rp-faq-page details {
   margin-bottom: 8px; padding: 0 14px; border-radius: 16px;
   background: linear-gradient(145deg, rgba(252,246,237,.95), rgba(244,233,218,.92));
@@ -1164,7 +1194,7 @@ details.rp-includes summary { color: var(--ink); }
   color: #51463d !important;
   font-size: 11.2px !important;
   line-height: 1.4 !important;
-  font-weight: 650;
+  font-weight: 700;
 }
 details.rp-includes ul { display: none; }
 .rp-faq-link-card { display: none; }
@@ -1327,8 +1357,8 @@ details.rp-includes,
   display: block;
   color: var(--red);
   font-size: 7.5px;
-  font-weight: 900;
-  letter-spacing: .16em;
+  font-weight: 800;
+  letter-spacing: .14em;
 }
 .rp-addon-sheet-head strong { display: block; margin-top: 2px; font-size: 15px; line-height: 1.2; }
 .rp-addon-sheet-head em { display: block; margin-top: 2px; color: var(--muted); font-size: 9.5px; line-height: 1.25; font-style: normal; }
@@ -1466,7 +1496,7 @@ details.rp-includes,
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: .11em;
+  letter-spacing: .14em;
   color: var(--muted);
 }
 .rp-date-btn strong {
@@ -1633,6 +1663,24 @@ details.rp-includes,
   -webkit-backdrop-filter: var(--rp-master-blur) !important;
 }
 .rp-sheet { border-radius: 30px; }
+/* Selected pills must win over the master glass override above — otherwise every
+   selected add-on choice (garage, junk, windows, yard, laundry, fridge, carpet rooms)
+   loses its red-gradient background but keeps its white text, which is unreadable. */
+.rp-pill.is-selected {
+  background: linear-gradient(145deg, var(--red-bright), var(--red-dark)) !important;
+  border-color: var(--red) !important;
+}
+/* These surfaces carry dense, price-relevant text and often sit directly on the
+   photo backdrop with no opaque parent behind them (e.g. the estimate screen's
+   wrapper is intentionally transparent) — they need stronger opacity than the
+   master glass default to stay legible. */
+.rp-invoice,
+details.rp-includes,
+.rp-checkbox-card,
+.rp-discount-card,
+.rp-notice {
+  background: linear-gradient(150deg, rgba(252,247,239,.93), rgba(244,235,220,.88)) !important;
+}
 .rp-screen:not(.step-service) .rp-center,
 .rp-screen.step-calendar .rp-screen-scroll > .rp-calendar-shell { border-radius: 28px; }
 .rp-row { box-shadow: 0 9px 24px rgba(48,32,19,.09), inset 0 1px 0 rgba(255,255,255,.42) !important; }
@@ -1686,7 +1734,6 @@ details.rp-includes,
 
 /* Customer details: 16px prevents iOS zoom; warm autofill prevents blue inputs. */
 .step-lead .rp-screen-scroll { overflow-y: auto; scroll-padding: 18px 0 170px; padding-bottom: 16px; }
-.step-lead .rp-center { margin-block: auto; }
 .rp-lead-field input,
 .rp-lead-field textarea {
   min-height: 45px;
@@ -1710,7 +1757,6 @@ details.rp-includes,
   transition: background-color 9999s ease-out 0s;
 }
 body.rp-keyboard-open .step-lead .rp-screen-footer { display: none; }
-body.rp-keyboard-open .step-lead .rp-center { margin-block: 0; }
 body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-bottom: 32px; }
 
 /* Calendar outer shell uses the same glass as every consultation panel. */
@@ -1727,8 +1773,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   margin: 0 0 8px;
   color: #8f2b31;
   font-size: 8px;
-  font-weight: 900;
-  letter-spacing: .18em;
+  font-weight: 800;
+  letter-spacing: .14em;
   text-transform: uppercase;
 }
 .step-calendar h2 { font-size: clamp(29px, 7vw, 36px); margin-bottom: 5px; }
@@ -1848,7 +1894,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   border-radius: 16px;
   text-align: left;
 }
-.rp-selected-date small { display: block; color: var(--red); font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.rp-selected-date small { display: block; color: var(--red); font-size: 8px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .rp-selected-date strong { display: block; margin-top: 3px; font-size: 13px; }
 .rp-selected-date em { color: var(--red); font-size: 10px; font-style: normal; font-weight: 800; }
 .rp-time-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
@@ -2020,6 +2066,20 @@ const rpServices = {
 
 const rpTierPrices = { 1: 199, 2: 299, 3: 399, 4: 499, 5: 599 };
 
+/* Recurring maintenance plans — industry-standard discount bands for a
+   no-contract, cancel-anytime recurring cleaning service. Discount applies
+   to the per-visit price; visitsPerMonth is used to show the total monthly
+   commitment (e.g. Weekly = 4 visits/month, billed at 4x the per-visit rate). */
+const rpFrequencyPlans = {
+  "Weekly":   { discount: 0.20, visitsPerMonth: 4 },
+  "Biweekly": { discount: 0.15, visitsPerMonth: 2 },
+  "Monthly":  { discount: 0.10, visitsPerMonth: 1 },
+  "One-Time": { discount: 0,    visitsPerMonth: 1 }
+};
+function rpFrequencyPlan() {
+  return rpFrequencyPlans[rpState.frequency] || null;
+}
+
 function rpMaintenancePrice(bedrooms, bathrooms) {
   const beds = Number(bedrooms || 1);
   const baths = Number(bathrooms || 1);
@@ -2030,7 +2090,7 @@ const rpAddonCatalog = {
   carpet:  { label: "Carpet Cleaning",     unit: "room", bundlePrice: 50 },
   junk:    { label: "Junk Haul",           half: 100, full: 200 },
   windows: { label: "Exterior Windows",    basic: 100, premium: 200 },
-  garage:  { label: "Garage Floor Wash",   price: 100 },
+  garage:  { label: "Garage Floor Wash",   price: 150 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
   yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 }
@@ -2075,7 +2135,7 @@ function rpCurrentFlow() { return rpFlows[rpState.service] || []; }
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
 function rpTimeEstimate() {
-  if (rpState.service === "moveout" || rpState.service === "movein") return "6–10 hours";
+  if (rpState.service === "moveout") return "6–10 hours";
   if (rpState.service === "deep") return "Up to 6 hours";
   if (rpState.service === "maintenance") return "Up to 4 hours";
   if (rpState.service === "airbnb") return "Varies by property size";
@@ -2083,7 +2143,7 @@ function rpTimeEstimate() {
   return "";
 }
 function rpTeamSize() {
-  if (rpState.service === "moveout" || rpState.service === "movein") return "2 cleaners";
+  if (rpState.service === "moveout") return "2 cleaners";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
   if (rpState.service === "airbnb") return "1–2 cleaners";
   if (rpState.service === "carpet") return "1 technician";
@@ -2113,9 +2173,11 @@ function rpCalculatePrice() {
   }
   if (rpState.service === "maintenance") {
     if (!rpState.bedrooms) return 0;
-    return rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms) + rpAddonsTotal();
+    const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms) + rpAddonsTotal();
+    const plan = rpFrequencyPlan();
+    return plan ? Math.round(base * (1 - plan.discount)) : base;
   }
-  if (["moveout", "movein", "deep"].includes(rpState.service)) {
+  if (["moveout", "deep"].includes(rpState.service)) {
     if (!rpState.bedrooms) return 0;
     const base = rpTierPrices[Math.min(Number(rpState.bedrooms), 5)] || rpTierPrices[5];
     return base + rpAddonsTotal();
@@ -2135,6 +2197,23 @@ function rpPriceLabel() {
   if (rpState.service === "airbnb") return "Custom Quote";
   if (!total) return "$0";
   return `$${total}`;
+}
+
+function rpIsRecurringPlan() {
+  return rpState.service === "maintenance" && !!rpFrequencyPlan() && rpFrequencyPlan().visitsPerMonth > 1;
+}
+function rpMonthlyTotal() {
+  const plan = rpFrequencyPlan();
+  const perVisit = rpFinalPrice();
+  if (!plan || !perVisit) return 0;
+  return perVisit * plan.visitsPerMonth;
+}
+function rpFrequencySummary() {
+  const plan = rpFrequencyPlan();
+  if (!plan || !rpState.frequency) return "";
+  if (rpState.frequency === "One-Time") return "One-Time · no recurring plan";
+  const pct = Math.round(plan.discount * 100);
+  return `${rpState.frequency} · ${pct}% off recurring rate`;
 }
 
 /* =========================================================================
@@ -2319,7 +2398,7 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "bedrooms") {
-    const isTiered = ["moveout", "movein", "deep"].includes(rpState.service);
+    const isTiered = ["moveout", "deep"].includes(rpState.service);
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bedrooms?</h2>
@@ -2365,12 +2444,14 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How often would you like cleanings?</h2>
-      <div class="rp-q-gap"></div>
+      <p class="rp-sub">Recurring plans save you money — cancel or reschedule anytime, no contract.</p>
       <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly')", title:"Weekly", desc:"Our most popular recurring plan." })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly')", title:"Biweekly", desc:"Every two weeks." })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly')", title:"Monthly", desc:"Once-a-month upkeep." })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly')", title:"Weekly", desc:"Our most popular recurring plan.", val:"Save 20%" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly')", title:"Biweekly", desc:"Every two weeks.", val:"Save 15%" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly')", title:"Monthly", desc:"Once-a-month upkeep.", val:"Save 10%" })}
+        ${rpRowBtn({ onclick:"rpSelectFrequency('One-Time')", title:"One-Time", desc:"A single visit, no recurring plan." })}
       </div>
+      <p class="rp-fineprint">Recurring plans are billed per visit — no long-term contract, and you can cancel or change your schedule anytime.</p>
     </div>` };
   }
 
@@ -2447,7 +2528,7 @@ function rpAddonsScreen(eyebrow) {
     carpet:  { icon: "layers", label: "Carpet Cleaning", desc: "Hot-water extraction for a deeper carpet clean." },
     junk:    { icon: "truck",  label: "Junk Haul", desc: "Bagged trash, furniture, and light debris removed." },
     windows: { icon: "window", label: "Exterior Windows", desc: "Exterior glass wash; screens available separately." },
-    garage:  { icon: "car",    label: "Garage Floor Wash", desc: "Garage must be empty; we sweep and wash the concrete floor." },
+    garage:  { icon: "car",    label: "Garage Floor Wash", desc: "A soft wash lifts embedded oils, then we scrub the concrete floor." },
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
     fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
     yard:    { icon: "leaf",   label: "Yard Refresh", desc: "Mow, trim, edge, and clear hard surfaces." }
@@ -2456,7 +2537,7 @@ function rpAddonsScreen(eyebrow) {
     if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
     if (key === "junk") return rpState.junkSize === "half" ? "Half Truck · $100" : rpState.junkSize === "full" ? "Full Truck · $200" : "Custom Quote";
     if (key === "windows") return rpState.windowsTier === "basic" ? "Basic Wash · $100" : "Premium Wash · $200";
-    if (key === "garage") return "$100";
+    if (key === "garage") return "$150";
     if (key === "laundry") return "$35/load";
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
     if (key === "yard") {
@@ -2493,7 +2574,7 @@ function rpAddonsScreen(eyebrow) {
       return `
         <p class="rp-tap-note"><strong>Garage must be completely empty before service.</strong></p>
         <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Add Floor Wash<br><small>$100</small></button>
+          <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Add Floor Wash<br><small>$150</small></button>
           <button class="rp-pill ${!rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(false)">Not Needed</button>
         </div>`;
     }
@@ -2575,7 +2656,7 @@ function rpAddonSummaryRows() {
   if (rpState.junkSize === "custom") rows.push(`<div class="rp-mini-row"><span>Junk Haul</span><strong>Larger load · Custom Quote</strong></div>`);
   if (rpState.windowsTier === "basic") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Basic Wash · $100</strong></div>`);
   if (rpState.windowsTier === "premium") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Premium Wash · $200</strong></div>`);
-  if (rpState.garageWash) rows.push(`<div class="rp-mini-row"><span>Garage Floor Wash</span><strong>$100</strong></div>`);
+  if (rpState.garageWash) rows.push(`<div class="rp-mini-row"><span>Garage Floor Wash</span><strong>$150</strong></div>`);
   if (rpState.laundryLoads) rows.push(`<div class="rp-mini-row"><span>Laundry Service</span><strong>$${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}</strong></div>`);
   if (rpState.fridgeAddon) rows.push(`<div class="rp-mini-row"><span>Refrigerator Interior</span><strong>$${rpAddonCatalog.fridge.price}</strong></div>`);
   if (rpState.yardTier === "normal") rows.push(`<div class="rp-mini-row"><span>Yard Refresh</span><strong>$100</strong></div>`);
@@ -2602,13 +2683,18 @@ function rpEstimateScreen(eyebrow) {
       </div>
       <div class="rp-guarantee">${rpIcon("check","rp-ic rp-ic-sm")} The Red Prairie Promise — we make it right.</div>
     </div>
+    ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
+    <div class="rp-recurring-summary">
+      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${final} each</span><strong>$${rpMonthlyTotal()}/mo</strong></div>` : ""}
+      <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
+    </div>` : ""}
     <div class="rp-invoice">
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
       ${rpTeamSize() ? `<div class="rp-mini-row"><span>Team Size</span><strong>${rpTeamSize()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
-      ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpState.frequency}</strong></div>` : ""}
+      ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.heavySoil ? `<div class="rp-mini-row"><span>Heavy soil/staining</span><strong>Noted</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.petOdor ? `<div class="rp-mini-row"><span>Pet odor</span><strong>Noted</strong></div>` : ""}
@@ -2653,6 +2739,9 @@ function rpEscapeAttr(value) {
 function rpCaptureLeadField(field, value) {
   rpState[field] = value;
 }
+function rpClearLeadFieldError(element) {
+  if (element.classList.contains("is-invalid")) element.classList.remove("is-invalid");
+}
 function rpLeadFieldFocus(element) {
   window.setTimeout(() => {
     try { element.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (error) {}
@@ -2665,14 +2754,14 @@ function rpLeadScreen(eyebrow) {
     <p class="rp-sub">Add the contact and property details we need to confirm your cleaning.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-row rp-lead-row-contact">
-        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
-        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@email.com" oninput="rpCaptureLeadField('email',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
-      <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" oninput="rpCaptureLeadField('address1',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@email.com" oninput="rpCaptureLeadField('email',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" oninput="rpCaptureLeadField('address1',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-row">
-        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
-        <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
     </div>
@@ -3010,7 +3099,8 @@ function rpGetEstimatePayload() {
   const jobDetails = [
     `Service: ${service}`, `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
-    `Condition: ${rpState.condition || "N/A"}`, `Frequency: ${rpState.frequency || "N/A"}`,
+    `Condition: ${rpState.condition || "N/A"}`, `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
+    `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo (${rpFrequencyPlan().visitsPerMonth} visits at $${total} each, no contract)` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
@@ -3031,6 +3121,10 @@ function rpGetEstimatePayload() {
     helpers_count: "N/A", hours_count: "N/A",
     addons: addonsList,
     condition: rpState.condition || "N/A", frequency: rpState.frequency || "N/A",
+    frequency_discount_percent: rpFrequencyPlan() ? Math.round(rpFrequencyPlan().discount * 100) : 0,
+    visits_per_month: rpFrequencyPlan() ? rpFrequencyPlan().visitsPerMonth : "N/A",
+    monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal() : "N/A",
+    no_contract: rpState.service === "maintenance" ? "Yes" : "N/A",
     heavy_soil: rpState.heavySoil ? "Yes" : "No", pet_odor: rpState.petOdor ? "Yes" : "No",
     airbnb_laundry: rpState.airbnbLaundry ? "Yes" : "No", airbnb_restocking: rpState.airbnbRestocking ? "Yes" : "No", airbnb_same_day: rpState.airbnbSameDay ? "Yes" : "No",
     exterior_windows_tier: rpState.windowsTier || "N/A",
@@ -3047,7 +3141,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3055,20 +3149,49 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   return true;
 }
 function rpSubmitLeadAndShowCalendar() {
-  const fullName = document.getElementById("rpFullName").value.trim();
-  const phone = document.getElementById("rpPhone").value.trim();
-  const email = document.getElementById("rpEmail").value.trim();
-  const address1 = document.getElementById("rpAddress1").value.trim();
-  const city = document.getElementById("rpCity").value.trim();
-  const postalCode = document.getElementById("rpPostalCode").value.trim();
+  const fields = {
+    rpFullName: document.getElementById("rpFullName"),
+    rpPhone: document.getElementById("rpPhone"),
+    rpEmail: document.getElementById("rpEmail"),
+    rpAddress1: document.getElementById("rpAddress1"),
+    rpCity: document.getElementById("rpCity"),
+    rpPostalCode: document.getElementById("rpPostalCode")
+  };
+  const fullName = fields.rpFullName.value.trim();
+  const phone = fields.rpPhone.value.trim();
+  const email = fields.rpEmail.value.trim();
+  const address1 = fields.rpAddress1.value.trim();
+  const city = fields.rpCity.value.trim();
+  const postalCode = fields.rpPostalCode.value.trim();
   const specialInstructions = document.getElementById("rpSpecialInstructions").value.trim();
   const errorBox = document.getElementById("rpFormError");
-  const emailLooksValid = email.includes("@") && email.includes(".");
-  if (!fullName || !phone || !emailLooksValid || !address1 || !city || !postalCode) {
+
+  const phoneDigits = phone.replace(/\D/g, "");
+  const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  const postalLooksValid = /^\d{5}(-\d{4})?$/.test(postalCode);
+
+  const checks = [
+    { field: fields.rpFullName, valid: fullName.length >= 2, message: "Please enter your full name." },
+    { field: fields.rpPhone, valid: phoneDigits.length >= 10, message: "Please enter a valid 10-digit phone number." },
+    { field: fields.rpEmail, valid: emailLooksValid, message: "Please enter a valid email address." },
+    { field: fields.rpAddress1, valid: !!address1, message: "Please enter your street address." },
+    { field: fields.rpCity, valid: !!city, message: "Please enter your city." },
+    { field: fields.rpPostalCode, valid: postalLooksValid, message: "Please enter a valid ZIP code." }
+  ];
+
+  Object.values(fields).forEach((el) => el.classList.remove("is-invalid"));
+  const firstInvalid = checks.find((check) => !check.valid);
+  if (firstInvalid) {
+    firstInvalid.field.classList.add("is-invalid");
+    checks.forEach((check) => { if (!check.valid) check.field.classList.add("is-invalid"); });
+    errorBox.textContent = firstInvalid.message;
     errorBox.style.display = "block";
-    rpTrack("lead_validation_error");
+    firstInvalid.field.scrollIntoView({ behavior: "smooth", block: "center" });
+    firstInvalid.field.focus({ preventScroll: true });
+    rpTrack("lead_validation_error", { field: firstInvalid.field.id });
     return;
   }
+  errorBox.style.display = "none";
   rpState.fullName = fullName; rpState.phone = phone; rpState.email = email; rpState.address1 = address1; rpState.city = city; rpState.state = "OK"; rpState.postalCode = postalCode; rpState.specialInstructions = specialInstructions;
 
   rpSendEstimateToGoHighLevel({
