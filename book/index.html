@@ -3123,7 +3123,7 @@ function rpGetEstimatePayload() {
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${subtotal - total})` : "No"}`,
-    `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`
+    `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
   ].join(" | ");
   return {
     source: "Red Prairie Website Instant Estimator", business: "Red Prairie Cleaning",
@@ -3143,6 +3143,9 @@ function rpGetEstimatePayload() {
     visits_per_month: rpFrequencyPlan() ? rpFrequencyPlan().visitsPerMonth : "N/A",
     monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal() : "N/A",
     no_contract: rpState.service === "maintenance" ? "Yes" : "N/A",
+    ad_attribution: rpAttributionSummary(),
+    gclid: rpAttribution.gclid || "", gbraid: rpAttribution.gbraid || "", wbraid: rpAttribution.wbraid || "",
+    utm_source: rpAttribution.utm_source || "", utm_medium: rpAttribution.utm_medium || "", utm_campaign: rpAttribution.utm_campaign || "",
     heavy_soil: rpState.heavySoil ? "Yes" : "No", pet_odor: rpState.petOdor ? "Yes" : "No",
     airbnb_laundry: rpState.airbnbLaundry ? "Yes" : "No", airbnb_restocking: rpState.airbnbRestocking ? "Yes" : "No", airbnb_same_day: rpState.airbnbSameDay ? "Yes" : "No",
     exterior_windows_tier: rpState.windowsTier || "N/A",
@@ -3159,7 +3162,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3376,6 +3379,24 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener("scroll", rpSyncAppViewport, { passive: true });
 }
 
+/* Ad-attribution capture — reads gclid/gbraid/wbraid/UTM params from the URL
+   so a booking can be traced back to the ad or campaign that drove it. These
+   only reach GHL via the "notes" field on the actual booking POST (see
+   rpGetEstimatePayload), since that's the only channel that's proven to
+   deliver data to the office today. */
+const rpAttributionKeys = ["gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid"];
+const rpAttribution = (function rpCaptureAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  const found = {};
+  rpAttributionKeys.forEach((key) => { const v = params.get(key); if (v) found[key] = v; });
+  return found;
+})();
+function rpAttributionSummary() {
+  const keys = Object.keys(rpAttribution);
+  if (!keys.length) return "Direct / no ad attribution";
+  return keys.map((k) => `${k}=${rpAttribution[k]}`).join(", ");
+}
+
 /* URL-based service preselect — e.g. /book?service=moveout skips the picker
    screen and opens straight into that service's flow. Used by Google Ads
    final URLs and landing-page CTAs that already know the visitor's intent.
@@ -3396,7 +3417,7 @@ const rpPreselectedService = (function rpApplyServicePreselect() {
 
 /* Boot */
 rpRender();
-rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : "direct", preselected_service: rpPreselectedService || "none" });
+rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : "direct", preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
 </script>
 </body>
 </html>

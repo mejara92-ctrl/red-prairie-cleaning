@@ -2,6 +2,27 @@
 
 <html lang="en">
 <head>
+<script>
+/* Mobile homepage -> /book redirect. Flip RP_MOBILE_HOMEPAGE_REDIRECT to
+   false to disable without removing this block. Only fires on the exact
+   homepage, only for mobile viewports, and only once per browser session
+   (sessionStorage) so a visitor who deliberately comes back to "/" after
+   being sent to /book isn't bounced right back. */
+(function () {
+  var RP_MOBILE_HOMEPAGE_REDIRECT = true;
+  if (!RP_MOBILE_HOMEPAGE_REDIRECT) return;
+  var path = window.location.pathname;
+  if (path !== "/" && path !== "/index.html") return;
+  if (!(window.matchMedia && window.matchMedia("(max-width: 768px)").matches)) return;
+  try {
+    if (sessionStorage.getItem("rpSkipHomepageRedirect")) return;
+    sessionStorage.setItem("rpSkipHomepageRedirect", "1");
+  } catch (e) { /* storage unavailable — still redirect once, just without loop protection */ }
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "mobile_homepage_redirect", destination: "/book" });
+  window.location.replace("/book" + window.location.search);
+})();
+</script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8D3WCS17S"></script>
 <script>
@@ -13,6 +34,7 @@
 </script>
 
 <meta charset="utf-8"/>
+<script src="/js/rp-link-attribution.js" defer></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Red Prairie Cleaning | Factory Reset Move-Out Cleaning in Lawton &amp; Fort Sill</title>
 <!-- Favicons -->
