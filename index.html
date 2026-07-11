@@ -2053,6 +2053,21 @@ window.__rpScheduleDeferred(function(){
     }
 </style>
 <style id="rp-estimator-v2">
+    /* Footer trust badges: same squared-chip language as the hero/estimator
+       badges (border-radius in the 8-12px family, not a full pill), just
+       tuned for the footer's dark background. */
+    .footer-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .footer-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+        color: #e8e8e8; font-size: 12px; font-weight: 700;
+        padding: 6px 10px; border-radius: 10px;
+    }
+    .footer-services-label {
+        color: #8a8a8a !important; font-size: 11px !important; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 6px !important;
+    }
+    .footer-services-label:first-of-type { margin-top: 0 !important; }
     .rp-hero-text-link { text-align: center; margin: 10px 0 0; }
     .rp-hero-text-link a {
         color: #fff; font-weight: 800; font-size: 14px; text-decoration: underline;
@@ -2074,6 +2089,21 @@ window.__rpScheduleDeferred(function(){
         border-radius: 8px !important;
     }
     .rp-discount-card { border-color: #cfae4a !important; background: #fffaf0; }
+    /* Calmer, consistent card language for the Quote Summary screen:
+       one bold black price card leads, everything else below it is a
+       plain white card with a thin colored left border instead of a
+       full solid-colored background -- avoids five different shouting
+       colors competing on one screen. */
+    .rp-guarantee-note {
+        display: block !important; background: #fff !important; border: 1px solid #e6e6e6 !important;
+        border-left: 3px solid #2ea44f !important; border-radius: 8px !important;
+        color: #222 !important; text-align: left !important; justify-content: flex-start !important;
+        font-size: 13px !important; padding: 10px 14px !important;
+    }
+    .rp-notice {
+        background: #fff !important; border: 1px solid #e6e6e6 !important;
+        border-left: 3px solid #c8862a !important;
+    }
     .rp-discount-row { color: #8a6d1a; font-weight: 900; }
     .rp-discount-row span:first-child { color: #8a6d1a; }
     @media (max-width: 699px) {
@@ -2250,9 +2280,9 @@ window.__rpScheduleDeferred(function(){
 </div>
 </section></main><footer>
 <div class="footer-content">
-<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, Factory Reset™ move-in cleaning, deep cleaning, carpet cleaning, upholstery, Airbnb turnover, and basic commercial cleaning across Southwest Oklahoma.</p><p><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</p><p><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Proud Member of the Lawton Fort Sill Chamber of Commerce</p></div>
+<div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, deep cleaning, maintenance cleaning, and carpet cleaning — plus yard care, junk hauling, window washing, Airbnb turnover, upholstery, and commercial cleaning across Southwest Oklahoma.</p><div class="footer-badges"><span class="footer-badge"><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span><span class="footer-badge"><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Chamber of Commerce Member</span></div></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan</li></ul></div>
-<div><h3>Services</h3><ul><li>Factory Reset™ Move-Out</li><li>Factory Reset™ Move-In</li><li>Deep Cleaning</li><li>Basic Cleaning</li><li>Airbnb Turnover</li><li>Carpet Extraction Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
+<div><h3>Services</h3><p class="footer-services-label">Core Services</p><ul><li>Factory Reset™ Move-Out Clean</li><li>Deep Cleaning</li><li>Maintenance Cleaning</li><li>Carpet Cleaning</li></ul><p class="footer-services-label">Also Available</p><ul><li>Yard Refresh</li><li>Exterior Windows</li><li>Junk Hauling</li><li>Airbnb Turnover</li><li>Hourly Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">
@@ -2506,7 +2536,7 @@ function rpRender() {
           <span>Professional hot-water extraction that lifts stains, dirt, and odors.</span>
         </button>
       </div>
-      <p class="rp-fineprint">Need Airbnb turnover, upholstery, or commercial cleaning instead? <a href="sms:5802150915">Text us</a> and we'll take care of it.</p>
+      <p class="rp-fineprint">Need something else — exterior windows, junk hauling, lawn care, Airbnb turnover, hourly cleaning, upholstery, or commercial cleaning? <a href="sms:5802150915">Text us</a> and we'll take care of it.</p>
     `;
     return;
   }
@@ -2802,11 +2832,6 @@ function rpRenderEstimateStep() {
   app.innerHTML = `
     ${rpLivePrice(isQuoteOnly ? "our team will confirm your exact price." : "looks good. You can reserve your cleaning next.")}
     <div class="rp-guarantee-note">✓ Satisfaction Guaranteed — if we miss something, just tell us and we'll make it right.</div>
-    ${!isQuoteOnly ? `
-    <label class="rp-checkbox-card rp-discount-card">
-      <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
-      <div><strong>🎖️ Military or First Responder?</strong><span>Save 10% as a thank-you for your service.</span></div>
-    </label>` : ""}
     <h2>Quote Summary</h2>
     <div class="rp-invoice">
       <div class="rp-mini-row"><span>Service</span><strong>${service.name}</strong></div>
@@ -2826,6 +2851,11 @@ function rpRenderEstimateStep() {
       ${rpState.handymanInterest ? `<div class="rp-mini-row"><span>Handyman &amp; Turnover interest</span><strong>Yes</strong></div>` : ""}
       ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>🎖️ Military &amp; First Responder Discount (10%)</span><strong>-$${subtotal - final}</strong></div>` : ""}
     </div>
+    ${!isQuoteOnly ? `
+    <label class="rp-checkbox-card rp-discount-card">
+      <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
+      <div><strong>🎖️ Military or First Responder?</strong><span>Save 10% as a thank-you for your service.</span></div>
+    </label>` : ""}
     <div class="rp-notice">Final price may change for severe mess, heavy trash, unusual access issues, biohazard conditions, or work beyond scope.</div>
     ${showHandymanHere ? `
     <label class="rp-checkbox-card rp-handyman-card">
@@ -3043,6 +3073,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
@@ -3122,7 +3153,7 @@ function rpSetupImageLightbox() {
 rpRender();
 rpSetupStickyMobileCta();
 rpSetupImageLightbox();
-document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); const booking = document.getElementById("booking"); if (booking) { booking.scrollIntoView({ behavior: "smooth", block: "start" }); setTimeout(() => rpScrollToCalculator(), 220); } });
+document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); rpScrollToCalculator(); });
 </script>
 <script>
 /*
