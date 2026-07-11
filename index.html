@@ -2053,6 +2053,11 @@ window.__rpScheduleDeferred(function(){
     }
 </style>
 <style id="rp-estimator-v2">
+    #rpStepper.rp-stepper {
+        display: block; text-align: center; font-size: 12.5px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .03em; color: var(--red);
+        margin-bottom: 12px;
+    }
     .rp-discount-card { border-color: #cfae4a !important; background: #fffaf0; }
     .rp-discount-row { color: #8a6d1a; font-weight: 900; }
     .rp-discount-row span:first-child { color: #8a6d1a; }
@@ -2173,12 +2178,7 @@ window.__rpScheduleDeferred(function(){
 </div>
 <div class="rp-card">
 <div class="rp-live-badge">Live Booking Calculator</div>
-<div class="rp-stepper" id="rpStepper">
-<div class="rp-stepper-item" data-stage="1"><span class="rp-stepper-dot">1</span><span class="rp-stepper-name">Choose</span></div>
-<div class="rp-stepper-item" data-stage="2"><span class="rp-stepper-dot">2</span><span class="rp-stepper-name">Included</span></div>
-<div class="rp-stepper-item" data-stage="3"><span class="rp-stepper-dot">3</span><span class="rp-stepper-name">Price</span></div>
-<div class="rp-stepper-item" data-stage="4"><span class="rp-stepper-dot">4</span><span class="rp-stepper-name">Book</span></div>
-</div>
+<div class="rp-stepper" id="rpStepper">Step 1 of 4 · Choose Your Service</div>
 <div id="rpApp"></div>
 </div>
 </div>
@@ -2265,6 +2265,7 @@ const rpState = {
   addonCarpetRooms: 0,
   expandedAddon: null,
   windowsTier: null,
+  yardTier: null,
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
@@ -2323,14 +2324,15 @@ const rpAddonCatalog = {
   // NOTE: no dollar amount was specified for Refrigerator Interior in the
   // brief ("Optional add-on," no price given). Defaulted to $50 as a
   // reasonable single-appliance add-on price -- flag/confirm this number.
-  fridge:  { label: "Refrigerator Interior", price: 50 }
+  fridge:  { label: "Refrigerator Interior", price: 50 },
+  yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 }
 };
 
 // Which add-ons show for which primary service, per the spec.
 const rpServiceAddons = {
-  moveout:     ["carpet", "junk", "windows", "garage"],
-  deep:        ["fridge", "carpet", "laundry", "windows", "garage"],
-  maintenance: ["laundry", "windows"]
+  moveout:     ["carpet", "junk", "windows", "garage", "yard"],
+  deep:        ["fridge", "carpet", "laundry", "windows", "garage", "yard"],
+  maintenance: ["laundry", "windows", "yard"]
 };
 
 // What's included at no extra charge, shown on the "what's included" screen.
@@ -2374,27 +2376,25 @@ function rpAdvance() {
   if (next) rpGoToStep(next);
 }
 
-function rpStepLabel() {
-  if (rpState.step === "service") return "Choose Service";
-  if (rpState.step === "estimate") return "Instant Price";
-  if (rpState.step === "lead" || rpState.step === "calendar") return "Book Appointment";
-  return "A Few Quick Details";
+function rpStepStage() {
+  if (rpState.step === "service") return 1;
+  if (rpState.step === "estimate") return 3;
+  if (rpState.step === "lead" || rpState.step === "calendar") return 4;
+  return 2;
+}
+function rpStepStageLabel() {
+  const stage = rpStepStage();
+  if (stage === 1) return "Choose Your Service";
+  if (stage === 2) return "Build Your Quote";
+  if (stage === 3) return "Your Price";
+  return "Book Your Appointment";
 }
 
-// Maps the current named step onto the existing 4-stage stepper UI
-// (Choose / Included / Price / Book) and progress bar.
+// Updates the single-line progress indicator ("Step X of 4 · Label")
+// that replaced the old 4-circle stepper UI.
 function rpUpdateProgress() {
-  let stage = 1;
-  if (rpState.step === "service") { stage = 1; }
-  else if (rpState.step === "estimate") { stage = 3; }
-  else if (rpState.step === "lead") { stage = 4; }
-  else if (rpState.step === "calendar") { stage = 4; }
-  else { stage = 2; }
-  document.querySelectorAll("#rpStepper .rp-stepper-item").forEach(function (el) {
-    const n = parseInt(el.getAttribute("data-stage"), 10);
-    el.classList.toggle("is-active", n === stage);
-    el.classList.toggle("is-done", n < stage);
-  });
+  const el = document.getElementById("rpStepper");
+  if (el) el.textContent = `Step ${rpStepStage()} of 4 · ${rpStepStageLabel()}`;
 }
 
 function rpTimeEstimate() {
@@ -2423,6 +2423,7 @@ function rpAddonsTotal() {
   if (rpState.garageWash) total += rpAddonCatalog.garage.price;
   if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
+  if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
   return total;
 }
 
@@ -2647,7 +2648,8 @@ function rpRender() {
       windows: { icon: "🪟", label: "Exterior Windows" },
       garage:  { icon: "🚗", label: "Garage Floor Wash" },
       laundry: { icon: "🧺", label: "Laundry Service" },
-      fridge:  { icon: "🧊", label: "Refrigerator Interior" }
+      fridge:  { icon: "🧊", label: "Refrigerator Interior" },
+      yard:    { icon: "🌱", label: "Yard Refresh" }
     };
     function summaryFor(key) {
       if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
@@ -2656,6 +2658,10 @@ function rpRender() {
       if (key === "garage") return "$100";
       if (key === "laundry") return "$35/load";
       if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
+      if (key === "yard") {
+        const yardLabels = { normal: "Yard Refresh · $100", overgrown: "Overgrown Yard · $150", xl: "XL Yard · $200", xlOvergrown: "XL Overgrown Yard · Starting at $250" };
+        return yardLabels[rpState.yardTier] || "";
+      }
       return "";
     }
     function bodyFor(key) {
@@ -2688,6 +2694,15 @@ function rpRender() {
           <div class="rp-choice-grid">
             <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Yes<br><small>$100</small></button>
             <button class="rp-pill ${!rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(false)">No</button>
+          </div>`;
+      }
+      if (key === "yard") {
+        return `
+          <div class="rp-choice-grid">
+            <button class="rp-pill ${rpState.yardTier === "normal" ? "is-selected" : ""}" onclick="rpSelectYardTier('normal')">🌱 Yard Refresh<br><small>Mow, trim &amp; blow · $100</small></button>
+            <button class="rp-pill ${rpState.yardTier === "overgrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('overgrown')">🌿 Overgrown Yard<br><small>Tall grass &amp; heavy trimming · $150</small></button>
+            <button class="rp-pill ${rpState.yardTier === "xl" ? "is-selected" : ""}" onclick="rpSelectYardTier('xl')">🌳 XL Yard<br><small>Large lot, mow, trim &amp; blow · $200</small></button>
+            <button class="rp-pill ${rpState.yardTier === "xlOvergrown" ? "is-selected" : ""}" onclick="rpSelectYardTier('xlOvergrown')">🌲 XL Overgrown Yard<br><small>Starting at $250, confirmed after inspection</small></button>
           </div>`;
       }
       if (key === "laundry") {
@@ -2766,6 +2781,10 @@ function rpAddonSummaryRows() {
   if (rpState.garageWash) rows.push(`<div class="rp-mini-row"><span>Garage Floor Wash</span><strong>$100</strong></div>`);
   if (rpState.laundryLoads) rows.push(`<div class="rp-mini-row"><span>Laundry Service</span><strong>$${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}</strong></div>`);
   if (rpState.fridgeAddon) rows.push(`<div class="rp-mini-row"><span>Refrigerator Interior</span><strong>$${rpAddonCatalog.fridge.price}</strong></div>`);
+  if (rpState.yardTier === "normal") rows.push(`<div class="rp-mini-row"><span>🌱 Yard Refresh</span><strong>$100</strong></div>`);
+  if (rpState.yardTier === "overgrown") rows.push(`<div class="rp-mini-row"><span>🌿 Overgrown Yard Refresh</span><strong>$150</strong></div>`);
+  if (rpState.yardTier === "xl") rows.push(`<div class="rp-mini-row"><span>🌳 XL Yard Refresh</span><strong>$200</strong></div>`);
+  if (rpState.yardTier === "xlOvergrown") rows.push(`<div class="rp-mini-row"><span>🌲 XL Overgrown Yard</span><strong>Starting at $250</strong></div>`);
   return rows.join("");
 }
 
@@ -2895,6 +2914,7 @@ function rpResetServiceState() {
   rpState.addonCarpetRooms = 0;
   rpState.expandedAddon = null;
   rpState.windowsTier = null;
+  rpState.yardTier = null;
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
@@ -2935,6 +2955,7 @@ function rpSelectAddonCarpetRooms(n) { rpState.addonCarpetRooms = n; rpState.exp
 function rpSelectAddonJunk(size) { rpState.junkSize = size; rpState.expandedAddon = null; rpRender(); }
 function rpSelectAddonWindows(tier) { rpState.windowsTier = tier; rpState.expandedAddon = null; rpRender(); }
 function rpSelectGarageWash(yes) { rpState.garageWash = yes; rpState.expandedAddon = null; rpRender(); }
+function rpSelectYardTier(tier) { rpState.yardTier = tier; rpState.expandedAddon = null; rpRender(); }
 function rpSelectLaundry(yes) { rpState.laundryLoads = yes ? 1 : 0; rpState.expandedAddon = null; rpRender(); }
 function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRender(); }
 
@@ -2967,7 +2988,8 @@ function rpGetEstimatePayload() {
     rpState.windowsTier ? `Exterior Windows: ${rpState.windowsTier}` : "",
     rpState.garageWash ? "Garage Floor Wash" : "",
     rpState.laundryLoads ? "Laundry Service" : "",
-    rpState.fridgeAddon ? "Refrigerator Interior" : ""
+    rpState.fridgeAddon ? "Refrigerator Interior" : "",
+    rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : ""
   ].filter(Boolean).join(", ") || "None";
   const jobDetails = [
     `Service: ${service}`, `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
@@ -3018,6 +3040,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
