@@ -2126,13 +2126,13 @@ window.__rpScheduleDeferred(function(){
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="../">Home</a></li>
-<li><a href="#booking">Estimate</a></li>
+<li><a href="/book?service=carpet">Estimate</a></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#equipment">Equipment</a></li>
 <li><a href="#reviews">Reviews</a></li>
 </ul>
 </nav>
-<a class="book-btn" href="#booking">Book Now</a>
+<a class="book-btn" href="/book?service=carpet">Book Now</a>
 </div>
 </header>
 
@@ -2167,11 +2167,11 @@ window.__rpScheduleDeferred(function(){
 <span>✓ Same-day &amp; next-day appointments often available</span>
 </div>
 <div class="hero-buttons">
-<a class="quote-btn" href="#booking">Get Carpet Cleaning Estimate</a>
+<a class="quote-btn" href="/book?service=carpet">Get Carpet Cleaning Estimate</a>
 </div>
 <p class="rp-hero-text-link"><a href="sms:5802150915">Prefer to text? Tap here →</a></p>
 </div>
-</section><section class="rp-funnel" id="booking">
+</section><section class="rp-funnel" id="booking" style="display:none" aria-hidden="true">
 <div class="rp-funnel-wrap">
 <div class="rp-card">
 <div class="rp-status-bar"><span class="rp-status-dot"></span>Live Estimator<span class="rp-status-divider"></span><span id="rpStepper">Step 1 of 4</span></div>
@@ -2197,7 +2197,7 @@ window.__rpScheduleDeferred(function(){
 <div>✓ Great for bedrooms, living rooms, halls, stairs, and rugs</div>
 <div>✓ Book online or text photos for a custom quote</div>
 </div>
-<a class="book-btn" href="#booking">Price Carpet Cleaning</a>
+<a class="book-btn" href="/book?service=carpet">Price Carpet Cleaning</a>
 </div>
 <div class="rp-package-card">
 <div class="rp-package-badge">Popular Carpet Package</div>
@@ -2211,7 +2211,7 @@ window.__rpScheduleDeferred(function(){
 <li>Can be booked alone or bundled with move-out cleaning</li>
 <li>Final price depends on carpet condition, room size, access, and travel</li>
 </ul>
-<a class="book-btn" href="#booking">Build Estimate</a>
+<a class="book-btn" href="/book?service=carpet">Build Estimate</a>
 </div>
 </div>
 </section><section class="rp-comparison">
@@ -2288,7 +2288,7 @@ window.__rpScheduleDeferred(function(){
 <li>Powerful suction for better moisture recovery</li>
 <li>Carpet grooming for a cleaner finished look</li>
 </ul>
-<a class="book-btn" href="#booking">Get Carpet Estimate</a>
+<a class="book-btn" href="/book?service=carpet">Get Carpet Estimate</a>
 </div>
 <div class="equipment-image">
 <img alt="Mytee professional carpet cleaning machine" decoding="async" height="1024" loading="lazy" src="../images/equipment/mytee-2002cs.webp" width="1536"/>
@@ -2402,7 +2402,7 @@ window.__rpScheduleDeferred(function(){
 </section><section class="final-cta">
 <h2>Ready For Cleaner Carpet?</h2>
 <p>Build your estimate, choose any service you need, and reserve online.</p>
-<a class="book-btn" href="#booking">Get Estimate</a>
+<a class="book-btn" href="/book?service=carpet">Get Estimate</a>
 </section></main><footer>
 <div class="footer-content">
 <div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, deep cleaning, maintenance cleaning, and carpet cleaning — plus yard care, junk hauling, window washing, Airbnb turnover, upholstery, and commercial cleaning across Southwest Oklahoma.</p><div class="footer-badges"><span class="footer-badge"><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span><span class="footer-badge"><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Chamber of Commerce Member</span></div></div>
@@ -2411,14 +2411,14 @@ window.__rpScheduleDeferred(function(){
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">
-<a class="book-btn" href="#booking">Estimate</a>
+<a class="book-btn" href="/book?service=carpet">Estimate</a>
 <a class="secondary-btn" href="sms:5802150915">Text</a>
 </div>
 <div aria-hidden="true" class="image-lightbox" id="imageLightbox">
 
 </div>
 <div class="sticky-mobile-cta" id="stickyMobileCta">
-<a class="quote-btn" href="#booking">Get Estimate</a>
+<a class="quote-btn" href="/book?service=carpet">Get Estimate</a>
 <a class="secondary-btn" href="sms:5802150915">Text</a>
 </div>
 <script>
@@ -3237,7 +3237,7 @@ function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-scri
 
 function rpSetupStickyMobileCta() {
   const sticky = document.querySelector(".sticky-mobile-cta");
-  const booking = document.querySelector("#booking");
+  const booking = document.querySelector(".rp-hero-text-link");
   if (!sticky || !booking) return;
 
   const update = () => {
@@ -3281,7 +3281,6 @@ function rpSetupImageLightbox() {
 rpRender();
 rpSetupStickyMobileCta();
 rpSetupImageLightbox();
-document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); rpScrollToCalculator(); });
 </script>
 <script>
 /*

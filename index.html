@@ -2145,13 +2145,13 @@ window.__rpScheduleDeferred(function(){
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
-<li><a href="#booking">Estimate</a></li>
+<li><a href="/book">Estimate</a></li>
 <li><a href="#reviews">Reviews</a></li>
 <li><a href="#before-after">Results</a></li>
 <li><a href="#faq">FAQ</a></li>
 </ul>
 </nav>
-<a class="book-btn" href="#booking">Book Now</a>
+<a class="book-btn" href="/book">Book Now</a>
 </div>
 </header>
 
@@ -2181,11 +2181,11 @@ window.__rpScheduleDeferred(function(){
 <span>✓ Same-day &amp; next-day appointments often available</span>
 </div>
 <div class="hero-buttons">
-<a class="quote-btn" href="#booking">Start Instant Estimate</a>
+<a class="quote-btn" href="/book">Start Instant Estimate</a>
 </div>
 <p class="rp-hero-text-link"><a href="sms:5802150915">Prefer to text? Tap here →</a></p>
 </div>
-</section><section class="rp-funnel" id="booking">
+</section><section class="rp-funnel" id="booking" style="display:none" aria-hidden="true">
 <div class="rp-funnel-wrap">
 <div class="rp-card">
 <div class="rp-status-bar"><span class="rp-status-dot"></span>Live Estimator<span class="rp-status-divider"></span><span id="rpStepper">Step 1 of 4</span></div>
@@ -2227,7 +2227,7 @@ window.__rpScheduleDeferred(function(){
 <p>Send your address, bedroom count, and any photos. We can help confirm the right service before you book.</p>
 <div class="cta-buttons">
 <a class="secondary-btn" href="sms:5802150915">Text Us</a>
-<a class="book-btn" href="#booking">Start Estimate</a>
+<a class="book-btn" href="/book">Start Estimate</a>
 </div>
 </section><section class="service-area">
 <h2>Serving Southwest Oklahoma</h2>
@@ -2257,7 +2257,7 @@ window.__rpScheduleDeferred(function(){
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">
-<a class="book-btn" href="#booking">Estimate</a>
+<a class="book-btn" href="/book">Estimate</a>
 <a class="secondary-btn" href="sms:5802150915">Text</a>
 </div>
 <div aria-hidden="true" class="image-lightbox" id="imageLightbox">
@@ -3079,7 +3079,7 @@ function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-scri
 
 function rpSetupStickyMobileCta() {
   const sticky = document.querySelector(".sticky-mobile-cta");
-  const booking = document.querySelector("#booking");
+  const booking = document.querySelector(".rp-hero-text-link");
   if (!sticky || !booking) return;
 
   const update = () => {
@@ -3123,7 +3123,6 @@ function rpSetupImageLightbox() {
 rpRender();
 rpSetupStickyMobileCta();
 rpSetupImageLightbox();
-document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); rpScrollToCalculator(); });
 </script>
 <script>
 /*

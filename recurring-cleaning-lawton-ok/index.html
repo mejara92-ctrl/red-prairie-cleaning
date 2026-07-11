@@ -2024,13 +2024,13 @@ window.__rpScheduleDeferred(function(){
 <nav aria-label="Primary navigation">
 <ul class="nav-links">
 <li><a href="../">Home</a></li>
-<li><a href="#booking">Estimate</a></li>
+<li><a href="/book?service=maintenance">Estimate</a></li>
 <li><a href="#plans">Plans</a></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#reviews">Reviews</a></li>
 </ul>
 </nav>
-<a class="book-btn" href="#booking">Book Now</a>
+<a class="book-btn" href="/book?service=maintenance">Book Now</a>
 </div>
 </header>
 
@@ -2064,11 +2064,11 @@ window.__rpScheduleDeferred(function(){
 <span>✓ Same-day &amp; next-day appointments often available</span>
 </div>
 <div class="hero-buttons">
-<a class="quote-btn" href="#booking">Get Affordable Estimate</a>
+<a class="quote-btn" href="/book?service=maintenance">Get Affordable Estimate</a>
 </div>
 <p class="rp-hero-text-link"><a href="sms:5802150915">Prefer to text? Tap here →</a></p>
 </div>
-</section><section class="rp-funnel" id="booking">
+</section><section class="rp-funnel" id="booking" style="display:none" aria-hidden="true">
 <div class="rp-funnel-wrap">
 <div class="rp-card">
 <div class="rp-status-bar"><span class="rp-status-dot"></span>Live Estimator<span class="rp-status-divider"></span><span id="rpStepper">Step 1 of 4</span></div>
@@ -2092,7 +2092,7 @@ window.__rpScheduleDeferred(function(){
 <div>✓ Affordable maintenance-first options available</div>
 <div>✓ Simple estimate and online booking</div>
 </div>
-<a class="book-btn" href="#booking">Price Maintenance Cleaning</a>
+<a class="book-btn" href="/book?service=maintenance">Price Maintenance Cleaning</a>
 </div>
 <div class="rp-package-card">
 <div class="rp-package-badge">Affordable Entry Point</div>
@@ -2106,7 +2106,7 @@ window.__rpScheduleDeferred(function(){
 <li>Monthly is best for already-clean homes</li>
 <li>Add-ons are optional so the estimate does not get inflated</li>
 </ul>
-<a class="book-btn" href="#booking">Build Affordable Estimate</a>
+<a class="book-btn" href="/book?service=maintenance">Build Affordable Estimate</a>
 </div>
 </div>
 </section><section class="rp-comparison" id="plans">
@@ -2247,7 +2247,7 @@ window.__rpScheduleDeferred(function(){
 </section><section class="final-cta">
 <h2>Ready To Stay Ahead Of The Mess?</h2>
 <p>Build your estimate, choose your frequency, and reserve your first recurring cleaning online.</p>
-<a class="book-btn" href="#booking">Get Started Today</a>
+<a class="book-btn" href="/book?service=maintenance">Get Started Today</a>
 </section></main><footer>
 <div class="footer-content">
 <div><h3>Red Prairie Cleaning</h3><p>Factory Reset™ move-out cleaning, deep cleaning, maintenance cleaning, and carpet cleaning — plus yard care, junk hauling, window washing, Airbnb turnover, upholstery, and commercial cleaning across Southwest Oklahoma.</p><div class="footer-badges"><span class="footer-badge"><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span><span class="footer-badge"><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Chamber of Commerce Member</span></div></div>
@@ -2256,7 +2256,7 @@ window.__rpScheduleDeferred(function(){
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">
-<a class="book-btn" href="#booking">Estimate</a>
+<a class="book-btn" href="/book?service=maintenance">Estimate</a>
 <a class="secondary-btn" href="sms:5802150915">Text</a>
 </div>
 <div aria-hidden="true" class="image-lightbox" id="imageLightbox">
@@ -3078,7 +3078,7 @@ function rpLoadCalendarScript() { if (document.getElementById("ghl-calendar-scri
 
 function rpSetupStickyMobileCta() {
   const sticky = document.querySelector(".sticky-mobile-cta");
-  const booking = document.querySelector("#booking");
+  const booking = document.querySelector(".rp-hero-text-link");
   if (!sticky || !booking) return;
 
   const update = () => {
@@ -3122,7 +3122,6 @@ function rpSetupImageLightbox() {
 rpRender();
 rpSetupStickyMobileCta();
 rpSetupImageLightbox();
-document.addEventListener("click", function(e) { const link = e.target.closest('a[href="#booking"]'); if (!link) return; e.preventDefault(); rpScrollToCalculator(); });
 </script>
 <script>
 /*

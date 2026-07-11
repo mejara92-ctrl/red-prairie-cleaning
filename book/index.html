@@ -2173,9 +2173,10 @@ function rpCalculatePrice() {
   }
   if (rpState.service === "maintenance") {
     if (!rpState.bedrooms) return 0;
-    const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms) + rpAddonsTotal();
+    const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
     const plan = rpFrequencyPlan();
-    return plan ? Math.round(base * (1 - plan.discount)) : base;
+    const discountedBase = plan ? Math.round(base * (1 - plan.discount)) : base;
+    return discountedBase + rpAddonsTotal();
   }
   if (["moveout", "deep"].includes(rpState.service)) {
     if (!rpState.bedrooms) return 0;
@@ -2186,6 +2187,10 @@ function rpCalculatePrice() {
 }
 
 function rpFinalPrice() {
+  if (rpState.service === "maintenance") {
+    if (!rpState.bedrooms) return 0;
+    return rpMaintenanceBasePerVisit() + rpAddonsOnceCharge();
+  }
   const subtotal = rpCalculatePrice();
   if (!subtotal) return subtotal;
   if (rpState.service === "airbnb") return subtotal;
@@ -2202,11 +2207,23 @@ function rpPriceLabel() {
 function rpIsRecurringPlan() {
   return rpState.service === "maintenance" && !!rpFrequencyPlan() && rpFrequencyPlan().visitsPerMonth > 1;
 }
+function rpMaintenanceBasePerVisit() {
+  if (rpState.service !== "maintenance" || !rpState.bedrooms) return 0;
+  const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
+  const plan = rpFrequencyPlan();
+  const discounted = plan ? Math.round(base * (1 - plan.discount)) : base;
+  return rpState.militaryDiscount ? Math.round(discounted * 0.9) : discounted;
+}
+function rpAddonsOnceCharge() {
+  const addons = rpAddonsTotal();
+  if (!addons) return 0;
+  return rpState.militaryDiscount ? Math.round(addons * 0.9) : addons;
+}
 function rpMonthlyTotal() {
   const plan = rpFrequencyPlan();
-  const perVisit = rpFinalPrice();
-  if (!plan || !perVisit) return 0;
-  return perVisit * plan.visitsPerMonth;
+  const basePerVisit = rpMaintenanceBasePerVisit();
+  if (!plan || !basePerVisit) return 0;
+  return basePerVisit * plan.visitsPerMonth;
 }
 function rpFrequencySummary() {
   const plan = rpFrequencyPlan();
@@ -2685,7 +2702,8 @@ function rpEstimateScreen(eyebrow) {
     </div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
-      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${final} each</span><strong>$${rpMonthlyTotal()}/mo</strong></div>` : ""}
+      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit()} each</span><strong>$${rpMonthlyTotal()}/mo</strong></div>` : ""}
+      ${rpIsRecurringPlan() && rpAddonsOnceCharge() ? `<div class="rp-recurring-total"><span>Add-ons for this visit (one-time)</span><strong>+$${rpAddonsOnceCharge()}</strong></div>` : ""}
       <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
     </div>` : ""}
     <div class="rp-invoice">
@@ -3100,7 +3118,7 @@ function rpGetEstimatePayload() {
     `Service: ${service}`, `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`, `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
-    `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo (${rpFrequencyPlan().visitsPerMonth} visits at $${total} each, no contract)` : "N/A"}`,
+    `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit()} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Handyman & Turnover interest: ${rpState.handymanInterest ? "Yes" : "No"}`,
@@ -3141,7 +3159,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3358,8 +3376,27 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener("scroll", rpSyncAppViewport, { passive: true });
 }
 
+/* URL-based service preselect — e.g. /book?service=moveout skips the picker
+   screen and opens straight into that service's flow. Used by Google Ads
+   final URLs and landing-page CTAs that already know the visitor's intent.
+   "movein" is aliased to "moveout" since Move-In and Move-Out share one
+   flow/card in this funnel. */
+const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance" };
+const rpPreselectedService = (function rpApplyServicePreselect() {
+  const params = new URLSearchParams(window.location.search);
+  const requested = (params.get("service") || "").trim().toLowerCase();
+  const resolved = rpServiceAliases[requested];
+  if (resolved && rpFlows[resolved]) {
+    rpState.service = resolved;
+    rpState.step = (rpFlows[resolved] || [])[0] || "service";
+    return resolved;
+  }
+  return null;
+})();
+
 /* Boot */
 rpRender();
+rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : "direct", preselected_service: rpPreselectedService || "none" });
 </script>
 </body>
 </html>
