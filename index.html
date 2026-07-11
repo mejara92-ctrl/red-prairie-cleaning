@@ -2058,10 +2058,20 @@ window.__rpScheduleDeferred(function(){
         color: #fff; font-weight: 800; font-size: 14px; text-decoration: underline;
         text-underline-offset: 3px; opacity: .92;
     }
-    #rpStepper.rp-stepper {
-        display: block; text-align: center; font-size: 12.5px; font-weight: 800;
-        text-transform: uppercase; letter-spacing: .03em; color: var(--red);
-        margin-bottom: 12px;
+    /* One unified status bar replacing the old separate pill badge +
+       stepper row. Squared radius intentionally matches .rp-card and
+       .rp-option instead of the old 999px pill shape, so every surface
+       in the estimator reads as one consistent design language. */
+    .rp-status-bar {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        background: var(--black); color: #fff; font-size: 11.5px; font-weight: 800;
+        letter-spacing: .02em; padding: 9px 14px; border-radius: 12px;
+        margin-bottom: 14px;
+    }
+    .rp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #33d17a; flex-shrink: 0; }
+    .rp-status-divider { width: 1px; height: 12px; background: rgba(255,255,255,.25); flex-shrink: 0; }
+    .rp-option .badge {
+        border-radius: 8px !important;
     }
     .rp-discount-card { border-color: #cfae4a !important; background: #fffaf0; }
     .rp-discount-row { color: #8a6d1a; font-weight: 900; }
@@ -2176,12 +2186,8 @@ window.__rpScheduleDeferred(function(){
 </div>
 </section><section class="rp-funnel" id="booking">
 <div class="rp-funnel-wrap">
-<div class="rp-funnel-header">
-<h2>Instant Price Estimate</h2>
-</div>
 <div class="rp-card">
-<div class="rp-live-badge">Live Booking Calculator</div>
-<div class="rp-stepper" id="rpStepper">Step 1 of 4 · Choose Your Service</div>
+<div class="rp-status-bar"><span class="rp-status-dot"></span>Live Estimator<span class="rp-status-divider"></span><span id="rpStepper">Step 1 of 4</span></div>
 <div id="rpApp"></div>
 </div>
 </div>
@@ -2385,19 +2391,13 @@ function rpStepStage() {
   if (rpState.step === "lead" || rpState.step === "calendar") return 4;
   return 2;
 }
-function rpStepStageLabel() {
-  const stage = rpStepStage();
-  if (stage === 1) return "Choose Your Service";
-  if (stage === 2) return "Build Your Quote";
-  if (stage === 3) return "Your Price";
-  return "Book Your Appointment";
-}
 
-// Updates the single-line progress indicator ("Step X of 4 · Label")
-// that replaced the old 4-circle stepper UI.
+// Single-line status bar ("Live Estimator · Step X of 4"). Only the step
+// count updates -- "Live Estimator" and the dot are static markup so this
+// never needs to rebuild the whole bar, just the number inside it.
 function rpUpdateProgress() {
   const el = document.getElementById("rpStepper");
-  if (el) el.textContent = `Step ${rpStepStage()} of 4 · ${rpStepStageLabel()}`;
+  if (el) el.textContent = `Step ${rpStepStage()} of 4`;
 }
 
 function rpTimeEstimate() {
@@ -3043,6 +3043,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   rpState.preBookingWebhookSent = true;
   return true;
 }
+
 function rpSubmitLeadAndShowCalendar() {
   const fullName = document.getElementById("rpFullName").value.trim();
   const phone = document.getElementById("rpPhone").value.trim();
