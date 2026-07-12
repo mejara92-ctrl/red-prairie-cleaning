@@ -3833,8 +3833,13 @@ async function rpConfirmNativeBooking() {
           postalCode: rpState.postalCode,
           startTime: rpState.selectedStartTime,
           service: rpServices[rpState.service]?.name || "Cleaning",
+          serviceKey: details.service_key,
           estimate: rpFinalPrice(),
+          bedrooms: details.bedrooms,
+          bathrooms: details.bathrooms,
+          specialInstructions: details.special_instructions,
           notes: details.job_details,
+          details,
           companyWebsite: "",
           dryRun: false
         })
