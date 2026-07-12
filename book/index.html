@@ -2253,9 +2253,12 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 }
 
 .step-lead .rp-screen-scroll {
+  padding-top: 16px !important;
   padding-bottom: 112px !important;
   scroll-padding-bottom: 112px;
 }
+.step-lead h2 { font-size: 24px; margin-bottom: 14px; }
+.step-lead .rp-center::before { margin-bottom: 8px; }
 .step-lead .rp-screen-footer {
   margin: 0 14px calc(7px + env(safe-area-inset-bottom));
   padding: 7px 9px 8px;
@@ -3231,7 +3234,6 @@ function rpLeadScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Almost done</h2>
-    <p class="rp-sub">Add the contact and property details we need to confirm your cleaning.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-row rp-lead-row-contact">
         <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
