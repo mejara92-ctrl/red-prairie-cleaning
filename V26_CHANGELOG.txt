@@ -1,6 +1,0 @@
-V26 /book alignment consistency
-
-- Centered the service-selection question inside its glass sheet using true centering instead of a left-margin offset.
-- Centered the generated panel label, step indicator, question heading, and short supporting copy on all estimator steps.
-- Centered the calendar question and supporting copy for the same visual rhythm.
-- Left option rows, prices, form fields, descriptions, and detailed content left-aligned for readability.
