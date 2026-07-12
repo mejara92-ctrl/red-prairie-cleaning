@@ -2304,6 +2304,38 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 }
 
 </style>
+
+<style id="rp-v26-panel-heading-alignment">
+/* V26 — consistent panel-header alignment across the full /book funnel.
+   Questions and their small progress/support copy are centered inside every
+   Prairie Glass panel. Choice rows, prices, forms, and detail content stay
+   left-aligned for fast scanning. */
+.step-service .rp-start-service-q {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: center !important;
+}
+
+.rp-screen:not(.step-service) .rp-center::before,
+.rp-screen:not(.step-service) .rp-center > .rp-eyebrow,
+.rp-screen:not(.step-service) .rp-center > h2,
+.rp-screen:not(.step-service) .rp-center > .rp-sub,
+.rp-screen.step-calendar .rp-calendar-shell > h2,
+.rp-screen.step-calendar .rp-calendar-shell > .rp-sub {
+  width: 100%;
+  text-align: center !important;
+}
+
+.rp-screen:not(.step-service) .rp-center > .rp-eyebrow {
+  justify-content: center;
+}
+
+.rp-screen:not(.step-service) .rp-center > .rp-sub,
+.rp-screen.step-calendar .rp-calendar-shell > .rp-sub {
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
 </head>
 <body>
 
@@ -3641,7 +3673,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
