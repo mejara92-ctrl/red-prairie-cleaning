@@ -1,0 +1,72 @@
+RED PRAIRIE CLEANING — V23 CHANGELOG
+/book only — design pass from the visual audit.
+
+1. Fixed a real contrast failure
+   -----------------------------
+   --faint (#9d9287) measured at 2.71:1 against the paper background —
+   below WCAG AA's 4.5:1 minimum for body text, and it was set on some of
+   the smallest text on the page (9.5–10.5px). Swapped every text usage
+   to --muted (#71685f, 4.86:1 — passes AA). Confirmed live in-browser on
+   the add-on detail sheets ("· $50 per room" style notes), which render
+   at the corrected color now.
+
+   Honest note: while auditing this, I found the two ".rp-footer-note"
+   disclaimer lines ("Confirmation sends only after your appointment
+   time is booked" / "You'll receive confirmation by text and email")
+   are actually set to display:none on both screens they're written for
+   (step-lead and step-calendar) — they were never visible to a real
+   user, contrast issue or not. Left them in place since removing markup
+   wasn't asked for, but flagging it: it's dead copy sitting in the
+   template, not a live bug.
+
+2. Trimmed the motion
+   -------------------
+   Removed the staggered per-row "rise in" animation that replayed on
+   every one of 8 steps (each element on screen fading/rising in with an
+   incremental delay, every single transition). Kept the one directional
+   slide animation (forward steps slide from the right, back steps from
+   the left) since that's functional — it reinforces which way you're
+   moving through the funnel. The decorative layer on top of it is gone.
+   Also removed the now-unused rpRise keyframe.
+
+3. Reduced background atmosphere
+   ------------------------------
+   Each screen was painting its own two radial gradients on top of the
+   two already coming from the app shell underneath — four overlapping
+   glows per screen, repeated at every step. Screens now use a plain
+   paper gradient and let the single ambient glow already on .rp-app
+   show through. Same warmth, a quarter of the layering, and one less
+   thing competing with the actual content for attention.
+
+4. Added a real signature element
+   -------------------------------
+   The price-reveal card had a giant, nearly-invisible "RP" monogram
+   watermark (opacity .045, and actually already suppressed sitewide by
+   a later CSS override from a prior pass — display:none !important —
+   so it hadn't been rendering at all). Replaced it with an inline SVG
+   wheat-sheaf mark — three fanned blades with a small grain cluster —
+   pulled from the same visual language as your actual logo mark, sized
+   large and bled off the corner of the card at 8% opacity. It's the one
+   moment on the page that's unmistakably Red Prairie rather than "a
+   nice premium checkout," on the one screen (the price reveal) that
+   deserves it most.
+
+Verification
+- node --check passed on every inline script across all 17 site pages
+  (only book/index.html was edited; the rest confirmed unaffected).
+- Rough brace-balance check passed on the full file (CSS + JS).
+- Live-rendered and inspected via Playwright/Chromium:
+  - watermark SVG confirmed present, sized 132×172, opacity 0.08
+  - corrected add-on tap-note color confirmed rendering at rgb(113,104,95)
+    (#71685f / --muted) in place of the old failing color
+  - existing already-correct disclaimer colors (estimate-screen dock
+    notice, lead-screen privacy note — both fixed in an earlier pass
+    per V18's changelog) confirmed untouched and still passing
+- No new console/page errors introduced.
+
+Not done
+- Real Google Fonts (DM Serif Display / Manrope) still couldn't be
+  verified in this offline sandbox — visually confirm the wheat-mark and
+  spacing in a real browser before calling this final.
+- No pricing, copy (other than the disclaimer dead-code note above), or
+  layout structure changes.

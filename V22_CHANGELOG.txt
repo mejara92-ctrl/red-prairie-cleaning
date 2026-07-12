@@ -1,0 +1,75 @@
+RED PRAIRIE CLEANING — V22 CHANGELOG
+/book only — no other pages touched.
+
+1. Native back button / gesture now steps back through the funnel
+   -------------------------------------------------------------
+   Previously the on-screen Back button mutated state directly and the
+   device's native back button/gesture had no hook into the funnel at
+   all — using it would leave /book entirely and drop all progress.
+
+   Now every forward step (service select, each flow step, entering the
+   calendar, moving from date-select to time-select) pushes a browser
+   history entry. The on-screen Back button and the "Choose a different
+   date" link now both just call history.back(); a single popstate
+   listener restores the prior screen's state and re-renders. This means
+   the native back button/gesture and the on-screen Back button now do
+   the exact same thing — reliably.
+
+   Backing out of the very first funnel step now correctly leaves /book
+   for whatever page the person arrived from, matching normal browser
+   behavior.
+
+2. Session resume via sessionStorage
+   ----------------------------------
+   A refresh, accidental tab close, low battery, or an incoming call no
+   longer resets the whole funnel. The person's own answers (service,
+   bedrooms/bathrooms, condition/frequency, every add-on choice, and
+   every contact-detail field they've typed) are saved to sessionStorage
+   after every screen change and restored on reload.
+
+   Deliberately NOT persisted: loading flags, fetched slot availability,
+   in-flight errors, or a previously selected calendar date/time — if
+   someone resumes into the calendar step, it always re-fetches live
+   availability and starts at date-selection rather than trusting a
+   stale time slot that may no longer be open.
+
+   Sessions expire after 3 hours — an old tab reopened the next day
+   starts fresh rather than surprising someone with yesterday's partial
+   quote.
+
+   An explicit ?service= URL parameter (ad click, landing-page CTA)
+   always wins over a resumable session — someone deliberately starting
+   a specific flow doesn't get pulled back into an old one.
+
+   The saved session is cleared the moment a booking is actually
+   confirmed, so a completed booking is never resumable and doesn't
+   linger in storage.
+
+Verification
+- node --check passed on every inline script across all 17 site pages
+  (book/index.html plus every other page — none of them were touched by
+  this change, confirmed unaffected).
+- Full functional test pass in a real Chromium browser (Playwright,
+  390×844 viewport) covering:
+  - native back button walking back through a multi-step flow
+  - backing all the way out to service selection correctly clears the
+    selected service
+  - backing out past the first screen leaves /book like a normal page
+  - switching to a different service after backing up mid-flow (history
+    forward-stack truncation) works cleanly
+  - session resume after a full page reload restores both the step and
+    every previously entered answer
+  - a session older than 3 hours is correctly NOT resumed
+  - a ?service= URL param correctly overrides a resumable saved session
+  - completing a booking clears the saved session
+  - the calendar's date -> time sub-stage: selecting a date, using
+    "Choose a different date," and using the native back button all
+    correctly move between date/time stages and clear any stale
+    selected time
+- No new console/page errors introduced (only pre-existing, expected
+  403s from Google/Clarity/Fonts being unreachable in the offline test
+  sandbox — unrelated to this change).
+
+Not touched
+- No visual, pricing, or copy changes.
+- No changes to any page other than /book.

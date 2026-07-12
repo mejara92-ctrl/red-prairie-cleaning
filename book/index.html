@@ -74,7 +74,7 @@ window.__rpScheduleDeferred(function(){
   --ink: #181512;
   --ink-soft: #37312b;
   --muted: #71685f;
-  --faint: #9d9287;
+  --faint: #9d9287; /* 2.71:1 on --paper — fails WCAG AA. Decorative use only, never text. */
   --paper: #f7f1e7;
   --paper-deep: #eadfce;
   --surface: #fffdf9;
@@ -220,10 +220,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .rp-screens { flex: 1; position: relative; overflow: hidden; }
 .rp-screen {
   position: absolute; inset: 0; display: flex; flex-direction: column;
-  background:
-    radial-gradient(620px 400px at 108% -8%, rgba(198,161,100,.14), transparent 62%),
-    radial-gradient(620px 420px at -12% 110%, rgba(159,32,39,.07), transparent 63%),
-    linear-gradient(180deg, #fbf7f0 0%, var(--paper) 100%);
+  /* Ambient warmth now lives once, on .rp-app::before, instead of being
+     re-added by every screen on top of it. */
+  background: linear-gradient(180deg, #fbf7f0 0%, var(--paper) 100%);
 }
 .rp-screen-scroll {
   flex: 1;
@@ -258,13 +257,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .rp-screen.exit-forward  { animation: rpOutFwd .34s cubic-bezier(.4,0,.6,1) both; }
   .rp-screen.enter-back    { animation: rpInBack .42s cubic-bezier(.22,.86,.28,1) both; }
   .rp-screen.exit-back     { animation: rpOutBack .34s cubic-bezier(.4,0,.6,1) both; }
-  .rp-screen.enter-forward .rp-center > *,
-  .rp-screen.enter-back .rp-center > * { animation: rpRise .46s cubic-bezier(.22,.86,.28,1) both; }
-  .rp-screen.enter-forward .rp-center > *:nth-child(2), .rp-screen.enter-back .rp-center > *:nth-child(2) { animation-delay: .035s; }
-  .rp-screen.enter-forward .rp-center > *:nth-child(3), .rp-screen.enter-back .rp-center > *:nth-child(3) { animation-delay: .07s; }
-  .rp-screen.enter-forward .rp-center > *:nth-child(4), .rp-screen.enter-back .rp-center > *:nth-child(4) { animation-delay: .105s; }
-  .rp-screen.enter-forward .rp-center > *:nth-child(5), .rp-screen.enter-back .rp-center > *:nth-child(5) { animation-delay: .14s; }
-  .rp-screen.enter-forward .rp-center > *:nth-child(n+6), .rp-screen.enter-back .rp-center > *:nth-child(n+6) { animation-delay: .175s; }
+  /* The staggered per-row rise-in (previously replayed on every one of 8 steps)
+     was cut — one clear directional slide per transition reads as considered;
+     doing it twice, on every screen, read as decoration. */
   .rp-primary::after { transition: transform .22s ease; }
   .rp-primary:hover::after { transform: translateX(4px); }
 }
@@ -272,7 +267,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @keyframes rpOutFwd { from { transform: none; opacity: 1; } to { transform: translate3d(-18px,0,0) scale(.992); opacity: 0; } }
 @keyframes rpInBack { from { transform: translate3d(-34px,0,0) scale(.985); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes rpOutBack{ from { transform: none; opacity: 1; } to { transform: translate3d(18px,0,0) scale(.992); opacity: 0; } }
-@keyframes rpRise   { from { transform: translateY(13px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ============ TYPE ============ */
 .rp-eyebrow {
@@ -472,7 +466,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   padding: 4px 9px; border-radius: 999px; text-transform: uppercase;
 }
 .rp-row-sum { font-size: 11.5px; font-weight: 800; color: var(--red); text-align: right; white-space: nowrap; position: relative; z-index: 1; padding: 7px 10px; border-radius: 999px; background: rgba(255,247,238,.68); border: 1px solid rgba(167,126,93,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.52); }
-.rp-row-sum em { font-style: normal; display: block; color: var(--faint); font-weight: 700; font-size: 9.5px; margin-top: 2px; }
+.rp-row-sum em { font-style: normal; display: block; color: var(--muted); font-weight: 700; font-size: 9.5px; margin-top: 2px; }
 .rp-row.is-selected .rp-row-val, .rp-row.is-selected .rp-row-sum { background: linear-gradient(135deg, var(--red-bright), var(--red-dark)); color: #fff7ee; border-color: rgba(255,243,229,.32); }
 .rp-row.is-selected .rp-row-val small, .rp-row.is-selected .rp-row-sum em { color: rgba(255,245,236,.82); }
 
@@ -660,7 +654,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-primary:hover::before { transform: translateX(120%); }
 .rp-primary:active { transform: scale(.982); filter: brightness(.96); }
 .rp-primary:disabled { opacity: .58; filter: grayscale(.2); }
-.rp-footer-note { text-align: center; font-size: 10.5px; color: var(--faint); margin: 9px 0 0; }
+.rp-footer-note { text-align: center; font-size: 10.5px; color: var(--muted); margin: 9px 0 0; }
 .rp-fineprint { position: relative; font-size: 10.5px; color: var(--muted); margin: 12px 3px 0; line-height: 1.45; }
 .rp-fineprint a, .rp-footer-note a { color: var(--red); font-weight: 800; }
 
@@ -695,16 +689,15 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   border-radius: 22px;
   pointer-events: none;
 }
-.rp-quote-band::after {
-  content: "RP";
+.rp-quote-mark {
   position: absolute;
-  right: -7px; bottom: -38px;
-  font-family: "DM Serif Display", Georgia, serif;
-  font-size: 132px;
-  line-height: 1;
-  color: rgba(255,255,255,.045);
-  letter-spacing: -.08em;
+  right: -18px; bottom: -22px;
+  width: 132px; height: 172px;
+  color: #fff;
+  opacity: .08;
+  pointer-events: none;
 }
+.rp-quote-mark svg { display: block; width: 100%; height: 100%; }
 .rp-quote-hero { position: relative; z-index: 1; padding: 3px 0 0; }
 .rp-quote-hero small {
   display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .14em;
@@ -846,7 +839,7 @@ details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; 
   border-radius: 14px; padding: 10px 13px; margin-top: 11px;
 }
 .rp-privacy-note {
-  font-size: 10.5px; color: var(--faint); margin: 12px 2px 0;
+  font-size: 10.5px; color: var(--muted); margin: 12px 2px 0;
   display: flex; gap: 6px; align-items: flex-start; line-height: 1.5;
 }
 .rp-privacy-note .rp-ic-sm { min-width: 15px; margin-top: 1px; color: var(--sage); }
@@ -1735,8 +1728,7 @@ details.rp-includes,
 .step-addons .rp-make-ready-copy span { font-size: 8.6px; line-height: 1.24; }
 .rp-addon-sheet { background: linear-gradient(150deg, rgba(244,235,222,.88), rgba(228,211,192,.80)) !important; }
 
-/* Estimate: keep the premium red reveal, remove decorative lettering, unify every support bubble. */
-.rp-quote-band::after { display: none !important; content: none !important; }
+/* Estimate: keep the premium red reveal, unify every support bubble. */
 .step-estimate .rp-invoice,
 .step-estimate details.rp-includes,
 .step-estimate .rp-checkbox-card,
@@ -2663,6 +2655,85 @@ function rpUpdateProgress() {
   if (backBtn) backBtn.classList.toggle("is-hidden", rpState.step === "service");
 }
 
+/* =========================================================================
+   NATIVE BACK BUTTON + SESSION RESUME
+   Two independent, low-risk resilience fixes:
+   1) The device's native back gesture/button steps back through the funnel
+      instead of leaving /book (via the History API).
+   2) A refresh, accidental tab close, or interrupted session resumes where
+      the person left off instead of forcing a full restart (via
+      sessionStorage). Network/loading state is intentionally never
+      persisted — only the person's own answers.
+   ========================================================================= */
+const rpHistoryNavAvailable = !!(window.history && window.history.pushState);
+let rpApplyingHistoryNav = false;
+
+function rpHistorySnapshot() {
+  return { step: rpState.step, calendarStage: rpState.calendarStage, service: rpState.service };
+}
+function rpPushHistoryEntry() {
+  if (!rpHistoryNavAvailable) return;
+  try { window.history.pushState(rpHistorySnapshot(), "", window.location.href); }
+  catch (e) { /* ignore — funnel still works without history sync */ }
+}
+function rpHandlePopState(event) {
+  if (!event.state || typeof event.state.step === "undefined") return;
+  rpApplyingHistoryNav = true;
+  rpTrack("screen_back");
+  rpState.step = event.state.step;
+  rpState.service = event.state.service;
+  rpState.calendarStage = event.state.calendarStage || "date";
+  if (rpState.calendarStage === "date") rpState.selectedStartTime = "";
+  rpRender("back");
+  rpApplyingHistoryNav = false;
+}
+if (rpHistoryNavAvailable) window.addEventListener("popstate", rpHandlePopState);
+
+const RP_STORAGE_KEY = "rpBookingStateV1";
+const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
+/* Only the person's own answers are persisted — never loading flags,
+   fetched availability, or in-flight error state. */
+const RP_PERSISTED_FIELDS = [
+  "service", "step", "bedrooms", "bathrooms", "condition", "frequency",
+  "carpetRooms", "addonCarpetRooms", "windowsTier", "yardTier", "garageWash",
+  "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
+  "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
+  "militaryDiscount", "fullName", "phone", "email", "address1", "city",
+  "state", "postalCode", "specialInstructions"
+];
+function rpSavePersistedState() {
+  try {
+    const snapshot = { savedAt: Date.now() };
+    RP_PERSISTED_FIELDS.forEach(function (key) { snapshot[key] = rpState[key]; });
+    window.sessionStorage.setItem(RP_STORAGE_KEY, JSON.stringify(snapshot));
+  } catch (e) { /* private browsing / storage disabled — fail silently */ }
+}
+function rpClearPersistedState() {
+  try { window.sessionStorage.removeItem(RP_STORAGE_KEY); } catch (e) { /* ignore */ }
+}
+function rpLoadPersistedState() {
+  try {
+    const raw = window.sessionStorage.getItem(RP_STORAGE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved || typeof saved !== "object") return false;
+    if (!saved.savedAt || Date.now() - saved.savedAt > RP_STORAGE_MAX_AGE_MS) { rpClearPersistedState(); return false; }
+    if (!saved.service || !rpFlows[saved.service] || !saved.step) return false;
+    RP_PERSISTED_FIELDS.forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(saved, key)) rpState[key] = saved[key];
+    });
+    /* Availability may have changed since the session was saved — always
+       resume the calendar step at date-selection with a fresh slot fetch
+       rather than trusting a stale saved date/time. */
+    rpState.calendarStage = "date";
+    rpState.selectedDate = "";
+    rpState.selectedStartTime = "";
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function rpGoToStep(name, direction = "forward") {
   if (direction === "forward" && rpState.step !== name) rpTrack("screen_continue", { to_screen: name });
   rpState.step = name;
@@ -2674,8 +2745,17 @@ function rpAdvance() {
   const next = flow[idx + 1];
   if (next) rpGoToStep(next, "forward");
 }
+/* rpBack() and rpChooseDifferentDate() no longer mutate state directly.
+   They ask the browser to go back one entry; the popstate listener
+   (rpHandlePopState, defined near boot) restores the prior screen's state
+   from history and re-renders. This keeps the on-screen Back button and
+   the device's native back button/gesture behaving identically, and means
+   a user who backs out with the OS back gesture lands on the previous
+   step of the funnel instead of leaving /book entirely. */
 function rpBack() {
   if (rpState.step === "service") return;
+  if (rpHistoryNavAvailable) { window.history.back(); return; }
+  /* Fallback for the rare browser without usable History API: behave as before. */
   if (rpState.step === "calendar" && rpState.calendarStage === "time") {
     rpTrack("screen_back", { from_calendar_stage: "time", to_calendar_stage: "date" });
     rpState.calendarStage = "date";
@@ -2893,7 +2973,7 @@ function rpAddonsScreen(eyebrow) {
   function bodyFor(key) {
     if (key === "carpet") {
       return `
-        <p class="rp-tap-note">How many rooms? <span style="color:var(--faint)">· $50 per room</span></p>
+        <p class="rp-tap-note">How many rooms? <span style="color:var(--muted)">· $50 per room</span></p>
         <div class="rp-pill-grid">
           ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.addonCarpetRooms === n ? "is-selected" : ""}" onclick="rpSelectAddonCarpetRooms(${n})">${n}${n===6?"+":""}</button>`).join("")}
         </div>`;
@@ -2933,7 +3013,7 @@ function rpAddonsScreen(eyebrow) {
     }
     if (key === "laundry") {
       return `
-        <p class="rp-tap-note">How many loads? <span style="color:var(--faint)">· $35 per load</span></p>
+        <p class="rp-tap-note">How many loads? <span style="color:var(--muted)">· $35 per load</span></p>
         <div class="rp-pill-grid">
           ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.laundryLoads === n ? "is-selected" : ""}" onclick="rpSelectLaundryLoads(${n})">${n}<br><small>load${n===1?"":"s"}</small></button>`).join("")}
         </div>`;
@@ -3024,6 +3104,17 @@ function rpEstimateScreen(eyebrow) {
   const includes = rpIncludes[rpState.service];
   return { scroll: `<div>
     <div class="rp-quote-band">
+      <div class="rp-quote-mark" aria-hidden="true"><svg viewBox="0 0 132 172" fill="currentColor" focusable="false">
+        <g transform="translate(64,170)">
+          <path transform="rotate(-15) scale(.8)" d="M0,0 C-23,-38 -18,-112 0,-150 C18,-112 23,-38 0,0 Z"/>
+          <path d="M0,0 C-27,-46 -22,-134 0,-176 C22,-134 27,-46 0,0 Z"/>
+          <path transform="rotate(15) scale(.8)" d="M0,0 C-23,-38 -18,-112 0,-150 C18,-112 23,-38 0,0 Z"/>
+          <circle cx="0" cy="-140" r="4"/>
+          <circle cx="-7" cy="-124" r="3.4"/>
+          <circle cx="7" cy="-124" r="3.4"/>
+          <circle cx="0" cy="-110" r="3"/>
+        </g>
+      </svg></div>
       <div class="rp-quote-hero ${isQuoteOnly ? "is-quote" : ""}">
         <small>Your Private Estimate</small>
         <strong>${rpPriceLabel()}</strong>
@@ -3339,6 +3430,9 @@ function rpRender(direction) {
   rpTrack("screen_view");
   if (rpState.step === "estimate") rpTrack("estimate_reached", { estimate: rpPriceLabel() });
   if (rpState.step === "calendar") rpTrack("calendar_reached", { estimate: rpPriceLabel() });
+
+  if (direction === "forward" && !rpApplyingHistoryNav) rpPushHistoryEntry();
+  rpSavePersistedState();
 }
 
 /* Same-screen refresh without transition or duplicate screen_view. */
@@ -3357,6 +3451,7 @@ function rpRefresh(resetScroll = false) {
   `;
   const newScrollEl = current.querySelector(".rp-screen-scroll");
   if (newScrollEl) newScrollEl.scrollTop = prevScrollTop;
+  rpSavePersistedState();
 }
 
 /* =========================================================================
@@ -3520,7 +3615,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3650,8 +3745,10 @@ function rpSelectBookingDate(dateKey) {
   rpState.bookingError = "";
   rpTrack("booking_date_selected", { date: dateKey });
   rpRefresh(true);
+  if (!rpApplyingHistoryNav) rpPushHistoryEntry();
 }
 function rpChooseDifferentDate() {
+  if (rpHistoryNavAvailable) { window.history.back(); return; }
   rpState.calendarStage = "date";
   rpState.selectedStartTime = "";
   rpState.bookingError = "";
@@ -3701,6 +3798,7 @@ async function rpConfirmNativeBooking() {
     const result = await response.json();
     if (!response.ok || !result.ok) throw new Error(result.error || "We couldn't confirm that appointment.");
     rpTrack("booking_completed", { completion_signal: "native_api", start_time: rpState.selectedStartTime, estimate: rpPriceLabel() });
+    rpClearPersistedState();
     window.location.assign(result.redirectUrl || rpConfirmationPath);
   } catch (error) {
     rpState.bookingError = error instanceof Error ? error.message : "We couldn't confirm that appointment. Please choose another time or text us.";
@@ -3774,8 +3872,16 @@ const rpPreselectedService = (function rpApplyServicePreselect() {
 })();
 
 /* Boot */
+/* An explicit ?service= URL param (ad click, landing-page CTA) always wins
+   over a resumed session — someone deliberately starting a specific flow
+   shouldn't get pulled back into an old, possibly abandoned one. */
+const rpResumedSession = rpPreselectedService ? false : rpLoadPersistedState();
+if (rpHistoryNavAvailable) {
+  try { window.history.replaceState(rpHistorySnapshot(), "", window.location.href); }
+  catch (e) { /* ignore */ }
+}
 rpRender();
-rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : "direct", preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
+rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : (rpResumedSession ? "resumed_session" : "direct"), preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
 </script>
 </body>
 </html>
