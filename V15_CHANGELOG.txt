@@ -1,8 +1,0 @@
-Red Prairie Cleaning — v15 changes
-
-1. Legacy homepage and all 17 SEO landing/content pages now use a warm cream Prairie Glass palette instead of stark white surfaces.
-2. Every legacy navbar now uses the compact /book wordmark (red prairie mark + RED PRAIRIE / CLEANING text).
-3. /book add-ons can now be removed after selection through an explicit "Remove this add-on" action in every selected add-on sheet.
-4. Selected add-on cards now say "Change or remove" so the action is discoverable.
-5. Fixed malformed/duplicate image-lightbox markup across 15 legacy pages. Several pages had an empty lightbox that caused a JavaScript null error and prevented gallery previews from working.
-6. Package is built with site files at the ZIP root for direct Cloudflare Pages upload (no extra red-prairie-cleaning-main folder).
