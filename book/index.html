@@ -921,16 +921,15 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 .rp-screen::before,.rp-screen::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:-2}
 .rp-screen:not(.step-service)::before{
   background:
-    linear-gradient(180deg,rgba(24,18,14,.12) 0%,rgba(245,233,217,.12) 34%,rgba(28,20,16,.16) 100%),
+    linear-gradient(180deg, rgba(18,13,10,.92) 0%, rgba(18,13,10,.5) 26%, rgba(18,13,10,.14) 55%, rgba(18,13,10,.24) 100%),
+    linear-gradient(120deg, rgba(111,17,24,.25), transparent 56%),
     url('/images/hero/front-photo-fullbleed-648.webp') center 36%/cover no-repeat;
   opacity:1;
 }
 .rp-screen:not(.step-service)::after{
   z-index:-1; inset:0;
-  background:
-    radial-gradient(circle at 22% 18%, rgba(215,160,120,.16), transparent 24%),
-    radial-gradient(circle at 82% 22%, rgba(120,37,43,.12), transparent 28%),
-    linear-gradient(180deg, rgba(16,11,9,.08) 0%, rgba(255,255,255,0) 24%, rgba(18,13,10,.10) 100%);
+  background: radial-gradient(circle at 78% 12%, rgba(234,185,123,.22), transparent 34%);
+  mix-blend-mode: screen;
   filter:none;
 }
 .rp-screen:not(.step-service) .rp-screen-scroll{padding-top:clamp(28px,7vh,72px)}
@@ -2183,32 +2182,6 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 
 
 
-.rp-service-area-line {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  max-width: 100%;
-  margin: 10px 0 13px;
-  padding: 7px 10px;
-  border: 1px solid rgba(255,255,255,.34);
-  border-radius: 999px;
-  background: rgba(30,20,14,.36);
-  color: #fffaf3;
-  font-size: 10.5px;
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: .01em;
-  box-shadow: 0 5px 16px rgba(0,0,0,.13);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.rp-service-area-line::before {
-  content: "●";
-  margin-right: 7px;
-  color: #f4c66b;
-  font-size: 8px;
-}
-
 /* V18 approved punch-list refinements. */
 .step-service .rp-start-service-q {
   margin-left: 63px;
@@ -2854,9 +2827,8 @@ function rpScreenHtml() {
       bg: `<div class="rp-bg-photo"><img src="/images/hero/front-photo-fullbleed-648.webp" alt="" width="648" height="1146" fetchpriority="high"/></div>`,
       scroll: `
       <div class="rp-hero-onphoto">
-        <p class="rp-eyebrow red">Private estimate · No phone call required</p>
+        <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache &amp; Southwest OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
-        <p class="rp-service-area-line">Serving Lawton, Fort Sill, Elgin, Cache, and surrounding Southwest Oklahoma communities.</p>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 37+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
