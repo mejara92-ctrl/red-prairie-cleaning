@@ -1,0 +1,61 @@
+RED PRAIRIE CLEANING — V24 CHANGELOG
+/book only.
+
+1. Calendar error state no longer leaks raw errors
+   ------------------------------------------------
+   Confirmed via a real (not simulated) network failure against the live
+   production API URL: customers were seeing literal browser exceptions
+   like "Failed to fetch" on screen when the calendar couldn't load.
+
+   Fixed at the source in both places a network call can fail:
+   - rpLoadNativeSlots (loading the calendar): the raw exception is now
+     logged to the console and tracked as a "slots_load_error" event
+     (so failure rates are visible in GA4), while rpState.slotsError
+     always holds a safe, friendly string.
+   - rpConfirmNativeBooking (submitting a booking): fetch failures are
+     now caught separately from the response-handling logic, so a
+     network-level failure gets a friendly, actionable message. Backend-
+     returned errors (like "this time is no longer available," which
+     the retry logic specifically watches for) are untouched — those
+     are your own API's deliberate, human-written messages and were
+     never the problem.
+
+   The error screen itself also now matches the quality of the loading
+   state next to it: added a warning icon and a direct call/text
+   fallback line, instead of a bare heading and a "Try again" button.
+
+2. Accordions now animate open and closed
+   ----------------------------------------
+   "What's Included" (estimate screen) and all 7 FAQ entries used native
+   <details>, which snaps open instantly with no transition — the one
+   interaction on the page that wasn't animated. Added a CSS-only
+   grid-rows technique (no JS state to keep in sync with the app's
+   full-re-render model): smooth open/close, respects
+   prefers-reduced-motion automatically, degrades to instant open in
+   unsupported browsers rather than breaking.
+
+3. Validation error text — investigated, already correct
+   ---------------------------------------------------------
+   I'd flagged this as generic/static in the last review. On closer
+   inspection it wasn't: the JS already shows the specific message for
+   whichever field is actually invalid ("Please enter a valid 10-digit
+   phone number," etc.) and always did. The generic sentence I saw was
+   dead placeholder text sitting in the initial (always-hidden) markup,
+   never actually shown to a user. Cleaned it out since it was stale,
+   but there was no live bug here — correcting the record rather than
+   claiming a fix that wasn't real.
+
+Verification
+- node --check passed on every inline script across all 17 site pages.
+- Live Chromium pass (Playwright): includes-accordion opens/closes with
+  a real mid-transition height value confirmed (not an instant snap);
+  all 7 FAQ items wired to the same animation; error-state text
+  confirmed free of "Failed to fetch"/raw exception text via an actual
+  triggered network failure against the real API URL, with the raw
+  message confirmed still present in the console for debugging;
+  validation error box confirmed empty by default and field-specific
+  once triggered.
+- No new console/page errors introduced.
+
+Not done
+- No visual/pricing/layout changes beyond what's described above.

@@ -297,6 +297,7 @@ h1, h2 {
 }
 h1 { font-size: clamp(31px, 7vw, 42px); line-height: 1.02; letter-spacing: -.028em; margin: 0 0 14px; }
 h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.025em; margin: 0 0 9px; }
+.step-addons h2 { margin-bottom: 20px; }
 .rp-sub { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 0 0 20px; max-width: 430px; }
 .rp-q-gap { height: 12px; }
 
@@ -797,6 +798,22 @@ details.rp-includes summary::-webkit-details-marker { display: none; }
 details.rp-includes summary::after { content: "+"; color: var(--red); font-size: 21px; font-weight: 400; }
 details.rp-includes[open] summary::after { content: "–"; }
 details.rp-includes p { font-size: 12px; color: var(--muted); margin: 0 0 14px; line-height: 1.6; }
+
+/* Smooth accordion open/close (What's Included + FAQ). Everything else on
+   this page is animated; native <details> snapping open instantly was the
+   one place that wasn't. CSS-only grid-rows technique — no JS state to
+   keep in sync with the app's full re-render model. */
+details.rp-animated-details > .rp-details-animate-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .32s cubic-bezier(.22,.86,.28,1);
+}
+details.rp-animated-details[open] > .rp-details-animate-wrap { grid-template-rows: 1fr; }
+details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: grid; }
+.rp-details-animate-inner { overflow: hidden; min-height: 0; }
+@media (prefers-reduced-motion: reduce) {
+  details.rp-animated-details > .rp-details-animate-wrap { transition: none; }
+}
 
 /* ============ LEAD FORM ============ */
 .rp-lead-form { display: grid; gap: 9px; }
@@ -1461,6 +1478,14 @@ details.rp-includes,
   animation: rpSpin .8s linear infinite;
 }
 @keyframes rpSpin { to { transform: rotate(360deg); } }
+.rp-native-status-icon {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 12px;
+  color: var(--red);
+  display: block;
+}
+.rp-native-status .rp-preferred-time { margin-top: 12px; }
 .rp-native-section-label {
   display: flex;
   justify-content: space-between;
@@ -2308,13 +2333,13 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <p class="rp-faq-kicker">QUICK ANSWERS</p>
       <p class="rp-faq-intro">Tap a question. Your estimate and selections stay saved.</p>
 
-      <details><summary>Is the instant estimate the final price?</summary><p>It is based on the size, condition, and options selected. We contact you before changing it for severe buildup, heavy trash, unusual access, biohazards, or work outside the selected scope.</p></details>
-      <details><summary>How do booking and arrival work?</summary><p>No deposit is required. Same-day openings are often available, and we use a 30-minute arrival window so the team can finish the prior appointment properly and travel safely.</p></details>
-      <details><summary>Do I need to be home or have the property empty?</summary><p>You do not need to be home. Move-in and move-out cleans work best in an empty property; provide a key, lockbox, property-manager contact, or other access instructions.</p></details>
-      <details><summary>How should I prepare?</summary><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></details>
-      <details><summary>What do the optional add-ons cover?</summary><p>Tap any add-on for its exact scope and price. Garage floor washing requires an empty garage; window screens, larger junk loads, and overgrown yards have separate options.</p></details>
-      <details><summary>How long will the cleaning take?</summary><p>Your estimate shows the expected time and team size. Actual time varies with the home, access, and condition.</p></details>
-      <details><summary>What if something is missed?</summary><p>If we miss something in the selected scope, contact us promptly and we’ll return to fix it.</p></details>
+      <details class="rp-animated-details"><summary>Is the instant estimate the final price?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>It is based on the size, condition, and options selected. We contact you before changing it for severe buildup, heavy trash, unusual access, biohazards, or work outside the selected scope.</p></div></div></details>
+      <details class="rp-animated-details"><summary>How do booking and arrival work?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>No deposit is required. Same-day openings are often available, and we use a 30-minute arrival window so the team can finish the prior appointment properly and travel safely.</p></div></div></details>
+      <details class="rp-animated-details"><summary>Do I need to be home or have the property empty?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>You do not need to be home. Move-in and move-out cleans work best in an empty property; provide a key, lockbox, property-manager contact, or other access instructions.</p></div></div></details>
+      <details class="rp-animated-details"><summary>How should I prepare?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></div></div></details>
+      <details class="rp-animated-details"><summary>What do the optional add-ons cover?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Tap any add-on for its exact scope and price. Garage floor washing requires an empty garage; window screens, larger junk loads, and overgrown yards have separate options.</p></div></div></details>
+      <details class="rp-animated-details"><summary>How long will the cleaning take?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Your estimate shows the expected time and team size. Actual time varies with the home, access, and condition.</p></div></div></details>
+      <details class="rp-animated-details"><summary>What if something is missed?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>If we miss something in the selected scope, contact us promptly and we’ll return to fix it.</p></div></div></details>
       <p class="rp-faq-footnote">Serving Lawton, Fort Sill, Elgin, Cache, and surrounding Southwest Oklahoma communities. Military and first responders save 10%.</p>
 
       <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
@@ -2570,7 +2595,8 @@ const rpIconPaths = {
   clock:   '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.6 1.7"/>',
   check:   '<path d="m5.5 12.5 4.3 4.3L18.5 8"/>',
   chev:    '<path d="m9.5 6 6 6-6 6"/>',
-  lock:    '<rect x="5.5" y="10.5" width="13" height="9.5" rx="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>'
+  lock:    '<rect x="5.5" y="10.5" width="13" height="9.5" rx="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
+  alert:   '<path d="M12 3.8 21 19.2H3Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.1" r=".25" fill="currentColor" stroke="none"/>'
 };
 function rpIcon(name, cls = "rp-ic") {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${rpIconPaths[name] || ""}</svg>`;
@@ -2719,6 +2745,7 @@ function rpLoadPersistedState() {
     if (!saved || typeof saved !== "object") return false;
     if (!saved.savedAt || Date.now() - saved.savedAt > RP_STORAGE_MAX_AGE_MS) { rpClearPersistedState(); return false; }
     if (!saved.service || !rpFlows[saved.service] || !saved.step) return false;
+    if (saved.step !== "service" && !rpFlows[saved.service].includes(saved.step)) return false;
     RP_PERSISTED_FIELDS.forEach(function (key) {
       if (Object.prototype.hasOwnProperty.call(saved, key)) rpState[key] = saved[key];
     });
@@ -3061,7 +3088,6 @@ function rpAddonsScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Would you like any add-ons?</h2>
-    <p class="rp-sub">Optional — select any that apply. Tap again to remove.</p>
     <div class="rp-rows">${cards}</div>
     <p class="rp-addon-section-label">Need help beyond cleaning?</p>
     <label class="rp-make-ready-card">
@@ -3148,11 +3174,11 @@ function rpEstimateScreen(eyebrow) {
     ${(includes || !isQuoteOnly) ? `
     <div class="rp-estimate-support">
       ${includes ? `
-      <details class="rp-includes">
+      <details class="rp-includes rp-animated-details">
         <summary>What's included</summary>
-        <div class="rp-includes-body">
+        <div class="rp-includes-body rp-details-animate-wrap"><div class="rp-details-animate-inner">
           <p class="rp-includes-intro">${includes.intro}</p>
-        </div>
+        </div></div>
       </details>` : ""}
       ${!isQuoteOnly ? `
       <label class="rp-discount-inline">
@@ -3208,7 +3234,7 @@ function rpLeadScreen(eyebrow) {
       </div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
     </div>
-    <div id="rpFormError" class="rp-error">Please enter your name, phone, email, street address, city, and ZIP code.</div>
+    <div id="rpFormError" class="rp-error"></div>
     <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
   </div>`, footer: `
     <div class="rp-live-chip"><span>Your estimate</span><strong>${rpPriceLabel()}</strong></div>
@@ -3354,7 +3380,7 @@ function rpCalendarScreen(eyebrow) {
   if (rpState.slotsLoading) {
     body = `<div class="rp-native-status"><div><div class="rp-native-spinner"></div><strong>Checking live availability…</strong><p>Finding the best openings for your cleaning.</p></div></div>`;
   } else if (rpState.slotsError) {
-    body = `<div class="rp-native-status"><div><strong>We couldn't load the calendar.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button></div></div>`;
+    body = `<div class="rp-native-status"><div>${rpIcon("alert","rp-ic rp-native-status-icon")}<strong>We couldn't load live availability.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button><p class="rp-preferred-time"><strong>Rather just talk to us?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar_error'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar_error'})">text</a> (580) 215-0915 and we'll get you booked directly.</p></div></div>`;
   } else if (!onTimeStage) {
     body = `<div class="rp-month-calendar">
       <div class="rp-month-nav">
@@ -3615,7 +3641,7 @@ function rpSendEstimateToGoHighLevel(extra = {}) {
   /*
     Calendar-only confirmation gate:
     Do not send the website webhook from the estimate/contact step.
-    The site only passes customer and job details into the embedded GHL calendar URL.
+    The website sends customer and job details only when a live appointment time is confirmed.
     GHL should send customer texts from the appointment booked trigger after a time slot is selected.
   */
   rpState.estimateSent = true;
@@ -3716,7 +3742,10 @@ async function rpLoadNativeSlots(force = false) {
     rpState.availableSlots = Object.assign({}, rpState.availableSlots || {}, data);
     rpState.loadedMonths = Object.assign({}, rpState.loadedMonths || {}, { [range.monthKey]: true });
   } catch (error) {
-    rpState.slotsError = error instanceof Error ? error.message : "Live availability is temporarily unavailable.";
+    const rawMessage = error instanceof Error ? error.message : "unknown_error";
+    rpState.slotsError = "Live availability is temporarily unavailable.";
+    console.error("[rpLoadNativeSlots] slots fetch failed:", rawMessage);
+    rpTrack("slots_load_error", { message: rawMessage });
   } finally {
     rpState.slotsLoading = false;
     if (rpState.step === "calendar") rpRefresh();
@@ -3775,27 +3804,33 @@ async function rpConfirmNativeBooking() {
   const name = rpSplitCustomerName(rpState.fullName);
   const details = rpGetEstimatePayload();
   try {
-    const response = await fetch(`${RP_BOOKING_API}/book`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: name.firstName,
-        lastName: name.lastName,
-        email: rpState.email,
-        phone: rpState.phone,
-        address1: rpState.address1,
-        city: rpState.city,
-        state: rpState.state || "OK",
-        postalCode: rpState.postalCode,
-        startTime: rpState.selectedStartTime,
-        service: rpServices[rpState.service]?.name || "Cleaning",
-        estimate: rpFinalPrice(),
-        notes: details.job_details,
-        companyWebsite: "",
-        dryRun: false
-      })
-    });
-    const result = await response.json();
+    let response;
+    try {
+      response = await fetch(`${RP_BOOKING_API}/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: name.firstName,
+          lastName: name.lastName,
+          email: rpState.email,
+          phone: rpState.phone,
+          address1: rpState.address1,
+          city: rpState.city,
+          state: rpState.state || "OK",
+          postalCode: rpState.postalCode,
+          startTime: rpState.selectedStartTime,
+          service: rpServices[rpState.service]?.name || "Cleaning",
+          estimate: rpFinalPrice(),
+          notes: details.job_details,
+          companyWebsite: "",
+          dryRun: false
+        })
+      });
+    } catch (networkError) {
+      console.error("[rpConfirmNativeBooking] network error:", networkError instanceof Error ? networkError.message : networkError);
+      throw new Error("We couldn't reach our booking system. Check your connection and try again, or text us and we'll get you booked.");
+    }
+    const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.ok) throw new Error(result.error || "We couldn't confirm that appointment.");
     rpTrack("booking_completed", { completion_signal: "native_api", start_time: rpState.selectedStartTime, estimate: rpPriceLabel() });
     rpClearPersistedState();
@@ -3877,8 +3912,35 @@ const rpPreselectedService = (function rpApplyServicePreselect() {
    shouldn't get pulled back into an old, possibly abandoned one. */
 const rpResumedSession = rpPreselectedService ? false : rpLoadPersistedState();
 if (rpHistoryNavAvailable) {
-  try { window.history.replaceState(rpHistorySnapshot(), "", window.location.href); }
-  catch (e) { /* ignore */ }
+  try {
+    const flow = rpResumedSession ? (rpFlows[rpState.service] || []) : [];
+    const targetIdx = flow.indexOf(rpState.step);
+    if (rpResumedSession && targetIdx > -1) {
+      /* Resuming straight into, say, step 4 of 8 used to replace the
+         page's one-and-only history entry with just that step — so
+         pressing back (on-screen or the native gesture) had nothing
+         underneath it to go back TO, and either did nothing or bounced
+         the person out of /book entirely. Rebuild one entry per step
+         already passed through, so back walks through them properly,
+         same as it would in a normal, non-resumed session. */
+      const finalStep = rpState.step;
+      const finalService = rpState.service;
+      const finalCalendarStage = rpState.calendarStage;
+      rpState.step = "service";
+      rpState.service = null;
+      window.history.replaceState(rpHistorySnapshot(), "", window.location.href);
+      rpState.service = finalService;
+      for (let i = 0; i < targetIdx; i++) {
+        rpState.step = flow[i];
+        window.history.pushState(rpHistorySnapshot(), "", window.location.href);
+      }
+      rpState.step = finalStep;
+      rpState.calendarStage = finalCalendarStage;
+      window.history.pushState(rpHistorySnapshot(), "", window.location.href);
+    } else {
+      window.history.replaceState(rpHistorySnapshot(), "", window.location.href);
+    }
+  } catch (e) { /* ignore — funnel still works without history sync */ }
 }
 rpRender();
 rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : (rpResumedSession ? "resumed_session" : "direct"), preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
