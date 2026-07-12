@@ -344,8 +344,15 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-hero-onphoto { padding: 5px 5px 112px; max-width: 500px; }
 .rp-hero-onphoto .rp-eyebrow.red { color: #f4d4c5; text-shadow: 0 1px 14px rgba(0,0,0,.34); }
 .rp-hero-onphoto h1 { color: #fffaf3; text-shadow: 0 3px 22px rgba(0,0,0,.34); max-width: 480px; }
-.rp-hero-onphoto .rp-trust { color: rgba(255,255,255,.94); }
+.rp-hero-onphoto .rp-trust {
+  color: rgba(255,255,255,.94);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.rp-hero-onphoto .rp-trust a { grid-column: 1 / -1; }
 .rp-hero-onphoto .rp-trust span, .rp-hero-onphoto .rp-trust a {
+  justify-content: center;
   background: rgba(255,255,255,.13);
   backdrop-filter: blur(14px) saturate(1.3);
   -webkit-backdrop-filter: blur(14px) saturate(1.3);
@@ -2827,7 +2834,7 @@ function rpScreenHtml() {
       bg: `<div class="rp-bg-photo"><img src="/images/hero/front-photo-fullbleed-648.webp" alt="" width="648" height="1146" fetchpriority="high"/></div>`,
       scroll: `
       <div class="rp-hero-onphoto">
-        <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache &amp; Southwest OK</p>
+        <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 37+ Reviews</a>
