@@ -190,13 +190,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .rp-wordmark strong b { color: var(--red); }
 .rp-wordmark small { margin-top: 4px; font-size: 7px; font-weight: 800; letter-spacing: .28em; color: var(--muted); }
 .rp-head-text {
-  font-size: 12px; font-weight: 800; letter-spacing: .02em;
-  color: var(--red);
+  font-size: 12px; letter-spacing: .02em;
   padding: 9px 11px;
   border-radius: 12px;
-  border: 1px solid rgba(159,32,39,.14);
-  background: rgba(255,255,255,.45);
   transition: background .18s, transform .18s;
+  /* font-weight, color, border, background match later rule at line ~1098 */
 }
 .rp-head-text:active { background: var(--surface); transform: scale(.96); }
 
@@ -1000,8 +998,8 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 .step-addons .rp-rows { gap: 8px; }
 .step-addons .rp-row { min-height: 62px; padding-top: 8px; padding-bottom: 8px; }
 .step-addons .rp-row-desc {
-  display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.42;
-  color: #4a3f37; font-weight: 500;
+  display: block; margin-top: 3px;
+  /* font-size, line-height, color, font-weight now consolidated at line ~2085 */
 }
 .step-addons .rp-expand-head { align-items: center; }
 .step-addons .rp-expand-head .rp-row-main { padding-right: 4px; }
@@ -1010,17 +1008,11 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 /* The included scope should read like a clear card, not text on the photo. */
 details.rp-includes {
   background: linear-gradient(150deg, rgba(250,245,236,.97), rgba(245,235,222,.95));
-  border-color: rgba(116,80,50,.18);
-  box-shadow: 0 13px 30px rgba(48,32,19,.13), inset 0 1px 0 rgba(255,255,255,.82);
-  backdrop-filter: blur(18px) saturate(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  /* border-color, box-shadow, backdrop-filter identical at later rule (line ~1193) */
 }
 details.rp-includes summary { color: var(--ink); }
 .rp-includes-body { padding: 0 0 15px; }
-.rp-includes-intro {
-  margin: 0 0 10px !important; color: #3f352c !important; font-size: 14px !important;
-  line-height: 1.48 !important; font-weight: 700;
-}
+/* .rp-includes-intro duplicate removed - identical rule at line ~1210 wins with same values */
 details.rp-includes ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
 details.rp-includes li {
   position: relative; padding-left: 18px; color: #66594d; font-size: 11.5px; line-height: 1.42;
@@ -1085,7 +1077,6 @@ details.rp-includes li::before {
   .step-addons .rp-screen-scroll { padding-top: 10px; }
   .step-addons .rp-center { padding: 14px 13px 12px; }
   .step-addons .rp-row { min-height: 58px; }
-  .step-addons .rp-row-desc { font-size: 9px; }
   .rp-faq-link-card { padding: 10px 12px; }
 }
 
@@ -1167,9 +1158,8 @@ details.rp-includes li::before {
 }
 .step-addons .rp-row-desc {
   margin-top: 2px;
-  font-size: 9.2px;
-  line-height: 1.18;
   white-space: normal;
+  /* font-size, line-height overridden by !important rule at line ~2085 */
 }
 .step-addons .rp-row-chev {
   width: 27px;
@@ -1183,13 +1173,12 @@ details.rp-includes li::before {
   gap: 10px;
 }
 .step-addons .rp-make-ready-copy strong {
-  font-size: 12.5px;
   line-height: 1.18;
+  /* font-size overridden by later same-specificity rule at line ~1751 */
 }
 .step-addons .rp-make-ready-copy span {
   margin-top: 2px;
-  font-size: 9.2px;
-  line-height: 1.2;
+  /* font-size, line-height overridden by !important at line ~2078 */
 }
 .step-addons .rp-make-ready-check {
   width: 27px;
@@ -1282,7 +1271,6 @@ details.rp-includes ul { display: none; }
   .step-addons .rp-rows { gap: 5px; }
   .step-addons .rp-row { min-height: 50px; padding-block: 5px; }
   .step-addons .rp-make-ready-card { min-height: 53px; margin-top: 5px; padding-block: 5px; }
-  .step-addons .rp-row-desc, .step-addons .rp-make-ready-copy span { font-size: 8.8px; }
 }
 
 
@@ -1446,9 +1434,7 @@ details.rp-includes,
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  font-size: 9.2px;
-  line-height: 1.34;
-  color: #5a4d43;
+  /* font-size, line-height, color overridden by !important rule at line ~1759 */
 }
 .rp-faq-scroll { flex: 0 1 auto; }
 
@@ -1583,9 +1569,8 @@ details.rp-includes,
 .rp-time-btn:active { transform: scale(.97); }
 .rp-time-btn.is-selected {
   border-color: rgba(159,32,39,.88);
-  color: #fff8ef;
-  background: linear-gradient(145deg,#c73640,#9f2027 54%,#76131a);
   box-shadow: 0 10px 22px rgba(105,19,25,.22), inset 0 1px 0 rgba(255,255,255,.22);
+  /* color, background match/overridden at line ~1923 */
 }
 .rp-booking-review {
   display: grid;
@@ -1753,11 +1738,9 @@ details.rp-includes,
 .step-addons .rp-row { min-height: 49px; padding: 5px 9px; border-radius: 15px; }
 .step-addons .rp-ic-chip { width: 38px; height: 38px; min-width: 38px; border-radius: 12px; }
 .step-addons .rp-row-title { font-size: 15.5px; }
-.step-addons .rp-row-desc { font-size: 13.5px; line-height: 1.42; }
 .step-addons .rp-row-sum { font-size: 11px; padding: 5px 7px; }
 .step-addons .rp-make-ready-card { min-height: 51px; margin-top: 5px; padding: 5px 9px; border-radius: 15px; }
 .step-addons .rp-make-ready-copy strong { font-size: 14.5px; }
-.step-addons .rp-make-ready-copy span { font-size: 13px; line-height: 1.42; }
 .rp-addon-sheet { background: linear-gradient(150deg, rgba(244,235,222,.88), rgba(228,211,192,.80)) !important; }
 
 /* Estimate: keep the premium red reveal, unify every support bubble. */
@@ -1908,10 +1891,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   border: 1px solid rgba(255,247,235,.32);
   border-radius: 12px;
   background: rgba(242,229,211,.36);
-  color: #5d5147;
-  font-size: 9.7px;
-  line-height: 1.4;
   text-align: center;
+  /* color, font-size, line-height overridden by !important rule at line ~2259 */
 }
 .rp-preferred-time a { color: var(--red); font-weight: 800; }
 
@@ -1958,7 +1939,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   .rp-month-nav { grid-template-columns: 34px 1fr 34px; }
   .rp-cal-day { border-radius: 10px; font-size: 11px; }
   .rp-cal-day i { bottom: 3px; }
-  .rp-preferred-time { padding: 6px 8px; font-size: 8.8px; }
+  .rp-preferred-time { padding: 6px 8px; }
   .rp-time-btn { min-height: 43px; }
 }
 @media (max-width: 370px) {
@@ -2177,8 +2158,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 .step-calendar .rp-calendar-assurance { grid-template-columns: repeat(2, minmax(0,1fr)); }
 .rp-preferred-time {
   padding: 10px 12px;
-  font-size: 10.5px;
-  line-height: 1.45;
+  /* font-size, line-height overridden by !important at line ~2259 */
 }
 .rp-preferred-time strong { color: var(--ink); }
 
@@ -2239,9 +2219,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 .step-estimate .rp-screen-footer .rp-primary { min-height: 46px; padding-block: 10px; }
 .step-estimate .rp-screen-footer .rp-dock-notice {
   margin: 0 5px 6px;
-  font-size: 13px;
-  line-height: 1.45;
-  color: #3f352c;
+  /* font-size, line-height, color already set by !important rule at line ~1759 */
 }
 .rp-separate-quote-row strong { text-align: right; }
 .rp-separate-quote-row strong small {
