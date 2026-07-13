@@ -49,11 +49,11 @@ body {
 
 .navbar .rp-site-wordmark .rp-site-mark {
   display: block !important;
-  width: 30px !important;
-  height: 30px !important;
-  min-width: 30px;
-  max-width: 30px !important;
-  max-height: 30px !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px;
+  max-width: 34px !important;
+  max-height: 34px !important;
   object-fit: contain;
   border: 0 !important;
   border-radius: 9px;
@@ -72,9 +72,9 @@ body {
 .navbar .rp-site-wordmark-copy strong {
   color: var(--rp-legacy-ink);
   font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 800;
-  letter-spacing: .075em;
+  letter-spacing: .04em;
   white-space: nowrap;
 }
 
@@ -83,13 +83,7 @@ body {
 }
 
 .navbar .rp-site-wordmark-copy small {
-  margin-top: 4px;
-  color: #71685f;
-  font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
-  font-size: 7px;
-  font-weight: 800;
-  letter-spacing: .28em;
-  white-space: nowrap;
+  display: none;
 }
 
 /* Warm major content bands and common card surfaces. */
@@ -134,14 +128,14 @@ body {
 }
 
 @media (max-width: 520px) {
-  .navbar .rp-site-wordmark { gap: 7px; }
+  .navbar .rp-site-wordmark { gap: 8px; }
   .navbar .rp-site-wordmark .rp-site-mark {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px;
-    max-width: 28px !important;
-    max-height: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    max-width: 32px !important;
+    max-height: 32px !important;
   }
-  .navbar .rp-site-wordmark-copy strong { font-size: 12px; }
+  .navbar .rp-site-wordmark-copy strong { font-size: 16px; }
   .navbar .book-btn { padding-inline: 12px; }
 }
