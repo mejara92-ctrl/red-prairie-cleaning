@@ -34,6 +34,7 @@
 <title>Book Your Cleaning — Red Prairie Cleaning</title>
 <meta name="description" content="Get an instant price and book your professional cleaning in about a minute. Serving Lawton, Fort Sill &amp; Southwest Oklahoma."/>
 <link rel="icon" type="image/png" href="/favicon.png"/>
+<link rel="preload" as="image" href="/images/hero/front-photo-fullbleed-648.webp" fetchpriority="high"/>
 
 <!-- Deferred-load helper (same pattern as homepage) -->
 <script>
@@ -1057,7 +1058,7 @@ details.rp-includes li::before {
 .rp-faq-kicker { margin: 0 0 8px; color: var(--red); font-size: 9px; font-weight: 800; letter-spacing: .14em; }
 .rp-faq-page h2 { margin-bottom: 8px; font-size: 31px; }
 .rp-faq-intro { margin: 0 0 20px; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
-.rp-faq-page h3 { margin: 22px 2px 8px; color: #7c262c; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; }
+.rp-faq-page h3 { margin: 22px 2px 8px; color: #7c262c; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
 .rp-faq-page details {
   margin-bottom: 8px; padding: 0 14px; border-radius: 16px;
   background: linear-gradient(145deg, rgba(252,246,237,.95), rgba(244,233,218,.92));
@@ -1400,28 +1401,29 @@ details.rp-includes,
 /* Compact FAQ: all closed questions plus the return button fit a normal phone viewport. */
 .rp-faq-scroll { overflow: hidden; padding: 11px 12px calc(12px + env(safe-area-inset-bottom)); }
 .rp-faq-kicker { margin-bottom: 2px; }
-.rp-faq-intro { margin-bottom: 7px; font-size: 10.5px; }
+.rp-faq-intro { margin-bottom: 7px; font-size: 13px; }
 .rp-faq-page details { margin-bottom: 4px; padding-inline: 11px; border-radius: 12px; }
-.rp-faq-page summary { padding: 8px 23px 8px 0; font-size: 10.8px; line-height: 1.22; }
-.rp-faq-page summary::after { top: 5px; font-size: 18px; }
-.rp-faq-page details p { margin: -1px 0 9px; font-size: 9.8px; line-height: 1.4; }
+.rp-faq-page summary { padding: 10px 25px 10px 0; font-size: 14.5px; font-weight: 700; line-height: 1.32; }
+.rp-faq-page summary::after { top: 7px; font-size: 20px; }
+.rp-faq-page details p { margin: -1px 0 11px; font-size: 13.5px; font-weight: 500; line-height: 1.5; }
 .rp-faq-footnote {
   margin: 7px 3px 0;
-  color: #62564c;
-  font-size: 9.5px;
-  line-height: 1.35;
+  color: #4a3f37;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.42;
   text-align: center;
 }
-.rp-faq-return { min-height: 43px; margin-top: 8px; padding-block: 9px; font-size: 13px; }
+.rp-faq-return { min-height: 46px; margin-top: 8px; padding-block: 10px; font-size: 15px; }
 
 @media (max-height: 700px) {
   .rp-faq-head { min-height: 52px; }
   .rp-faq-scroll { padding-top: 8px; }
   .rp-faq-intro { display: none; }
   .rp-faq-page details { margin-bottom: 3px; }
-  .rp-faq-page summary { padding-block: 7px; font-size: 10.4px; }
-  .rp-faq-footnote { font-size: 9px; margin-top: 5px; }
-  .rp-faq-return { min-height: 40px; margin-top: 6px; }
+  .rp-faq-page summary { padding-block: 8px; font-size: 13.5px; }
+  .rp-faq-footnote { font-size: 11px; margin-top: 5px; }
+  .rp-faq-return { min-height: 42px; margin-top: 6px; }
 }
 
 /* Keep the price-change notice visible inside the same estimate dock. */
