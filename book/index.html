@@ -184,12 +184,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .rp-head-btn:active { background: var(--surface); transform: scale(.95); }
 .rp-head-btn.is-hidden { opacity: 0; pointer-events: none; }
-.rp-wordmark { height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.rp-wordmark img { width: 30px; height: 30px; display: block; border-radius: 9px; box-shadow: 0 5px 12px rgba(159,32,39,.18); }
-.rp-wordmark span { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
-.rp-wordmark strong { font-size: 13px; font-weight: 800; letter-spacing: .075em; color: var(--ink); white-space: nowrap; }
+.rp-wordmark { height: 42px; display: flex; align-items: center; justify-content: center; gap: 9px; }
+.rp-wordmark img { width: 34px; height: 34px; display: block; border-radius: 9px; box-shadow: 0 5px 12px rgba(159,32,39,.18); }
+.rp-wordmark strong { font-size: 17px; font-weight: 800; letter-spacing: .04em; color: var(--ink); white-space: nowrap; }
 .rp-wordmark strong b { color: var(--red); }
-.rp-wordmark small { margin-top: 4px; font-size: 7px; font-weight: 800; letter-spacing: .28em; color: var(--muted); }
 .rp-head-text {
   font-size: 12px; letter-spacing: .02em;
   padding: 9px 11px;
@@ -907,9 +905,9 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 }
 @media (max-width: 390px) {
   .rp-head { padding-inline: 9px; }
-  .rp-wordmark { gap: 7px; }
-  .rp-wordmark img { width: 28px; height: 28px; }
-  .rp-wordmark strong { font-size: 12px; }
+  .rp-wordmark { gap: 8px; }
+  .rp-wordmark img { width: 32px; height: 32px; }
+  .rp-wordmark strong { font-size: 16px; }
   .rp-screen-scroll { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer::before { left: 20px; right: 20px; }
@@ -2310,8 +2308,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <svg class="rp-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5.5 8.5 12 15 18.5"/></svg>
     </button>
     <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage" onclick="rpTrack('home_logo_tap',{placement:'book_header'})">
-      <img src="/images/logo/favicon.png" width="32" height="32" alt="">
-      <span><strong><b>RED</b> PRAIRIE</strong><small>CLEANING</small></span>
+      <img src="/images/logo/favicon.png" width="34" height="34" alt="">
+      <strong><b>RED</b> PRAIRIE</strong>
     </a>
     <div class="rp-head-actions">
       <button class="rp-head-faq" type="button" onclick="rpOpenFaq('header')" aria-label="Open frequently asked questions">FAQ</button>
