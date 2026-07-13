@@ -49,14 +49,14 @@ body {
 
 .navbar .rp-site-wordmark .rp-site-mark {
   display: block !important;
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px;
-  max-width: 34px !important;
-  max-height: 34px !important;
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px;
+  max-width: 52px !important;
+  max-height: 52px !important;
   object-fit: contain;
   border: 0 !important;
-  border-radius: 9px;
+  border-radius: 12px;
   background: transparent !important;
   box-shadow: 0 5px 12px rgba(159, 32, 39, .18) !important;
 }
@@ -128,13 +128,13 @@ body {
 }
 
 @media (max-width: 520px) {
-  .navbar .rp-site-wordmark { gap: 8px; }
+  .navbar .rp-site-wordmark { gap: 10px; }
   .navbar .rp-site-wordmark .rp-site-mark {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px;
-    max-width: 32px !important;
-    max-height: 32px !important;
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px;
+    max-width: 46px !important;
+    max-height: 46px !important;
   }
   .navbar .rp-site-wordmark-copy strong { font-size: 16px; }
   .navbar .book-btn { padding-inline: 12px; }
