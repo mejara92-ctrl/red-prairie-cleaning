@@ -2838,7 +2838,7 @@ function rpScreenHtml() {
         <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 41+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 42+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day</span>
         </div>
@@ -3244,12 +3244,12 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
       <div class="rp-prep-check">
-        <label class="rp-prep-check-label">Before we confirm — does any of this apply?</label>
-        <p class="rp-prep-check-note">Helps us bring the right supplies and block enough time. Won't affect whether we can help.</p>
+        <label class="rp-prep-check-label">A few quick property details</label>
+        <p class="rp-prep-check-note">This helps us bring the right equipment, schedule enough time, and confirm the final scope.</p>
         <div class="rp-prep-check-list">
           <label class="rp-make-ready-card rp-prep-toggle">
             <input class="rp-make-ready-input" type="checkbox" ${rpState.noAC ? "checked" : ""} onchange="rpToggleNoAC(this.checked)">
-            ${rpChip("alert")}
+            ${rpChip("zap")}
             <span class="rp-make-ready-copy"><strong>No working air conditioning</strong></span>
             <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
           </label>
@@ -3261,8 +3261,8 @@ function rpLeadScreen(eyebrow) {
           </label>
           <label class="rp-make-ready-card rp-prep-toggle">
             <input class="rp-make-ready-input" type="checkbox" ${rpState.petWasteConcern ? "checked" : ""} onchange="rpTogglePetWasteConcern(this.checked)">
-            ${rpChip("alert")}
-            <span class="rp-make-ready-copy"><strong>Pets at the property, or pet waste/odor</strong></span>
+            ${rpChip("home")}
+            <span class="rp-make-ready-copy"><strong>Pets present, pet odor, or animal waste</strong></span>
             <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
           </label>
         </div>
@@ -3628,7 +3628,7 @@ function rpGetEstimatePayload() {
   const propertyConditionFlags = [
     rpState.noAC ? "No AC" : "",
     rpState.moldConcern ? "Mold/musty smell reported" : "",
-    rpState.petWasteConcern ? "Pets/pet waste at property" : ""
+    rpState.petWasteConcern ? "Pets present/pet odor/animal waste" : ""
   ].filter(Boolean);
   const propertyConditionsSummary = propertyConditionFlags.length
     ? `⚠ CREW PREP: ${propertyConditionFlags.join(", ")}`
