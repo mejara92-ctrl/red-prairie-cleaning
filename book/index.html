@@ -3359,7 +3359,7 @@ function rpCalendarMonthGrid() {
 }
 function rpPreferredTimeMessage(kind = "time") {
   const need = kind === "date" ? "date" : "time";
-  return `<p class="rp-preferred-time"><strong>Don’t see the ${need} you need?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a>—we may still be able to fit you in.</p>`;
+  return `<p class="rp-preferred-time"><strong>Don’t see the ${need} you need?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'}); return gtag_report_conversion('tel:5802150915');">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a>—we may still be able to fit you in.</p>`;
 }
 function rpCalendarScreen(eyebrow) {
   const dates = rpAvailableDateKeys();
@@ -3373,7 +3373,7 @@ function rpCalendarScreen(eyebrow) {
   if (rpState.slotsLoading) {
     body = `<div class="rp-native-status"><div><div class="rp-native-spinner"></div><strong>Checking live availability…</strong><p>Finding the best openings for your cleaning.</p></div></div>`;
   } else if (rpState.slotsError) {
-    body = `<div class="rp-native-status"><div>${rpIcon("alert","rp-ic rp-native-status-icon")}<strong>We couldn't load live availability.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button><p class="rp-preferred-time"><strong>Rather just talk to us?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar_error'})">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar_error'})">text</a> (580) 215-0915 and we'll get you booked directly.</p></div></div>`;
+    body = `<div class="rp-native-status"><div>${rpIcon("alert","rp-ic rp-native-status-icon")}<strong>We couldn't load live availability.</strong><p>${rpState.slotsError}</p><button class="rp-calendar-retry" onclick="rpLoadNativeSlots(true)">Try again</button><p class="rp-preferred-time"><strong>Rather just talk to us?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar_error'}); return gtag_report_conversion('tel:5802150915');">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar_error'})">text</a> (580) 215-0915 and we'll get you booked directly.</p></div></div>`;
   } else if (!onTimeStage) {
     body = `<div class="rp-month-calendar">
       <div class="rp-month-nav">

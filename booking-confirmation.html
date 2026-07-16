@@ -35,6 +35,22 @@
       });
     }
   });
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') { window.location = url; }
+    };
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
+        'value': 1.0,
+        'currency': 'USD',
+        'event_callback': callback
+      });
+    } else {
+      callback();
+    }
+    return false;
+  }
 </script>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
@@ -226,7 +242,7 @@ h1 { font-size: clamp(28px, 7vw, 34px); margin-bottom: 10px; letter-spacing: -.0
 
     <div class="contact">
       <p>Need to update your appointment?</p>
-      <a class="phone" href="tel:5802150915">(580) 215-0915</a>
+      <a class="phone" href="tel:5802150915" onclick="return gtag_report_conversion('tel:5802150915');">(580) 215-0915</a>
       <p class="small">We appreciate your trust in our local cleaning team and look forward to serving your home.</p>
     </div>
   </div>
