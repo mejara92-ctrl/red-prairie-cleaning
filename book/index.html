@@ -865,6 +865,28 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   display: flex; gap: 6px; align-items: flex-start; line-height: 1.5;
 }
 .rp-privacy-note .rp-ic-sm { min-width: 15px; margin-top: 1px; color: var(--sage); }
+.rp-prep-check {
+  background: rgba(159,32,39,.05);
+  border: 1px solid rgba(159,32,39,.12);
+  border-radius: 15px;
+  padding: 12px 13px 13px;
+}
+.rp-prep-check label { margin: 0 0 3px 0; }
+.rp-prep-check-note {
+  font-size: 12.5px; color: var(--muted); font-weight: 500;
+  margin: 0 0 10px; line-height: 1.45;
+}
+.rp-prep-check-list { display: grid; gap: 9px; }
+.rp-checkbox-row {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 14.5px; font-weight: 650; color: var(--ink);
+  text-transform: none; letter-spacing: normal;
+  cursor: pointer; line-height: 1.4;
+}
+.rp-checkbox-row input[type="checkbox"] {
+  width: 19px; height: 19px; flex-shrink: 0; margin-top: 1px;
+  accent-color: var(--red); cursor: pointer;
+}
 
 /* Compact-height safeguards */
 @media (max-height: 760px) {
@@ -2370,6 +2392,9 @@ const rpState = {
   airbnbSameDay: false,
   handymanInterest: false,
   militaryDiscount: false,
+  noAC: false,
+  moldConcern: false,
+  petWasteConcern: false,
   fullName: "",
   phone: "",
   email: "",
@@ -2719,7 +2744,8 @@ const RP_PERSISTED_FIELDS = [
   "carpetRooms", "addonCarpetRooms", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
-  "militaryDiscount", "fullName", "phone", "email", "address1", "city",
+  "militaryDiscount", "noAC", "moldConcern", "petWasteConcern",
+  "fullName", "phone", "email", "address1", "city",
   "state", "postalCode", "specialInstructions"
 ];
 function rpSavePersistedState() {
@@ -3225,6 +3251,15 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
+      <div class="rp-lead-field rp-prep-check">
+        <label>Before we confirm — does any of this apply?</label>
+        <p class="rp-prep-check-note">This just helps us bring the right supplies and block enough time. It won't affect whether we can help.</p>
+        <div class="rp-prep-check-list">
+          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.noAC ? "checked" : ""} onchange="rpToggleNoAC(this.checked)"> No working air conditioning at the property</label>
+          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.moldConcern ? "checked" : ""} onchange="rpToggleMoldConcern(this.checked)"> Visible mold, water damage, or a musty smell</label>
+          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.petWasteConcern ? "checked" : ""} onchange="rpTogglePetWasteConcern(this.checked)"> Pets currently at the property, or pet waste/odor to address</label>
+        </div>
+      </div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
     </div>
     <div id="rpFormError" class="rp-error"></div>
@@ -3533,6 +3568,13 @@ function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpS
 function rpSelectCarpetOnlyRooms(n, element) { rpCommitChoice(element, () => { rpState.carpetRooms = n; rpAdvance(); }); }
 function rpToggleHeavySoil(checked) { rpState.heavySoil = checked; rpRefresh(); }
 function rpTogglePetOdor(checked) { rpState.petOdor = checked; rpRefresh(); }
+/* Property-condition flags (crew prep / safety, not pricing):
+   captured on the contact step so the crew and Mike see them on the job
+   card before arriving on-site. See rpGetEstimatePayload for how these
+   surface in the booking notes sent to GoHighLevel. */
+function rpToggleNoAC(checked) { rpState.noAC = checked; rpRefresh(); }
+function rpToggleMoldConcern(checked) { rpState.moldConcern = checked; rpRefresh(); }
+function rpTogglePetWasteConcern(checked) { rpState.petWasteConcern = checked; rpRefresh(); }
 function rpToggleAirbnbLaundry(checked) { rpState.airbnbLaundry = checked; rpRefresh(); }
 function rpToggleAirbnbRestocking(checked) { rpState.airbnbRestocking = checked; rpRefresh(); }
 function rpToggleAirbnbSameDay(checked) { rpState.airbnbSameDay = checked; rpRefresh(); }
@@ -3576,6 +3618,14 @@ function rpGetEstimatePayload() {
   const postalCode = rpState.postalCode.trim();
   const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const notes = rpState.specialInstructions.trim() || "None";
+  const propertyConditionFlags = [
+    rpState.noAC ? "No AC" : "",
+    rpState.moldConcern ? "Mold/musty smell reported" : "",
+    rpState.petWasteConcern ? "Pets/pet waste at property" : ""
+  ].filter(Boolean);
+  const propertyConditionsSummary = propertyConditionFlags.length
+    ? `⚠ CREW PREP: ${propertyConditionFlags.join(", ")}`
+    : "None flagged";
   const addonsList = [
     rpState.addonCarpetRooms ? `Carpet Cleaning: ${rpState.addonCarpetRooms} room(s)` : "",
     rpState.junkSize ? `Junk Haul: ${rpState.junkSize}` : "",
@@ -3586,7 +3636,8 @@ function rpGetEstimatePayload() {
     rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : ""
   ].filter(Boolean).join(", ") || "None";
   const jobDetails = [
-    `Service: ${service}`, `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
+    `Service: ${service}`, `Property conditions: ${propertyConditionsSummary}`,
+    `Estimate: ${rpState.service === "airbnb" ? "Custom Quote" : `$${total}`}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`, `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit()} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
@@ -3619,6 +3670,8 @@ function rpGetEstimatePayload() {
     gclid: rpAttribution.gclid || "", gbraid: rpAttribution.gbraid || "", wbraid: rpAttribution.wbraid || "",
     utm_source: rpAttribution.utm_source || "", utm_medium: rpAttribution.utm_medium || "", utm_campaign: rpAttribution.utm_campaign || "",
     heavy_soil: rpState.heavySoil ? "Yes" : "No", pet_odor: rpState.petOdor ? "Yes" : "No",
+    no_ac: rpState.noAC ? "Yes" : "No", mold_concern: rpState.moldConcern ? "Yes" : "No", pet_waste_concern: rpState.petWasteConcern ? "Yes" : "No",
+    property_conditions_summary: propertyConditionsSummary,
     airbnb_laundry: rpState.airbnbLaundry ? "Yes" : "No", airbnb_restocking: rpState.airbnbRestocking ? "Yes" : "No", airbnb_same_day: rpState.airbnbSameDay ? "Yes" : "No",
     exterior_windows_tier: rpState.windowsTier || "N/A",
     handyman_interest: rpState.handymanInterest ? "Yes" : "No",
