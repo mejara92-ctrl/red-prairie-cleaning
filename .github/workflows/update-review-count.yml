@@ -1,1 +1,119 @@
+name: Update Google Review Count
 
+on:
+  schedule:
+    - cron: '0 13 * * *'   # Runs daily at 13:00 UTC (~7-8am Central, depending on DST)
+  workflow_dispatch:        # Lets you also trigger it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update-review-count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch live rating from Google Places API and update site
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+        run: |
+          python3 <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          import urllib.request
+          from pathlib import Path
+
+          api_key = os.environ["GOOGLE_PLACES_API_KEY"]
+
+          # Anchored on Red Prairie Cleaning's actual service-area coordinates
+          # (resolved from the business's Google Maps listing) so this can't
+          # accidentally match a similarly-named business elsewhere.
+          request_body = {
+              "textQuery": "Red Prairie Cleaning",
+              "locationBias": {
+                  "circle": {
+                      "center": {"latitude": 34.5656304, "longitude": -98.255165},
+                      "radius": 20000.0
+                  }
+              }
+          }
+
+          req = urllib.request.Request(
+              "https://places.googleapis.com/v1/places:searchText",
+              data=json.dumps(request_body).encode("utf-8"),
+              method="POST",
+              headers={
+                  "Content-Type": "application/json",
+                  "X-Goog-Api-Key": api_key,
+                  "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount",
+              },
+          )
+
+          try:
+              with urllib.request.urlopen(req, timeout=20) as resp:
+                  data = json.load(resp)
+          except Exception as e:
+              print(f"Places API request failed: {e}")
+              sys.exit(1)
+
+          places = data.get("places", [])
+          match = None
+          for place in places:
+              name = place.get("displayName", {}).get("text", "")
+              if "red prairie" in name.lower():
+                  match = place
+                  break
+
+          if not match:
+              # Safety net: if nothing matches by name, do nothing rather than
+              # risk writing another business's review count onto the site.
+              print("No result matched 'Red Prairie' by name -- refusing to update.")
+              print(f"Raw response (truncated): {json.dumps(data)[:500]}")
+              sys.exit(1)
+
+          review_count = match.get("userRatingCount")
+          if not isinstance(review_count, int) or review_count <= 0:
+              print(f"Got an unexpected review count value: {review_count!r} -- refusing to update.")
+              sys.exit(1)
+
+          print(
+              f"Matched: {match.get('displayName', {}).get('text')} | "
+              f"rating={match.get('rating')} | userRatingCount={review_count}"
+          )
+
+          changed = []
+          for path in sorted(Path(".").rglob("*.html")):
+              if ".git" in path.parts:
+                  continue
+              text = path.read_text(encoding="utf-8")
+              original = text
+
+              # Only these three patterns are ever touched. No other copy,
+              # layout, or logic on the page is modified.
+              text = re.sub(r"\d+\+ Ratings", f"{review_count}+ Ratings", text)
+              text = re.sub(r"\d+\+ Reviews", f"{review_count}+ Reviews", text)
+              text = re.sub(r'("reviewCount":\s*")\d+(")', rf"\g<1>{review_count}\g<2>", text)
+
+              if text != original:
+                  path.write_text(text, encoding="utf-8")
+                  changed.append(str(path))
+
+          print("Changed files:")
+          print("\n".join(changed) if changed else "None (count already current)")
+          PY
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-update Google review count"
+          git push
