@@ -865,31 +865,18 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   display: flex; gap: 6px; align-items: flex-start; line-height: 1.5;
 }
 .rp-privacy-note .rp-ic-sm { min-width: 15px; margin-top: 1px; color: var(--sage); }
-.rp-prep-check {
-  background: rgba(159,32,39,.05);
-  border: 1px solid rgba(159,32,39,.12);
-  border-radius: 13px;
-  padding: 10px 12px 11px;
-}
-.rp-prep-check label.rp-prep-check-label {
-  font-size: 12px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
-  margin: 0 0 4px 0; color: var(--muted);
+.rp-prep-check-label {
+  display: block;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  margin: 0 0 5px 2px; color: var(--muted);
 }
 .rp-prep-check-note {
-  font-size: 12px; color: var(--muted); font-weight: 500;
-  margin: 0 0 8px; line-height: 1.4;
+  font-size: 12.5px; color: var(--muted); font-weight: 500;
+  margin: 0 0 8px 2px; line-height: 1.4;
 }
-.rp-prep-check-list { display: grid; gap: 6px; }
-.rp-prep-check .rp-checkbox-row {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13.5px; font-weight: 600; color: var(--ink);
-  text-transform: none; letter-spacing: normal;
-  cursor: pointer; line-height: 1.3; margin: 0;
-}
-.rp-prep-check .rp-checkbox-row input[type="checkbox"] {
-  width: 16px; height: 16px; flex-shrink: 0;
-  accent-color: var(--red); cursor: pointer;
-}
+.rp-prep-check-list { display: grid; gap: 7px; }
+.rp-prep-check-card { padding: 10px 12px; border-radius: 14px; }
+.rp-prep-check-card strong { font-size: 14.5px; line-height: 1.3; font-weight: 650; }
 
 /* Compact-height safeguards */
 @media (max-height: 760px) {
@@ -3254,13 +3241,13 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      <div class="rp-lead-field rp-prep-check">
+      <div class="rp-lead-field">
         <label class="rp-prep-check-label">Before we confirm — does any of this apply?</label>
         <p class="rp-prep-check-note">Helps us bring the right supplies and block enough time. Won't affect whether we can help.</p>
         <div class="rp-prep-check-list">
-          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.noAC ? "checked" : ""} onchange="rpToggleNoAC(this.checked)"> No working air conditioning</label>
-          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.moldConcern ? "checked" : ""} onchange="rpToggleMoldConcern(this.checked)"> Mold, water damage, or musty smell</label>
-          <label class="rp-checkbox-row"><input type="checkbox" ${rpState.petWasteConcern ? "checked" : ""} onchange="rpTogglePetWasteConcern(this.checked)"> Pets at the property, or pet waste/odor</label>
+          <label class="rp-checkbox-card rp-prep-check-card"><input type="checkbox" ${rpState.noAC ? "checked" : ""} onchange="rpToggleNoAC(this.checked)"><div><strong>No working air conditioning</strong></div></label>
+          <label class="rp-checkbox-card rp-prep-check-card"><input type="checkbox" ${rpState.moldConcern ? "checked" : ""} onchange="rpToggleMoldConcern(this.checked)"><div><strong>Mold, water damage, or musty smell</strong></div></label>
+          <label class="rp-checkbox-card rp-prep-check-card"><input type="checkbox" ${rpState.petWasteConcern ? "checked" : ""} onchange="rpTogglePetWasteConcern(this.checked)"><div><strong>Pets at the property, or pet waste/odor</strong></div></label>
         </div>
       </div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
