@@ -2426,20 +2426,32 @@ const rpDeepTierPrices = { 1: 179, 2: 249, 3: 299, 4: 399 };
 
 /* Condition adjustment — applied only to Deep Cleaning and Factory Reset™,
    calculated off the selected service's bedroom-based base price, BEFORE
-   military discount and add-ons. Extreme conditions (animal waste, mold,
-   hoarding, excessive trash, severe smoke, pests, no A/C) are handled
-   separately as crew-prep flags (see propertyConditionFlags) and are never
-   folded into this +/-20% adjustment. */
-const rpConditionAdjustments = {
-  "Light Condition": -0.20,
-  "Standard Condition": 0,
-  "Heavy Condition": 0.20
+   military discount and add-ons. Severe/unusual condition is excluded from
+   instant pricing entirely and requires an on-site review quote. */
+const CONDITION_MULTIPLIERS = {
+  precleaned: 0.95,
+  standard: 1,
+  heavy: 1.2
+};
+const rpConditionKeys = {
+  "Pre-cleaned / minor touch-up": "precleaned",
+  "Standard condition": "standard",
+  "Heavy buildup": "heavy",
+  "Severe or unusual condition": "severe"
 };
 const rpConditionCopy = {
-  "Light Condition": { badge: "Save 20%", desc: "Professionally maintained with minimal dust, grease, buildup, or pet hair." },
-  "Standard Condition": { badge: "Base Price", desc: "Normal lived-in condition with typical dust, bathroom buildup, kitchen grease, and routine cleaning needs." },
-  "Heavy Condition": { badge: "Add 20%", desc: "Significant grime, buildup, heavy pet hair, neglected surfaces, or substantially more labor than a standard home." }
+  "Pre-cleaned / minor touch-up": { badge: "5% reduction", desc: "The home has already been cleaned and only needs light dusting, floors, and minor touch-ups." },
+  "Standard condition": { badge: "Base price", desc: "Normal household or move-out buildup, including ordinary dust, kitchen residue, bathroom buildup, and normal pet hair." },
+  "Heavy buildup": { badge: "20% increase", desc: "Heavy grease, thick residue, excessive pet hair, neglected bathrooms, significant clutter, or substantially more labor than normal." },
+  "Severe or unusual condition": { badge: "Review required", desc: "Animal waste, biohazards, infestation, mold, excessive trash, smoke damage, or unsafe conditions." }
 };
+
+/* Military / First Responder discount — 10%, capped at $25. Cannot stack
+   with promotional coupon codes. */
+const MILITARY_DISCOUNT_RATE = 0.10;
+const MILITARY_DISCOUNT_CAP = 25;
+
+
 
 /* Recurring maintenance plans — industry-standard discount bands for a
    no-contract, cancel-anytime recurring cleaning service. Discount applies
@@ -2525,24 +2537,19 @@ function rpTeamSize() {
   return "";
 }
 
-function rpAddonsTotal() {
-  let total = 0;
-  if (rpState.addonCarpetRooms > 0) total += rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice;
-  if (rpState.junkSize === "half") total += rpAddonCatalog.junk.half;
-  if (rpState.junkSize === "full") total += rpAddonCatalog.junk.full;
-  if (rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
-  if (rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
-  if (rpState.garageWash) total += rpAddonCatalog.garage.price;
-  if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
-  if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
-  if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
-  return total;
+/* True when this service/selection has no fixed instant price and needs
+   review — Airbnb Turnover always, Deep Cleaning at 5+ bedrooms, and any
+   Deep/Factory Reset booking where "Severe or unusual condition" is
+   selected. Booking still proceeds normally (calendar + confirmation);
+   only the price display and crew notes change. */
+function rpConditionKey() {
+  return rpConditionKeys[rpState.condition] || null;
 }
-
-/* True when this service/selection has no fixed price and needs a
-   custom quote — Airbnb Turnover always, and Deep Cleaning at 5+ bedrooms. */
+function rpIsSevereCondition() {
+  return ["moveout", "deep"].includes(rpState.service) && rpConditionKey() === "severe";
+}
 function rpIsCustomQuoteOnly() {
-  return rpState.service === "airbnb" || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5);
+  return rpState.service === "airbnb" || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5) || rpIsSevereCondition();
 }
 
 /* Bedroom-tier base price for Deep Cleaning / Factory Reset™ only —
@@ -2559,62 +2566,122 @@ function rpServiceBasePrice() {
   return 0;
 }
 
+/* ---- All money math below runs in integer cents to avoid float drift,
+   then converts to dollars only for display/storage. ---- */
+function rpToCents(dollars) { return Math.round(Number(dollars || 0) * 100); }
+function rpCentsToDollars(cents) { return Number((cents / 100).toFixed(2)); }
+function rpFormatMoney(cents) { return `$${(Math.abs(cents) / 100).toFixed(2)}`; }
+
+/* Condition multiplier as a decimal (e.g. -0.05, 0, 0.2). Severe/unusual
+   condition and any custom-quote state carry no instant-price adjustment. */
 function rpConditionAdjustmentPercent() {
   if (!["moveout", "deep"].includes(rpState.service)) return 0;
   if (rpIsCustomQuoteOnly()) return 0;
-  return rpConditionAdjustments[rpState.condition] || 0;
+  const key = rpConditionKey();
+  if (!key || !(key in CONDITION_MULTIPLIERS)) return 0;
+  return CONDITION_MULTIPLIERS[key] - 1;
+}
+
+function rpConditionAdjustmentCents() {
+  if (!["moveout", "deep"].includes(rpState.service)) return 0;
+  if (rpIsCustomQuoteOnly()) return 0;
+  const baseCents = rpToCents(rpServiceBasePrice());
+  const key = rpConditionKey();
+  const multiplier = (key && key in CONDITION_MULTIPLIERS) ? CONDITION_MULTIPLIERS[key] : 1;
+  return Math.round(baseCents * multiplier) - baseCents;
 }
 
 /* Dollar amount of the condition adjustment, calculated off the bedroom-based
-   base price before military discounts and add-ons. Can be negative (Light). */
+   base price before military discount and add-ons. Can be negative. */
 function rpConditionAdjustmentAmount() {
-  if (rpIsCustomQuoteOnly()) return 0;
-  return Math.round(rpServiceBasePrice() * rpConditionAdjustmentPercent());
+  return rpCentsToDollars(rpConditionAdjustmentCents());
 }
 
 function rpFormatSignedDollar(amount) {
-  if (amount > 0) return `+$${amount}`;
-  if (amount < 0) return `-$${Math.abs(amount)}`;
-  return "$0";
+  if (amount > 0) return `+$${amount.toFixed(2)}`;
+  if (amount < 0) return `-$${Math.abs(amount).toFixed(2)}`;
+  return "$0.00";
 }
 
-function rpCalculatePrice() {
-  if (!rpState.service) return 0;
-  if (rpIsCustomQuoteOnly()) return 0; // custom quote, no fixed price
+/* Per-visit / per-job subtotal BEFORE military discount and BEFORE add-ons.
+   For Deep/Factory Reset this is base price + condition adjustment.
+   For Maintenance this is the frequency-discounted per-visit price.
+   For Carpet this is the room-based price. Add-ons are always excluded —
+   they're fixed price and never touched by condition or military discount. */
+function rpPreDiscountSubtotalCents() {
+  if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
   if (rpState.service === "carpet") {
     const rooms = Math.max(2, Number(rpState.carpetRooms || 0)); // 2-room minimum
-    return rpState.carpetRooms ? rooms * 75 : 0;
+    return rpState.carpetRooms ? rpToCents(rooms * 75) : 0;
   }
   if (rpState.service === "maintenance") {
     if (!rpState.bedrooms) return 0;
     const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
     const plan = rpFrequencyPlan();
     const discountedBase = plan ? Math.round(base * (1 - plan.discount)) : base;
-    return discountedBase + rpAddonsTotal();
+    return rpToCents(discountedBase);
   }
   if (["moveout", "deep"].includes(rpState.service)) {
     if (!rpState.bedrooms) return 0;
-    return rpServiceBasePrice() + rpConditionAdjustmentAmount() + rpAddonsTotal();
+    return rpToCents(rpServiceBasePrice()) + rpConditionAdjustmentCents();
   }
   return 0;
 }
 
+/* Military / First Responder discount — 10% of the pre-add-on subtotal
+   (after condition adjustment), capped at MILITARY_DISCOUNT_CAP. Never
+   applied to add-ons, and never stacks with promotional coupon codes. */
+function rpMilitaryDiscountCents() {
+  if (!rpState.militaryDiscount || rpIsCustomQuoteOnly()) return 0;
+  const subtotal = rpPreDiscountSubtotalCents();
+  if (subtotal <= 0) return 0;
+  return Math.min(Math.round(subtotal * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP));
+}
+function rpMilitaryDiscountAmount() { return rpCentsToDollars(rpMilitaryDiscountCents()); }
+
+function rpAddonsTotal() {
+  let total = 0;
+  if (rpState.addonCarpetRooms > 0) total += rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice;
+  if (rpState.junkSize === "half") total += rpAddonCatalog.junk.half;
+  if (rpState.junkSize === "full") total += rpAddonCatalog.junk.full;
+  if (rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
+  if (rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
+  if (rpState.garageWash) total += rpAddonCatalog.garage.price;
+  if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
+  if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
+  if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
+  return total;
+}
+function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }
+/* Add-ons are fixed price and are never discounted by the military offer. */
+function rpAddonsOnceCharge() { return rpAddonsTotal(); }
+
+function rpFinalPriceCents() {
+  if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
+  const subtotal = rpPreDiscountSubtotalCents();
+  const addons = rpAddonsCents();
+  if (subtotal <= 0 && addons <= 0) return 0;
+  return subtotal - rpMilitaryDiscountCents() + addons;
+}
+
+/* Pre-discount subtotal INCLUDING add-ons — used only where the code needs
+   "what it would cost with no military discount applied." */
+function rpCalculatePrice() {
+  if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
+  return rpCentsToDollars(rpPreDiscountSubtotalCents() + rpAddonsCents());
+}
+
 function rpFinalPrice() {
-  if (rpState.service === "maintenance") {
-    if (!rpState.bedrooms) return 0;
-    return rpMaintenanceBasePerVisit() + rpAddonsOnceCharge();
-  }
-  const subtotal = rpCalculatePrice();
-  if (!subtotal) return subtotal;
-  if (rpIsCustomQuoteOnly()) return subtotal;
-  return rpState.militaryDiscount ? Math.round(subtotal * 0.9) : subtotal;
+  if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
+  return rpCentsToDollars(rpFinalPriceCents());
 }
 
 function rpPriceLabel() {
-  const total = rpFinalPrice();
+  if (rpIsSevereCondition()) return "Review Required";
   if (rpIsCustomQuoteOnly()) return "Custom Quote";
-  if (!total) return "$0";
-  return `$${total}`;
+  const cents = rpFinalPriceCents();
+  if (!cents) return "$0.00";
+  return rpFormatMoney(cents);
 }
 
 function rpIsRecurringPlan() {
@@ -2622,21 +2689,13 @@ function rpIsRecurringPlan() {
 }
 function rpMaintenanceBasePerVisit() {
   if (rpState.service !== "maintenance" || !rpState.bedrooms) return 0;
-  const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
-  const plan = rpFrequencyPlan();
-  const discounted = plan ? Math.round(base * (1 - plan.discount)) : base;
-  return rpState.militaryDiscount ? Math.round(discounted * 0.9) : discounted;
-}
-function rpAddonsOnceCharge() {
-  const addons = rpAddonsTotal();
-  if (!addons) return 0;
-  return rpState.militaryDiscount ? Math.round(addons * 0.9) : addons;
+  return rpCentsToDollars(rpPreDiscountSubtotalCents() - rpMilitaryDiscountCents());
 }
 function rpMonthlyTotal() {
   const plan = rpFrequencyPlan();
-  const basePerVisit = rpMaintenanceBasePerVisit();
-  if (!plan || !basePerVisit) return 0;
-  return basePerVisit * plan.visitsPerMonth;
+  const basePerVisitCents = Math.round(rpPreDiscountSubtotalCents() - rpMilitaryDiscountCents());
+  if (!plan || !basePerVisitCents) return 0;
+  return rpCentsToDollars(basePerVisitCents * plan.visitsPerMonth);
 }
 function rpFrequencySummary() {
   const plan = rpFrequencyPlan();
@@ -2951,16 +3010,21 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "condition") {
+    const rpConditionOrder = ["Pre-cleaned / minor touch-up", "Standard condition", "Heavy buildup", "Severe or unusual condition"];
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>What condition is the home in?</h2>
-      <p class="rp-sub">This adjusts your instant price up or down before add-ons.</p>
+      <h2>Which best describes the current condition of the home?</h2>
+      <p class="rp-sub">This helps us reserve the correct amount of time. Final condition is confirmed upon arrival.</p>
       <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectCondition('Light Condition', this)", title:"Light Condition", val: rpConditionCopy["Light Condition"].badge, desc: rpConditionCopy["Light Condition"].desc, selected: rpState.condition === "Light Condition" })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Standard Condition', this)", title:"Standard Condition", val: rpConditionCopy["Standard Condition"].badge, desc: rpConditionCopy["Standard Condition"].desc, selected: rpState.condition === "Standard Condition" })}
-        ${rpRowBtn({ onclick:"rpSelectCondition('Heavy Condition', this)", title:"Heavy Condition", val: rpConditionCopy["Heavy Condition"].badge, desc: rpConditionCopy["Heavy Condition"].desc, selected: rpState.condition === "Heavy Condition" })}
+        ${rpConditionOrder.map(label => rpRowBtn({
+          onclick: `rpSelectCondition('${label}', this)`,
+          title: label,
+          val: rpConditionCopy[label].badge,
+          desc: rpConditionCopy[label].desc,
+          selected: rpState.condition === label
+        })).join("")}
       </div>
-      <p class="rp-notice rp-condition-notice">Your estimate is based on the condition selected. The home’s condition will be confirmed upon arrival, and any necessary price adjustment will be discussed before cleaning begins.</p>
+      <p class="rp-notice rp-condition-notice">Pre-cleaned pricing is subject to verification. Final condition will be confirmed upon arrival, and any price adjustment will be discussed and approved before cleaning begins.</p>
     </div>` };
   }
 
@@ -3195,12 +3259,11 @@ function rpAddonSummaryRows() {
 }
 
 function rpEstimateScreen(eyebrow) {
-  const subtotal = rpCalculatePrice();
-  const final = rpFinalPrice();
   const service = rpServices[rpState.service];
   const isQuoteOnly = rpState.service === "airbnb";
+  const noGuaranteedPrice = rpIsCustomQuoteOnly();
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
-  const discountActive = rpState.militaryDiscount && !isQuoteOnly && subtotal > 0;
+  const discountActive = rpState.militaryDiscount && !noGuaranteedPrice && rpMilitaryDiscountCents() > 0;
   const includes = rpIncludes[rpState.service];
   return { scroll: `<div>
     <div class="rp-quote-band">
@@ -3215,7 +3278,7 @@ function rpEstimateScreen(eyebrow) {
           <circle cx="0" cy="-110" r="3"/>
         </g>
       </svg></div>
-      <div class="rp-quote-hero ${isQuoteOnly ? "is-quote" : ""}">
+      <div class="rp-quote-hero ${noGuaranteedPrice ? "is-quote" : ""}">
         <small>Your Private Estimate</small>
         <strong>${rpPriceLabel()}</strong>
         <span>${service.name}</span>
@@ -3224,7 +3287,7 @@ function rpEstimateScreen(eyebrow) {
     </div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
-      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit()} each</span><strong>$${rpMonthlyTotal()}/mo</strong></div>` : ""}
+      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}
       ${rpIsRecurringPlan() && rpAddonsOnceCharge() ? `<div class="rp-recurring-total"><span>Add-ons for this visit (one-time)</span><strong>+$${rpAddonsOnceCharge()}</strong></div>` : ""}
       <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
     </div>` : ""}
@@ -3233,10 +3296,10 @@ function rpEstimateScreen(eyebrow) {
       ${rpTeamSize() ? `<div class="rp-mini-row"><span>Team Size</span><strong>${rpTeamSize()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
-      ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !rpIsCustomQuoteOnly() ? `<div class="rp-mini-row"><span>Base Price</span><strong>$${rpServiceBasePrice()}</strong></div>` : ""}
+      ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
-      ${["moveout","deep"].includes(rpState.service) && rpState.condition && !rpIsCustomQuoteOnly() ? `<div class="rp-mini-row ${rpConditionAdjustmentAmount() < 0 ? "rp-discount-row" : ""}"><span>Condition Adjustment (${rpConditionAdjustmentPercent() > 0 ? "+" : ""}${Math.round(rpConditionAdjustmentPercent() * 100)}%)</span><strong>${rpFormatSignedDollar(rpConditionAdjustmentAmount())}</strong></div>` : ""}
-      ${rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
+      ${["moveout","deep"].includes(rpState.service) && rpState.condition && !noGuaranteedPrice && rpConditionAdjustmentPercent() !== 0 ? `<div class="rp-mini-row ${rpConditionAdjustmentAmount() < 0 ? "rp-discount-row" : ""}"><span>Condition Adjustment (${rpConditionAdjustmentPercent() > 0 ? "+" : ""}${Math.round(rpConditionAdjustmentPercent() * 100)}%)</span><strong>${rpFormatSignedDollar(rpConditionAdjustmentAmount())}</strong></div>` : ""}
+      ${rpIsSevereCondition() ? `<div class="rp-mini-row rp-separate-quote-row"><span>Pricing</span><strong>Review Required<small>Quoted on-site before cleaning begins</small></strong></div>` : (rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : "")}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.heavySoil ? `<div class="rp-mini-row"><span>Heavy soil/staining</span><strong>Noted</strong></div>` : ""}
@@ -3246,7 +3309,7 @@ function rpEstimateScreen(eyebrow) {
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
       ${rpState.handymanInterest ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional service request</span><strong>Make-ready repairs<small>Quoted separately · not included</small></strong></div>` : ""}
-      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder (10%)</span><strong>-$${subtotal - final}</strong></div>` : ""}
+      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder Discount</span><strong>-$${rpMilitaryDiscountAmount().toFixed(2)}</strong></div>` : ""}
     </div>
     ${(includes || !isQuoteOnly) ? `
     <div class="rp-estimate-support">
@@ -3257,10 +3320,10 @@ function rpEstimateScreen(eyebrow) {
           <p class="rp-includes-intro">${includes.intro}</p>
         </div></div>
       </details>` : ""}
-      ${!isQuoteOnly ? `
+      ${!noGuaranteedPrice ? `
       <label class="rp-discount-inline">
         <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
-        <span><strong>Military or First Responder?</strong><small>Save 10% as a thank-you for your service.</small></span>
+        <span><strong>Military or First Responder?</strong><small>Save 10% (up to $25) as a thank-you for your service. Cannot be combined with other promotional offers.</small></span>
       </label>` : ""}
     </div>` : ""}
     ${showHandymanHere ? `
@@ -3271,7 +3334,7 @@ function rpEstimateScreen(eyebrow) {
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>` : ""}
   </div>`, footer: `
-    <p class="rp-notice rp-dock-notice">Price may change only for severe buildup, heavy trash, access issues, biohazards, or work outside the selected scope. Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>
+    <p class="rp-notice rp-dock-notice">${rpIsSevereCondition() ? "Severe/unusual condition homes are quoted on-site — we’ll confirm final pricing with you before cleaning begins." : "Price may change only for severe buildup, heavy trash, access issues, biohazards, or work outside the selected scope."} Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>
     <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>` };
 }
 
@@ -3682,7 +3745,7 @@ function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon 
 function rpGetEstimatePayload() {
   const subtotal = rpCalculatePrice();
   const total = rpFinalPrice();
-  const discountApplied = rpState.militaryDiscount && !rpIsCustomQuoteOnly() && subtotal > 0;
+  const discountApplied = rpState.militaryDiscount && !rpIsCustomQuoteOnly() && rpMilitaryDiscountCents() > 0;
   const service = rpServices[rpState.service]?.name || "Not selected";
   const address1 = rpState.address1.trim();
   const city = rpState.city.trim();
@@ -3690,10 +3753,12 @@ function rpGetEstimatePayload() {
   const postalCode = rpState.postalCode.trim();
   const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const notes = rpState.specialInstructions.trim() || "None";
+  const isSevere = rpIsSevereCondition();
   const propertyConditionFlags = [
     rpState.noAC ? "No AC" : "",
     rpState.moldConcern ? "Mold/musty smell reported" : "",
-    rpState.petWasteConcern ? "Pets present/pet odor/animal waste" : ""
+    rpState.petWasteConcern ? "Pets present/pet odor/animal waste" : "",
+    isSevere ? "Severe/unusual condition self-reported — verify and quote on-site" : ""
   ].filter(Boolean);
   const propertyConditionsSummary = propertyConditionFlags.length
     ? `⚠ CREW PREP: ${propertyConditionFlags.join(", ")}`
@@ -3707,22 +3772,31 @@ function rpGetEstimatePayload() {
     rpState.fridgeAddon ? "Refrigerator Interior" : "",
     rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : ""
   ].filter(Boolean).join(", ") || "None";
+  const isConditionPriced = ["moveout", "deep"].includes(rpState.service) && !rpIsCustomQuoteOnly();
   const baseServicePrice = rpServiceBasePrice();
   const conditionAdjustmentPercent = rpConditionAdjustmentPercent();
   const conditionAdjustmentAmount = rpConditionAdjustmentAmount();
+  const militaryDiscountAmount = rpMilitaryDiscountAmount();
+  /* Pricing status shown to the office: "Confirmed" for a normal instant
+     estimate, "Custom Quote" for Airbnb/5+ bedroom Deep Cleaning, and
+     "Review Required — Quote On-Site" for severe/unusual condition. The
+     booking itself still confirms normally in all three cases. */
+  const pricingStatus = isSevere ? "Review Required — Quote On-Site" : (rpIsCustomQuoteOnly() ? "Custom Quote" : "Confirmed");
+  const estimateDisplay = isSevere ? "Review Required (quoted on-site)" : (rpIsCustomQuoteOnly() ? "Custom Quote" : `$${total.toFixed(2)}`);
   const jobDetails = [
     `Service: ${service}`, `Property conditions: ${propertyConditionsSummary}`,
-    `Estimate: ${rpIsCustomQuoteOnly() ? "Custom Quote" : `$${total}`}`,
+    `Pricing status: ${pricingStatus}`,
+    `Estimate: ${estimateDisplay}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`,
-    `Base service price: ${["moveout","deep"].includes(rpState.service) && !rpIsCustomQuoteOnly() ? `$${baseServicePrice}` : "N/A"}`,
-    `Condition adjustment: ${["moveout","deep"].includes(rpState.service) && rpState.condition && !rpIsCustomQuoteOnly() ? `${conditionAdjustmentPercent > 0 ? "+" : ""}${Math.round(conditionAdjustmentPercent * 100)}% (${rpFormatSignedDollar(conditionAdjustmentAmount)})` : "N/A"}`,
+    `Base service price: ${isConditionPriced ? `$${baseServicePrice.toFixed(2)}` : "N/A"}`,
+    `Condition adjustment: ${isConditionPriced && rpState.condition && conditionAdjustmentPercent !== 0 ? `${conditionAdjustmentPercent > 0 ? "+" : ""}${Math.round(conditionAdjustmentPercent * 100)}% (${rpFormatSignedDollar(conditionAdjustmentAmount)})` : "N/A"}`,
     `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
-    `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal()}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit()} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
+    `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal().toFixed(2)}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit().toFixed(2)} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
-    `Military/First Responder Discount: ${discountApplied ? `Yes (-$${subtotal - total})` : "No"}`,
+    `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,
     `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
   ].join(" | ");
   return {
@@ -3730,7 +3804,8 @@ function rpGetEstimatePayload() {
     full_name: rpState.fullName, phone: rpState.phone, email: rpState.email,
     address1, street_address: address1, address: address1, city, state, postal_code: postalCode, zip: postalCode, full_address: fullAddress,
     service, service_type: service, service_key: rpState.service,
-    estimated_price: rpIsCustomQuoteOnly() ? "Custom Quote" : `$${total}`, estimated_price_number: total, price_estimate: rpIsCustomQuoteOnly() ? "Custom Quote" : `$${total}`,
+    estimated_price: estimateDisplay, estimated_price_number: isSevere || rpIsCustomQuoteOnly() ? "N/A" : total, price_estimate: estimateDisplay,
+    pricing_status: pricingStatus,
     bedrooms: rpState.bedrooms || "N/A", bathrooms: rpState.bathrooms || "N/A",
     carpet_rooms: rpState.carpetRooms || rpState.addonCarpetRooms || "0",
     exterior_windows: rpState.windowsTier ? "Yes" : "No",
@@ -3740,14 +3815,14 @@ function rpGetEstimatePayload() {
     helpers_count: "N/A", hours_count: "N/A",
     addons: addonsList,
     condition: rpState.condition || "N/A",
-    base_service_price: ["moveout","deep"].includes(rpState.service) && !rpIsCustomQuoteOnly() ? baseServicePrice : "N/A",
-    condition_adjustment_percent: ["moveout","deep"].includes(rpState.service) && rpState.condition && !rpIsCustomQuoteOnly() ? Math.round(conditionAdjustmentPercent * 100) : 0,
-    condition_adjustment_amount: ["moveout","deep"].includes(rpState.service) && rpState.condition && !rpIsCustomQuoteOnly() ? conditionAdjustmentAmount : 0,
-    condition_adjustment_summary: ["moveout","deep"].includes(rpState.service) && rpState.condition && !rpIsCustomQuoteOnly() ? `${conditionAdjustmentPercent > 0 ? "+" : ""}${Math.round(conditionAdjustmentPercent * 100)}% (${rpFormatSignedDollar(conditionAdjustmentAmount)})` : "N/A",
+    base_service_price: isConditionPriced ? baseServicePrice.toFixed(2) : "N/A",
+    condition_adjustment_percent: isConditionPriced && rpState.condition ? Math.round(conditionAdjustmentPercent * 100) : 0,
+    condition_adjustment_amount: isConditionPriced && rpState.condition ? conditionAdjustmentAmount.toFixed(2) : "0.00",
+    condition_adjustment_summary: isConditionPriced && rpState.condition && conditionAdjustmentPercent !== 0 ? `${conditionAdjustmentPercent > 0 ? "+" : ""}${Math.round(conditionAdjustmentPercent * 100)}% (${rpFormatSignedDollar(conditionAdjustmentAmount)})` : "N/A",
     frequency: rpState.frequency || "N/A",
     frequency_discount_percent: rpFrequencyPlan() ? Math.round(rpFrequencyPlan().discount * 100) : 0,
     visits_per_month: rpFrequencyPlan() ? rpFrequencyPlan().visitsPerMonth : "N/A",
-    monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal() : "N/A",
+    monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal().toFixed(2) : "N/A",
     no_contract: rpState.service === "maintenance" ? "Yes" : "N/A",
     ad_attribution: rpAttributionSummary(),
     gclid: rpAttribution.gclid || "", gbraid: rpAttribution.gbraid || "", wbraid: rpAttribution.wbraid || "",
@@ -3759,8 +3834,11 @@ function rpGetEstimatePayload() {
     exterior_windows_tier: rpState.windowsTier || "N/A",
     handyman_interest: rpState.handymanInterest ? "Yes" : "No",
     military_discount: discountApplied ? "Yes" : "No",
-    subtotal_before_discount: discountApplied ? `$${subtotal}` : (rpIsCustomQuoteOnly() ? "Custom Quote" : `$${subtotal}`),
-    discount_amount: discountApplied ? `$${subtotal - total}` : "$0",
+    military_discount_rate: MILITARY_DISCOUNT_RATE,
+    military_discount_cap: MILITARY_DISCOUNT_CAP,
+    military_discount_combinable_with_coupons: "No",
+    subtotal_before_discount: rpIsCustomQuoteOnly() ? estimateDisplay : `$${subtotal.toFixed(2)}`,
+    discount_amount: discountApplied ? `$${militaryDiscountAmount.toFixed(2)}` : "$0.00",
     special_instructions: notes, customer_notes: notes, estimate_notes: jobDetails, job_details: jobDetails, cleaner_notes: jobDetails,
     submitted_at: new Date().toISOString(), page_url: window.location.href
   };
