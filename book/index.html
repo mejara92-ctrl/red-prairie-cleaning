@@ -2368,6 +2368,8 @@ const rpState = {
   bathrooms: null,
   condition: null,
   frequency: null,
+  cleanerCount: null,
+  hourCount: null,
   carpetRooms: 0,
   addonCarpetRooms: 0,
   expandedAddon: null,
@@ -2414,6 +2416,7 @@ const rpServices = {
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Maintenance Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
+  hourly:      { name: "Hourly Cleaning & Organizing",     emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
 
@@ -2424,12 +2427,19 @@ const rpTierPrices = { 1: 199, 2: 299, 3: 399, 4: 499, 5: 599 };
    (no fixed tier), handled via rpIsCustomQuoteOnly(). */
 const rpDeepTierPrices = { 1: 179, 2: 249, 3: 299, 4: 399 };
 
+/* Hourly Cleaning & Organizing — flat rate per cleaner per hour. No
+   condition step; the customer sets scope via cleaner count + hours. */
+const HOURLY_RATE_PER_CLEANER = 50;
+const HOURLY_MIN_HOURS = 4;
+const HOURLY_MAX_HOURS = 8;
+const HOURLY_MAX_CLEANERS = 3;
+
 /* Condition adjustment — applied only to Deep Cleaning and Factory Reset™,
    calculated off the selected service's bedroom-based base price, BEFORE
    military discount and add-ons. Severe/unusual condition is excluded from
    instant pricing entirely and requires an on-site review quote. */
 const CONDITION_MULTIPLIERS = {
-  precleaned: 0.95,
+  precleaned: 0.90,
   standard: 1,
   heavy: 1.2
 };
@@ -2440,7 +2450,7 @@ const rpConditionKeys = {
   "Severe or unusual condition": "severe"
 };
 const rpConditionCopy = {
-  "Pre-cleaned / minor touch-up": { badge: "5% reduction", desc: "The home has already been cleaned and only needs light dusting, floors, and minor touch-ups." },
+  "Pre-cleaned / minor touch-up": { badge: "10% reduction", desc: "The home has already been cleaned and only needs light dusting, floors, and minor touch-ups." },
   "Standard condition": { badge: "Base price", desc: "Normal household or move-out buildup, including ordinary dust, kitchen residue, bathroom buildup, and normal pet hair." },
   "Heavy buildup": { badge: "20% increase", desc: "Heavy grease, thick residue, excessive pet hair, neglected bathrooms, significant clutter, or substantially more labor than normal." },
   "Severe or unusual condition": { badge: "Review required", desc: "Animal waste, biohazards, infestation, mold, excessive trash, smoke damage, or unsafe conditions." }
@@ -2486,7 +2496,8 @@ const rpAddonCatalog = {
 const rpServiceAddons = {
   moveout:     ["carpet", "junk", "windows", "garage", "yard"],
   deep:        ["fridge", "carpet", "laundry", "windows", "garage", "yard"],
-  maintenance: ["laundry", "windows", "yard"]
+  maintenance: ["laundry", "windows", "yard"],
+  hourly:      ["fridge", "laundry", "windows", "garage", "yard"]
 };
 
 const rpIncludes = {
@@ -2502,6 +2513,9 @@ const rpIncludes = {
   carpet: {
     intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select."
   },
+  hourly: {
+    intro: "Flexible, general help around the house—cleaning, organizing, decluttering, and light tidying—billed by the hour with as many cleaners as you need."
+  },
   airbnb: {
     intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request."
   }
@@ -2515,6 +2529,7 @@ const rpFlows = {
   deep:        ["bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   maintenance: ["bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["rooms", "carpetdetails", "estimate", "lead", "calendar"],
+  hourly:      ["cleaners", "hours", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
 };
 
@@ -2525,6 +2540,7 @@ function rpTimeEstimate() {
   if (rpState.service === "moveout") return "6–10 hours";
   if (rpState.service === "deep") return "Up to 6 hours";
   if (rpState.service === "maintenance") return "Up to 4 hours";
+  if (rpState.service === "hourly") return rpState.hourCount ? `${rpState.hourCount} hour${rpState.hourCount === 1 ? "" : "s"}` : `${HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "airbnb") return "Varies by property size";
   if (rpState.service === "carpet") return "Varies by room count";
   return "";
@@ -2532,6 +2548,7 @@ function rpTimeEstimate() {
 function rpTeamSize() {
   if (rpState.service === "moveout") return "2 cleaners";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
+  if (rpState.service === "hourly") return rpState.cleanerCount ? `${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}` : "You choose";
   if (rpState.service === "airbnb") return "1–2 cleaners";
   if (rpState.service === "carpet") return "1 technician";
   return "";
@@ -2624,6 +2641,10 @@ function rpPreDiscountSubtotalCents() {
   if (["moveout", "deep"].includes(rpState.service)) {
     if (!rpState.bedrooms) return 0;
     return rpToCents(rpServiceBasePrice()) + rpConditionAdjustmentCents();
+  }
+  if (rpState.service === "hourly") {
+    if (!rpState.cleanerCount || !rpState.hourCount) return 0;
+    return rpToCents(HOURLY_RATE_PER_CLEANER * rpState.cleanerCount * rpState.hourCount);
   }
   return 0;
 }
@@ -2852,6 +2873,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
    fetched availability, or in-flight error state. */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "bedrooms", "bathrooms", "condition", "frequency",
+  "cleanerCount", "hourCount",
   "carpetRooms", "addonCarpetRooms", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
@@ -2970,6 +2992,7 @@ function rpScreenHtml() {
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
+          ${rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning & Organizing", desc:"General help around the house, billed by the hour." })}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -3004,6 +3027,38 @@ function rpScreenHtml() {
           onclick:`rpSelectBathrooms(${n}, this)`,
           title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
           selected: rpState.bathrooms === n
+        })).join("")}
+      </div>
+    </div>` };
+  }
+
+  if (rpState.step === "cleaners") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>How many cleaners do you need?</h2>
+      <p class="rp-sub">$${HOURLY_RATE_PER_CLEANER}/hour, per cleaner.</p>
+      <div class="rp-rows">
+        ${Array.from({ length: HOURLY_MAX_CLEANERS }, (_, i) => i + 1).map(n => rpRowBtn({
+          onclick:`rpSelectCleanerCount(${n}, this)`,
+          title:`${n} cleaner${n > 1 ? "s" : ""}`,
+          val: `$${HOURLY_RATE_PER_CLEANER * n}/hr`,
+          selected: rpState.cleanerCount === n
+        })).join("")}
+      </div>
+    </div>` };
+  }
+
+  if (rpState.step === "hours") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>How many hours?</h2>
+      <p class="rp-sub">${HOURLY_MIN_HOURS}-hour minimum per booking.</p>
+      <div class="rp-rows">
+        ${Array.from({ length: HOURLY_MAX_HOURS - HOURLY_MIN_HOURS + 1 }, (_, i) => i + HOURLY_MIN_HOURS).map(n => rpRowBtn({
+          onclick:`rpSelectHourCount(${n}, this)`,
+          title:`${n} hour${n > 1 ? "s" : ""}`,
+          val: rpState.cleanerCount ? `$${(HOURLY_RATE_PER_CLEANER * rpState.cleanerCount * n).toFixed(2)}` : "",
+          selected: rpState.hourCount === n
         })).join("")}
       </div>
     </div>` };
@@ -3296,6 +3351,9 @@ function rpEstimateScreen(eyebrow) {
       ${rpTeamSize() ? `<div class="rp-mini-row"><span>Team Size</span><strong>${rpTeamSize()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
+      ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
+      ${rpState.service === "hourly" && rpState.hourCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hourCount}</strong></div>` : ""}
+      ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.condition && !noGuaranteedPrice && rpConditionAdjustmentPercent() !== 0 ? `<div class="rp-mini-row ${rpConditionAdjustmentAmount() < 0 ? "rp-discount-row" : ""}"><span>Condition Adjustment (${rpConditionAdjustmentPercent() > 0 ? "+" : ""}${Math.round(rpConditionAdjustmentPercent() * 100)}%)</span><strong>${rpFormatSignedDollar(rpConditionAdjustmentAmount())}</strong></div>` : ""}
@@ -3651,6 +3709,8 @@ function rpResetServiceState() {
   rpState.bathrooms = null;
   rpState.condition = null;
   rpState.frequency = null;
+  rpState.cleanerCount = null;
+  rpState.hourCount = null;
   rpState.carpetRooms = 0;
   rpState.addonCarpetRooms = 0;
   rpState.expandedAddon = null;
@@ -3698,6 +3758,8 @@ function rpSelectService(service, element) {
 }
 function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.bedrooms = n; rpAdvance(); }); }
 function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
+function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
+function rpSelectHourCount(n, element) { rpCommitChoice(element, () => { rpState.hourCount = n; rpAdvance(); }); }
 function rpSelectCondition(label, element) { rpCommitChoice(element, () => { rpState.condition = label; rpAdvance(); }); }
 function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpState.frequency = label; rpAdvance(); }); }
 function rpSelectCarpetOnlyRooms(n, element) { rpCommitChoice(element, () => { rpState.carpetRooms = n; rpAdvance(); }); }
@@ -3788,6 +3850,7 @@ function rpGetEstimatePayload() {
     `Pricing status: ${pricingStatus}`,
     `Estimate: ${estimateDisplay}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
+    `Cleaners: ${rpState.cleanerCount || "N/A"}`, `Hours: ${rpState.hourCount || "N/A"}`, `Hourly rate: ${rpState.service === "hourly" ? `$${HOURLY_RATE_PER_CLEANER}/hr per cleaner` : "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`,
     `Base service price: ${isConditionPriced ? `$${baseServicePrice.toFixed(2)}` : "N/A"}`,
     `Condition adjustment: ${isConditionPriced && rpState.condition && conditionAdjustmentPercent !== 0 ? `${conditionAdjustmentPercent > 0 ? "+" : ""}${Math.round(conditionAdjustmentPercent * 100)}% (${rpFormatSignedDollar(conditionAdjustmentAmount)})` : "N/A"}`,
@@ -3812,7 +3875,8 @@ function rpGetEstimatePayload() {
     upholstery_type: "N/A", upholstery_item: "N/A", upholstery_price: "0",
     junk_size: rpState.junkSize || "N/A",
     laundry_loads: rpState.laundryLoads || "0",
-    helpers_count: "N/A", hours_count: "N/A",
+    helpers_count: rpState.cleanerCount || "N/A", hours_count: rpState.hourCount || "N/A",
+    hourly_rate: rpState.service === "hourly" ? HOURLY_RATE_PER_CLEANER : "N/A",
     addons: addonsList,
     condition: rpState.condition || "N/A",
     base_service_price: isConditionPriced ? baseServicePrice.toFixed(2) : "N/A",
@@ -4105,7 +4169,7 @@ function rpAttributionSummary() {
    final URLs and landing-page CTAs that already know the visitor's intent.
    "movein" is aliased to "moveout" since Move-In and Move-Out share one
    flow/card in this funnel. */
-const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance" };
+const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", hourly: "hourly" };
 const rpPreselectedService = (function rpApplyServicePreselect() {
   const params = new URLSearchParams(window.location.search);
   const requested = (params.get("service") || "").trim().toLowerCase();
