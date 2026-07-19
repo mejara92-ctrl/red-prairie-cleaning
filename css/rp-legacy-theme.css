@@ -83,7 +83,14 @@ body {
 }
 
 .navbar .rp-site-wordmark-copy small {
-  display: none;
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: var(--rp-legacy-ink);
+  opacity: .58;
+  margin-top: 2px;
 }
 
 /* Warm major content bands and common card surfaces. */
@@ -137,5 +144,6 @@ body {
     max-height: 46px !important;
   }
   .navbar .rp-site-wordmark-copy strong { font-size: 16px; }
+  .navbar .rp-site-wordmark-copy small { font-size: 8px; letter-spacing: .14em; }
   .navbar .book-btn { padding-inline: 12px; }
 }

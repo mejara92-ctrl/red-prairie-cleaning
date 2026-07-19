@@ -186,8 +186,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .rp-head-btn.is-hidden { opacity: 0; pointer-events: none; }
 .rp-wordmark { height: 42px; display: flex; align-items: center; justify-content: center; gap: 9px; }
 .rp-wordmark img { width: 34px; height: 34px; display: block; border-radius: 9px; box-shadow: 0 5px 12px rgba(159,32,39,.18); }
-.rp-wordmark strong { font-size: 17px; font-weight: 800; letter-spacing: .04em; color: var(--ink); white-space: nowrap; }
-.rp-wordmark strong b { color: var(--red); }
+.rp-wordmark-copy { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.rp-wordmark-copy strong { font-size: 17px; font-weight: 800; letter-spacing: .04em; color: var(--ink); white-space: nowrap; }
+.rp-wordmark-copy strong b { color: var(--red); }
+.rp-wordmark-copy small { display: block; font-size: 9px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--ink); opacity: .58; margin-top: 2px; white-space: nowrap; }
 .rp-head-text {
   font-size: 12px; letter-spacing: .02em;
   padding: 9px 11px;
@@ -947,7 +949,8 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-head { padding-inline: 9px; }
   .rp-wordmark { gap: 8px; }
   .rp-wordmark img { width: 32px; height: 32px; }
-  .rp-wordmark strong { font-size: 16px; }
+  .rp-wordmark-copy strong { font-size: 16px; }
+  .rp-wordmark-copy small { font-size: 8px; letter-spacing: .14em; }
   .rp-screen-scroll { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer::before { left: 20px; right: 20px; }
@@ -956,6 +959,16 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-row-desc { font-size: 15px; }
   .rp-sheet { padding-left: 13px; padding-right: 13px; }
   .rp-sheet .rp-row-title { font-size: 16.5px; }
+}
+
+@media (max-width: 340px) {
+  .rp-head { padding-inline: 7px; }
+  .rp-wordmark { gap: 6px; }
+  .rp-wordmark img { width: 28px; height: 28px; }
+  .rp-wordmark-copy strong { font-size: 14px; }
+  .rp-wordmark-copy small { font-size: 7px; letter-spacing: .1em; }
+  .rp-head-actions { gap: 3px; }
+  .rp-head-faq, .rp-head-text { padding: 8px 8px; font-size: 11px; }
 }
 
 
@@ -2349,7 +2362,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
     </button>
     <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage" onclick="rpTrack('home_logo_tap',{placement:'book_header'})">
       <img src="/images/logo/favicon.png" width="34" height="34" alt="">
-      <strong><b>RED</b> PRAIRIE</strong>
+      <span class="rp-wordmark-copy"><strong><b>RED</b> PRAIRIE</strong><small>CLEANING</small></span>
     </a>
     <div class="rp-head-actions">
       <button class="rp-head-faq" type="button" onclick="rpOpenFaq('header')" aria-label="Open frequently asked questions">FAQ</button>
