@@ -340,7 +340,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-screen.has-photo-bg .rp-screen-scroll { position: relative; z-index: 3; padding: 6px 20px 22px; }
 
 .rp-hero-onphoto { padding: 5px 5px 112px; max-width: 500px; }
-.rp-hero-onphoto.is-intro { padding-bottom: 40px; }
+.rp-hero-onphoto.is-intro { padding-bottom: 6px; }
 .rp-hero-onphoto .rp-eyebrow.red { color: #f4d4c5; text-shadow: 0 1px 14px rgba(0,0,0,.34); }
 .rp-hero-onphoto h1 { color: #fffaf3; text-shadow: 0 3px 22px rgba(0,0,0,.34); max-width: 480px; }
 .rp-hero-onphoto .rp-trust {
@@ -364,12 +364,15 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 
 .rp-hero-cta {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; margin-top: 16px; padding: 15px 18px;
+  position: absolute; left: 20px; right: 20px;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  padding: 16px 18px;
   background: linear-gradient(160deg, #c8372e, #9e2a23);
   border: 1px solid rgba(255,255,255,.22);
   border-radius: 16px;
   color: #fff; font-size: 15.5px; font-weight: 800;
-  box-shadow: 0 14px 28px rgba(20,10,7,.35), inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow: 0 14px 32px rgba(20,10,7,.4), inset 0 1px 0 rgba(255,255,255,.18);
+  z-index: 6;
 }
 .rp-hero-cta:active { transform: scale(.98); }
 .rp-hero-cta .rp-ic-sm { width: 15px; height: 15px; }
