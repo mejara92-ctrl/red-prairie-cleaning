@@ -373,8 +373,17 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 .rp-hero-cta:active { transform: scale(.98); }
 .rp-hero-cta .rp-ic-sm { width: 15px; height: 15px; }
-.step-service .rp-screen-footer { background: transparent; padding: 0 20px calc(22px + env(safe-area-inset-bottom)); }
-.step-service .rp-screen-footer::before { display: none; }
+.step-service .rp-screen-footer {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 20px calc(22px + env(safe-area-inset-bottom)) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.step-service .rp-screen-footer::before { display: none !important; }
 
 .rp-sheet.is-intro-hidden { display: none; }
 
