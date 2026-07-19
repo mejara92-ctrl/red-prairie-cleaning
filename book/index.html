@@ -364,18 +364,17 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 
 .rp-hero-cta {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  position: absolute; left: 20px; right: 20px;
-  bottom: calc(22px + env(safe-area-inset-bottom));
-  padding: 16px 18px;
+  width: 100%; padding: 16px 18px;
   background: linear-gradient(160deg, #c8372e, #9e2a23);
   border: 1px solid rgba(255,255,255,.22);
   border-radius: 16px;
   color: #fff; font-size: 15.5px; font-weight: 800;
   box-shadow: 0 14px 32px rgba(20,10,7,.4), inset 0 1px 0 rgba(255,255,255,.18);
-  z-index: 6;
 }
 .rp-hero-cta:active { transform: scale(.98); }
 .rp-hero-cta .rp-ic-sm { width: 15px; height: 15px; }
+.step-service .rp-screen-footer { background: transparent; padding: 0 20px calc(22px + env(safe-area-inset-bottom)); }
+.step-service .rp-screen-footer::before { display: none; }
 
 .rp-sheet.is-intro-hidden { display: none; }
 
@@ -2764,9 +2763,10 @@ function rpRevealServiceSheet() {
   rpServiceIntroRevealed = true;
   const hero = document.querySelector(".rp-hero-onphoto.is-intro");
   const btn = document.getElementById("rpServiceIntroBtn");
+  const footerBar = btn ? btn.closest(".rp-screen-footer") : null;
   const sheet = document.getElementById("rpServiceSheet");
   if (hero) hero.classList.remove("is-intro");
-  if (btn) btn.remove();
+  if (footerBar) footerBar.remove();
   if (sheet) {
     sheet.classList.remove("is-intro-hidden");
     window.setTimeout(function() {
@@ -2986,11 +2986,10 @@ function rpScreenHtml() {
         <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 42+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 46+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day</span>
         </div>
-        ${introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">What do you need cleaned? ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : ""}
       </div>
       <div class="rp-sheet ${introActive ? "is-intro-hidden" : ""}" id="rpServiceSheet">
         <div class="rp-sheet-handle"></div>
@@ -3004,7 +3003,9 @@ function rpScreenHtml() {
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
-    `};
+    `,
+      footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">What do you need cleaned? ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
+    };
   }
 
   if (rpState.step === "bedrooms") {
