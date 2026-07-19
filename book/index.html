@@ -30,7 +30,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="robots" content="noindex,follow"/>
-<meta name="theme-color" content="#f7f1e7"/>
+<meta name="theme-color" content="#f7f1e7" id="rpThemeColor"/>
 <title>Book Your Cleaning — Red Prairie Cleaning</title>
 <meta name="description" content="Get an instant price and book your professional cleaning in about a minute. Serving Lawton, Fort Sill &amp; Southwest Oklahoma."/>
 <link rel="icon" type="image/png" href="/favicon.png"/>
@@ -2759,6 +2759,12 @@ function rpTrack(event, extra = {}) {
 }
 
 let rpServiceIntroRevealed = false;
+const RP_THEME_DEFAULT = "#f7f1e7";
+const RP_THEME_INTRO = "#7e1c22";
+function rpSetThemeColor(color) {
+  const meta = document.getElementById("rpThemeColor");
+  if (meta) meta.setAttribute("content", color);
+}
 function rpRevealServiceSheet() {
   rpServiceIntroRevealed = true;
   const hero = document.querySelector(".rp-hero-onphoto.is-intro");
@@ -2773,6 +2779,7 @@ function rpRevealServiceSheet() {
       sheet.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 30);
   }
+  rpSetThemeColor(RP_THEME_DEFAULT);
   rpTrack("service_intro_reveal");
 }
 
@@ -3675,6 +3682,7 @@ function rpRender(direction) {
     <div class="rp-screen-scroll">${def.scroll || ""}</div>
     ${def.footer ? `<div class="rp-screen-footer">${def.footer}</div>` : ""}
   `;
+  rpSetThemeColor(rpState.step === "service" && !rpServiceIntroRevealed ? RP_THEME_INTRO : RP_THEME_DEFAULT);
 
   const old = host.querySelector(".rp-screen:last-child");
   if (old && (direction === "forward" || direction === "back")) {
@@ -3714,6 +3722,7 @@ function rpRefresh(resetScroll = false) {
   `;
   const newScrollEl = current.querySelector(".rp-screen-scroll");
   if (newScrollEl) newScrollEl.scrollTop = prevScrollTop;
+  rpSetThemeColor(rpState.step === "service" && !rpServiceIntroRevealed ? RP_THEME_INTRO : RP_THEME_DEFAULT);
   rpSavePersistedState();
 }
 
