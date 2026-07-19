@@ -342,6 +342,20 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-hero-onphoto { padding: 5px 5px 112px; max-width: 500px; }
 .rp-hero-onphoto .rp-eyebrow.red { color: #f4d4c5; text-shadow: 0 1px 14px rgba(0,0,0,.34); }
 .rp-hero-onphoto h1 { color: #fffaf3; text-shadow: 0 3px 22px rgba(0,0,0,.34); max-width: 480px; }
+.rp-team-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 0 0 12px; padding: 7px 12px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  color: #f5d9c4;
+  font-size: 12.5px; font-weight: 600;
+  text-shadow: 0 1px 10px rgba(0,0,0,.28);
+}
+.rp-team-pill:active { transform: scale(.98); }
+.rp-team-pill .rp-ic-sm { width: 13px; height: 13px; flex-shrink: 0; }
+.rp-team-pill .rp-ic-sm:first-child { color: #f0997b; }
+
 .rp-hero-onphoto .rp-trust {
   color: rgba(255,255,255,.94);
   display: grid;
@@ -1052,6 +1066,28 @@ details.rp-includes li::before {
     url('/images/hero/front-photo-fullbleed-648.webp') center 36%/cover no-repeat;
 }
 .rp-faq-page[hidden] { display: none; }
+
+.rp-team-page {
+  position: absolute; inset: 0; z-index: 80; display: flex; flex-direction: column;
+  background: #17120f;
+}
+.rp-team-page[hidden] { display: none; }
+.rp-team-head {
+  min-height: var(--header-h); display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 10px;
+  padding: 0 12px; color: var(--ink); background: rgba(247,241,231,.94);
+  border-bottom: 1px solid rgba(70,52,37,.10); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.rp-team-head > div { text-align: center; line-height: 1.05; }
+.rp-team-head small { display: block; color: var(--red); font-size: 7px; font-weight: 800; letter-spacing: .14em; }
+.rp-team-head strong { display: block; margin-top: 4px; font-family: "DM Serif Display", Georgia, serif; font-size: 17px; font-weight: 400; }
+.rp-team-head a { color: var(--red); font-size: 12px; font-weight: 800; padding: 8px 9px; border: 1px solid rgba(159,32,39,.14); border-radius: 11px; background: rgba(255,255,255,.50); }
+.rp-team-scroll {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center;
+}
+.rp-team-scroll img { width: 100%; max-width: 420px; height: auto; border-radius: 18px; display: block; }
+.rp-team-caption { margin: 14px 4px 0; color: rgba(255,250,243,.82); font-size: 12.5px; line-height: 1.5; text-align: center; max-width: 420px; }
 .rp-faq-head {
   min-height: var(--header-h); display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 10px;
   padding: 0 12px; color: var(--ink); background: rgba(247,241,231,.94);
@@ -2332,6 +2368,17 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </header>
   <div class="rp-progress"><div class="rp-progress-fill" id="rpProgressFill"></div></div>
   <main class="rp-screens" id="rpScreens" aria-live="polite"></main>
+  <section class="rp-team-page" id="rpTeamPage" hidden aria-hidden="true" aria-label="Meet the Red Prairie Cleaning team">
+    <header class="rp-team-head">
+      <button class="rp-faq-back" type="button" onclick="rpCloseTeamPhoto()" aria-label="Return to booking">←</button>
+      <div><small>RED PRAIRIE CLEANING</small><strong>Meet the team</strong></div>
+      <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'team_photo'})">Text us</a>
+    </header>
+    <div class="rp-team-scroll">
+      <img src="/images/hero/front-photo-team-full.webp" alt="The Red Prairie Cleaning team, a veteran-owned crew serving Fort Sill and the Lawton area" width="800" height="1421"/>
+      <p class="rp-team-caption">Veteran-owned and locally operated — the same team who shows up at your door.</p>
+    </div>
+  </section>
   <section class="rp-faq-page" id="rpFaqPage" hidden aria-hidden="true" aria-label="Frequently asked questions">
     <header class="rp-faq-head">
       <button class="rp-faq-back" type="button" onclick="rpCloseFaq()" aria-label="Return to booking">←</button>
@@ -2762,6 +2809,27 @@ function rpCloseFaq() {
   if (rpFaqReturnFocus && typeof rpFaqReturnFocus.focus === "function") rpFaqReturnFocus.focus({ preventScroll: true });
   rpTrack("faq_close");
 }
+let rpTeamReturnFocus = null;
+function rpOpenTeamPhoto(source = "unknown") {
+  const page = document.getElementById("rpTeamPage");
+  if (!page) return;
+  rpTeamReturnFocus = document.activeElement;
+  page.hidden = false;
+  page.setAttribute("aria-hidden", "false");
+  const scroll = page.querySelector(".rp-team-scroll");
+  if (scroll) scroll.scrollTop = 0;
+  const back = page.querySelector(".rp-faq-back");
+  if (back) back.focus({ preventScroll: true });
+  rpTrack("team_photo_open", { source });
+}
+function rpCloseTeamPhoto() {
+  const page = document.getElementById("rpTeamPage");
+  if (!page) return;
+  page.hidden = true;
+  page.setAttribute("aria-hidden", "true");
+  if (rpTeamReturnFocus && typeof rpTeamReturnFocus.focus === "function") rpTeamReturnFocus.focus({ preventScroll: true });
+  rpTrack("team_photo_close");
+}
 function rpRevealExpandedDetails(details) {
   window.setTimeout(function() {
     const scroller = details.closest(".rp-screen-scroll");
@@ -2781,6 +2849,8 @@ document.addEventListener("keydown", function(event) {
   if (event.key === "Escape") {
     const page = document.getElementById("rpFaqPage");
     if (page && !page.hidden) rpCloseFaq();
+    const teamPage = document.getElementById("rpTeamPage");
+    if (teamPage && !teamPage.hidden) rpCloseTeamPhoto();
   }
 });
 
@@ -2949,6 +3019,9 @@ function rpScreenHtml() {
       <div class="rp-hero-onphoto">
         <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
+        <button type="button" class="rp-team-pill" onclick="rpOpenTeamPhoto('hero_pill')">
+          ${rpIcon("shield","rp-ic rp-ic-sm")} Meet the veteran-owned team behind Red Prairie ${rpIcon("chev","rp-ic rp-ic-sm")}
+        </button>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 42+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
