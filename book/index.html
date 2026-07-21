@@ -1091,6 +1091,33 @@ details.rp-includes li::before {
   border: 1px solid rgba(116,80,50,.17); border-radius: 17px;
   box-shadow: 0 9px 22px rgba(48,32,19,.09), inset 0 1px 0 rgba(255,255,255,.72);
 }
+
+.rp-included-list {
+  list-style: none; margin: 4px 0 0; padding: 0;
+  display: grid; gap: 10px; max-width: 460px;
+}
+.rp-included-list li {
+  display: flex; align-items: center; gap: 13px;
+  padding: 14px 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(255,252,247,.84));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.95);
+  color: var(--ink); font-size: 16px; font-weight: 600; line-height: 1.3;
+}
+.rp-included-check {
+  flex-shrink: 0; width: 26px; height: 26px; padding: 5px;
+  color: #fff; background: var(--red); border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(159,32,39,.25);
+}
+.rp-included-note {
+  margin: 16px 3px 0; color: var(--muted);
+  font-size: 13.5px; line-height: 1.5; max-width: 440px;
+}
+@media (max-width: 390px) {
+  .rp-included-list li { padding: 12px 14px; font-size: 15px; gap: 11px; }
+  .rp-included-check { width: 24px; height: 24px; }
+}
 .rp-faq-link-card strong { display: block; font-size: 12.5px; }
 .rp-faq-link-card small { display: block; margin-top: 2px; color: var(--muted); font-size: 10.5px; line-height: 1.35; }
 .rp-faq-link-card b { flex: 0 0 auto; color: var(--red); font-size: 10.5px; letter-spacing: .08em; }
@@ -2481,7 +2508,7 @@ const rpState = {
 const rpServices = {
   moveout:     { name: "Factory Reset™ Move-Out Cleaning",     emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
-  maintenance: { name: "Maintenance Cleaning",             emoji: "✨" },
+  maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
   hourly:      { name: "Hourly Cleaning & Organizing",     emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
@@ -2567,22 +2594,28 @@ const rpServiceAddons = {
 
 const rpIncludes = {
   moveout: {
-    intro: "Everything inside the empty home, cleaned top to bottom—including appliances inside and out, cabinets, drawers, closets, baseboards, doors, fixtures, floors, and reachable surfaces."
+    intro: "Everything inside the empty home, cleaned top to bottom—including appliances inside and out, cabinets, drawers, closets, baseboards, doors, fixtures, floors, and reachable surfaces.",
+    items: ["Appliances cleaned inside & out", "Cabinets, drawers & closets", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   deep: {
-    intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave."
+    intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
+    items: ["Kitchens & bathrooms, detailed", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "A complete routine clean of kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh."
+    intro: "A complete routine clean of kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh.",
+    items: ["Kitchens & bathrooms", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {
-    intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select."
+    intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select.",
+    items: ["Hot-water extraction cleaning", "Pre-treatment included", "Normal spot treatment", "For the rooms you select"]
   },
   hourly: {
-    intro: "Flexible, general help around the house—cleaning, organizing, decluttering, and light tidying—billed by the hour with as many cleaners as you need."
+    intro: "Flexible, general help around the house—cleaning, organizing, decluttering, and light tidying—billed by the hour with as many cleaners as you need.",
+    items: ["Cleaning & light tidying", "Organizing & decluttering", "As many cleaners as you need", "Billed by the hour"]
   },
   airbnb: {
-    intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request."
+    intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request.",
+    items: ["Guest-ready kitchens & bathrooms", "Floors & everyday surfaces", "Laundry & restocking on request", "Same-day service available"]
   }
 };
 
@@ -2590,12 +2623,12 @@ const rpIncludes = {
    read-only "includes" screen — that content lives as an expandable
    "What's included" on the estimate screen. */
 const rpFlows = {
-  moveout:     ["bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  deep:        ["bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  maintenance: ["bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
-  carpet:      ["rooms", "carpetdetails", "estimate", "lead", "calendar"],
-  hourly:      ["cleaners", "hours", "addons", "estimate", "lead", "calendar"],
-  airbnb:      ["bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
+  moveout:     ["included", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
+  deep:        ["included", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
+  maintenance: ["included", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
+  carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
+  hourly:      ["included", "cleaners", "hours", "addons", "estimate", "lead", "calendar"],
+  airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
 };
 
 function rpCurrentFlow() { return rpFlows[rpState.service] || []; }
@@ -3053,7 +3086,7 @@ function rpScreenHtml() {
         <div class="rp-rows">
           ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Factory Reset™ Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Maintenance Cleaning", desc:"A consistently beautiful home, handled for you." })}
+          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
           ${rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning & Organizing", desc:"General help around the house, billed by the hour." })}
         </div>
@@ -3062,6 +3095,21 @@ function rpScreenHtml() {
     `,
       footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get Instant Quote ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
     };
+  }
+
+  if (rpState.step === "included") {
+    const inc = rpIncludes[rpState.service];
+    const items = (inc && inc.items) || [];
+    const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>Here's what your ${svcName} includes</h2>
+      <p class="rp-sub">Every ${svcName.toLowerCase()} covers all of this — no add-ons required.</p>
+      <ul class="rp-included-list">
+        ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
+      </ul>
+      <p class="rp-included-note">Need something specific? You can add extras on the next steps, or text us anytime.</p>
+    </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good — continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
   if (rpState.step === "bedrooms") {

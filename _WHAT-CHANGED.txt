@@ -24,11 +24,24 @@ WHAT CHANGED
      Button scales cleanly from small phones to large, never wraps.
    - Safari/Chrome address-bar tint turns red on the photo intro screen,
      back to cream everywhere else.
+   - NEW "What's included" screen: right after a customer picks a service,
+     they now see a clean checklist of exactly what that cleaning covers
+     (derived from your existing includes copy), with a "Looks good —
+     continue" button. Confirmational, not homework — reduces the "what am
+     I actually paying for?" confusion. Per-service, so each cleaning type
+     shows its own list. The existing "What's included" accordion on the
+     estimate screen was kept as a reference-back.
    - Condition step SIMPLIFIED: now three simple tap-tiles
      ("Already mostly cleaned" / "Standard condition" / "Needs extra
      attention") matching the bedroom/bathroom steps. No more paragraphs
      or price badges. IMPORTANT: the underlying pricing/crew-note logic is
      unchanged — only what the customer sees was simplified.
+
+   - "Maintenance Cleaning" service RENAMED to "Basic Cleaning" with a new
+     description ("A light refresh for an already-tidy home") to match what
+     it actually is — one-time light cleans. The internal service key was
+     left as "maintenance" so all pricing/flow logic is unaffected; only
+     the customer-facing name and description changed.
 
 3. HEADER WORDMARK  (book/index.html + css/rp-legacy-theme.css)
    - Now reads "RED PRAIRIE CLEANING" inline (added "Cleaning").
