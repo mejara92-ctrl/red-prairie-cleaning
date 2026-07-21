@@ -365,16 +365,24 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-hero-onphoto .rp-trust .amber { color: #ffd983; }
 
 .rp-hero-cta {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; padding: 16px 18px;
+  display: flex; align-items: center; justify-content: center; gap: 11px;
+  width: 100%; padding: 22px 24px;
   background: linear-gradient(160deg, #c8372e, #9e2a23);
   border: 1px solid rgba(255,255,255,.22);
-  border-radius: 16px;
-  color: #fff; font-size: 15.5px; font-weight: 800;
-  box-shadow: 0 14px 32px rgba(20,10,7,.4), inset 0 1px 0 rgba(255,255,255,.18);
+  border-radius: 19px;
+  color: #fff; font-size: 24px; font-weight: 800;
+  box-shadow: 0 18px 40px rgba(20,10,7,.42), inset 0 1px 0 rgba(255,255,255,.18);
+  animation: rpCtaPulse 2.6s ease-in-out infinite;
 }
-.rp-hero-cta:active { transform: scale(.98); }
-.rp-hero-cta .rp-ic-sm { width: 15px; height: 15px; }
+.rp-hero-cta:active { transform: scale(.98); animation: none; }
+.rp-hero-cta .rp-ic-sm { width: 21px; height: 21px; }
+@keyframes rpCtaPulse {
+  0%, 100% { box-shadow: 0 18px 40px rgba(20,10,7,.42), inset 0 1px 0 rgba(255,255,255,.18), 0 0 0 0 rgba(200,55,46,.5); }
+  50% { box-shadow: 0 18px 40px rgba(20,10,7,.42), inset 0 1px 0 rgba(255,255,255,.18), 0 0 0 10px rgba(200,55,46,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rp-hero-cta { animation: none; }
+}
 .step-service .rp-screen-footer {
   background: transparent !important;
   margin: 0 !important;
@@ -482,9 +490,6 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-row-desc { font-size: 15.5px; font-weight: 500; color: var(--muted); line-height: 1.46; display: block; margin-top: 3px; }
 .rp-row-val { font-size: 15.5px; font-weight: 800; color: var(--red-dark); white-space: nowrap; position: relative; z-index: 1; padding: 7px 10px; border-radius: 999px; background: rgba(255,247,238,.72); border: 1px solid rgba(167,126,93,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
 .rp-row-val small { display: block; font-size: 11px; font-weight: 800; color: var(--red); text-align: right; }
-
-.step-condition .rp-row { flex-direction: column; align-items: stretch; min-height: 0; }
-.step-condition .rp-row-val { white-space: normal; align-self: flex-start; margin-top: 10px; text-align: left; }
 .rp-row-chev {
   width: 28px; height: 28px; min-width: 28px;
   display: inline-flex; align-items: center; justify-content: center;
@@ -950,10 +955,12 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 }
 @media (max-width: 390px) {
   .rp-head { padding-inline: 9px; }
-  .rp-wordmark { gap: 8px; }
-  .rp-wordmark img { width: 32px; height: 32px; }
-  .rp-wordmark-copy strong { font-size: 16px; }
-  .rp-wordmark-copy small { font-size: 16px; }
+  .rp-wordmark { gap: 6px; }
+  .rp-wordmark img { width: 25px; height: 25px; }
+  .rp-wordmark-copy strong { font-size: 12.5px; }
+  .rp-wordmark-copy small { font-size: 12.5px; }
+  .rp-head-actions { gap: 4px; }
+  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
   .rp-screen-scroll { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer::before { left: 20px; right: 20px; }
@@ -964,14 +971,16 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-sheet .rp-row-title { font-size: 16.5px; }
 }
 
-@media (max-width: 340px) {
-  .rp-head { padding-inline: 7px; }
-  .rp-wordmark { gap: 6px; }
-  .rp-wordmark img { width: 28px; height: 28px; }
-  .rp-wordmark-copy strong { font-size: 14px; }
-  .rp-wordmark-copy small { font-size: 14px; }
-  .rp-head-actions { gap: 3px; }
-  .rp-head-faq, .rp-head-text { padding: 8px 8px; font-size: 11px; }
+@media (max-width: 374px) {
+  .rp-head { padding-inline: 5px; }
+  .rp-wordmark { gap: 4px; }
+  .rp-wordmark img { width: 20px; height: 20px; }
+  .rp-wordmark-copy strong { font-size: 9.5px; }
+  .rp-wordmark-copy small { font-size: 9.5px; }
+  .rp-head-actions { gap: 2px; }
+  .rp-head-faq, .rp-head-text { padding: 5px 5px; font-size: 8.5px; }
+  .rp-hero-cta { padding: 18px 20px; gap: 9px; font-size: 19px; border-radius: 17px; }
+  .rp-hero-cta .rp-ic-sm { width: 19px; height: 19px; }
 }
 
 
@@ -1314,9 +1323,24 @@ details.rp-includes ul { display: none; }
 @media (max-width: 390px) {
   .rp-head { gap: 5px; }
   .rp-head-actions { gap: 4px; }
-  .rp-head-faq, .rp-head-text { padding-inline: 7px; font-size: 10.5px; }
+  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
   .step-addons .rp-screen-scroll { padding-inline: 14px; }
 }
+
+@media (min-width: 375px) and (max-width: 390px) {
+  .rp-hero-cta { padding: 20px 22px; gap: 10px; font-size: 22px; border-radius: 18px; }
+  .rp-hero-cta .rp-ic-sm { width: 20px; height: 20px; }
+}
+
+@media (min-width: 391px) and (max-width: 539px) {
+  .rp-wordmark { gap: 5px; }
+  .rp-wordmark img { width: 22px; height: 22px; }
+  .rp-wordmark-copy strong { font-size: 11px; }
+  .rp-wordmark-copy small { font-size: 11px; }
+  .rp-head-actions { gap: 4px; }
+  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
+}
+
 @media (max-height: 760px) {
   .step-addons .rp-screen-scroll { padding-top: 6px; }
   .step-addons .rp-center { padding: 10px 10px 9px; }
@@ -2491,7 +2515,7 @@ const rpConditionKeys = {
   "Needs extra attention": "extra_attention"
 };
 const rpConditionCopy = {
-  "Already mostly cleaned": { badge: "Up to $50 credit", desc: "The home has already had substantial cleaning and only needs final detailing or touch-ups." },
+  "Already mostly cleaned": { badge: "Price adjusted down", desc: "The home has already had substantial cleaning and only needs final detailing or touch-ups." },
   "Standard move-out condition": { badge: "Standard price", desc: "Normal lived-in condition with typical dust, kitchen/bathroom buildup, and general cleaning needed." },
   "Needs extra attention": { badge: "Additional labor may apply", desc: "Heavy buildup, excessive pet hair, grease, trash, neglected areas, or other conditions requiring significantly more labor." }
 };
@@ -3036,7 +3060,7 @@ function rpScreenHtml() {
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
     `,
-      footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">What do you need cleaned? ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
+      footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get Instant Quote ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
     };
   }
 
@@ -3107,20 +3131,22 @@ function rpScreenHtml() {
 
   if (rpState.step === "condition") {
     const rpConditionOrder = ["Already mostly cleaned", "Standard move-out condition", "Needs extra attention"];
+    const rpConditionShort = {
+      "Already mostly cleaned": "Already mostly cleaned",
+      "Standard move-out condition": "Standard condition",
+      "Needs extra attention": "Needs extra attention"
+    };
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>Which best describes the current condition of the home?</h2>
-      <p class="rp-sub">This helps us reserve the correct amount of time. Final condition is confirmed upon arrival.</p>
+      <h2>What's the condition of the home?</h2>
+      <p class="rp-sub">Just a rough sense — we confirm it when we arrive.</p>
       <div class="rp-rows">
         ${rpConditionOrder.map(label => rpRowBtn({
           onclick: `rpSelectCondition('${label}', this)`,
-          title: label,
-          val: rpConditionCopy[label].badge,
-          desc: rpConditionCopy[label].desc,
+          title: rpConditionShort[label],
           selected: rpState.condition === label
         })).join("")}
       </div>
-      <p class="rp-notice rp-condition-notice">No surprises: We confirm the home’s condition when we arrive. Any credit or additional labor charge will be discussed and approved before cleaning begins.</p>
     </div>` };
   }
 

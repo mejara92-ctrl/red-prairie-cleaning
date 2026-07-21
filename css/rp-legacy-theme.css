@@ -63,8 +63,9 @@ body {
 
 .navbar .rp-site-wordmark-copy {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: baseline;
+  gap: .32em;
   min-width: 0;
   line-height: 1;
 }
@@ -84,13 +85,14 @@ body {
 
 .navbar .rp-site-wordmark-copy small {
   display: block;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .17em;
-  text-transform: uppercase;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: none;
   color: var(--rp-legacy-ink);
-  opacity: .58;
-  margin-top: 2px;
+  opacity: 1;
+  margin-top: 0;
+  white-space: nowrap;
 }
 
 /* Warm major content bands and common card surfaces. */
@@ -144,6 +146,19 @@ body {
     max-height: 46px !important;
   }
   .navbar .rp-site-wordmark-copy strong { font-size: 16px; }
-  .navbar .rp-site-wordmark-copy small { font-size: 8px; letter-spacing: .14em; }
+  .navbar .rp-site-wordmark-copy small { font-size: 16px; }
   .navbar .book-btn { padding-inline: 12px; }
+}
+@media (max-width: 430px) {
+  .navbar .rp-site-wordmark { gap: 6px; }
+  .navbar .rp-site-wordmark .rp-site-mark {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px;
+    max-width: 30px !important;
+    max-height: 30px !important;
+  }
+  .navbar .rp-site-wordmark-copy strong { font-size: 10px; }
+  .navbar .rp-site-wordmark-copy small { font-size: 10px; }
+  .navbar .book-btn { padding-inline: 8px; font-size: 12px; }
 }
