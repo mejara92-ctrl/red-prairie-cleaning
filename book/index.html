@@ -2594,8 +2594,8 @@ const rpServiceAddons = {
 
 const rpIncludes = {
   moveout: {
-    intro: "Everything inside the empty home, cleaned top to bottom—including appliances inside and out, cabinets, drawers, closets, baseboards, doors, fixtures, floors, and reachable surfaces.",
-    items: ["Appliances cleaned inside & out", "Cabinets, drawers & closets", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
+    intro: "A complete top-to-bottom reset of the entire interior — every room, surface, and appliance inside and out. Built for move-outs, move-ins, and getting a home show-ready for sale.",
+    items: ["The entire interior, cleaned top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every cleaning item on a move-out checklist"]
   },
   deep: {
     intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
@@ -3104,7 +3104,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>Here's what your ${svcName} includes</h2>
-      <p class="rp-sub">Every ${svcName.toLowerCase()} covers all of this — no add-ons required.</p>
+      <p class="rp-sub">${rpState.service === "moveout" ? "Whether you're moving out, moving in, or listing for sale — the entire interior, cleaned top to bottom." : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
       <ul class="rp-included-list">
         ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
       </ul>
