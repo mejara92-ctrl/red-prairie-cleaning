@@ -74,7 +74,7 @@ window.__rpScheduleDeferred(function(){
   --red-dark: #6f1118;
   --ink: #181512;
   --ink-soft: #37312b;
-  --muted: #71685f;
+  --muted: #554d44;
   --faint: #9d9287; /* 2.71:1 on --paper — fails WCAG AA. Decorative use only, never text. */
   --paper: #f7f1e7;
   --paper-deep: #eadfce;
@@ -2245,8 +2245,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   display: flex;
   align-items: flex-start;
   gap: 11px;
-  padding: 12px 0 13px;
-  border-top: 1px solid rgba(75,55,40,.10);
+  padding: 13px 0;
+  border-top: 1px solid rgba(70,52,37,.08);
   cursor: pointer;
 }
 .rp-discount-inline input {
@@ -2522,7 +2522,7 @@ const rpState = {
 };
 
 const rpServices = {
-  moveout:     { name: "Factory Reset™ Move-Out Cleaning",     emoji: "🏠" },
+  moveout:     { name: "Move-In / Move-Out Cleaning",     emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
@@ -2611,7 +2611,7 @@ const rpServiceAddons = {
 const rpIncludes = {
   moveout: {
     intro: "A complete top-to-bottom reset of the entire interior — every room, surface, and appliance inside and out. Built for move-outs, move-ins, and getting a home show-ready for sale.",
-    items: ["The entire interior, cleaned top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every cleaning item on a move-out checklist"]
+    items: ["The entire interior, cleaned top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Baseboards, doors, fixtures & trim", "All floors throughout"]
   },
   deep: {
     intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
@@ -3100,7 +3100,7 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Factory Reset™ Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
@@ -3450,7 +3450,6 @@ function rpEstimateScreen(eyebrow) {
   const noGuaranteedPrice = rpIsCustomQuoteOnly();
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
   const discountActive = rpState.militaryDiscount && !noGuaranteedPrice && rpMilitaryDiscountCents() > 0;
-  const includes = rpIncludes[rpState.service];
   return { scroll: `<div>
     <div class="rp-quote-band">
       <div class="rp-quote-mark" aria-hidden="true"><svg viewBox="0 0 132 172" fill="currentColor" focusable="false">
@@ -3465,7 +3464,7 @@ function rpEstimateScreen(eyebrow) {
         </g>
       </svg></div>
       <div class="rp-quote-hero ${noGuaranteedPrice ? "is-quote" : ""}">
-        <small>Your Private Estimate</small>
+        <small>Your Price</small>
         <strong>${rpPriceLabel()}</strong>
         <span>${service.name}</span>
       </div>
@@ -3479,7 +3478,6 @@ function rpEstimateScreen(eyebrow) {
     </div>` : ""}
     <div class="rp-invoice">
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
-      ${rpTeamSize() ? `<div class="rp-mini-row"><span>Team Size</span><strong>${rpTeamSize()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
@@ -3487,7 +3485,6 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
-      ${rpIsPreCleanedFlag() ? `<div class="rp-mini-row rp-separate-quote-row"><span>Possible Credit</span><strong>Up to $${PRECLEANED_MAX_CREDIT}<small>Confirmed on-site, applied before you pay</small></strong></div>` : ""}
       ${rpIsExtraAttentionFlag() ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional Labor</span><strong>May apply<small>Assessed on-site, approved before cleaning begins</small></strong></div>` : ""}
       ${rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
@@ -3499,23 +3496,13 @@ function rpEstimateScreen(eyebrow) {
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
       ${rpState.handymanInterest ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional service request</span><strong>Make-ready repairs<small>Quoted separately · not included</small></strong></div>` : ""}
-      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder Discount</span><strong>-$${rpMilitaryDiscountAmount().toFixed(2)}</strong></div>` : ""}
-    </div>
-    ${(includes || !isQuoteOnly) ? `
-    <div class="rp-estimate-support">
-      ${includes ? `
-      <details class="rp-includes rp-animated-details">
-        <summary>What's included</summary>
-        <div class="rp-includes-body rp-details-animate-wrap"><div class="rp-details-animate-inner">
-          <p class="rp-includes-intro">${includes.intro}</p>
-        </div></div>
-      </details>` : ""}
       ${!noGuaranteedPrice ? `
       <label class="rp-discount-inline">
         <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
         <span><strong>Military or First Responder?</strong><small>Save 10% (up to $25) as a thank-you for your service. Cannot be combined with other promotional offers.</small></span>
       </label>` : ""}
-    </div>` : ""}
+      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder Discount</span><strong>-$${rpMilitaryDiscountAmount().toFixed(2)}</strong></div>` : ""}
+    </div>
     ${showHandymanHere ? `
     <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
