@@ -322,14 +322,14 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 /* Full-bleed photo background */
 .rp-screen.has-photo-bg { background: #17120f; }
 .rp-bg-photo { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
-.rp-bg-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.012); }
+.rp-bg-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.012); filter: brightness(1.14) contrast(1.03) saturate(1.04); }
 .rp-bg-photo::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(18,13,10,.92) 0%, rgba(18,13,10,.5) 26%, rgba(18,13,10,.14) 55%, rgba(18,13,10,.24) 100%),
+    linear-gradient(180deg, rgba(18,13,10,.92) 0%, rgba(18,13,10,.42) 26%, rgba(18,13,10,.06) 55%, rgba(18,13,10,.2) 100%),
     linear-gradient(120deg, rgba(111,17,24,.25), transparent 56%);
 }
 .rp-bg-photo::after {
@@ -363,6 +363,22 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 .rp-hero-onphoto .rp-trust .rp-ic-sm { color: #fff; }
 .rp-hero-onphoto .rp-trust .amber { color: #ffd983; }
+/* Rating badge leads the trust row — bigger, gold-tinted, bolder weight */
+.rp-hero-onphoto .rp-trust a {
+  padding: 10px 12px;
+  font-weight: 800;
+  font-size: 13.5px;
+  background: linear-gradient(135deg, rgba(255,217,131,.22), rgba(255,255,255,.14));
+  border: 1px solid rgba(255,217,131,.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 4px 14px rgba(0,0,0,.18);
+}
+/* Secondary badges (Licensed, Same-Day) step back slightly */
+.rp-hero-onphoto .rp-trust span {
+  font-weight: 600;
+  font-size: 12px;
+  opacity: .88;
+  padding: 7px 10px;
+}
 
 .rp-hero-cta {
   display: flex; align-items: center; justify-content: center; gap: 11px;
@@ -1188,9 +1204,9 @@ details.rp-includes li::before {
   justify-content: center;
   padding: 8px 9px;
   border-radius: 11px;
-  border: 1px solid rgba(159,32,39,.14);
-  background: rgba(255,255,255,.45);
-  color: var(--red);
+  border: 1px solid rgba(159,32,39,.34);
+  background: rgba(159,32,39,.08);
+  color: var(--red-dark);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .01em;
@@ -3093,7 +3109,7 @@ function rpScreenHtml() {
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
     `,
-      footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get Instant Quote ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
+      footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get My 60-Second Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
     };
   }
 
