@@ -726,6 +726,41 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-live-chip span::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 4px rgba(111,128,111,.12); }
 .rp-live-chip strong { font-family: "DM Serif Display", Georgia, serif; font-size: 23px; color: var(--ink); font-weight: 400; }
 
+.rp-price-section {
+  text-align: center;
+  padding: 14px 0 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(70,52,37,.08);
+}
+.rp-price-block strong {
+  display: block;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: clamp(48px, 13vw, 60px);
+  font-weight: 400;
+  letter-spacing: -.03em;
+  line-height: .98;
+  color: var(--red-dark);
+}
+.rp-price-block.is-quote strong { font-size: 32px; padding: 6px 0; letter-spacing: -.01em; }
+.rp-price-block span {
+  display: block;
+  margin-top: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6b5c4f;
+  letter-spacing: .01em;
+}
+.rp-guarantee-light {
+  width: fit-content;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 10.5px; font-weight: 800; color: var(--red-dark);
+  background: rgba(159,32,39,.08);
+  border: 1px solid rgba(159,32,39,.20);
+  border-radius: 999px;
+  padding: 8px 11px;
+  margin: 12px auto 0;
+}
+.rp-guarantee-light .rp-ic-sm { color: var(--red-dark); }
 /* ============ ESTIMATE ============ */
 .rp-quote-band {
   position: relative;
@@ -2204,6 +2239,25 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   letter-spacing: .05em;
   text-transform: uppercase;
 }
+.rp-more-addons-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,253,249,.72);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--red-dark);
+  cursor: pointer;
+}
+.rp-more-addons-chev { transition: transform .2s ease; }
+.rp-more-addons-chev.is-open { transform: rotate(90deg); }
+.rp-more-addons-body { margin-top: 8px; }
 
 
 .rp-added-inline {
@@ -2482,6 +2536,7 @@ const rpState = {
   carpetRooms: 0,
   addonCarpetRooms: 0,
   expandedAddon: null,
+  showMoreAddons: false,
   windowsTier: null,
   yardTier: null,
   garageWash: false,
@@ -3120,7 +3175,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>Here's what your ${svcName} includes</h2>
-      <p class="rp-sub">${rpState.service === "moveout" ? "Whether you're moving out, moving in, or listing for sale — the entire interior, cleaned top to bottom." : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
+      <p class="rp-sub">${rpState.service === "moveout" ? "Whether you're moving out, moving in, or listing for sale — here's everything included." : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
       <ul class="rp-included-list">
         ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
       </ul>
@@ -3379,7 +3434,12 @@ function rpAddonsScreen(eyebrow) {
     return "";
   }
 
-  const cards = keys.map(key => {
+  const primaryKeys = keys.slice(0, 3);
+  const secondaryKeys = keys.slice(3);
+  const hasSecondarySelected = secondaryKeys.some(k => isSelected[k]);
+  const moreOpen = rpState.showMoreAddons || hasSecondarySelected;
+
+  function cardFor(key) {
     const meta = cardMeta[key];
     const selected = isSelected[key];
     if (selected) {
@@ -3391,7 +3451,16 @@ function rpAddonsScreen(eyebrow) {
         </button>`;
     }
     return rpRowBtn({ onclick:`rpExpandAddon('${key}')`, icon: meta.icon, title: meta.label, desc: meta.desc });
-  }).join("");
+  }
+
+  const cards = primaryKeys.map(cardFor).join("");
+  const moreCards = secondaryKeys.map(cardFor).join("");
+  const moreToggle = secondaryKeys.length ? `
+    <button type="button" class="rp-more-addons-toggle" onclick="rpToggleMoreAddons()" aria-expanded="${moreOpen}">
+      <span>More Add-ons</span>
+      <span class="rp-row-chev rp-more-addons-chev ${moreOpen ? "is-open" : ""}">${rpIcon("chev","rp-ic rp-ic-sm")}</span>
+    </button>
+    ${moreOpen ? `<div class="rp-rows rp-more-addons-body">${moreCards}</div>` : ""}` : "";
 
   const activeKey = rpState.expandedAddon;
   const activeMeta = activeKey ? cardMeta[activeKey] : null;
@@ -3413,6 +3482,7 @@ function rpAddonsScreen(eyebrow) {
     ${eyebrow}
     <h2>Would you like any add-ons?</h2>
     <div class="rp-rows">${cards}</div>
+    ${moreToggle}
     <p class="rp-addon-section-label">Need help beyond cleaning?</p>
     <label class="rp-make-ready-card">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
@@ -3451,25 +3521,6 @@ function rpEstimateScreen(eyebrow) {
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
   const discountActive = rpState.militaryDiscount && !noGuaranteedPrice && rpMilitaryDiscountCents() > 0;
   return { scroll: `<div>
-    <div class="rp-quote-band">
-      <div class="rp-quote-mark" aria-hidden="true"><svg viewBox="0 0 132 172" fill="currentColor" focusable="false">
-        <g transform="translate(64,170)">
-          <path transform="rotate(-15) scale(.8)" d="M0,0 C-23,-38 -18,-112 0,-150 C18,-112 23,-38 0,0 Z"/>
-          <path d="M0,0 C-27,-46 -22,-134 0,-176 C22,-134 27,-46 0,0 Z"/>
-          <path transform="rotate(15) scale(.8)" d="M0,0 C-23,-38 -18,-112 0,-150 C18,-112 23,-38 0,0 Z"/>
-          <circle cx="0" cy="-140" r="4"/>
-          <circle cx="-7" cy="-124" r="3.4"/>
-          <circle cx="7" cy="-124" r="3.4"/>
-          <circle cx="0" cy="-110" r="3"/>
-        </g>
-      </svg></div>
-      <div class="rp-quote-hero ${noGuaranteedPrice ? "is-quote" : ""}">
-        <small>Your Price</small>
-        <strong>${rpPriceLabel()}</strong>
-        <span>${service.name}</span>
-      </div>
-      <div class="rp-guarantee">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
-    </div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
       ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}
@@ -3477,6 +3528,13 @@ function rpEstimateScreen(eyebrow) {
       <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
     </div>` : ""}
     <div class="rp-invoice">
+      <div class="rp-price-section">
+        <div class="rp-price-block ${noGuaranteedPrice ? "is-quote" : ""}">
+          <strong>${rpPriceLabel()}</strong>
+          <span>${service.name}</span>
+        </div>
+        <div class="rp-guarantee-light">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
+      </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
@@ -3908,6 +3966,7 @@ function rpToggleMilitaryDiscount(checked) { rpState.militaryDiscount = checked;
 
 function rpExpandAddon(key) { rpState.expandedAddon = key; rpRefresh(); }
 function rpCollapseAddon() { rpState.expandedAddon = null; rpRefresh(); }
+function rpToggleMoreAddons() { rpState.showMoreAddons = !rpState.showMoreAddons; rpRefresh(); }
 function rpClearAddon(key) {
   if (key === "carpet") rpState.addonCarpetRooms = 0;
   else if (key === "junk") rpState.junkSize = null;
