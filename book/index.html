@@ -3183,7 +3183,7 @@ function rpScreenHtml() {
         <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 51+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 55+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day</span>
         </div>
@@ -3225,13 +3225,8 @@ function rpScreenHtml() {
       ${eyebrow}
       <h2>About how big is the home?</h2>
       <p class="rp-sub">Not sure of the exact number? A typical 3-bedroom home in this area runs 1,400–1,800 sq ft.</p>
-      <div class="rp-rows">
-        ${rpSqftTiers.map(t => rpRowBtn({
-          onclick:`rpSelectSqft('${t.key}', this)`,
-          title: t.label,
-          val: t.base === null ? "Custom Quote" : `$${t.base}`,
-          selected: rpState.sqft === t.key
-        })).join("")}
+      <div class="rp-choice-grid">
+        ${rpSqftTiers.map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}<br><small>${t.base === null ? "Custom Quote" : `$${t.base}`}</small></button>`).join("")}
       </div>
     </div>` };
   }
