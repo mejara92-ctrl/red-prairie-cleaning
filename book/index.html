@@ -2654,9 +2654,9 @@ const rpMoveoutConditionKeys = {
 };
 const rpMoveoutConditionCopy = {
   "Standard Condition": "Normal lived-in condition — no loose trash, no major oven or fridge buildup, no heavy grime.",
-  "Heavy Buildup": "More buildup than a standard move-out — some trash, grease in the oven or stovetop, soap scum, dust or pet hair throughout.",
+  "Heavy Buildup": "More buildup than a standard move-out — some trash, grease in the oven or stovetop, major soap scum or hard water buildup, dust or pet hair throughout.",
   "Extreme Buildup": "Requires significant extra time and labor — heavy grease, trash in multiple rooms, noticeable pet odor, or visible mold.",
-  "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Custom quote — not bookable online."
+  "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Still bookable online — we'll confirm a custom quote before your cleaning date."
 };
 const RP_MOVEOUT_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
 
@@ -4108,7 +4108,7 @@ function rpGetEstimatePayload() {
     isExtraAttentionFlag ? "Customer flagged home as needing extra attention — assess labor before starting" : "",
     isPreCleanedFlag ? "Customer flagged home as already mostly cleaned — verify eligibility for up to $" + PRECLEANED_MAX_CREDIT + " credit" : "",
     rpState.service === "moveout" && moveoutConditionMultiplier > 0 ? `Condition tagged as ${rpState.condition} — +${Math.round(moveoutConditionMultiplier * 100)}% already applied to price, confirm on arrival` : "",
-    isSpecialtyCondition ? "Customer flagged Specialty/Unsafe condition — requires custom quote before scheduling, do not treat as standard job" : ""
+    isSpecialtyCondition ? "Customer flagged Specialty/Unsafe condition — booking proceeds, but confirm custom quote with customer before the cleaning date" : ""
   ].filter(Boolean);
   const propertyConditionsSummary = propertyConditionFlags.length
     ? `⚠ CREW PREP: ${propertyConditionFlags.join(", ")}`
