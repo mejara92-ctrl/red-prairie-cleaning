@@ -2527,6 +2527,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 const rpState = {
   step: "service",
   service: null,
+  sqft: null,
   bedrooms: null,
   bathrooms: null,
   condition: null,
@@ -2585,8 +2586,36 @@ const rpServices = {
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
 
-/* Factory Reset™ Move-Out Cleaning bedroom-tier base prices — unchanged. */
-const rpTierPrices = { 1: 199, 2: 299, 3: 399, 4: 499, 5: 599 };
+/* Move-In / Move-Out Cleaning pricing — sq-ft bracket base + bedroom/bathroom
+   adders. Replaces the old flat bedroom-tier table (was: 1:199, 2:299, 3:399,
+   4:499, 5:599), which underpriced small 4-bed homes and overpriced small
+   1-bed homes since it ignored home size entirely. Base includes up to
+   2 bedrooms and 1 full bathroom. "base: null" (over 3,400 sq ft) is a
+   custom quote — see rpIsCustomQuoteOnly(). */
+const rpSqftTiers = [
+  { key: "t1", label: "Up to 1,000 sq ft",     base: 229 },
+  { key: "t2", label: "1,001–1,400 sq ft",     base: 259 },
+  { key: "t3", label: "1,401–1,800 sq ft",     base: 299 },
+  { key: "t4", label: "1,801–2,200 sq ft",     base: 349 },
+  { key: "t5", label: "2,201–2,600 sq ft",     base: 399 },
+  { key: "t6", label: "2,601–3,000 sq ft",     base: 449 },
+  { key: "t7", label: "3,001–3,400 sq ft",     base: 499 },
+  { key: "t8", label: "Over 3,400 sq ft",      base: null }
+];
+const RP_MOVEOUT_INCLUDED_BEDROOMS = 2;
+const RP_MOVEOUT_INCLUDED_BATHROOMS = 1;
+const RP_MOVEOUT_BEDROOM_RATE = 45;   // $ per bedroom above the included 2
+const RP_MOVEOUT_BATHROOM_RATE = 35;  // $ per full bathroom above the included 1
+function rpSqftTier() { return rpSqftTiers.find(t => t.key === rpState.sqft) || null; }
+function rpMoveoutIsCustomSqft() { return rpState.service === "moveout" && rpState.sqft === "t8"; }
+/* Price for a given bedroom count at the currently-selected sq-ft tier,
+   holding bathrooms at the included 1 (used for the live preview on the
+   bedrooms screen, before bathrooms has been asked). */
+function rpMoveoutPriceForBedCount(n) {
+  const tier = rpSqftTier();
+  if (!tier || tier.base === null) return null;
+  return tier.base + Math.max(0, n - RP_MOVEOUT_INCLUDED_BEDROOMS) * RP_MOVEOUT_BEDROOM_RATE;
+}
 
 /* Deep Cleaning bedroom-tier base prices. 5+ bedrooms is a custom quote
    (no fixed tier), handled via rpIsCustomQuoteOnly(). */
@@ -2694,7 +2723,7 @@ const rpIncludes = {
    read-only "includes" screen — that content lives as an expandable
    "What's included" on the estimate screen. */
 const rpFlows = {
-  moveout:     ["included", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
+  moveout:     ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   deep:        ["included", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   maintenance: ["included", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
@@ -2737,17 +2766,25 @@ function rpIsExtraAttentionFlag() {
   return ["moveout", "deep"].includes(rpState.service) && rpConditionKey() === "extra_attention";
 }
 function rpIsCustomQuoteOnly() {
-  return rpState.service === "airbnb" || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5);
+  return rpState.service === "airbnb"
+    || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5)
+    || rpMoveoutIsCustomSqft();
 }
 
-/* Bedroom-tier base price for Deep Cleaning / Factory Reset™ only —
-   before add-ons and military discount. Condition never changes this
-   number automatically; any credit or added labor is handled manually
-   by the office after on-site verification. */
+/* Base price for Move-Out (sq-ft bracket + bedroom/bathroom adders) or
+   Deep Cleaning (bedroom-tier) — before add-ons and military discount.
+   Condition never changes this number automatically; any credit or added
+   labor is handled manually by the office after on-site verification. */
 function rpServiceBasePrice() {
   if (rpState.service === "moveout") {
-    if (!rpState.bedrooms) return 0;
-    return rpTierPrices[Math.min(Number(rpState.bedrooms), 5)] || rpTierPrices[5];
+    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft()) return 0;
+    const tier = rpSqftTier();
+    if (!tier || tier.base === null) return 0;
+    const beds = Number(rpState.bedrooms);
+    const baths = Number(rpState.bathrooms || RP_MOVEOUT_INCLUDED_BATHROOMS);
+    const bedAdj = Math.max(0, beds - RP_MOVEOUT_INCLUDED_BEDROOMS) * RP_MOVEOUT_BEDROOM_RATE;
+    const bathAdj = Math.max(0, baths - RP_MOVEOUT_INCLUDED_BATHROOMS) * RP_MOVEOUT_BATHROOM_RATE;
+    return tier.base + bedAdj + bathAdj;
   }
   if (rpState.service === "deep") {
     if (!rpState.bedrooms || Number(rpState.bedrooms) >= 5) return 0; // custom quote
@@ -3038,7 +3075,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 /* Only the person's own answers are persisted — never loading flags,
    fetched availability, or in-flight error state. */
 const RP_PERSISTED_FIELDS = [
-  "service", "step", "bedrooms", "bathrooms", "condition", "frequency",
+  "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
   "carpetRooms", "addonCarpetRooms", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
@@ -3183,9 +3220,26 @@ function rpScreenHtml() {
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good — continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
+  if (rpState.step === "sqft") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>About how big is the home?</h2>
+      <p class="rp-sub">Not sure of the exact number? A typical 3-bedroom home in this area runs 1,400–1,800 sq ft.</p>
+      <div class="rp-rows">
+        ${rpSqftTiers.map(t => rpRowBtn({
+          onclick:`rpSelectSqft('${t.key}', this)`,
+          title: t.label,
+          val: t.base === null ? "Custom Quote" : `$${t.base}`,
+          selected: rpState.sqft === t.key
+        })).join("")}
+      </div>
+    </div>` };
+  }
+
   if (rpState.step === "bedrooms") {
     const isTiered = ["moveout", "deep"].includes(rpState.service);
     const isDeep = rpState.service === "deep";
+    const isMoveout = rpState.service === "moveout";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bedrooms?</h2>
@@ -3194,7 +3248,13 @@ function rpScreenHtml() {
         ${[1,2,3,4,5].map(n => rpRowBtn({
           onclick:`rpSelectBedrooms(${n}, this)`,
           title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-          val: isTiered ? (isDeep ? (n >= 5 ? "Custom Quote" : `$${rpDeepTierPrices[n]}`) : `$${rpTierPrices[n]}`) : "",
+          val: isTiered
+            ? (isDeep
+                ? (n >= 5 ? "Custom Quote" : `$${rpDeepTierPrices[n]}`)
+                : (isMoveout
+                    ? (rpMoveoutIsCustomSqft() || rpMoveoutPriceForBedCount(n) === null ? "Custom Quote" : `$${rpMoveoutPriceForBedCount(n)}`)
+                    : ""))
+            : "",
           selected: rpState.bedrooms === n
         })).join("")}
       </div>
@@ -3202,14 +3262,16 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "bathrooms") {
+    const isMoveout = rpState.service === "moveout" && !rpMoveoutIsCustomSqft();
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bathrooms?</h2>
-      <p class="rp-sub">Helps us plan your cleaning. Your price stays the same.</p>
+      <p class="rp-sub">${isMoveout ? "The first full bathroom is included in your price above." : "Helps us plan your cleaning. Your price stays the same."}</p>
       <div class="rp-rows">
         ${[1,2,3,4].map(n => rpRowBtn({
           onclick:`rpSelectBathrooms(${n}, this)`,
           title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
+          val: isMoveout ? (n <= RP_MOVEOUT_INCLUDED_BATHROOMS ? "Included" : `+$${(n - RP_MOVEOUT_INCLUDED_BATHROOMS) * RP_MOVEOUT_BATHROOM_RATE}`) : "",
           selected: rpState.bathrooms === n
         })).join("")}
       </div>
@@ -3536,6 +3598,7 @@ function rpEstimateScreen(eyebrow) {
         <div class="rp-guarantee-light">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
+      ${rpState.service === "moveout" && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
@@ -3545,6 +3608,7 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpIsExtraAttentionFlag() ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional Labor</span><strong>May apply<small>Assessed on-site, approved before cleaning begins</small></strong></div>` : ""}
       ${rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
+      ${rpMoveoutIsCustomSqft() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.heavySoil ? `<div class="rp-mini-row"><span>Heavy soil/staining</span><strong>Noted</strong></div>` : ""}
@@ -3941,6 +4005,7 @@ function rpSelectService(service, element) {
     rpRender("forward");
   });
 }
+function rpSelectSqft(key, element) { rpCommitChoice(element, () => { rpState.sqft = key; rpAdvance(); }); }
 function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.bedrooms = n; rpAdvance(); }); }
 function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
 function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
@@ -4041,6 +4106,7 @@ function rpGetEstimatePayload() {
     `Service: ${service}`, `Property conditions: ${propertyConditionsSummary}`,
     `Pricing status: ${pricingStatus}`,
     `Estimate: ${estimateDisplay}`,
+    `Square footage: ${rpSqftTier() ? rpSqftTier().label : "N/A"}`,
     `Bedrooms: ${rpState.bedrooms || "N/A"}`, `Bathrooms: ${rpState.bathrooms || "N/A"}`,
     `Cleaners: ${rpState.cleanerCount || "N/A"}`, `Hours: ${rpState.hourCount || "N/A"}`, `Hourly rate: ${rpState.service === "hourly" ? `$${HOURLY_RATE_PER_CLEANER}/hr per cleaner` : "N/A"}`,
     `Condition: ${rpState.condition || "N/A"}`,
@@ -4061,6 +4127,7 @@ function rpGetEstimatePayload() {
     service, service_type: service, service_key: rpState.service,
     estimated_price: estimateDisplay, estimated_price_number: rpIsCustomQuoteOnly() ? "N/A" : total, price_estimate: estimateDisplay,
     pricing_status: pricingStatus,
+    square_footage: rpSqftTier() ? rpSqftTier().label : "N/A",
     bedrooms: rpState.bedrooms || "N/A", bathrooms: rpState.bathrooms || "N/A",
     carpet_rooms: rpState.carpetRooms || rpState.addonCarpetRooms || "0",
     exterior_windows: rpState.windowsTier ? "Yes" : "No",
