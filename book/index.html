@@ -2620,45 +2620,28 @@ const HOURLY_MIN_HOURS = 4;
 const HOURLY_MAX_HOURS = 8;
 const HOURLY_MAX_CLEANERS = 4;
 
-/* Condition step — Deep Cleaning only, manual flag model. No automatic
-   price math here: the instant estimate always uses the base bedroom-tier
-   price. "Already mostly cleaned" and "Needs extra attention" are flags
-   for the office to verify/assess on-site — a credit or added labor charge
-   is discussed and approved before cleaning begins, never applied
-   automatically. Hazard-type conditions (trash/hoarding, pests, smoke, no
-   AC, mold, pet waste) are captured separately as their own crew-prep
-   checkboxes on the lead step, not on this screen. */
+/* Condition step — Move-Out and Deep Cleaning, automatic percentage
+   model. Standard is the lowest advertised price (no pre-cleaned
+   discount/credit for either service). Heavy (+20%) and Extreme (+50%)
+   apply automatically to the base price — confirmed, not re-priced, at
+   the arrival walkthrough. Specialty/Unsafe is still bookable online but
+   routes to a custom quote, same treatment as over-3,400 sq ft Move-Out
+   or 5+ bedroom Deep Cleaning. */
+const rpConditionOrder = ["Standard Condition", "Heavy Buildup", "Extreme Buildup", "Specialty or Unsafe Conditions"];
 const rpConditionKeys = {
-  "Already mostly cleaned": "precleaned",
-  "Standard move-out condition": "standard",
-  "Needs extra attention": "extra_attention"
-};
-const rpConditionCopy = {
-  "Already mostly cleaned": { badge: "Price adjusted down", desc: "The home has already had substantial cleaning and only needs final detailing or touch-ups." },
-  "Standard move-out condition": { badge: "Standard price", desc: "Normal lived-in condition with typical dust, kitchen/bathroom buildup, and general cleaning needed." },
-  "Needs extra attention": { badge: "Additional labor may apply", desc: "Heavy buildup, excessive pet hair, grease, trash, neglected areas, or other conditions requiring significantly more labor." }
-};
-const PRECLEANED_MAX_CREDIT = 50;
-
-/* Condition step — Move-Out only, automatic percentage model. Standard is
-   the lowest advertised price (no pre-cleaned discount). Heavy and Extreme
-   apply automatically to the sq-ft/bedroom/bathroom base — confirmed, not
-   re-priced, at the arrival walkthrough. Specialty/Unsafe routes to a
-   custom quote, same treatment as over-3,400 sq ft. */
-const rpMoveoutConditionOrder = ["Standard Condition", "Heavy Buildup", "Extreme Buildup", "Specialty or Unsafe Conditions"];
-const rpMoveoutConditionKeys = {
   "Standard Condition": "standard",
   "Heavy Buildup": "heavy",
   "Extreme Buildup": "extreme",
   "Specialty or Unsafe Conditions": "specialty"
 };
-const rpMoveoutConditionCopy = {
+const rpConditionCopy = {
   "Standard Condition": "Normal lived-in condition — no loose trash, no major oven or fridge buildup, no heavy grime.",
-  "Heavy Buildup": "More buildup than a standard move-out — some trash, grease in the oven or stovetop, major soap scum or hard water buildup, dust or pet hair throughout.",
+  "Heavy Buildup": "More buildup than standard — some trash, grease in the oven or stovetop, major soap scum or hard water buildup, dust or pet hair throughout.",
   "Extreme Buildup": "Requires significant extra time and labor — heavy grease, trash in multiple rooms, noticeable pet odor, or visible mold.",
   "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Still bookable online — we'll confirm a custom quote before your cleaning date."
 };
-const RP_MOVEOUT_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
+const RP_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
+
 
 /* Military / First Responder discount — 10%, capped at $25. Cannot stack
    with promotional coupon codes. */
@@ -2707,7 +2690,7 @@ const rpServiceAddons = {
 const rpIncludes = {
   moveout: {
     intro: "A complete top-to-bottom reset of the entire interior — every room, surface, and appliance inside and out. Built for move-outs, move-ins, and getting a home show-ready for sale.",
-    items: ["The entire interior, cleaned top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Baseboards, doors, fixtures & trim", "All floors throughout"]
+    items: ["The entire interior, cleaned top to bottom", "Bathrooms, scrubbed top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout"]
   },
   deep: {
     intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
@@ -2769,40 +2752,36 @@ function rpTeamSize() {
    bedrooms. Booking still proceeds normally (calendar + confirmation);
    only the price display and crew notes change. */
 function rpConditionKey() {
-  if (rpState.service === "moveout") return rpMoveoutConditionKeys[rpState.condition] || null;
   return rpConditionKeys[rpState.condition] || null;
 }
-function rpIsPreCleanedFlag() {
-  return rpState.service === "deep" && rpConditionKey() === "precleaned";
-}
-function rpIsExtraAttentionFlag() {
-  return rpState.service === "deep" && rpConditionKey() === "extra_attention";
-}
-/* Move-Out automatic condition multiplier — 0 for Standard, 0.20 for
-   Heavy, 0.50 for Extreme. Specialty has no multiplier (null); it's
-   handled as a custom quote via rpMoveoutIsSpecialtyCondition() instead. */
-function rpMoveoutConditionMultiplier() {
-  if (rpState.service !== "moveout") return 0;
-  const m = RP_MOVEOUT_CONDITION_MULTIPLIER[rpConditionKey()];
+/* Automatic condition multiplier for Move-Out and Deep Cleaning — 0 for
+   Standard, 0.20 for Heavy, 0.50 for Extreme. Specialty has no multiplier
+   (null); it's handled as a custom quote via rpIsSpecialtyCondition()
+   instead. */
+function rpConditionMultiplier() {
+  if (!["moveout", "deep"].includes(rpState.service)) return 0;
+  const m = RP_CONDITION_MULTIPLIER[rpConditionKey()];
   return typeof m === "number" ? m : 0;
 }
-function rpMoveoutIsSpecialtyCondition() {
-  return rpState.service === "moveout" && rpConditionKey() === "specialty";
+function rpIsSpecialtyCondition() {
+  return ["moveout", "deep"].includes(rpState.service) && rpConditionKey() === "specialty";
 }
 function rpIsCustomQuoteOnly() {
   return rpState.service === "airbnb"
     || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5)
     || rpMoveoutIsCustomSqft()
-    || rpMoveoutIsSpecialtyCondition();
+    || rpIsSpecialtyCondition();
 }
 
-/* Base price for Move-Out (sq-ft bracket + bedroom/bathroom adders, then
-   the Heavy/Extreme condition multiplier applied automatically) or Deep
-   Cleaning (bedroom-tier, condition is a manual office-approved flag —
-   never applied here) — before add-ons and military discount. */
+/* Base price for Move-Out (sq-ft bracket + bedroom/bathroom adders) or
+   Deep Cleaning (bedroom-tier) — then the Heavy/Extreme condition
+   multiplier applied automatically to either, before add-ons and
+   military discount. No manual credits for either service; Standard is
+   always the lowest advertised price. */
 function rpServiceBasePrice() {
+  const mult = rpConditionMultiplier();
   if (rpState.service === "moveout") {
-    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft() || rpMoveoutIsSpecialtyCondition()) return 0;
+    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition()) return 0;
     const tier = rpSqftTier();
     if (!tier || tier.base === null) return 0;
     const beds = Number(rpState.bedrooms);
@@ -2810,12 +2789,12 @@ function rpServiceBasePrice() {
     const bedAdj = Math.max(0, beds - RP_MOVEOUT_INCLUDED_BEDROOMS) * RP_MOVEOUT_BEDROOM_RATE;
     const bathAdj = Math.max(0, baths - RP_MOVEOUT_INCLUDED_BATHROOMS) * RP_MOVEOUT_BATHROOM_RATE;
     const preConditionCents = rpToCents(tier.base + bedAdj + bathAdj);
-    const mult = rpMoveoutConditionMultiplier();
     return rpCentsToDollars(Math.round(preConditionCents * (1 + mult)));
   }
   if (rpState.service === "deep") {
-    if (!rpState.bedrooms || Number(rpState.bedrooms) >= 5) return 0; // custom quote
-    return rpDeepTierPrices[Number(rpState.bedrooms)] || 0;
+    if (!rpState.bedrooms || Number(rpState.bedrooms) >= 5 || rpIsSpecialtyCondition()) return 0; // custom quote
+    const base = rpDeepTierPrices[Number(rpState.bedrooms)] || 0;
+    return rpCentsToDollars(Math.round(rpToCents(base) * (1 + mult)));
   }
   return 0;
 }
@@ -3323,29 +3302,7 @@ function rpScreenHtml() {
     </div>` };
   }
 
-  if (rpState.step === "condition" && rpState.service === "moveout") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>What's the condition of the home?</h2>
-      <p class="rp-sub">Just a rough sense — we confirm it when we arrive.</p>
-      <div class="rp-rows">
-        ${rpMoveoutConditionOrder.map(label => rpRowBtn({
-          onclick: `rpSelectCondition('${label}', this)`,
-          title: label,
-          desc: rpMoveoutConditionCopy[label],
-          selected: rpState.condition === label
-        })).join("")}
-      </div>
-    </div>` };
-  }
-
   if (rpState.step === "condition") {
-    const rpConditionOrder = ["Already mostly cleaned", "Standard move-out condition", "Needs extra attention"];
-    const rpConditionShort = {
-      "Already mostly cleaned": "Already mostly cleaned",
-      "Standard move-out condition": "Standard condition",
-      "Needs extra attention": "Needs extra attention"
-    };
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>What's the condition of the home?</h2>
@@ -3353,7 +3310,8 @@ function rpScreenHtml() {
       <div class="rp-rows">
         ${rpConditionOrder.map(label => rpRowBtn({
           onclick: `rpSelectCondition('${label}', this)`,
-          title: rpConditionShort[label],
+          title: label,
+          desc: rpConditionCopy[label],
           selected: rpState.condition === label
         })).join("")}
       </div>
@@ -3635,9 +3593,8 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
-      ${rpIsExtraAttentionFlag() ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional Labor</span><strong>May apply<small>Assessed on-site, approved before cleaning begins</small></strong></div>` : ""}
       ${rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
-      ${rpMoveoutIsCustomSqft() || rpMoveoutIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
+      ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.heavySoil ? `<div class="rp-mini-row"><span>Heavy soil/staining</span><strong>Noted</strong></div>` : ""}
@@ -4096,18 +4053,14 @@ function rpGetEstimatePayload() {
   const postalCode = rpState.postalCode.trim();
   const fullAddress = [address1, [city, state, postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const notes = rpState.specialInstructions.trim() || "None";
-  const isPreCleanedFlag = rpIsPreCleanedFlag();
-  const isExtraAttentionFlag = rpIsExtraAttentionFlag();
-  const moveoutConditionMultiplier = rpMoveoutConditionMultiplier();
-  const isSpecialtyCondition = rpMoveoutIsSpecialtyCondition();
+  const conditionMultiplier = rpConditionMultiplier();
+  const isSpecialtyCondition = rpIsSpecialtyCondition();
   const propertyConditionFlags = [
     rpState.noAC ? "No AC" : "",
     rpState.moldConcern ? "Mold/musty smell reported" : "",
     rpState.petWasteConcern ? "Pets present/pet odor/animal waste" : "",
     rpState.hazardConcern ? "Excessive trash/hoarding, pest infestation, or smoke damage reported" : "",
-    isExtraAttentionFlag ? "Customer flagged home as needing extra attention — assess labor before starting" : "",
-    isPreCleanedFlag ? "Customer flagged home as already mostly cleaned — verify eligibility for up to $" + PRECLEANED_MAX_CREDIT + " credit" : "",
-    rpState.service === "moveout" && moveoutConditionMultiplier > 0 ? `Condition tagged as ${rpState.condition} — +${Math.round(moveoutConditionMultiplier * 100)}% already applied to price, confirm on arrival` : "",
+    ["moveout", "deep"].includes(rpState.service) && conditionMultiplier > 0 ? `Condition tagged as ${rpState.condition} — +${Math.round(conditionMultiplier * 100)}% already applied to price, confirm on arrival` : "",
     isSpecialtyCondition ? "Customer flagged Specialty/Unsafe condition — booking proceeds, but confirm custom quote with customer before the cleaning date" : ""
   ].filter(Boolean);
   const propertyConditionsSummary = propertyConditionFlags.length
@@ -4126,18 +4079,14 @@ function rpGetEstimatePayload() {
   const baseServicePrice = rpServiceBasePrice();
   const militaryDiscountAmount = rpMilitaryDiscountAmount();
   /* Pricing status shown to the office: "Confirmed" for a normal instant
-     estimate (the base price always holds — condition never changes it
-     automatically), "Custom Quote" for Airbnb/5+ bedroom Deep Cleaning.
-     Pre-cleaned/extra-attention are separate flags carried alongside the
-     confirmed price — any credit or added labor is manual, office-approved,
-     and never applied to the instant estimate itself. */
+     estimate, "Custom Quote" for Airbnb, 5+ bedroom Deep Cleaning, over
+     3,400 sq ft Move-Out, or Specialty/Unsafe condition on either. Heavy
+     and Extreme conditions are applied automatically — no manual credit
+     or office-approved adjustment for either service. */
   const pricingStatus = rpIsCustomQuoteOnly() ? "Custom Quote" : "Confirmed";
   const estimateDisplay = rpIsCustomQuoteOnly() ? "Custom Quote" : `$${total.toFixed(2)}`;
-  const conditionFlagNote = rpState.service === "moveout"
-    ? (isSpecialtyCondition ? "Specialty/unsafe condition — requires custom quote, not auto-priced"
-        : (moveoutConditionMultiplier > 0 ? `+${Math.round(moveoutConditionMultiplier * 100)}% condition adjustment applied automatically (already included in Base service price)` : "N/A"))
-    : (isPreCleanedFlag ? `Eligible for review — up to $${PRECLEANED_MAX_CREDIT} credit if verified on-site (not applied to estimate)`
-        : (isExtraAttentionFlag ? "Flagged for assessment — additional labor may be priced and approved on-site (not applied to estimate)" : "N/A"));
+  const conditionFlagNote = isSpecialtyCondition ? "Specialty/unsafe condition — requires custom quote, not auto-priced"
+    : (conditionMultiplier > 0 ? `+${Math.round(conditionMultiplier * 100)}% condition adjustment applied automatically (already included in Base service price)` : "N/A");
   const jobDetails = [
     `Service: ${service}`, `Property conditions: ${propertyConditionsSummary}`,
     `Pricing status: ${pricingStatus}`,
@@ -4175,10 +4124,7 @@ function rpGetEstimatePayload() {
     addons: addonsList,
     condition: rpState.condition || "N/A",
     base_service_price: isConditionPriced ? baseServicePrice.toFixed(2) : "N/A",
-    condition_credit_eligible: isPreCleanedFlag ? "Yes — pending verification" : "No",
-    condition_credit_max_amount: isPreCleanedFlag ? PRECLEANED_MAX_CREDIT.toFixed(2) : "0.00",
-    condition_extra_attention_flag: isExtraAttentionFlag ? "Yes — pending assessment" : "No",
-    condition_adjustment_percent: rpState.service === "moveout" ? Math.round(moveoutConditionMultiplier * 100) : 0,
+    condition_adjustment_percent: ["moveout", "deep"].includes(rpState.service) ? Math.round(conditionMultiplier * 100) : 0,
     condition_specialty_flag: isSpecialtyCondition ? "Yes — custom quote required" : "No",
     condition_flag_note: conditionFlagNote,
     frequency: rpState.frequency || "N/A",
