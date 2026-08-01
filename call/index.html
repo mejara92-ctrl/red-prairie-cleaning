@@ -408,13 +408,11 @@ function screenHtml(){
   const s=rpState.step;
 
   if(s==="caller") return `
-    <div class="f"><label for="csr">Your name (for the greeting)</label>
-      <input id="csr" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="set('csrName',this.value)"></div>
     <div class="f"><label for="nm">Caller name *</label>
       <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" oninput="set('fullName',this.value)"></div>
     <div class="f"><label for="ph">Best callback number *</label>
       <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" oninput="set('phone',this.value)"></div>
-    <div class="f"><label for="src">How did they hear about us?</label>
+    <div class="f"><label for="src">How did they hear about us? (if it comes up)</label>
       <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014</option>
       ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
         .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
@@ -500,7 +498,10 @@ function screenHtml(){
   if(s==="done") return `<div class="guard info" style="margin-top:0"><b>Booked</b>
       ${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.</div>
     <p class="sub" style="margin-top:12px">Repeat the date and time once more before you hang up.</p>
-    <button class="btn pri" style="width:100%" onclick="resetCall()">Start next call</button>`;
+    <div class="f" style="margin-top:14px"><label for="csrDone">Who took this call?</label>
+      <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="setCsrIdentity(this.value)">
+      <p class="sub" style="margin:5px 0 0">Saved on this device \u2014 you won't need to re-enter it next call.</p></div>
+    <button class="btn pri" style="width:100%;margin-top:6px" onclick="resetCall()">Start next call</button>`;
   return "";
 }
 
@@ -523,9 +524,10 @@ function render(){
       ${guardrails().map(g=>`<div class="guard ${g.level}"><b>${g.title}</b>${g.body}</div>`).join("")}
       ${rpState.step==="done"?"":`<div class="nav">
         ${idx>0?`<button class="btn" onclick="back()">Back</button>`:""}
-        <button class="btn pri" onclick="next()" ${stepValid()&&!hasBlockingGuard()?"":"disabled"}>
+        <button class="btn pri" onclick="next()" ${rpState.bookingSubmitting?"disabled":""}>
           ${rpState.step==="calendar"?"Confirm booking":"Next"}</button></div>`}
-    </div>`;
+    </div>
+    ${!stepValid()?`<p class="sub" style="text-align:center;margin-top:8px">Not fully filled out \u2014 that's fine, keep going. You can always come back to it.</p>`:""}`;
   renderRail(); save();
 }
 function fmtPhone(v){ const d=normalizePhone(v);
@@ -560,7 +562,7 @@ function toggle(f){ rpState[f]=!rpState[f];
 function pickService(k){ rpState.service=k;
   ["sqft","bedrooms","bathrooms","condition","frequency"].forEach(f=>rpState[f]=null); render(); }
 function next(){
-  if(!stepValid()||hasBlockingGuard()) return;
+  if(rpState.bookingSubmitting) return;
   const f=flow(), i=stepIdx();
   if(rpState.step==="calendar"){ submitBooking(); return; }
   if(i<f.length-1){
@@ -583,9 +585,22 @@ function openDrawer(id){
 function closeDrawer(id){ el(id).hidden=true; document.body.style.overflow=""; }
 
 /* ---------- Persistence (survives an accidental refresh mid-call) ---------- */
+const CSR_IDENTITY_KEY = "rpCallConsole.csrIdentity";
 function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(rpState)); }catch(e){} }
-function load(){ try{ const raw=localStorage.getItem(LS_KEY); if(!raw) return;
-  const d=JSON.parse(raw); if(d&&d.bookedAt) return; Object.assign(rpState,d); }catch(e){} }
+function load(){
+  try{ const raw=localStorage.getItem(LS_KEY); if(raw){
+    const d=JSON.parse(raw); if(!(d&&d.bookedAt)) Object.assign(rpState,d);
+  } }catch(e){}
+  // CSR identity persists independently of per-call state and survives
+  // "Start next call" — set once at the end of a call, applied to every
+  // call after that without re-entering it.
+  try{ const name=localStorage.getItem(CSR_IDENTITY_KEY); if(name) rpState.csrName=name; }catch(e){}
+}
+function setCsrIdentity(name){
+  rpState.csrName=name;
+  try{ localStorage.setItem(CSR_IDENTITY_KEY,name); }catch(e){}
+  save();
+}
 function resetCall(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} window.location.reload(); }
 
 /* ---------- Office/crew summary ---------- */
@@ -634,23 +649,77 @@ function fmtTime(t){ return new Date(t).toLocaleTimeString(undefined,{hour:"nume
 function pickSlot(t){ rpState.selectedStartTime=t;
   rpState.bookedAt=`${fmtDay(rpState.selectedDay||Object.keys(rpState.availableSlots)[0])} at ${fmtTime(t)}`; render(); }
 
+/* Date helpers — must match /book exactly. The booking worker expects
+   date-only keys (YYYY-MM-DD) in America/Chicago, NOT ISO timestamps.
+   Sending a full .toISOString() gets rejected as "Invalid date range".
+   /book also requests one MONTH at a time (start/end clamped to a single
+   month, within a 60-day booking window), so we do the same and merge two
+   months — otherwise a call late in the month shows almost no dates. */
+function centralDateKey(date=new Date()){
+  const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",
+    year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date)
+    .reduce((a,x)=>{ if(x.type!=="literal") a[x.type]=x.value; return a; },{});
+  return `${p.year}-${p.month}-${p.day}`;
+}
+function isoDate(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function dateFromKey(k){ return new Date(`${k}T12:00:00`); }
+function addDaysKey(key,days){ const d=dateFromKey(key); d.setDate(d.getDate()+days); return isoDate(d); }
+/* Inclusive first/last day of the month containing `key`. */
+function monthBounds(key){
+  const first=dateFromKey(key); first.setDate(1);
+  const last=new Date(first); last.setMonth(last.getMonth()+1,0);
+  return {first:isoDate(first), last:isoDate(last)};
+}
+
+async function fetchSlotRange(start,end){
+  const r=await fetch(`${RP_BOOKING_API}/slots?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
+    {headers:{Accept:"application/json"}});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.ok) throw new Error(j.error||`Availability request failed (HTTP ${r.status})`);
+  const data=j.data||{}; delete data.traceId;
+  return data;
+}
+
 async function loadSlots(){
   if(rpState.slotsLoading) return;
   rpState.slotsLoading=true; rpState.slotsError=""; render();
   try{
-    const start=new Date(), end=new Date(); end.setDate(end.getDate()+21);
-    const r=await fetch(`${RP_BOOKING_API}/slots?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,
-      {headers:{Accept:"application/json"}});
-    const j=await r.json();
-    if(!r.ok||!j.ok) throw new Error(j.error||"Availability temporarily unavailable.");
-    const data=j.data||{}; delete data.traceId;
-    rpState.availableSlots=data;
-  }catch(e){ rpState.slotsError=(e.message||"Availability temporarily unavailable.")+" Offer to call them back with a time \u2014 don't guess."; }
+    const today=centralDateKey();
+    const windowEnd=addDaysKey(today,60);            // worker's booking window
+    const thisMonth=monthBounds(today);
+    const nextKey=addDaysKey(thisMonth.last,1);
+    const nextMonth=monthBounds(nextKey);
+
+    const ranges=[
+      {start:today, end:thisMonth.last<windowEnd?thisMonth.last:windowEnd}
+    ];
+    if(nextKey<=windowEnd){
+      ranges.push({start:nextKey, end:nextMonth.last<windowEnd?nextMonth.last:windowEnd});
+    }
+
+    let merged={}, firstError=null;
+    for(const rg of ranges){
+      try{ merged=Object.assign(merged, await fetchSlotRange(rg.start,rg.end)); }
+      catch(e){ if(!firstError) firstError=e; }
+    }
+    if(!Object.keys(merged).length && firstError) throw firstError;
+    rpState.availableSlots=merged;
+  }catch(e){
+    rpState.slotsError=(e.message||"Availability temporarily unavailable.")
+      +" Take their preferred day, tell them you'll confirm by text shortly, and book it in GHL \u2014 don't guess at a time.";
+  }
   rpState.slotsLoading=false; render();
 }
 
 async function submitBooking(){
   if(rpState.bookingSubmitting) return;
+  if(!rpState.selectedStartTime){
+    rpState.bookingError="Pick a date and time above first.";
+    render();
+    return;
+  }
   rpState.bookingSubmitting=true; rpState.bookingError=""; render();
   const parts=rpState.fullName.trim().split(/\s+/);
   try{
