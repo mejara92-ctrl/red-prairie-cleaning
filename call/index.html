@@ -236,13 +236,97 @@ function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i
    watch  — the trap at this step. These protect margin and stop the crew
             being sent to a mispriced job.
    ========================================================================= */
+/* =========================================================================
+   SERVICE PSYCHOLOGY
+   =========================================================================
+   What actually motivates the purchase is different per service — a
+   move-out customer is protecting a deposit, a recurring customer is
+   buying back their time, an Airbnb host is protecting their rating.
+   Using the generic "move-out" pitch on a recurring-cleaning caller (or
+   vice versa) undersells the thing they actually care about.
+
+   Language note: avoid assuming every caller is military/PCS-related.
+   Plenty of Lawton-area movers are civilian. "Moving season" lands with
+   everyone; "PCS" only lands with people who already know the acronym.
+   ========================================================================= */
+const SERVICE_ANGLES = {
+  moveout: {
+    value: "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
+    addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
+    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
+    urgencyNoun: "move-out slots",
+    seasonNote: "our busiest moving season"
+  },
+  deep: {
+    value: "that's a full top-to-bottom reset \u2014 inside the oven, baseboards, everything \u2014 not just a surface clean",
+    addon: "Since everything's already getting a deep clean, a lot of people knock out carpets or windows in the same visit rather than scheduling it separately.",
+    objection: "A deep clean is meant to reset the whole house at once \u2014 that's the difference between this and a regular cleaning.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy stretch for deep cleans"
+  },
+  maintenance: {
+    value: "that keeps the whole house consistently handled \u2014 kitchens, bathrooms, floors \u2014 on whatever schedule works for you",
+    addon: "A lot of recurring customers add windows or laundry once they see how much time the regular visits actually free up.",
+    objection: "Once this is on a schedule it's genuinely one less thing on your plate every week \u2014 that's really what you're paying for, not just the cleaning itself.",
+    urgencyNoun: "recurring slots",
+    seasonNote: "filling up our regular schedule"
+  },
+  carpet: {
+    value: "that's real hot-water extraction with pre-treatment, not a rental machine or a quick surface pass",
+    addon: "",
+    objection: "A proper hot-water extraction gets out what a rental machine or a regular vacuum physically can't \u2014 that's the difference the price reflects.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy week for carpet jobs"
+  },
+  hourly: {
+    value: "that's flexible time with as many cleaners as you need, working on exactly what you point them to",
+    addon: "",
+    objection: "You're not locked into a fixed scope like a flat-rate clean \u2014 the crew spends the whole time on what you actually want done.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy week"
+  },
+  airbnb: {
+    value: "that's a full guest-ready turnover \u2014 kitchens, bathrooms, floors \u2014 ready before your next check-in",
+    addon: "A lot of hosts add laundry or restocking once they see how tight same-day turnovers can get.",
+    objection: "One bad review from a rushed turnover costs a lot more than this \u2014 that's really what you're protecting.",
+    urgencyNoun: "turnover slots",
+    seasonNote: "a busy stretch of back-to-back bookings"
+  }
+};
+function angle(){ return SERVICE_ANGLES[rpState.service] || {}; }
+
+function quoteSayLine(){
+  const bits=[];
+  if(rpState.service==="moveout" && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
+  if(rpState.bedrooms) bits.push(`${rpState.bedrooms} bedroom${rpState.bedrooms>1?"s":""}`);
+  if(rpState.bathrooms) bits.push(`${rpState.bathrooms} bathroom${rpState.bathrooms>1?"s":""}`);
+  const desc = bits.length ? `for a ${bits.join(", ")}` : "for this job";
+  const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : `$${rpFinalPrice().toFixed(2)}`;
+  const val = angle().value || "that's the full price, nothing added at the door";
+  return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
+}
+function addonsSayLine(){
+  const base = "\u201cCouple things people often add \u2014 any carpet that needs shampooing? Exterior windows? Garage?\u201d";
+  const a = angle().addon;
+  return a ? `${base} ${a}` : base;
+}
+function calendarSayLine(){
+  const days=Object.keys(rpState.availableSlots||{});
+  const total=days.reduce((n,d)=>n+((rpState.availableSlots[d]||[]).length),0);
+  const noun=angle().urgencyNoun || "openings";
+  if(total>0 && total<=6){
+    return `\u201cI've got [day] or [day] open \u2014 and we're honestly down to just a few ${noun} this week, so if either works for you I'd grab it now.\u201d`;
+  }
+  return `\u201cI've got [day] or [day] open \u2014 which works better for you?\u201d`;
+}
+
 const SCRIPT = {
   caller:{say:"\u201cThanks for calling Red Prairie Cleaning, this is [your name] \u2014 who am I speaking with?\u201d Then: \u201cAnd what's the best number for you, in case we get cut off?\u201d",
     listen:"Get the name and number BEFORE anything else.",
     watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
   service:{say:"\u201cAre you looking for a move-out clean, or something else?\u201d",
-    listen:"Most Fort Sill callers are PCS move-outs. Landlord, deposit, inspection, or \u201cmoving out\u201d all mean move-out.",
-    watch:"If they say \u201cjust a regular cleaning,\u201d ask: one-time, or on a schedule? Different services, different prices."},
+    listen:"Callers move for all kinds of reasons \u2014 military transfer, new job, new place. Landlord, deposit, inspection, or \u201cmoving out\u201d all mean move-out; don't assume they know military terms and don't assume they don't.",
+    watch:"If they say \u201cjust a regular cleaning,\u201d ask: one-time, or on a schedule? Different services, different prices, different pitch \u2014 see the script change once you pick one."},
   sqft:{say:"\u201cRoughly how big is the home? A ballpark is fine.\u201d",
     listen:"Typical Lawton 3-bed is 1,400\u20131,800. A 4-bed starter home is usually 1,600\u20132,000.",
     watch:"People guess low. If it sounds small for the bedroom count, ask if that includes the garage \u2014 it shouldn't."},
@@ -255,9 +339,9 @@ const SCRIPT = {
   condition:{say:"\u201cLast one on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
     listen:"Let them describe it, then YOU pick the tier. Read the tier description back to confirm.",
     watch:"Never pick Standard just to keep the price down. That's how a crew gets sent to a 6-hour job priced for 3 \u2014 it comes out of their day and the margin."},
-  addons:{say:"\u201cCouple things people often add \u2014 any carpet that needs shampooing? Exterior windows? Garage?\u201d",
+  addons:{say:addonsSayLine,
     listen:"Ask these by name. Customers almost never volunteer them.",
-    watch:"Pet stains or odor is a crew-prep flag, not automatically a condition bump. Don't charge twice for the same thing."},
+    watch:"Pet stains or odor is a crew-prep flag, not automatically a condition bump. Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price."},
   frequency:{say:"\u201cWould you want this one-time, or set up on a regular schedule?\u201d",
     listen:"Recurring is worth more long-term.",
     watch:"If they hesitate, book One-Time. They can switch later; a lost booking can't."},
@@ -270,24 +354,37 @@ const SCRIPT = {
   hours:{say:"\u201cAnd about how many hours do you think you'll need?\u201d",
     listen:"4-hour minimum.",
     watch:"If they don't know, ask what they want done and estimate for them \u2014 don't make them guess."},
-  quote:{say:"\u201cSo for a [size] home with [beds] bedrooms and [baths] baths, your total is [price]. That's the full price \u2014 nothing added at the door.\u201d",
+  quote:{say:quoteSayLine,
     listen:"Say the number plainly, then STOP TALKING. Let them respond first.",
     watch:"Silence after a price is normal and it is not a no. Do not fill it by offering a discount."},
   contact:{say:"\u201cPerfect \u2014 let me grab the address and get you on the schedule.\u201d",
     listen:"Read the address back out loud, digit by digit on the house number.",
     watch:"Wrong address = wasted crew trip and a lost day. Confirm it verbally before moving on."},
-  calendar:{say:"\u201cI've got [day] or [day] open \u2014 which works better for you?\u201d",
+  calendar:{say:calendarSayLine,
     listen:"Offer two specific days. Don't ask an open \u201cwhat day works?\u201d",
     watch:"Move-outs are deadline-driven. Ask when they have to be out, and work backward."},
-  done:{say:"\u201cYou're all set for [day] at [time]. You'll get a text confirmation in just a second.\u201d",
+  done:{say:"\u201cYou're all set for [day] at [time]. You'll get a text confirmation in just a second \u2014 and if anything comes up before then, have them call back and ask for [your name].\u201d",
     listen:"Confirm they got the text before hanging up.",
     watch:"Don't hang up without repeating the date and time one more time."}
 };
+function resolveScript(step){
+  const e=SCRIPT[step]; if(!e) return null;
+  return {
+    say: typeof e.say==="function"?e.say():e.say,
+    listen: typeof e.listen==="function"?e.listen():e.listen,
+    watch: typeof e.watch==="function"?e.watch():e.watch
+  };
+}
 
+function objectionPriceAnswer(){
+  const val = angle().value || "that covers everything, nothing added at the door";
+  const obj = angle().objection || "";
+  return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
+}
 const OBJECTIONS = [
   {q:"\u201cThat's more than I expected.\u201d",
-   a:"\u201cI hear you. That covers the whole interior \u2014 inside the oven and fridge, inside cabinets, baseboards, all of it \u2014 with nothing added when we show up. Most of our move-out customers are trying to protect a full deposit, and this is what it takes to pass inspection.\u201d",
-   n:"Don't drop the price. Restate value first."},
+   a:objectionPriceAnswer,
+   n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
   {q:"\u201cAnother company quoted me less.\u201d",
    a:"\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d",
    n:"Never bad-mouth a competitor by name."},
@@ -295,7 +392,7 @@ const OBJECTIONS = [
    a:"\u201cI can't move the base price, but if you're military or first responder that's 10% off. Or if you'd rather handle the carpet yourself, I can take that off the total.\u201d",
    n:"Remove scope to lower price. Never discount the base."},
   {q:"\u201cI need to think about it / talk to my spouse.\u201d",
-   a:"\u201cTotally fair. Dates fill up fast during PCS season \u2014 want me to hold one? Nothing's charged today and you can cancel free.\u201d",
+   a:"\u201cTotally fair. Dates fill up fast during our busy moving season \u2014 want me to hold one? Nothing's charged today and you can cancel free.\u201d",
    n:"Offer the hold once. If they still say no, log the outcome."},
   {q:"\u201cWill I get my deposit back?\u201d",
    a:"\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it.\u201d",
@@ -506,7 +603,7 @@ function screenHtml(){
 }
 
 function render(){
-  const t=TITLES[rpState.step]||["",""], sc=SCRIPT[rpState.step];
+  const t=TITLES[rpState.step]||["",""], sc=resolveScript(rpState.step);
   const idx=stepIdx(), total=flow().length;
   el("progFill").style.width=`${Math.round((idx/Math.max(1,total-1))*100)}%`;
   el("hdWho").textContent = rpState.fullName
@@ -577,7 +674,7 @@ function back(){ const f=flow(), i=stepIdx();
 
 function openDrawer(id){
   if(id==="drObj") el("objList").innerHTML=OBJECTIONS.map(o=>
-    `<div class="obj"><b>${o.q}</b><span>${o.a}</span><em>${o.n}</em></div>`).join("");
+    `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${o.n}</em></div>`).join("");
   if(id==="drOut") el("outList").innerHTML=OUTCOMES.map(o=>
     `<button class="out-btn" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
   el(id).hidden=false; document.body.style.overflow="hidden";
