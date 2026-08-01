@@ -148,7 +148,33 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .out-btn small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px}
 .status{font-size:13.5px;margin:8px 0;min-height:18px;line-height:1.45}
 
-.days,.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:7px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:7px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav strong{font-size:16px}
+.cal-nav button{background:#fff;border:1.5px solid var(--line);border-radius:9px;width:36px;height:36px;font-size:18px;font-weight:800;color:var(--ink)}
+.cal-nav button:disabled{opacity:.3;cursor:not-allowed}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px}
+.cal-weekdays span{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-blank{visibility:hidden}
+.cal-day{
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:#fff;border:1.5px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:700;color:var(--ink);
+  position:relative;
+}
+.cal-day.avail{border-color:rgba(159,32,39,.35)}
+.cal-day.avail:active{transform:scale(.94)}
+.cal-day.full{color:rgba(60,50,42,.32);background:#f0ebe1;cursor:not-allowed}
+.cal-day.today{box-shadow:0 0 0 2px rgba(198,161,100,.55)}
+.cal-day.sel{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1.5px var(--red)}
+.cal-day small{font-size:8.5px;font-weight:800;color:var(--red)}
+.cal-day.full small{color:var(--muted)}
+.cal-day.sel small{color:var(--red)}
+.cal-key{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px}
+.cal-key span{display:flex;align-items:center;gap:5px}
+.cal-key i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.cal-key i.avail{background:#fff;border:1.5px solid rgba(159,32,39,.5)}
+.cal-key i.today{background:#fff;box-shadow:0 0 0 2px rgba(198,161,100,.7)}
 .days{margin-bottom:12px}
 </style>
 </head>
@@ -216,7 +242,7 @@ const rpState = {
   customNotes:"",
   csrName:"", csrLeadSource:null, csrCallNotes:"", csrDisposition:null,
   quotedAloud:false,
-  selectedDay:null, selectedStartTime:null, bookedAt:null,
+  selectedDay:null, selectedStartTime:null, bookedAt:null, calendarMonth:null,
   availableSlots:{}, slotsLoading:false, slotsError:"",
   bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:""
 };
@@ -803,14 +829,14 @@ function jobDetails(){
   ].filter(Boolean).join("\n");
 }
 
-/* ---------- Calendar ---------- */
+/* ---------- Calendar: real month grid, current + next month ---------- */
 /* Slot data shape, straight from GHL via the /slots worker endpoint:
    { "2026-08-05": { slots: ["2026-08-05T10:00:00-05:00", ...] }, ... }
    Each day is an OBJECT with a .slots array, not a plain array — treating
-   it as a plain array (what this file did before) silently produces
-   "undefined" everywhere. This matches /book's rpSlotsForDate() exactly,
-   including the 9am-5pm business-hours filter, so both pages show the
-   same bookable window. */
+   it as a plain array (an earlier version of this file did) silently
+   produces "undefined" everywhere. This matches /book's rpSlotsForDate()
+   exactly, including the 9am-5pm business-hours filter, so both pages
+   show the same bookable window. */
 function slotsForDate(dateKey){
   const raw=rpState.availableSlots?.[dateKey]?.slots || [];
   return raw.filter(slot=>{
@@ -822,34 +848,82 @@ function slotsForDate(dateKey){
 function availableDateKeys(){
   return Object.keys(rpState.availableSlots||{}).filter(k=>slotsForDate(k).length>0).sort();
 }
-
+function bookingBounds(){
+  const start=centralDateKey();
+  return {start, end:addDaysKey(start,60)};
+}
+function monthKeyFromDateKey(k){ return `${String(k).slice(0,7)}-01`; }
+function clampCalendarMonth(monthKey){
+  const bounds=bookingBounds();
+  const minMonth=monthKeyFromDateKey(bounds.start);
+  const maxMonth=monthKeyFromDateKey(bounds.end);
+  if(!monthKey||monthKey<minMonth) return minMonth;
+  if(monthKey>maxMonth) return maxMonth;
+  return monthKey;
+}
+function canMoveCalendarMonth(delta){
+  const current=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  const target=clampCalendarMonth(addDaysKey(monthBounds(current).first, delta>0?32:-1));
+  return target!==current;
+}
+function changeCalendarMonth(delta){
+  const current=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  const target=addDaysKey(monthBounds(current).first, delta>0?32:-1);
+  rpState.calendarMonth=clampCalendarMonth(monthKeyFromDateKey(target));
+  render();
+}
+function formatMonthTitle(monthKey){
+  return new Intl.DateTimeFormat("en-US",{month:"long",year:"numeric"}).format(dateFromKey(monthKey));
+}
+function calendarGridHtml(monthKey){
+  const bounds=bookingBounds();
+  const first=dateFromKey(monthKey);
+  const year=first.getFullYear(), month=first.getMonth();
+  const firstDow=new Date(year,month,1,12).getDay();
+  const daysInMonth=new Date(year,month+1,0,12).getDate();
+  const today=bounds.start;
+  const cells=[];
+  for(let i=0;i<firstDow;i++) cells.push(`<span class="cal-blank" aria-hidden="true"></span>`);
+  for(let day=1;day<=daysInMonth;day++){
+    const dateKey=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const inWindow=dateKey>=bounds.start && dateKey<=bounds.end;
+    const count=inWindow?slotsForDate(dateKey).length:0;
+    const avail=inWindow && count>0;
+    const isToday=dateKey===today;
+    const isSel=rpState.selectedDay===dateKey;
+    const cls=["cal-day",avail?"avail":"full",isToday?"today":"",isSel?"sel":""].filter(Boolean).join(" ");
+    cells.push(`<button type="button" class="${cls}" ${avail?`onclick="pick('selectedDay','${dateKey}')"`:"disabled"}>
+      <span>${day}</span>${avail?`<small>${count}</small>`:""}
+    </button>`);
+  }
+  return cells.join("");
+}
 function calendarHtml(){
   if(rpState.slotsLoading) return `<p class="sub">Loading availability\u2026</p>`;
   if(rpState.slotsError) return `<div class="guard warn"><b>Availability unavailable</b>${esc(rpState.slotsError)}
     <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div>`;
-  const days=Object.keys(rpState.availableSlots||{}).sort();
-  if(!days.length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
+  if(!Object.keys(rpState.availableSlots||{}).length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
+
+  const monthKey=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  rpState.calendarMonth=monthKey;
   const daysWithSlots=availableDateKeys();
-  const sel = (rpState.selectedDay && slotsForDate(rpState.selectedDay).length>0)
-    ? rpState.selectedDay
-    : (daysWithSlots[0] || days[0]);
-  const slots=slotsForDate(sel);
-  return `<div class="days">${days.slice(0,14).map(d=>dayBtn(d,sel===d)).join("")}</div>
-    <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
-      :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>
+  const sel=(rpState.selectedDay && slotsForDate(rpState.selectedDay).length>0) ? rpState.selectedDay : "";
+  const slots=sel?slotsForDate(sel):[];
+
+  return `<div class="cal-nav">
+      <button type="button" onclick="changeCalendarMonth(-1)" ${canMoveCalendarMonth(-1)?"":"disabled"} aria-label="Previous month">\u2039</button>
+      <strong>${formatMonthTitle(monthKey)}</strong>
+      <button type="button" onclick="changeCalendarMonth(1)" ${canMoveCalendarMonth(1)?"":"disabled"} aria-label="Next month">\u203a</button>
+    </div>
+    <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+    <div class="cal-grid">${calendarGridHtml(monthKey)}</div>
+    <div class="cal-key"><span><i class="avail"></i>Open (number = slots)</span><span><i class="today"></i>Today</span></div>
+    ${!daysWithSlots.some(d=>monthKeyFromDateKey(d)===monthKey) ? `<p class="sub">Nothing open this month \u2014 try the other month.</p>` : ""}
+    ${sel ? `<p class="sub" style="margin-top:2px"><b>${fmtDay(sel)}</b> \u2014 tap a time:</p>
+      <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
+        :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>` : ""}
     ${rpState.bookingError?`<div class="guard stop" style="margin-top:10px"><b>Booking failed</b>${esc(rpState.bookingError)}</div>`:""}
     ${rpState.bookingSubmitting?`<p class="sub" style="margin-top:10px">Booking\u2026</p>`:""}`;
-}
-/* A fully-booked day renders visibly dead — disabled, no checkmark ever
-   possible — instead of looking identical to an open day until tapped.
-   That's what was letting a "Nothing open" day show a false selected
-   checkmark: the button gave zero signal beforehand. */
-function dayBtn(d,selected){
-  const count=slotsForDate(d).length;
-  if(count===0){
-    return `<button type="button" class="opt" disabled><span>${fmtDay(d)}<small>Full</small></span></button>`;
-  }
-  return opt(fmtDay(d),`pick('selectedDay','${d}')`,selected,`${count} open`);
 }
 function fmtDay(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"}); }
 /* Explicit America/Chicago, same as /book's rpFormatTime() — without
@@ -858,7 +932,7 @@ function fmtTime(t){
   return new Intl.DateTimeFormat("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/Chicago"}).format(new Date(t));
 }
 function pickSlot(t){ rpState.selectedStartTime=t;
-  rpState.bookedAt=`${fmtDay(rpState.selectedDay||Object.keys(rpState.availableSlots)[0])} at ${fmtTime(t)}`; render(); }
+  rpState.bookedAt=`${fmtDay(rpState.selectedDay)} at ${fmtTime(t)}`; render(); }
 
 /* Date helpers — must match /book exactly. The booking worker expects
    date-only keys (YYYY-MM-DD) in America/Chicago, NOT ISO timestamps.
