@@ -322,8 +322,8 @@ function addonsSayLine(){
   return a ? `${base} ${a}` : base;
 }
 function calendarSayLine(){
-  const days=Object.keys(rpState.availableSlots||{}).filter(d=>(rpState.availableSlots[d]||[]).length>0).sort();
-  const total=days.reduce((n,d)=>n+((rpState.availableSlots[d]||[]).length),0);
+  const days=availableDateKeys();
+  const total=days.reduce((n,d)=>n+slotsForDate(d).length,0);
   const noun=angle().urgencyNoun || "openings";
   let dayPhrase;
   if(days.length>=2) dayPhrase=`${fmtDay(days[0])} or ${fmtDay(days[1])}`;
@@ -643,14 +643,39 @@ function screenHtml(){
         ? "No appointment yet \u2014 the office will follow up to schedule a walkthrough or request photos, then confirm a quote."
         : `${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.`}</div>
     <p class="sub" style="margin-top:12px">${isCustomService()?"Let them know someone will reach out soon \u2014 no firm timeline promises.":"Repeat the date and time once more before you hang up."}</p>
-    <div class="f" style="margin-top:14px"><label for="csrDone">Who took this call?</label>
+    <div class="f" style="margin-top:14px"><label for="csrDone">Not you? Update your name</label>
       <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="setCsrIdentity(this.value)">
-      <p class="sub" style="margin:5px 0 0">Saved on this device \u2014 you won't need to re-enter it next call.</p></div>
+      <p class="sub" style="margin:5px 0 0">Saved on this device for next call.</p></div>
     <button class="btn pri" style="width:100%;margin-top:6px" onclick="resetCall()">Start next call</button>`;
   return "";
 }
 
+/* Shown once, before the first call on this device. Nothing else in the
+   console runs until this is filled in — the greeting script needs a
+   real name, not a placeholder or a generic fallback. Persists via
+   setCsrIdentity(), so this never shows again on this device after. */
+function renderSetup(){
+  el("progFill").style.width="0%";
+  el("hdWho").textContent="Internal tool";
+  el("main").innerHTML=`
+    <div class="q">
+      <p class="stepno">Before you start</p>
+      <h2>What's your name?</h2>
+      <p class="sub">Used in the call script and saved on this device \u2014 you'll only enter it once.</p>
+      <div class="f"><input id="setupName" placeholder="Liz" autofocus onkeydown="if(event.key==='Enter')finishSetup()"></div>
+      <button class="btn pri" style="width:100%" onclick="finishSetup()">Start taking calls</button>
+    </div>`;
+  el("rail").innerHTML="";
+}
+function finishSetup(){
+  const v=(el("setupName").value||"").trim();
+  if(!v) return;
+  setCsrIdentity(v);
+  render();
+}
+
 function render(){
+  if(!rpState.csrName){ renderSetup(); return; }
   const t=TITLES[rpState.step]||["",""], sc=resolveScript(rpState.step);
   const idx=stepIdx(), total=flow().length;
   el("progFill").style.width=`${Math.round((idx/Math.max(1,total-1))*100)}%`;
@@ -779,17 +804,36 @@ function jobDetails(){
 }
 
 /* ---------- Calendar ---------- */
+/* Slot data shape, straight from GHL via the /slots worker endpoint:
+   { "2026-08-05": { slots: ["2026-08-05T10:00:00-05:00", ...] }, ... }
+   Each day is an OBJECT with a .slots array, not a plain array — treating
+   it as a plain array (what this file did before) silently produces
+   "undefined" everywhere. This matches /book's rpSlotsForDate() exactly,
+   including the 9am-5pm business-hours filter, so both pages show the
+   same bookable window. */
+function slotsForDate(dateKey){
+  const raw=rpState.availableSlots?.[dateKey]?.slots || [];
+  return raw.filter(slot=>{
+    const m=String(slot).match(/T(\d{2}):/);
+    const hour=m?Number(m[1]):NaN;
+    return Number.isFinite(hour) && hour>=9 && hour<=17;
+  });
+}
+function availableDateKeys(){
+  return Object.keys(rpState.availableSlots||{}).filter(k=>slotsForDate(k).length>0).sort();
+}
+
 function calendarHtml(){
   if(rpState.slotsLoading) return `<p class="sub">Loading availability\u2026</p>`;
   if(rpState.slotsError) return `<div class="guard warn"><b>Availability unavailable</b>${esc(rpState.slotsError)}
     <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div>`;
   const days=Object.keys(rpState.availableSlots||{}).sort();
   if(!days.length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
-  const daysWithSlots=days.filter(d=>(rpState.availableSlots[d]||[]).length>0);
-  const sel = (rpState.selectedDay && (rpState.availableSlots[rpState.selectedDay]||[]).length>0)
+  const daysWithSlots=availableDateKeys();
+  const sel = (rpState.selectedDay && slotsForDate(rpState.selectedDay).length>0)
     ? rpState.selectedDay
     : (daysWithSlots[0] || days[0]);
-  const slots=rpState.availableSlots[sel]||[];
+  const slots=slotsForDate(sel);
   return `<div class="days">${days.slice(0,14).map(d=>dayBtn(d,sel===d)).join("")}</div>
     <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
       :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>
@@ -801,14 +845,18 @@ function calendarHtml(){
    That's what was letting a "Nothing open" day show a false selected
    checkmark: the button gave zero signal beforehand. */
 function dayBtn(d,selected){
-  const count=(rpState.availableSlots[d]||[]).length;
+  const count=slotsForDate(d).length;
   if(count===0){
     return `<button type="button" class="opt" disabled><span>${fmtDay(d)}<small>Full</small></span></button>`;
   }
   return opt(fmtDay(d),`pick('selectedDay','${d}')`,selected,`${count} open`);
 }
 function fmtDay(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"}); }
-function fmtTime(t){ return new Date(t).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }
+/* Explicit America/Chicago, same as /book's rpFormatTime() — without
+   this, a device set to a different timezone shows the wrong time. */
+function fmtTime(t){
+  return new Intl.DateTimeFormat("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/Chicago"}).format(new Date(t));
+}
 function pickSlot(t){ rpState.selectedStartTime=t;
   rpState.bookedAt=`${fmtDay(rpState.selectedDay||Object.keys(rpState.availableSlots)[0])} at ${fmtTime(t)}`; render(); }
 
