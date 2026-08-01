@@ -90,6 +90,8 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .opt small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
 .opt:active{transform:scale(.99)}
 .opt.on{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1px var(--red)}
+.opt:disabled{opacity:.4;background:#eee7db;cursor:not-allowed;color:var(--muted)}
+.opt:disabled:active{transform:none}
 .opt .chk{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--red);opacity:0}
 .opt.on .chk{opacity:1}
 .opts.two .opt,.opts.three .opt{justify-content:center;text-align:center}
@@ -202,7 +204,7 @@ const LS_KEY = "rpCallConsole.v1";
 
 /* The engine reads this global. Field names match /book's rpState. */
 const rpState = {
-  step:"caller", service:null,
+  step:"service", service:null,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, windowsTier:null, yardTier:null,
@@ -211,22 +213,31 @@ const rpState = {
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
   fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
   specialInstructions:"", addressReadBack:false,
+  customNotes:"",
   csrName:"", csrLeadSource:null, csrCallNotes:"", csrDisposition:null,
   quotedAloud:false,
   selectedDay:null, selectedStartTime:null, bookedAt:null,
   availableSlots:{}, slotsLoading:false, slotsError:"",
-  bookingSubmitting:false, bookingError:""
+  bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:""
 };
 
+/* "custom" is a console-only pseudo-service — not part of the shared
+   pricing engine's rpServices. It's the fallback for anything that
+   doesn't fit a real service (commercial, specialty/one-off jobs). No
+   price is ever given; it captures contact info + what they need, then
+   logs it as a lead via /lead for the office to follow up with an
+   in-person visit or photo request. */
 const FLOWS = {
-  moveout:     ["caller","service","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  deep:        ["caller","service","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  maintenance: ["caller","service","bedrooms","bathrooms","frequency","addons","quote","contact","calendar","done"],
-  carpet:      ["caller","service","rooms","quote","contact","calendar","done"],
-  hourly:      ["caller","service","cleaners","hours","addons","quote","contact","calendar","done"],
-  airbnb:      ["caller","service","bedrooms","bathrooms","quote","contact","calendar","done"]
+  moveout:     ["service","caller","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
+  deep:        ["service","caller","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
+  maintenance: ["service","caller","bedrooms","bathrooms","frequency","addons","quote","contact","calendar","done"],
+  carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
+  hourly:      ["service","caller","cleaners","hours","addons","quote","contact","calendar","done"],
+  airbnb:      ["service","caller","bedrooms","bathrooms","quote","contact","calendar","done"],
+  custom:      ["service","caller","customDetails","contact","done"]
 };
-function flow(){ return rpState.service ? FLOWS[rpState.service] : ["caller","service"]; }
+function flow(){ return rpState.service ? FLOWS[rpState.service] : ["service"]; }
+function isCustomService(){ return rpState.service==="custom"; }
 function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i; }
 
 /* =========================================================================
@@ -306,39 +317,59 @@ function quoteSayLine(){
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
 }
 function addonsSayLine(){
-  const base = "\u201cCouple things people often add \u2014 any carpet that needs shampooing? Exterior windows? Garage?\u201d";
+  const base = "\u201cCouple things people often add \u2014 any carpet that needs professional cleaning? Junk or old furniture to haul off? Exterior windows washed? Garage floor?\u201d";
   const a = angle().addon;
   return a ? `${base} ${a}` : base;
 }
 function calendarSayLine(){
-  const days=Object.keys(rpState.availableSlots||{});
+  const days=Object.keys(rpState.availableSlots||{}).filter(d=>(rpState.availableSlots[d]||[]).length>0).sort();
   const total=days.reduce((n,d)=>n+((rpState.availableSlots[d]||[]).length),0);
   const noun=angle().urgencyNoun || "openings";
+  let dayPhrase;
+  if(days.length>=2) dayPhrase=`${fmtDay(days[0])} or ${fmtDay(days[1])}`;
+  else if(days.length===1) dayPhrase=fmtDay(days[0]);
+  else dayPhrase="a couple options coming up";
   if(total>0 && total<=6){
-    return `\u201cI've got [day] or [day] open \u2014 and we're honestly down to just a few ${noun} this week, so if either works for you I'd grab it now.\u201d`;
+    return `\u201cI've got ${dayPhrase} open \u2014 and we're honestly down to just a few ${noun} this week, so if either works for you I'd grab it now.\u201d`;
   }
-  return `\u201cI've got [day] or [day] open \u2014 which works better for you?\u201d`;
+  return `\u201cI've got ${dayPhrase} open \u2014 which works better for you?\u201d`;
+}
+/* Service-aware calendar WATCH \u2014 "ask when they have to be out" is real,
+   good advice for a move-out, but doesn't apply to a maintenance signup or
+   a carpet job with no deadline. */
+function calendarWatchLine(){
+  if(rpState.service==="moveout") return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
+  if(rpState.service==="deep" || rpState.service==="maintenance") return "Ask if there's an event or date they're working around \u2014 otherwise just offer your two soonest openings.";
+  return "Offer your two soonest real openings \u2014 no deadline to work around here, so don't invent one.";
+}
+function csrGreetingName(){ return rpState.csrName || "the team"; }
+function doneSayLine(){
+  if(isCustomService()) return `\u201cThanks for the details \u2014 we'll follow up shortly to schedule a look or request some photos, and get you a firm quote.\u201d`;
+  return `\u201cYou're all set for ${rpState.bookedAt||"the time we picked"}. You'll get a text confirmation in just a second \u2014 and if anything comes up before then, have them call back and ask for ${csrGreetingName()}.\u201d`;
 }
 
 const SCRIPT = {
-  caller:{say:"\u201cThanks for calling Red Prairie Cleaning, this is [your name] \u2014 who am I speaking with?\u201d Then: \u201cAnd what's the best number for you, in case we get cut off?\u201d",
-    listen:"Get the name and number BEFORE anything else.",
+  /* "service" now runs FIRST \u2014 ask what they need before asking who
+     they are. Old order (identity before purpose) read as interrogative
+     in the first five seconds of the call. */
+  service:{say:()=>`\u201cThanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} \u2014 what can we help you with today?\u201d`,
+    listen:"Let them describe it in their own words first. Callers move for all kinds of reasons \u2014 military transfer, new job, new place \u2014 don't assume they know military terms and don't assume they don't.",
+    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number."},
+  caller:{say:"\u201cHappy to help with that \u2014 let me just grab your name and a good number for you in case we get cut off.\u201d",
+    listen:"Get the name and number BEFORE anything else past this point.",
     watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
-  service:{say:"\u201cAre you looking for a move-out clean, or something else?\u201d",
-    listen:"Callers move for all kinds of reasons \u2014 military transfer, new job, new place. Landlord, deposit, inspection, or \u201cmoving out\u201d all mean move-out; don't assume they know military terms and don't assume they don't.",
-    watch:"If they say \u201cjust a regular cleaning,\u201d ask: one-time, or on a schedule? Different services, different prices, different pitch \u2014 see the script change once you pick one."},
   sqft:{say:"\u201cRoughly how big is the home? A ballpark is fine.\u201d",
-    listen:"Typical Lawton 3-bed is 1,400\u20131,800. A 4-bed starter home is usually 1,600\u20132,000.",
-    watch:"People guess low. If it sounds small for the bedroom count, ask if that includes the garage \u2014 it shouldn't."},
+    listen:"Lawton-area rough sizes by bedroom count \u2014 1-bed: 600\u2013900 \u00b7 2-bed: 900\u20131,300 \u00b7 3-bed: 1,400\u20131,800 \u00b7 4-bed: 1,800\u20132,200 \u00b7 5-bed: 2,400+. This is just a starting estimate \u2014 if it's off, we adjust on-site, not a big deal.",
+    watch:"If the size sounds way off for the bedroom count, don't push back on it \u2014 just say \u2018no problem, we'll confirm when we arrive\u2019 and move on. It's not worth making them defend a guess."},
   bedrooms:{say:"\u201cHow many bedrooms?\u201d",
     listen:"Bedrooms only. An office or bonus room counts only if they'd call it a bedroom.",
     watch:"Don't count a converted garage or sunroom \u2014 put it in the notes instead."},
-  bathrooms:{say:"\u201cAnd how many full bathrooms?\u201d",
-    listen:"Full baths only.",
-    watch:"\u201cTwo and a half\u201d means two full baths \u2014 enter 2. Half-baths aren't priced separately."},
+  bathrooms:{say:"\u201cHow many bathrooms?\u201d",
+    listen:"Count full bathrooms only \u2014 if they say \u201ctwo and a half,\u201d that's 2.",
+    watch:"Half-baths aren't priced separately, so don't make a thing of it if they're not sure whether it counts."},
   condition:{say:"\u201cLast one on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
-    listen:"Let them describe it, then YOU pick the tier. Read the tier description back to confirm.",
-    watch:"Never pick Standard just to keep the price down. That's how a crew gets sent to a 6-hour job priced for 3 \u2014 it comes out of their day and the margin."},
+    listen:"Standard sounds like: \u2018pretty normal,\u2019 \u2018lived-in,\u2019 \u2018nothing crazy.\u2019 Heavy sounds like: trash, grease, pet hair, \u2018hasn't been cleaned in a while.\u2019 Extreme sounds like: \u2018honestly it's bad,\u2019 mold, strong pet odor, \u2018hasn't really been touched in months.\u2019 Stuck between two? Pick the higher one \u2014 the crew finding it lighter than expected costs nothing; being sent in short costs their whole day.",
+    watch:"Don't default to Standard because you're unsure or don't want to sound judgmental about someone's house \u2014 that's the same costly mistake as underpricing on purpose, just a nicer-feeling reason for it. If they push back after you read the tier back, hold your read \u2014 describe what they told you, let the crew confirm on arrival."},
   addons:{say:addonsSayLine,
     listen:"Ask these by name. Customers almost never volunteer them.",
     watch:"Pet stains or odor is a crew-prep flag, not automatically a condition bump. Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price."},
@@ -356,14 +387,17 @@ const SCRIPT = {
     watch:"If they don't know, ask what they want done and estimate for them \u2014 don't make them guess."},
   quote:{say:quoteSayLine,
     listen:"Say the number plainly, then STOP TALKING. Let them respond first.",
-    watch:"Silence after a price is normal and it is not a no. Do not fill it by offering a discount."},
+    watch:"Pause 2\u20133 seconds after the price. If they don't jump in with a question or objection, that's your cue \u2014 move straight into \u2018Perfect, let me grab your address\u2019 on the next screen. Don't sit in dead silence waiting for them to bring up booking; you lead into it."},
   contact:{say:"\u201cPerfect \u2014 let me grab the address and get you on the schedule.\u201d",
     listen:"Read the address back out loud, digit by digit on the house number.",
     watch:"Wrong address = wasted crew trip and a lost day. Confirm it verbally before moving on."},
+  customDetails:{say:"\u201cThat's a bit outside our standard services, so let me get some details and we'll follow up with a firm quote.\u201d",
+    listen:"Get a clear description of the job \u2014 what, where, how big, anything unusual.",
+    watch:"Set the expectation now: this will likely need an in-person visit or some photos before we can give a real number. Don't guess a price out loud, even a rough one."},
   calendar:{say:calendarSayLine,
     listen:"Offer two specific days. Don't ask an open \u201cwhat day works?\u201d",
-    watch:"Move-outs are deadline-driven. Ask when they have to be out, and work backward."},
-  done:{say:"\u201cYou're all set for [day] at [time]. You'll get a text confirmation in just a second \u2014 and if anything comes up before then, have them call back and ask for [your name].\u201d",
+    watch:calendarWatchLine},
+  done:{say:doneSayLine,
     listen:"Confirm they got the text before hanging up.",
     watch:"Don't hang up without repeating the date and time one more time."}
 };
@@ -484,19 +518,20 @@ function chk(field,label){
 }
 
 const TITLES = {
-  caller:["Who's calling?","Name and number first \u2014 before anything else."],
-  service:["What do they need?",""],
+  service:["What can we help you with?",""],
+  caller:["Who's calling?","Name and number \u2014 you'll need it either way."],
   sqft:["About how big is the home?",""],
   bedrooms:["How many bedrooms?",""],
-  bathrooms:["How many full bathrooms?",""],
+  bathrooms:["How many bathrooms?",""],
   condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
   frequency:["One-time or recurring?",""],
   rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
   hours:["How many hours?","4-hour minimum."],
-  addons:["Anything to add on?","Ask carpet, windows, and garage by name."],
+  addons:["Anything to add on?","Ask carpet, junk, windows, and garage by name."],
   quote:["Give the quote","Say it once, plainly, then stop talking."],
   contact:["Service address","Read it back out loud before continuing."],
+  customDetails:["What do they need?","Get enough detail for the office to follow up."],
   calendar:["Pick a date and time","Offer two specific options."],
   done:["All set",""]
 };
@@ -509,13 +544,24 @@ function screenHtml(){
       <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" oninput="set('fullName',this.value)"></div>
     <div class="f"><label for="ph">Best callback number *</label>
       <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" oninput="set('phone',this.value)"></div>
-    <div class="f"><label for="src">How did they hear about us? (if it comes up)</label>
+    <div class="f"><label for="src">How did they hear about us? (Optional)</label>
       <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014</option>
       ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
         .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
 
-  if(s==="service") return `<div class="opts">${Object.entries(rpServices)
-    .map(([k,v])=>opt(v.name,`pickService('${k}')`,rpState.service===k)).join("")}</div>`;
+  if(s==="service"){
+    const items = Object.entries(rpServices).map(([k,v])=>
+      opt(v.name, `pickService('${k}')`, rpState.service===k,
+        k==="hourly" ? "General help \u2014 covers anything that doesn't fit the options above." : null)
+    ).join("");
+    const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
+      "Commercial, specialty, or one-of-a-kind \u2014 we'll follow up with a real quote.");
+    return `<div class="opts">${items}${customBtn}</div>`;
+  }
+
+  if(s==="customDetails") return `
+    <div class="f"><label for="cd">What do they need?</label>
+      <textarea id="cd" placeholder="Describe the job \u2014 commercial space, specialty request, rough size, anything unusual\u2026" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
 
   if(s==="sqft") return `<div class="opts two">${rpSqftTiers
     .map(t=>opt(t.label,`pick('sqft','${t.key}')`,rpState.sqft===t.key)).join("")}</div>`;
@@ -592,9 +638,11 @@ function screenHtml(){
 
   if(s==="calendar") return calendarHtml();
 
-  if(s==="done") return `<div class="guard info" style="margin-top:0"><b>Booked</b>
-      ${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.</div>
-    <p class="sub" style="margin-top:12px">Repeat the date and time once more before you hang up.</p>
+  if(s==="done") return `<div class="guard info" style="margin-top:0"><b>${isCustomService()?"Request Logged":"Booked"}</b>
+      ${isCustomService()
+        ? "No appointment yet \u2014 the office will follow up to schedule a walkthrough or request photos, then confirm a quote."
+        : `${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.`}</div>
+    <p class="sub" style="margin-top:12px">${isCustomService()?"Let them know someone will reach out soon \u2014 no firm timeline promises.":"Repeat the date and time once more before you hang up."}</p>
     <div class="f" style="margin-top:14px"><label for="csrDone">Who took this call?</label>
       <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="setCsrIdentity(this.value)">
       <p class="sub" style="margin:5px 0 0">Saved on this device \u2014 you won't need to re-enter it next call.</p></div>
@@ -619,10 +667,11 @@ function render(){
       <h2>${t[0]}</h2>${t[1]?`<p class="sub">${t[1]}</p>`:""}
       ${screenHtml()}
       ${guardrails().map(g=>`<div class="guard ${g.level}"><b>${g.title}</b>${g.body}</div>`).join("")}
+      ${rpState.customLeadError?`<div class="guard stop"><b>Couldn't save</b>${esc(rpState.customLeadError)}</div>`:""}
       ${rpState.step==="done"?"":`<div class="nav">
         ${idx>0?`<button class="btn" onclick="back()">Back</button>`:""}
-        <button class="btn pri" onclick="next()" ${rpState.bookingSubmitting?"disabled":""}>
-          ${rpState.step==="calendar"?"Confirm booking":"Next"}</button></div>`}
+        <button class="btn pri" onclick="next()" ${rpState.bookingSubmitting||rpState.customLeadSaving?"disabled":""}>
+          ${rpState.step==="calendar"?"Confirm booking":(rpState.step==="contact"&&isCustomService())?(rpState.customLeadSaving?"Saving\u2026":"Submit request"):"Next"}</button></div>`}
     </div>
     ${!stepValid()?`<p class="sub" style="text-align:center;margin-top:8px">Not fully filled out \u2014 that's fine, keep going. You can always come back to it.</p>`:""}`;
   renderRail(); save();
@@ -631,8 +680,8 @@ function fmtPhone(v){ const d=normalizePhone(v);
   return d.length===10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:v; }
 
 function renderRail(){
-  const custom=rpIsCustomQuoteOnly(), rows=[];
-  if(rpState.service) rows.push(["Service",(rpServices[rpState.service]||{}).name]);
+  const custom=rpIsCustomQuoteOnly()||isCustomService(), rows=[];
+  if(rpState.service) rows.push(["Service",isCustomService()?"Custom Quote / Something Else":(rpServices[rpState.service]||{}).name]);
   if(rpSqftTier()) rows.push(["Size",rpSqftTier().label]);
   if(rpState.bedrooms) rows.push(["Bedrooms",rpState.bedrooms]);
   if(rpState.bathrooms) rows.push(["Bathrooms",rpState.bathrooms]);
@@ -657,11 +706,14 @@ function pick(f,v){ rpState[f]=v; render(); }
 function toggle(f){ rpState[f]=!rpState[f];
   if(f==="militaryDiscount"&&!rpState.militaryDiscount) rpState.militaryVerified=false; render(); }
 function pickService(k){ rpState.service=k;
-  ["sqft","bedrooms","bathrooms","condition","frequency"].forEach(f=>rpState[f]=null); render(); }
+  rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
+  rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
+  render(); }
 function next(){
-  if(rpState.bookingSubmitting) return;
+  if(rpState.bookingSubmitting || rpState.customLeadSaving) return;
   const f=flow(), i=stepIdx();
   if(rpState.step==="calendar"){ submitBooking(); return; }
+  if(rpState.step==="contact" && isCustomService()){ submitCustomLead(); return; }
   if(i<f.length-1){
     rpState.step=f[i+1];
     window.scrollTo({top:0,behavior:"smooth"});
@@ -733,13 +785,27 @@ function calendarHtml(){
     <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div>`;
   const days=Object.keys(rpState.availableSlots||{}).sort();
   if(!days.length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
-  const sel=rpState.selectedDay||days[0];
+  const daysWithSlots=days.filter(d=>(rpState.availableSlots[d]||[]).length>0);
+  const sel = (rpState.selectedDay && (rpState.availableSlots[rpState.selectedDay]||[]).length>0)
+    ? rpState.selectedDay
+    : (daysWithSlots[0] || days[0]);
   const slots=rpState.availableSlots[sel]||[];
-  return `<div class="days">${days.slice(0,14).map(d=>opt(fmtDay(d),`pick('selectedDay','${d}')`,sel===d)).join("")}</div>
+  return `<div class="days">${days.slice(0,14).map(d=>dayBtn(d,sel===d)).join("")}</div>
     <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
       :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>
     ${rpState.bookingError?`<div class="guard stop" style="margin-top:10px"><b>Booking failed</b>${esc(rpState.bookingError)}</div>`:""}
     ${rpState.bookingSubmitting?`<p class="sub" style="margin-top:10px">Booking\u2026</p>`:""}`;
+}
+/* A fully-booked day renders visibly dead — disabled, no checkmark ever
+   possible — instead of looking identical to an open day until tapped.
+   That's what was letting a "Nothing open" day show a false selected
+   checkmark: the button gave zero signal beforehand. */
+function dayBtn(d,selected){
+  const count=(rpState.availableSlots[d]||[]).length;
+  if(count===0){
+    return `<button type="button" class="opt" disabled><span>${fmtDay(d)}<small>Full</small></span></button>`;
+  }
+  return opt(fmtDay(d),`pick('selectedDay','${d}')`,selected,`${count} open`);
 }
 function fmtDay(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"}); }
 function fmtTime(t){ return new Date(t).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }
@@ -852,6 +918,38 @@ async function submitBooking(){
   }catch(e){
     rpState.bookingSubmitting=false;
     rpState.bookingError=(e.message||"Unknown error")+" \u2014 don't hang up. Take the details down and book it in GHL manually.";
+    render();
+  }
+}
+
+/* ---------- Custom Quote fallback: no booking, just a logged lead ---------- */
+async function submitCustomLead(){
+  if(rpState.customLeadSaving) return;
+  rpState.customLeadSaving=true; rpState.customLeadError=""; render();
+  try{
+    const r=await fetch(`${RP_BOOKING_API}/lead`,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        source:"RPC Call Console", booking_channel:"phone_csr", lead_status:"custom_quote_requested",
+        call_outcome:"Custom quote requested", csr_name:rpState.csrName,
+        csr_lead_source:rpState.csrLeadSource||"N/A", csr_call_notes:rpState.csrCallNotes||"",
+        full_name:rpState.fullName, phone:normalizePhone(rpState.phone), email:rpState.email,
+        service:"Custom Quote / Something Else",
+        quoted_price:"No quote given \u2014 requires in-person visit or photos",
+        details:[
+          `CUSTOM QUOTE REQUEST`,
+          `What they need: ${rpState.customNotes||"(not captured)"}`,
+          `Address: ${rpState.address1}, ${rpState.city}, ${rpState.state} ${rpState.postalCode}`,
+          rpState.specialInstructions?`Notes: ${rpState.specialInstructions}`:""
+        ].filter(Boolean).join("\n"),
+        submitted_at:new Date().toISOString()
+      })
+    });
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    rpState.customLeadSaving=false; rpState.step="done"; render();
+  }catch(e){
+    rpState.customLeadSaving=false;
+    rpState.customLeadError=(e.message||"Unknown error")+" \u2014 don't hang up. Take the details down and pass them to the office manually.";
     render();
   }
 }
