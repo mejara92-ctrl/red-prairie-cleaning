@@ -1,38 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) — GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8D3WCS17S"></script>
+<!-- Google Ads/GA4 tracking intentionally OFF on this internal tool.
+     /call bookings aren't ad-driven — firing the same conversion pixels
+     here as on /book would inflate Google Ads conversion counts with
+     phone bookings, corrupting the data Mike uses for bid strategy
+     (Maximize Clicks -> conversion-based bidding decision). If you want
+     separate internal analytics on /call usage later, wire up a
+     different GA4 property here, not the same AW-17734105967 account. -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-Y8D3WCS17S');
-  /* Google Ads */
-  gtag('config', 'AW-17734105967');
-  /* Google Ads website call conversion: Call (580) 215-0915 */
-  gtag('config', 'AW-17734105967/sH0JCMCJ1cYcEO_2o4hC', {
-    'phone_conversion_number': '(580) 215-0915'
-  });
+  function gtag(){}
   function gtag_report_conversion(url) {
-    var callback = function () {
-      if (typeof(url) != 'undefined') { window.location = url; }
-    };
-    gtag('event', 'conversion', {
-        'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
-        'value': 1.0,
-        'currency': 'USD',
-        'event_callback': callback
-    });
+    if (typeof(url) != 'undefined') { window.location = url; }
     return false;
   }
 </script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="robots" content="noindex,follow"/>
 <meta name="theme-color" content="#f7f1e7" id="rpThemeColor"/>
-<title>Book Your Cleaning — Red Prairie Cleaning</title>
-<meta name="description" content="Get an instant price and book your professional cleaning in about a minute. Serving Lawton, Fort Sill &amp; Southwest Oklahoma."/>
+<title>Call Booking Tool — Red Prairie Cleaning (Internal)</title>
+<meta name="description" content="Internal CSR phone-booking tool. Not for customer use."/>
+<meta name="robots" content="noindex, nofollow"/>
 <link rel="icon" type="image/png" href="/favicon.png"/>
 <link rel="preload" as="image" href="/images/hero/front-photo-fullbleed-648.webp" fetchpriority="high"/>
 
@@ -51,16 +39,12 @@
   window.__rpScheduleDeferred = schedule;
 })();
 </script>
-<!-- Microsoft Clarity (deferred) -->
-<script type="text/javascript">
-window.__rpScheduleDeferred(function(){
-(function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "xb86ac4u38");
-});
-</script>
+<!-- Microsoft Clarity intentionally NOT loaded on this internal tool.
+     Clarity records session replays including form input. On /call the
+     CSR types customer names, addresses, phone numbers and emails, so
+     replay capture here would be storing customer PII in a third-party
+     analytics tool for no product benefit. Session analytics belong on
+     /book (real user behavior), not on an internal data-entry screen. -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -198,6 +182,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* font-weight, color, border, background match later rule at line ~1098 */
 }
 .rp-head-text:active { background: var(--surface); transform: scale(.96); }
+/* CSR header: three actions instead of two — keep the brand block compact
+   so nothing overlaps on a 360px phone. */
+.rp-csr-wordmark strong { font-size: 14px; letter-spacing: .01em; }
+.rp-csr-wordmark small { font-size: 9.5px; letter-spacing: .07em; opacity: .7; }
+.rp-head .rp-wordmark { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+@media (max-width: 460px) { .rp-csr-wordmark { display: none; } }
+.rp-head-actions { flex: 0 0 auto; gap: 5px; }
+.rp-head-actions .rp-head-faq, .rp-head-actions .rp-head-text {
+  padding: 7px 9px; font-size: 11.5px; white-space: nowrap;
+}
 
 /* Progress */
 .rp-progress {
@@ -289,6 +283,58 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   opacity: .6;
 }
 .rp-eyebrow.red { color: #f4c9b6; }
+.rp-csr-banner {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--ink); color: #fff; font-weight: 800; font-size: 15px;
+  padding: 8px 14px; border-radius: 999px; margin: 0 0 14px;
+}
+.rp-csr-banner strong { color: #f4c9b6; }
+.rp-csr-script {
+  background: rgba(255,255,255,.72); border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: 12px; padding: 12px 14px; margin: 0 0 18px; max-width: 430px;
+  text-align: left;
+}
+.rp-csr-line { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; line-height: 1.46; }
+.rp-csr-line + .rp-csr-line { margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(0,0,0,.07); }
+.rp-csr-tag {
+  flex: 0 0 62px; font-size: 9.5px; font-weight: 800; letter-spacing: .05em;
+  padding-top: 2px; text-transform: uppercase;
+}
+.rp-csr-say { font-weight: 600; color: var(--ink); }
+.rp-csr-say .rp-csr-tag { color: var(--red); }
+.rp-csr-listen { color: var(--muted); }
+.rp-csr-listen .rp-csr-tag { color: #6b7f5a; }
+.rp-csr-watch { color: var(--muted); }
+.rp-csr-watch .rp-csr-tag { color: #a8761c; }
+/* Objection cheat sheet + call outcome */
+.rp-csr-tools { display: flex; gap: 8px; margin: 0 0 14px; }
+.rp-csr-toolbtn {
+  flex: 1; background: rgba(255,255,255,.9); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 8px; font-size: 12.5px; font-weight: 700;
+  color: var(--ink); cursor: pointer;
+}
+.rp-csr-toolbtn:active { transform: scale(.97); border-color: var(--red); }
+.rp-csr-sheet {
+  position: fixed; inset: 0; background: rgba(30,20,12,.55); z-index: 90;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.rp-csr-sheet[hidden] { display: none; }
+.rp-csr-sheet-inner {
+  background: var(--cream, #f7f1e7); width: 100%; max-width: 560px; max-height: 86vh;
+  overflow-y: auto; border-radius: 18px 18px 0 0; padding: 20px 18px 28px;
+}
+.rp-csr-sheet-inner h3 { margin: 0 0 4px; font-size: 20px; }
+.rp-csr-obj { border-top: 1px solid var(--line); padding: 13px 0; }
+.rp-csr-obj strong { display: block; font-size: 14.5px; margin-bottom: 5px; color: var(--ink); }
+.rp-csr-obj span { display: block; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.rp-csr-outcome-btn {
+  display: block; width: 100%; text-align: left; background: rgba(255,255,255,.9);
+  border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px;
+  margin-bottom: 8px; font-size: 14.5px; font-weight: 700; color: var(--ink); cursor: pointer;
+}
+.rp-csr-outcome-btn:active { border-color: var(--red); transform: scale(.99); }
+.rp-csr-outcome-btn small { display: block; font-weight: 500; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
 h1, h2 {
   font-family: "DM Serif Display", Georgia, "Times New Roman", serif;
   font-weight: 400;
@@ -1063,7 +1109,7 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   backdrop-filter:blur(16px) saturate(1.1);-webkit-backdrop-filter:blur(16px) saturate(1.1)
 }
 .rp-screen:not(.step-service) .rp-center::before{
-  content:"BUILDING YOUR ESTIMATE";display:block;margin:0 0 13px;color:#8f2b31;
+  content:"CALL BOOKING";display:block;margin:0 0 13px;color:#8f2b31;
   font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase
 }
 .rp-screen .rp-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
@@ -2209,7 +2255,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
 }
 
 /* Default consultation label. */
-.rp-screen:not(.step-service) .rp-center::before { content: "BUILDING YOUR ESTIMATE"; }
+.rp-screen:not(.step-service) .rp-center::before { content: "CALL BOOKING"; }
 .rp-screen.step-lead .rp-center::before { content: "YOUR APPOINTMENT DETAILS"; }
 .rp-screen.step-addons .rp-center::before { content: "PERSONALIZE YOUR CLEAN"; }
 
@@ -2486,11 +2532,12 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
     </button>
     <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage" onclick="rpTrack('home_logo_tap',{placement:'book_header'})">
       <img src="/images/logo/favicon.png" width="34" height="34" alt="">
-      <span class="rp-wordmark-copy"><strong><b>RED</b> PRAIRIE</strong><small>CLEANING</small></span>
+      <span class="rp-wordmark-copy rp-csr-wordmark"><strong><b>RPC</b></strong><small>CALL TOOL</small></span>
     </a>
     <div class="rp-head-actions">
+      <button class="rp-head-faq" type="button" onclick="rpOpenObjections()" aria-label="Open objection handling cheat sheet">Objections</button>
       <button class="rp-head-faq" type="button" onclick="rpOpenFaq('header')" aria-label="Open frequently asked questions">FAQ</button>
-      <a class="rp-head-text" href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'header'})">Text us</a>
+      <button class="rp-head-text" type="button" onclick="rpOpenOutcome()" aria-label="Log call outcome">End Call</button>
     </div>
   </header>
   <div class="rp-progress"><div class="rp-progress-fill" id="rpProgressFill"></div></div>
@@ -2517,6 +2564,42 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
     </div>
   </section>
+
+  <!-- CSR objection cheat sheet -->
+  <div class="rp-csr-sheet" id="rpObjectionsSheet" hidden onclick="if(event.target===this)rpCloseObjections()">
+    <div class="rp-csr-sheet-inner">
+      <h3>Objection handling</h3>
+      <p class="rp-sub" style="font-size:14px;margin-bottom:6px">Answer, then go straight back to booking. Don't over-explain.</p>
+      <div class="rp-csr-obj"><strong>"That's more than I expected."</strong><span>"I hear you. That price covers the whole interior — inside the oven and fridge, cabinets, baseboards, all of it — with no add-on fees when we show up. Most of our move-out customers are trying to protect a full deposit, and this is what it takes to pass inspection."</span></div>
+      <div class="rp-csr-obj"><strong>"Another company quoted me less."</strong><span>"They may be quoting a lighter scope. Ask them if inside the oven, inside the fridge, and inside cabinets are included — a lot of quotes leave those out and add them on later. Ours is the full price up front."</span></div>
+      <div class="rp-csr-obj"><strong>"Can you do better on price?"</strong><span>Don't discount the base. Offer the military/first responder discount if they qualify, or suggest dropping an add-on. "I can't move the base price, but if you handle the carpet yourself I can take that off."</span></div>
+      <div class="rp-csr-obj"><strong>"I need to talk to my spouse / think about it."</strong><span>"Totally fair. Dates around PCS season fill up fast — want me to hold a slot? Nothing's charged today and you can cancel free."</span></div>
+      <div class="rp-csr-obj"><strong>"Do you guarantee I get my deposit back?"</strong><span>Never promise this — the landlord decides. "I can't speak for your landlord, but if they flag something in our scope, we come back and fix it."</span></div>
+      <div class="rp-csr-obj"><strong>"Can you come today / tomorrow?"</strong><span>Check the calendar honestly. If nothing's open, offer the soonest real slot rather than promising a maybe.</span></div>
+      <div class="rp-csr-obj"><strong>"Do I need to be there?"</strong><span>"Nope. Most move-outs are empty — just get us a key, lockbox code, or the property manager's contact."</span></div>
+      <button class="rp-primary" type="button" onclick="rpCloseObjections()" style="margin-top:16px">Back to Call</button>
+    </div>
+  </div>
+
+  <!-- CSR call outcome logging (for calls that don't reach a booking) -->
+  <div class="rp-csr-sheet" id="rpOutcomeSheet" hidden onclick="if(event.target===this)rpCloseOutcome()">
+    <div class="rp-csr-sheet-inner">
+      <h3>Log call outcome</h3>
+      <p class="rp-sub" style="font-size:14px;margin-bottom:14px">Use this when the call ends without a booking, so the lead still gets captured and followed up.</p>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Price objection')">Price objection<small>Quoted, but the price was the blocker</small></button>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Thinking it over')">Thinking it over<small>Interested, needs to decide or check with someone</small></button>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Date not available')">Date not available<small>Wanted a date we couldn't cover</small></button>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Out of service area')">Out of service area<small>Outside Lawton / Fort Sill / Elgin / Cache range</small></button>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Wrong number / not a lead')">Wrong number / not a lead<small>No follow-up needed</small></button>
+      <button class="rp-csr-outcome-btn" onclick="rpLogOutcome('Call dropped')">Call dropped<small>Disconnected before finishing</small></button>
+      <div class="rp-lead-field" style="margin-top:6px">
+        <label for="rpOutcomeNotes">Notes for follow-up</label>
+        <textarea id="rpOutcomeNotes" placeholder="What did they say? What would change their mind?" oninput="rpCaptureCsrField('csrCallNotes',this.value)"></textarea>
+      </div>
+      <div id="rpOutcomeStatus" class="rp-error"></div>
+      <button class="rp-primary" type="button" onclick="rpCloseOutcome()" style="margin-top:8px">Back to Call</button>
+    </div>
+  </div>
 </div>
 
 <script src="../js/rp-pricing-engine.js"></script>
@@ -2575,7 +2658,11 @@ const rpState = {
   bookingSubmitting: false,
   bookingError: "",
   estimateSent: false,
-  preBookingWebhookSent: false
+  preBookingWebhookSent: false,
+  /* CSR-only fields — not present in /book's rpState */
+  csrLeadSource: null,
+  csrCallNotes: "",
+  csrDisposition: null
 };
 
 /* =========================================================================
@@ -2713,6 +2800,94 @@ function rpStepNumber() {
 function rpStepLabel() {
   return `Step ${rpStepNumber()} of ${rpTotalSteps()}`;
 }
+
+/* =========================================================================
+   CSR-ONLY HELPERS — not present in /book. This is the internal call
+   tool: unlike the customer funnel, the price is meant to be visible the
+   whole way through so the CSR can say the number out loud as it builds,
+   and each question gets a one-line prompt for what to say on the call.
+   ========================================================================= */
+const RP_CSR_HIDE_PRICE_STEPS = ["service", "included", "estimate", "lead", "calendar"];
+function rpCsrPriceBanner() {
+  if (RP_CSR_HIDE_PRICE_STEPS.includes(rpState.step) || !rpState.service) return "";
+  const label = rpIsCustomQuoteOnly() ? "Custom Quote" : `$${rpFinalPrice().toFixed(2)}`;
+  return `<div class="rp-csr-banner">Running price: <strong>${label}</strong></div>`;
+}
+/* Guided call script. Each step can define:
+     say    — suggested words, spoken naturally (not read verbatim)
+     listen — what to actually capture from the answer
+     watch  — the common trap/objection at this step and how to handle it
+   Keys are step names; `${service}:${step}` overrides the generic entry
+   when a service needs different phrasing. */
+const rpCsrScript = {
+  service: {
+    say: "\u201cThanks for calling Red Prairie Cleaning, this is [name] \u2014 are you looking for a move-out clean, or something else?\u201d",
+    listen: "Most Fort Sill callers are PCS move-outs. If they mention a landlord, deposit, or inspection \u2014 that's a move-out.",
+    watch: "If they say \u201cjust a regular cleaning,\u201d clarify: one-time deep clean, or recurring? Those are different services and different prices."
+  },
+  included: {
+    say: "\u201cLet me tell you what's included so you know exactly what you're getting \u2014 then I'll get you a price.\u201d",
+    listen: "Read 2\u20133 items, not all seven. Lead with the ones people care about: inside the oven and fridge, cabinets, bathrooms.",
+    watch: "Value before price. If they push for a number first, give it \u2014 but come back to what's included after."
+  },
+  sqft: {
+    say: "\u201cAbout how big is the home? A ballpark is fine \u2014 I can work from bedrooms if you're not sure.\u201d",
+    listen: "Most Lawton-area 3-beds are 1,400\u20131,800. A 4-bed starter home is usually 1,600\u20132,000.",
+    watch: "People guess low. If the number sounds small for the bedroom count, ask if that includes the garage \u2014 it shouldn't."
+  },
+  bedrooms: {
+    say: "\u201cAnd how many bedrooms?\u201d",
+    listen: "Bedrooms only. An office, den, or bonus room counts only if they'd call it a bedroom.",
+    watch: "Don't count a finished garage or sunroom \u2014 note those in call notes instead."
+  },
+  bathrooms: {
+    say: "\u201cHow many full bathrooms?\u201d",
+    listen: "Full baths only. Half-baths aren't priced separately \u2014 just note them.",
+    watch: "\u201cTwo and a half\u201d means two full baths. Enter 2."
+  },
+  condition: {
+    say: "\u201cLast question on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
+    listen: "Let them describe it, then you pick the tier. Read the tier description back to confirm.",
+    watch: "Never assume Standard to keep the price down \u2014 that's how a crew shows up to a 6-hour job priced for 3. If it sounds Heavy, tag it Heavy."
+  },
+  addons: {
+    say: "\u201cA couple things people often want added \u2014 any carpet that needs shampooing? Exterior windows? Garage?\u201d",
+    listen: "Ask these three by name. Customers almost never bring them up unprompted.",
+    watch: "If they mention pet stains or odor, that's the pet-treatment add-on \u2014 not a condition upgrade."
+  },
+  frequency: {
+    say: "\u201cWould you want this one-time, or set up on a regular schedule?\u201d",
+    listen: "Recurring is worth more long-term \u2014 but don't push it if they hesitate.",
+    watch: "If unsure, book One-Time. They can switch later; a lost booking can't."
+  },
+  estimate: {
+    say: "\u201cSo for a [beds]-bedroom, [baths]-bath at [size], your total comes to [price]. That's the full price \u2014 no add-on fees at the door.\u201d",
+    listen: "Say the number plainly and then stop talking. Let them respond first.",
+    watch: "Silence after a price is normal. Don't fill it by discounting."
+  },
+  lead: {
+    say: "\u201cLet me grab your info and get you on the schedule.\u201d",
+    listen: "Repeat the address back out loud, digit by digit on the house number.",
+    watch: "Wrong address is the #1 cause of a wasted crew trip. Confirm it verbally, always."
+  },
+  calendar: {
+    say: "\u201cI've got [day] or [day] open \u2014 which works better?\u201d",
+    listen: "Offer two specific options rather than asking what day they want.",
+    watch: "Move-outs are deadline-driven. Ask when they have to be out by, and work backward."
+  }
+};
+function rpCsrStepScript() {
+  return rpCsrScript[`${rpState.service}:${rpState.step}`] || rpCsrScript[rpState.step] || null;
+}
+function rpCsrHintBox() {
+  const s = rpCsrStepScript();
+  if (!s) return "";
+  return `<div class="rp-csr-script">
+    ${s.say ? `<div class="rp-csr-line rp-csr-say"><span class="rp-csr-tag">SAY</span><span>${s.say}</span></div>` : ""}
+    ${s.listen ? `<div class="rp-csr-line rp-csr-listen"><span class="rp-csr-tag">LISTEN FOR</span><span>${s.listen}</span></div>` : ""}
+    ${s.watch ? `<div class="rp-csr-line rp-csr-watch"><span class="rp-csr-tag">WATCH OUT</span><span>${s.watch}</span></div>` : ""}
+  </div>`;
+}
 function rpUpdateProgress() {
   const fill = document.getElementById("rpProgressFill");
   const backBtn = document.getElementById("rpBackBtn");
@@ -2766,7 +2941,8 @@ const RP_PERSISTED_FIELDS = [
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
   "fullName", "phone", "email", "address1", "city",
-  "state", "postalCode", "specialInstructions"
+  "state", "postalCode", "specialInstructions",
+  "csrLeadSource", "csrCallNotes", "csrDisposition"
 ];
 function rpSavePersistedState() {
   try {
@@ -2856,7 +3032,7 @@ function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, s
 }
 
 function rpScreenHtml() {
-  const eyebrow = `<p class="rp-eyebrow">${rpStepLabel()}</p>`;
+  const eyebrow = `<p class="rp-eyebrow">${rpStepLabel()}</p>${rpCsrPriceBanner()}${rpCsrHintBox()}`;
 
   if (rpState.step === "service") {
     const introActive = !rpServiceIntroRevealed;
@@ -3311,6 +3487,71 @@ function rpEscapeAttr(value) {
 function rpCaptureLeadField(field, value) {
   rpState[field] = value;
 }
+function rpCaptureCsrField(field, value) {
+  rpState[field] = value;
+  rpSavePersistedState();
+}
+
+/* =========================================================================
+   CSR SHEETS — objection cheat sheet + call outcome logging
+   ========================================================================= */
+function rpToggleSheet(id, open) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.hidden = !open;
+  document.body.style.overflow = open ? "hidden" : "";
+}
+function rpOpenObjections() { rpToggleSheet("rpObjectionsSheet", true); }
+function rpCloseObjections() { rpToggleSheet("rpObjectionsSheet", false); }
+function rpOpenOutcome() { rpToggleSheet("rpOutcomeSheet", true); }
+function rpCloseOutcome() { rpToggleSheet("rpOutcomeSheet", false); }
+
+/* Logs a call that ended WITHOUT a booking so the lead isn't lost.
+   NOTE: this posts to /lead on the booking worker — that endpoint must
+   exist server-side (rpc-booking-api) for these to land in GHL. Until
+   it's added, outcomes are still captured in the CSR's own session and
+   the UI will show a save error rather than failing silently. */
+async function rpLogOutcome(outcome) {
+  rpState.csrDisposition = outcome;
+  const notesEl = document.getElementById("rpOutcomeNotes");
+  if (notesEl) rpState.csrCallNotes = notesEl.value;
+  const status = document.getElementById("rpOutcomeStatus");
+  if (status) { status.textContent = "Saving…"; status.style.color = ""; }
+  const payload = {
+    source: "Red Prairie Call Booking Tool (CSR)",
+    business: "Red Prairie Cleaning",
+    booking_channel: "phone_csr",
+    lead_status: "no_booking",
+    call_outcome: outcome,
+    csr_lead_source: rpState.csrLeadSource || "N/A",
+    csr_call_notes: rpState.csrCallNotes || "",
+    full_name: rpState.fullName || "",
+    phone: rpState.phone || "",
+    email: rpState.email || "",
+    service: rpState.service ? (rpServices[rpState.service] || {}).name || rpState.service : "Not selected",
+    quoted_price: rpState.service && !rpIsCustomQuoteOnly() ? `$${rpFinalPrice().toFixed(2)}` : "No quote given",
+    square_footage: rpSqftTier() ? rpSqftTier().label : "N/A",
+    bedrooms: rpState.bedrooms || "N/A",
+    bathrooms: rpState.bathrooms || "N/A",
+    condition: rpState.condition || "N/A",
+    submitted_at: new Date().toISOString()
+  };
+  try {
+    const res = await fetch(`${RP_BOOKING_API}/lead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (status) { status.textContent = `Logged: ${outcome}. Starting a fresh call…`; status.style.color = "#3f7d40"; }
+    setTimeout(() => { rpClearPersistedState(); window.location.reload(); }, 1200);
+  } catch (e) {
+    if (status) {
+      status.textContent = `Couldn't save to CRM (${e.message}). Copy the notes into GHL manually before starting the next call.`;
+      status.style.color = "#a12a2a";
+    }
+  }
+}
 function rpClearLeadFieldError(element) {
   if (element.classList.contains("is-invalid")) element.classList.remove("is-invalid");
 }
@@ -3365,6 +3606,21 @@ function rpLeadScreen(eyebrow) {
         </div>
       </div>
       <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
+      <div class="rp-prep-check">
+        <label class="rp-prep-check-label">Call details (internal — not sent to the customer)</label>
+        <div class="rp-lead-field"><label for="rpCsrLeadSource">How did they hear about us?</label>
+          <select id="rpCsrLeadSource" onchange="rpCaptureCsrField('csrLeadSource',this.value)">
+            <option value="" ${!rpState.csrLeadSource ? "selected" : ""}>Select one…</option>
+            <option value="Google" ${rpState.csrLeadSource === "Google" ? "selected" : ""}>Google / Search</option>
+            <option value="Referral" ${rpState.csrLeadSource === "Referral" ? "selected" : ""}>Referral</option>
+            <option value="Repeat Customer" ${rpState.csrLeadSource === "Repeat Customer" ? "selected" : ""}>Repeat Customer</option>
+            <option value="Facebook/Social" ${rpState.csrLeadSource === "Facebook/Social" ? "selected" : ""}>Facebook / Social</option>
+            <option value="Property Manager/Realtor" ${rpState.csrLeadSource === "Property Manager/Realtor" ? "selected" : ""}>Property Manager / Realtor</option>
+            <option value="Other" ${rpState.csrLeadSource === "Other" ? "selected" : ""}>Other</option>
+          </select>
+        </div>
+        <div class="rp-lead-field"><label for="rpCsrCallNotes">Call notes</label><textarea id="rpCsrCallNotes" placeholder="Anything worth flagging for the office — tone of the call, objections raised, follow-up needed…" oninput="rpCaptureCsrField('csrCallNotes',this.value)">${rpEscapeAttr(rpState.csrCallNotes)}</textarea></div>
+      </div>
     </div>
     <div id="rpFormError" class="rp-error"></div>
     <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
@@ -3784,7 +4040,10 @@ function rpGetEstimatePayload() {
     `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
   ].join(" | ");
   return {
-    source: "Red Prairie Website Instant Estimator", business: "Red Prairie Cleaning",
+    source: "Red Prairie Call Booking Tool (CSR)", business: "Red Prairie Cleaning",
+    booking_channel: "phone_csr",
+    csr_lead_source: rpState.csrLeadSource || "N/A",
+    csr_call_notes: rpState.csrCallNotes || "N/A",
     full_name: rpState.fullName, phone: rpState.phone, email: rpState.email,
     address1, street_address: address1, address: address1, city, state, postal_code: postalCode, zip: postalCode, full_address: fullAddress,
     service, service_type: service, service_key: rpState.service,
