@@ -117,8 +117,8 @@ const HOURLY_MAX_CLEANERS = 4;
    discount/credit for either service). Heavy (+20%) and Extreme (+50%)
    apply automatically to the base price — confirmed, not re-priced, at
    the arrival walkthrough. Specialty/Unsafe is still bookable online but
-   routes to a custom quote, same treatment as over-3,400 sq ft Move-Out
-   or 5+ bedroom Deep Cleaning. */
+   routes to a custom quote, same treatment as over-3,400 sq ft on either
+   Move-Out or Deep Cleaning. */
 const rpConditionOrder = ["Standard Condition", "Heavy Buildup", "Extreme Buildup", "Specialty or Unsafe Conditions"];
 const rpConditionKeys = {
   "Standard Condition": "standard",
@@ -190,11 +190,11 @@ const rpIncludes = {
   },
   deep: {
     intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
-    items: ["Kitchens & bathrooms, detailed", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
+    items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
     intro: "A complete routine clean of kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh.",
-    items: ["Kitchens & bathrooms", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
+    items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {
     intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select.",
@@ -297,7 +297,7 @@ function rpCentsToDollars(cents) { return Number((cents / 100).toFixed(2)); }
 function rpFormatMoney(cents) { return `$${(Math.abs(cents) / 100).toFixed(2)}`; }
 
 /* Per-visit / per-job subtotal BEFORE military discount and BEFORE add-ons.
-   For Deep/Factory Reset this is base price + condition adjustment.
+   For Deep Cleaning this is base price + condition adjustment.
    For Maintenance this is the frequency-discounted per-visit price.
    For Carpet this is the room-based price. Add-ons are always excluded —
    they're fixed price and never touched by condition or military discount. */

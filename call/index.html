@@ -640,18 +640,18 @@ function screenHtml(){
     const list=rpServiceAddons[rpState.service]||[];
     let h="";
     if(list.includes("carpet")) h+=`<div style="margin-bottom:9px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$50/room</span></div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.carpet.bundlePrice}/room</span></div>
       <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div></div>`;
     if(list.includes("junk")) h+=`<div class="opts" style="margin-bottom:9px">
-      ${opt("Junk haul \u2014 half load (+$100)",`pick('junkSize', rpState.junkSize==='half'?null:'half')`,rpState.junkSize==="half")}
-      ${opt("Junk haul \u2014 full load (+$200)",`pick('junkSize', rpState.junkSize==='full'?null:'full')`,rpState.junkSize==="full")}</div>`;
+      ${opt(`Junk haul \u2014 half load (+$${rpAddonCatalog.junk.half})`,`pick('junkSize', rpState.junkSize==='half'?null:'half')`,rpState.junkSize==="half")}
+      ${opt(`Junk haul \u2014 full load (+$${rpAddonCatalog.junk.full})`,`pick('junkSize', rpState.junkSize==='full'?null:'full')`,rpState.junkSize==="full")}</div>`;
     if(list.includes("windows")) h+=`<div class="opts" style="margin-bottom:9px">
-      ${opt("Exterior windows \u2014 basic (+$100)",`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
-      ${opt("Exterior windows \u2014 premium (+$200)",`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
+      ${opt(`Exterior windows \u2014 basic (+$${rpAddonCatalog.windows.basic})`,`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
+      ${opt(`Exterior windows \u2014 premium (+$${rpAddonCatalog.windows.premium})`,`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
     h+=`<div class="opts">`;
-    if(list.includes("garage")) h+=opt("Garage floor wash (+$150)",`toggle('garageWash')`,rpState.garageWash);
-    if(list.includes("fridge")) h+=opt("Refrigerator interior (+$50)",`toggle('fridgeAddon')`,rpState.fridgeAddon);
-    h+=`</div><div style="margin-top:13px">${chk("militaryDiscount","Military / first responder discount (10%, max $25)")}
+    if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
+    if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
+    h+=`</div><div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
       ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed"):""}</div>`;
     return h;
   }
@@ -817,6 +817,7 @@ function renderRail(){
   if(rpState.bedrooms) rows.push(["Bedrooms",rpState.bedrooms]);
   if(rpState.bathrooms) rows.push(["Bathrooms",rpState.bathrooms]);
   if(rpState.condition) rows.push(["Condition",rpState.condition.replace(/ Conditions?$/,"")]);
+  if(rpState.service==="maintenance" && rpState.bedrooms && rpState.sqft) rows.push(["Base (before discount)","$"+rpMaintenancePrice(rpState.bedrooms,rpState.bathrooms).toFixed(2)]);
   if(rpState.frequency) rows.push(["Frequency",rpState.frequency]);
   if(rpAddonsTotal()>0) rows.push(["Add-ons","+$"+rpAddonsTotal().toFixed(2)]);
   if(rpState.militaryDiscount&&rpMilitaryDiscountAmount()>0) rows.push(["Military","\u2212$"+rpMilitaryDiscountAmount().toFixed(2)]);

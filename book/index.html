@@ -761,6 +761,13 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   margin: 12px auto 0;
 }
 .rp-guarantee-light .rp-ic-sm { color: var(--red-dark); }
+.rp-trust-signal {
+  width: fit-content;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; color: var(--muted);
+  margin: 8px auto 0;
+}
+.rp-trust-signal strong { color: var(--ink); font-weight: 800; }
 /* ============ ESTIMATE ============ */
 .rp-quote-band {
   position: relative;
@@ -2867,7 +2874,7 @@ function rpScreenHtml() {
         <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
         <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 55+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day</span>
         </div>
@@ -3259,6 +3266,7 @@ function rpEstimateScreen(eyebrow) {
           <span>${service.name}</span>
         </div>
         <div class="rp-guarantee-light">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
+        <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
       ${["moveout","deep","maintenance"].includes(rpState.service) && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
@@ -3268,6 +3276,7 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.service === "hourly" && rpState.hourCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hourCount}</strong></div>` : ""}
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
+      ${rpState.service === "maintenance" && rpState.bedrooms && rpState.sqft ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms).toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
@@ -3754,8 +3763,8 @@ function rpGetEstimatePayload() {
   const baseServicePrice = rpServiceBasePrice();
   const militaryDiscountAmount = rpMilitaryDiscountAmount();
   /* Pricing status shown to the office: "Confirmed" for a normal instant
-     estimate, "Custom Quote" for Airbnb, 5+ bedroom Deep Cleaning, over
-     3,400 sq ft Move-Out, or Specialty/Unsafe condition on either. Heavy
+     estimate, "Custom Quote" for Airbnb, over 3,400 sq ft on Move-Out or
+     Deep Cleaning, or Specialty/Unsafe condition on either. Heavy
      and Extreme conditions are applied automatically — no manual credit
      or office-approved adjustment for either service. */
   const pricingStatus = rpIsCustomQuoteOnly() ? "Custom Quote" : "Confirmed";
