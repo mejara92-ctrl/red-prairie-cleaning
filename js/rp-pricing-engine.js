@@ -45,21 +45,65 @@ const rpSqftTiers = [
   { key: "t2", label: "1,001–1,400 sq ft",     base: 259 },
   { key: "t3", label: "1,401–1,800 sq ft",     base: 299 },
   { key: "t4", label: "1,801–2,200 sq ft",     base: 349 },
-  { key: "t5", label: "2,201–2,600 sq ft",     base: 399 },
-  { key: "t6", label: "2,601–3,000 sq ft",     base: 449 },
-  { key: "t7", label: "3,001–3,400 sq ft",     base: 499 },
+  { key: "t5", label: "2,201–2,600 sq ft",     base: 419 },
+  { key: "t6", label: "2,601–3,000 sq ft",     base: 479 },
+  { key: "t7", label: "3,001–3,400 sq ft",     base: 549 },
+  { key: "t8", label: "Over 3,400 sq ft",      base: null }
+];
+/* Deep Cleaning sq-ft tiers — same bracket structure and included
+   bed/bath convention as Move-Out (RP_MOVEOUT_* constants below), just
+   its own base prices. Replaces the old flat 1-4 bedroom table, which
+   couldn't tell a compact home from a sprawling one at the same bedroom
+   count. */
+const rpDeepSqftTiers = [
+  { key: "t1", label: "Up to 1,000 sq ft",     base: 199 },
+  { key: "t2", label: "1,001–1,400 sq ft",     base: 255 },
+  { key: "t3", label: "1,401–1,800 sq ft",     base: 259 },
+  { key: "t4", label: "1,801–2,200 sq ft",     base: 299 },
+  { key: "t5", label: "2,201–2,600 sq ft",     base: 339 },
+  { key: "t6", label: "2,601–3,000 sq ft",     base: 379 },
+  { key: "t7", label: "3,001–3,400 sq ft",     base: 419 },
+  { key: "t8", label: "Over 3,400 sq ft",      base: null }
+];
+/* Basic/Maintenance Cleaning sq-ft tiers — lighter included bed/bath
+   baseline (1 bed, 1 bath) and a smaller per-room rate than Move-Out/Deep
+   since a recurring visit is a lighter touch than a full reset. The
+   frequency discount (rpFrequencyPlan) still applies on top of this. */
+const rpMaintenanceSqftTiers = [
+  { key: "t1", label: "Up to 1,000 sq ft",     base: 139 },
+  { key: "t2", label: "1,001–1,400 sq ft",     base: 155 },
+  { key: "t3", label: "1,401–1,800 sq ft",     base: 175 },
+  { key: "t4", label: "1,801–2,200 sq ft",     base: 195 },
+  { key: "t5", label: "2,201–2,600 sq ft",     base: 219 },
+  { key: "t6", label: "2,601–3,000 sq ft",     base: 245 },
+  { key: "t7", label: "3,001–3,400 sq ft",     base: 275 },
   { key: "t8", label: "Over 3,400 sq ft",      base: null }
 ];
 const RP_MOVEOUT_INCLUDED_BEDROOMS = 2;
 const RP_MOVEOUT_INCLUDED_BATHROOMS = 1;
-const RP_MOVEOUT_BEDROOM_RATE = 45;   // $ per bedroom above the included 2
-const RP_MOVEOUT_BATHROOM_RATE = 35;  // $ per full bathroom above the included 1
-function rpSqftTier() { return rpSqftTiers.find(t => t.key === rpState.sqft) || null; }
-function rpMoveoutIsCustomSqft() { return rpState.service === "moveout" && rpState.sqft === "t8"; }
-
-/* Deep Cleaning bedroom-tier base prices. 5+ bedrooms is a custom quote
-   (no fixed tier), handled via rpIsCustomQuoteOnly(). */
-const rpDeepTierPrices = { 1: 179, 2: 249, 3: 299, 4: 399 };
+const RP_MOVEOUT_BEDROOM_RATE = 45;   // $ per bedroom above the included 2 — also used by Deep, same convention
+const RP_MOVEOUT_BATHROOM_RATE = 35;  // $ per full bathroom above the included 1 — also used by Deep
+const RP_MAINTENANCE_INCLUDED_BEDROOMS = 1;
+const RP_MAINTENANCE_INCLUDED_BATHROOMS = 1;
+const RP_MAINTENANCE_BEDROOM_RATE = 15;
+const RP_MAINTENANCE_BATHROOM_RATE = 15;
+/* Picks the right tier table for whichever service is active. Every
+   caller (in this file, /book, and /call) goes through rpSqftTier()
+   rather than referencing a tier array by name, so a page never has to
+   know which service uses which table. */
+function rpSqftTiersForService(service) {
+  if (service === "deep") return rpDeepSqftTiers;
+  if (service === "maintenance") return rpMaintenanceSqftTiers;
+  return rpSqftTiers; // moveout, and safe default
+}
+function rpSqftTier() { return rpSqftTiersForService(rpState.service).find(t => t.key === rpState.sqft) || null; }
+/* Over-3,400-sq-ft custom-quote check — covers Move-Out, Deep, and
+   Maintenance (all three are sq-ft-tiered now). Name kept as-is even
+   though it now covers more than Move-Out, to avoid touching every call
+   site across /book and /call for a rename. */
+function rpMoveoutIsCustomSqft() {
+  return ["moveout", "deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8";
+}
 
 /* Hourly Cleaning & Organizing — flat rate per cleaner per hour. No
    condition step; the customer sets scope via cleaner count + hours. */
@@ -113,9 +157,13 @@ function rpFrequencyPlan() {
 }
 
 function rpMaintenancePrice(bedrooms, bathrooms) {
-  const beds = Number(bedrooms || 1);
-  const baths = Number(bathrooms || 1);
-  return 149 + Math.max(0, beds - 1) * 25 + Math.max(0, baths - 1) * 25;
+  const tier = rpSqftTier();
+  if (!tier || tier.base === null) return 0; // no sqft selected yet, or over-3400sf custom quote
+  const beds = Number(bedrooms || RP_MAINTENANCE_INCLUDED_BEDROOMS);
+  const baths = Number(bathrooms || RP_MAINTENANCE_INCLUDED_BATHROOMS);
+  const bedAdj = Math.max(0, beds - RP_MAINTENANCE_INCLUDED_BEDROOMS) * RP_MAINTENANCE_BEDROOM_RATE;
+  const bathAdj = Math.max(0, baths - RP_MAINTENANCE_INCLUDED_BATHROOMS) * RP_MAINTENANCE_BATHROOM_RATE;
+  return tier.base + bedAdj + bathAdj;
 }
 
 const rpAddonCatalog = {
@@ -167,8 +215,8 @@ const rpIncludes = {
    "What's included" on the estimate screen. */
 const rpFlows = {
   moveout:     ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  deep:        ["included", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  maintenance: ["included", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
+  deep:        ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
+  maintenance: ["included", "sqft", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
@@ -216,19 +264,19 @@ function rpIsSpecialtyCondition() {
 }
 function rpIsCustomQuoteOnly() {
   return rpState.service === "airbnb"
-    || (rpState.service === "deep" && Number(rpState.bedrooms) >= 5)
     || rpMoveoutIsCustomSqft()
     || rpIsSpecialtyCondition();
 }
 
-/* Base price for Move-Out (sq-ft bracket + bedroom/bathroom adders) or
-   Deep Cleaning (bedroom-tier) — then the Heavy/Extreme condition
-   multiplier applied automatically to either, before add-ons and
-   military discount. No manual credits for either service; Standard is
-   always the lowest advertised price. */
+/* Base price for Move-Out or Deep Cleaning — both are sq-ft bracket +
+   bedroom/bathroom adders (same included-2-bed/1-bath convention and
+   $45/$35 rates for both), then the Heavy/Extreme condition multiplier
+   applied automatically, before add-ons and military discount. No manual
+   credits for either service; Standard is always the lowest advertised
+   price. */
 function rpServiceBasePrice() {
   const mult = rpConditionMultiplier();
-  if (rpState.service === "moveout") {
+  if (rpState.service === "moveout" || rpState.service === "deep") {
     if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition()) return 0;
     const tier = rpSqftTier();
     if (!tier || tier.base === null) return 0;
@@ -238,11 +286,6 @@ function rpServiceBasePrice() {
     const bathAdj = Math.max(0, baths - RP_MOVEOUT_INCLUDED_BATHROOMS) * RP_MOVEOUT_BATHROOM_RATE;
     const preConditionCents = rpToCents(tier.base + bedAdj + bathAdj);
     return rpCentsToDollars(Math.round(preConditionCents * (1 + mult)));
-  }
-  if (rpState.service === "deep") {
-    if (!rpState.bedrooms || Number(rpState.bedrooms) >= 5 || rpIsSpecialtyCondition()) return 0; // custom quote
-    const base = rpDeepTierPrices[Number(rpState.bedrooms)] || 0;
-    return rpCentsToDollars(Math.round(rpToCents(base) * (1 + mult)));
   }
   return 0;
 }
@@ -265,7 +308,7 @@ function rpPreDiscountSubtotalCents() {
     return rpState.carpetRooms ? rpToCents(rooms * 75) : 0;
   }
   if (rpState.service === "maintenance") {
-    if (!rpState.bedrooms) return 0;
+    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft()) return 0;
     const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
     const plan = rpFrequencyPlan();
     const discountedBase = plan ? Math.round(base * (1 - plan.discount)) : base;

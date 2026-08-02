@@ -2581,7 +2581,7 @@ const rpState = {
 /* =========================================================================
    PRICING & BOOKING-DATA ENGINE — moved to /js/rp-pricing-engine.js
    =========================================================================
-   rpServices, rpSqftTiers, rpDeepTierPrices, condition model, rpAddonCatalog,
+   rpServices, rpSqftTiers/rpDeepSqftTiers/rpMaintenanceSqftTiers, condition model, rpAddonCatalog,
    rpIncludes, rpFlows, and all pricing math (rpServiceBasePrice,
    rpCalculatePrice, etc.) now live in the shared engine file so /book and
    /call can never quote different numbers for the same job. See that file
@@ -2910,14 +2910,12 @@ function rpScreenHtml() {
       <h2>About how big is the home?</h2>
       <p class="rp-sub">Not sure of the exact number? A typical 3-bedroom home in this area runs 1,400–1,800 sq ft.</p>
       <div class="rp-choice-grid">
-        ${rpSqftTiers.map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}${t.base === null ? "<br><small>Custom Quote</small>" : ""}</button>`).join("")}
+        ${rpSqftTiersForService(rpState.service).map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}${t.base === null ? "<br><small>Custom Quote</small>" : ""}</button>`).join("")}
       </div>
     </div>` };
   }
 
   if (rpState.step === "bedrooms") {
-    const isDeep = rpState.service === "deep";
-    const isMoveout = rpState.service === "moveout";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bedrooms?</h2>
@@ -2926,7 +2924,7 @@ function rpScreenHtml() {
         ${[1,2,3,4,5].map(n => rpRowBtn({
           onclick:`rpSelectBedrooms(${n}, this)`,
           title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-          val: (isDeep && n >= 5) || (isMoveout && rpMoveoutIsCustomSqft()) ? "Custom Quote" : "",
+          val: rpMoveoutIsCustomSqft() ? "Custom Quote" : "",
           selected: rpState.bedrooms === n
         })).join("")}
       </div>
@@ -3263,7 +3261,7 @@ function rpEstimateScreen(eyebrow) {
         <div class="rp-guarantee-light">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
-      ${rpState.service === "moveout" && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
+      ${["moveout","deep","maintenance"].includes(rpState.service) && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
@@ -3271,7 +3269,6 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
       ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
-      ${rpState.service === "deep" && Number(rpState.bedrooms) >= 5 ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
       ${rpState.service === "carpet" && rpState.carpetRooms ? `<div class="rp-mini-row"><span>Rooms</span><strong>${rpState.carpetRooms}${rpState.carpetRooms >= 6 ? "+" : ""}</strong></div>` : ""}

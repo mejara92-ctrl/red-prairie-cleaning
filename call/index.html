@@ -264,8 +264,8 @@ const rpState = {
    in-person visit or photo request. */
 const FLOWS = {
   moveout:     ["service","caller","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  deep:        ["service","caller","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  maintenance: ["service","caller","bedrooms","bathrooms","frequency","addons","quote","contact","calendar","done"],
+  deep:        ["service","caller","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
+  maintenance: ["service","caller","sqft","bedrooms","bathrooms","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
   hourly:      ["service","caller","cleaners","hours","addons","quote","contact","calendar","done"],
   airbnb:      ["service","caller","bedrooms","bathrooms","quote","contact","calendar","done"],
@@ -343,7 +343,7 @@ function angle(){ return SERVICE_ANGLES[rpState.service] || {}; }
 
 function quoteSayLine(){
   const bits=[];
-  if(rpState.service==="moveout" && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
+  if(["moveout","deep","maintenance"].includes(rpState.service) && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
   if(rpState.bedrooms) bits.push(`${rpState.bedrooms} bedroom${rpState.bedrooms>1?"s":""}`);
   if(rpState.bathrooms) bits.push(`${rpState.bathrooms} bathroom${rpState.bathrooms>1?"s":""}`);
   const desc = bits.length ? `for a ${bits.join(", ")}` : "for this job";
@@ -607,7 +607,7 @@ function screenHtml(){
     <div class="f"><label for="cd">What do they need?</label>
       <textarea id="cd" placeholder="Describe the job \u2014 commercial space, specialty request, rough size, anything unusual\u2026" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
 
-  if(s==="sqft") return `<div class="opts two">${rpSqftTiers
+  if(s==="sqft") return `<div class="opts two">${rpSqftTiersForService(rpState.service)
     .map(t=>opt(t.label,`pick('sqft','${t.key}')`,rpState.sqft===t.key)).join("")}</div>`;
 
   if(s==="bedrooms") return `<div class="opts three">${[1,2,3,4,5]
