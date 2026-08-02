@@ -59,6 +59,14 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .hd-btn.danger{background:var(--red);border-color:var(--red)}
 
 .prog{height:3px;background:var(--line)}
+.jump-rail{display:flex;gap:5px;overflow-x:auto;padding:8px 12px;background:var(--panel);
+  border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.jump-rail::-webkit-scrollbar{display:none}
+.jump-chip{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.jump-chip.done{color:var(--ink);border-color:rgba(63,125,64,.4);background:rgba(63,125,64,.06)}
+.jump-chip.now{background:var(--red);border-color:var(--red);color:#fff}
+.jump-chip:active{transform:scale(.95)}
 .prog i{display:block;height:100%;background:var(--red);transition:width .25s}
 
 .wrap{max-width:1060px;margin:0 auto;padding:14px 12px 60px}
@@ -188,6 +196,7 @@ input,select,textarea{font-family:inherit;font-size:15px}
   </div>
 </header>
 <div class="prog"><i id="progFill" style="width:0%"></i></div>
+<div class="jump-rail" id="jumpRail"></div>
 
 <div class="wrap">
   <div class="cols">
@@ -442,6 +451,9 @@ function objectionPriceAnswer(){
   return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
 }
 const OBJECTIONS = [
+  {q:"\u201cHave you done this before? / Are you legit?\u201d",
+   a:"\u201cWe're a veteran-owned local company, fully insured, with over 50 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
+   n:"Real, verifiable numbers only \u2014 don't round up or guess. If the review count changes, this line needs updating too."},
   {q:"\u201cThat's more than I expected.\u201d",
    a:objectionPriceAnswer,
    n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
@@ -560,6 +572,12 @@ const TITLES = {
   customDetails:["What do they need?","Get enough detail for the office to follow up."],
   calendar:["Pick a date and time","Offer two specific options."],
   done:["All set",""]
+};
+const SHORT_LABELS = {
+  service:"Service", caller:"Contact", sqft:"Size", bedrooms:"Beds", bathrooms:"Baths",
+  condition:"Condition", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
+  hours:"Hours", addons:"Add-ons", quote:"Quote", contact:"Address",
+  customDetails:"Details", calendar:"Calendar", done:"Done"
 };
 
 function screenHtml(){
@@ -680,6 +698,26 @@ function screenHtml(){
    console runs until this is filled in — the greeting script needs a
    real name, not a placeholder or a generic fallback. Persists via
    setCsrIdentity(), so this never shows again on this device after. */
+/* The guided script is a default path, not a cage. Real calls skip
+   around — a customer front-loads their address before you've asked,
+   or wants a ballpark price before finishing the details. This lets
+   Liz tap directly to any step in the current flow instead of clicking
+   Next repeatedly through screens she already has the answer to. */
+function renderJumpRail(){
+  const f=flow(), idx=stepIdx();
+  el("jumpRail").innerHTML=f.map((s,i)=>{
+    const cls=i===idx?"now":(i<idx?"done":"");
+    return `<button type="button" class="jump-chip ${cls}" onclick="jumpToStep('${s}')">${SHORT_LABELS[s]||s}</button>`;
+  }).join("");
+}
+function jumpToStep(step){
+  if(!flow().includes(step)) return;
+  rpState.step=step;
+  window.scrollTo({top:0,behavior:"smooth"});
+  render();
+  if(step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+}
+
 function renderSetup(){
   el("progFill").style.width="0%";
   el("hdWho").textContent="Internal tool";
@@ -692,6 +730,7 @@ function renderSetup(){
       <button class="btn pri" style="width:100%" onclick="finishSetup()">Start taking calls</button>
     </div>`;
   el("rail").innerHTML="";
+  el("jumpRail").innerHTML="";
 }
 function finishSetup(){
   const v=(el("setupName").value||"").trim();
@@ -700,13 +739,54 @@ function finishSetup(){
   render();
 }
 
+/* =========================================================================
+   STAFF PASSWORD GATE
+   =========================================================================
+   Client-side only — anyone who views page source can see AUTH_PASSWORD.
+   This stops a casual visitor who finds the URL; it is NOT real security
+   and won't stop someone determined to get in. For that, use Cloudflare
+   Access in front of /call at the DNS/edge level instead. Asked once per
+   device, then remembered via localStorage.
+   ========================================================================= */
+const AUTH_KEY="rpCallConsole.authOk";
+const AUTH_PASSWORD="2657";
+function isAuthed(){ try{ return localStorage.getItem(AUTH_KEY)==="1"; }catch(e){ return false; } }
+function renderAuthGate(){
+  el("progFill").style.width="0%";
+  el("jumpRail").innerHTML="";
+  el("hdWho").textContent="Internal tool";
+  el("main").innerHTML=`
+    <div class="q">
+      <p class="stepno">Staff Only</p>
+      <h2>Enter password</h2>
+      <p class="sub">Internal tool \u2014 ask your manager if you don't have the password.</p>
+      <div class="f"><input id="authPass" type="password" inputmode="numeric" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')checkAuth()"></div>
+      <p id="authError" class="sub" style="color:var(--red);min-height:16px"></p>
+      <button class="btn pri" style="width:100%" onclick="checkAuth()">Enter</button>
+    </div>`;
+  el("rail").innerHTML="";
+}
+function checkAuth(){
+  const v=(el("authPass").value||"").trim();
+  if(v===AUTH_PASSWORD){
+    try{ localStorage.setItem(AUTH_KEY,"1"); }catch(e){}
+    render();
+  }else{
+    el("authError").textContent="Incorrect password \u2014 try again.";
+    el("authPass").value="";
+    el("authPass").focus();
+  }
+}
+
 function render(){
+  if(!isAuthed()){ renderAuthGate(); return; }
   if(!rpState.csrName){ renderSetup(); return; }
   const t=TITLES[rpState.step]||["",""], sc=resolveScript(rpState.step);
   const idx=stepIdx(), total=flow().length;
   el("progFill").style.width=`${Math.round((idx/Math.max(1,total-1))*100)}%`;
   el("hdWho").textContent = rpState.fullName
     ? `${rpState.fullName}${phoneOk(rpState.phone)?" \u00b7 "+fmtPhone(rpState.phone):""}` : "Internal tool";
+  renderJumpRail();
   el("main").innerHTML=`
     ${sc?`<div class="script">
       <div class="script-row"><span class="tag t-say">Say</span><span class="say-text">${sc.say}</span></div>
