@@ -80,6 +80,7 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .script-row+.script-row{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
 .tag{flex:0 0 52px;font-size:9px;font-weight:800;letter-spacing:.06em;padding-top:3px;text-transform:uppercase}
 .t-say{color:var(--red)}.t-listen{color:var(--green)}.t-watch{color:var(--amber)}
+.t-close{color:var(--blue)}.t-pushback{color:var(--amber)}
 .say-text{font-weight:700;font-size:15.5px}
 .script-row.muted{color:var(--muted);font-size:13.5px}
 
@@ -468,8 +469,8 @@ const OBJECTIONS = [
    a:"\u201cI can't move the base price, but if you're military or first responder that's 10% off. Or if you'd rather handle the carpet yourself, I can take that off the total.\u201d",
    n:"Remove scope to lower price. Never discount the base."},
   {q:"\u201cI need to think about it / talk to my spouse.\u201d",
-   a:"\u201cTotally fair. Dates fill up fast during our busy moving season \u2014 want me to hold one? Nothing's charged today and you can cancel free.\u201d",
-   n:"Offer the hold once. If they still say no, log the outcome."},
+   a:"\u201cTotally fair \u2014 we can at least get you on the calendar. No deposit required, and you can let us know if anything changes.\u201d",
+   n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
   {q:"\u201cWill I get my deposit back?\u201d",
    a:"\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it.\u201d",
    n:"NEVER promise a deposit back. The landlord decides, not us."},
@@ -483,6 +484,55 @@ const OBJECTIONS = [
    a:"\u201cIf we miss something in the scope you booked, call us and we come back and fix it.\u201d",
    n:"Don't invent a refund policy. Re-clean, not money back."}
 ];
+
+/* Closing lines for the quote screen — proactive, not reactive. Used
+   right after the price-and-pause, whether or not an objection came up.
+   Objection handling only fires when the customer pushes back; a close
+   has to happen even on a clean call with zero pushback, or interest
+   never turns into a booking. */
+const QUOTE_CLOSERS = [
+  "\u201cGreat \u2014 let's get you on the schedule. What day works best?\u201d",
+  "\u201cWant me to go ahead and get that booked for you?\u201d",
+  "\u201cWe can at least get you on the calendar \u2014 no deposit required, and you can always let us know if anything changes.\u201d"
+];
+/* The 4 objections most likely to fire in the first few seconds right
+   after a price is said. Referenced by exact question text (not array
+   index) so this stays correct even if OBJECTIONS gets reordered or
+   added to later. */
+const QUOTE_SCREEN_OBJECTION_KEYS = [
+  "\u201cThat's more than I expected.\u201d",
+  "\u201cAnother company quoted me less.\u201d",
+  "\u201cCan you do better on price?\u201d",
+  "\u201cI need to think about it / talk to my spouse.\u201d"
+];
+function quoteCloseHelpersHtml(){
+  const objs = OBJECTIONS.filter(o => QUOTE_SCREEN_OBJECTION_KEYS.includes(o.q));
+  const urgency = quoteUrgencyLine();
+  return `<div class="script" style="margin-bottom:13px">
+    ${urgency?`<div class="script-row"><span class="tag" style="color:var(--red)">Urgency</span><span class="say-text" style="font-size:14.5px">${urgency}</span></div>`:""}
+    <div class="script-row"><span class="tag t-close">Close</span><span class="say-text" style="font-size:14.5px">
+      ${QUOTE_CLOSERS.map(c=>`<div style="margin-bottom:5px">${c}</div>`).join("")}
+    </span></div>
+    <div class="script-row muted"><span class="tag t-pushback">Pushback</span><span>
+      ${objs.map(o=>`<div style="margin-bottom:8px"><b style="color:var(--ink);font-weight:700">${o.q}</b><br>${typeof o.a==="function"?o.a():o.a}</div>`).join("")}
+      <div style="font-size:12px">Anything else \u2014 tap Objections above.</div>
+    </span></div>
+  </div>`;
+}
+/* Only fires when the loaded calendar actually shows 6 or fewer open
+   slots across the next two months (same threshold as calendarSayLine).
+   Silent otherwise — no fallback "we're pretty busy" guess if the real
+   data doesn't support it. If slots haven't finished loading yet
+   (pickService's background fetch is still in flight), also silent
+   rather than showing a stale or premature number. */
+function quoteUrgencyLine(){
+  if(rpState.slotsLoading || !Object.keys(rpState.availableSlots||{}).length) return "";
+  const days=availableDateKeys();
+  const total=days.reduce((n,d)=>n+slotsForDate(d).length,0);
+  if(total<=0 || total>6) return "";
+  const noun=angle().urgencyNoun || "openings";
+  return `\u201cHonestly, we're down to just ${total} ${noun} across the next couple weeks \u2014 if you want one of those, I'd grab it now while I've got you.\u201d`;
+}
 
 const OUTCOMES = [
   ["Price objection","Quoted, but price was the blocker"],
@@ -667,7 +717,9 @@ function screenHtml(){
         <strong>${custom?"Custom Quote":"$"+rpFinalPrice().toFixed(2)}</strong>
         ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
           :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}</span>`}
-      </div>${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
+      </div>
+      ${custom?"":quoteCloseHelpersHtml()}
+      ${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
   }
 
   if(s==="contact") return `
@@ -848,7 +900,12 @@ function toggle(f){ rpState[f]=!rpState[f];
 function pickService(k){ rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
-  render(); }
+  render();
+  // Fetch availability in the background now, not when she reaches the
+  // calendar step — by the time she's at the price, real slot counts are
+  // already loaded and ready for an honest urgency line, not a guess.
+  if(k!=="custom" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+}
 function next(){
   if(rpState.bookingSubmitting || rpState.customLeadSaving) return;
   const f=flow(), i=stepIdx();
