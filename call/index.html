@@ -134,6 +134,10 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .rail-list div:last-child{border-bottom:none}
 .rail-list span{color:var(--muted)}
 .rail-list b{font-weight:700;text-align:right}
+.rail-included{padding:11px 15px;border-top:1px solid var(--line)}
+.rail-included-title{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.rail-included ul{margin:0;padding:0 0 0 16px;list-style:disc}
+.rail-included li{font-size:12.5px;line-height:1.5;color:var(--ink);margin-bottom:2px}
 
 .guard{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.45;border:1.5px solid}
 .guard b{display:block;margin-bottom:2px;font-size:12px;letter-spacing:.03em;text-transform:uppercase}
@@ -827,6 +831,10 @@ function renderRail(){
       <strong>${custom?"Custom":(rpFinalPrice()>0?"$"+rpFinalPrice().toFixed(2):"\u2014")}</strong>
       ${custom?`<span class="note">Don't quote a number.</span>`:""}</div>
     ${rows.length?`<div class="rail-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div>`:""}
+    ${rpState.service && rpIncludes[rpState.service] ? `<div class="rail-included">
+      <div class="rail-included-title">What's Included \u2014 read this if asked</div>
+      <ul>${rpIncludes[rpState.service].items.map(i=>`<li>${i}</li>`).join("")}</ul>
+    </div>` : ""}
   </div>`;
 }
 
