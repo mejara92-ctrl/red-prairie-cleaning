@@ -455,6 +455,24 @@ function objectionPriceAnswer(){
   const obj = angle().objection || "";
   return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
 }
+/* Only names an add-on that's actually on THIS order — checked against
+   the same state fields the addons screen writes to. Returns null if
+   nothing was added, so there's nothing false to offer to remove. */
+function removableAddonLabel(){
+  if(Number(rpState.addonCarpetRooms)>0) return "the carpet cleaning";
+  if(rpState.junkSize) return "the junk haul";
+  if(rpState.windowsTier) return "the exterior windows";
+  if(rpState.garageWash) return "the garage floor wash";
+  if(rpState.fridgeAddon) return "the refrigerator interior";
+  if(Number(rpState.laundryLoads)>0) return "the laundry service";
+  if(rpState.yardTier) return "the yard refresh";
+  return null;
+}
+function doBetterPriceAnswer(){
+  const removable = removableAddonLabel();
+  const removeLine = removable ? ` Or if you'd rather handle ${removable} yourself, I can take that off the total.` : "";
+  return `\u201cI can't move the base price, but if you're military or first responder that's 10% off.${removeLine}\u201d`;
+}
 const OBJECTIONS = [
   {q:"\u201cHave you done this before? / Are you legit?\u201d",
    a:"\u201cWe're a veteran-owned local company, fully insured, with over 50 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
@@ -466,8 +484,8 @@ const OBJECTIONS = [
    a:"\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d",
    n:"Never bad-mouth a competitor by name."},
   {q:"\u201cCan you do better on price?\u201d",
-   a:"\u201cI can't move the base price, but if you're military or first responder that's 10% off. Or if you'd rather handle the carpet yourself, I can take that off the total.\u201d",
-   n:"Remove scope to lower price. Never discount the base."},
+   a:doBetterPriceAnswer,
+   n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, it just offers the military/first responder discount instead of naming something that was never there."},
   {q:"\u201cI need to think about it / talk to my spouse.\u201d",
    a:"\u201cTotally fair \u2014 we can at least get you on the calendar. No deposit required, and you can let us know if anything changes.\u201d",
    n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
