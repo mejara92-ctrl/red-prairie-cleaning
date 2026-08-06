@@ -177,3 +177,79 @@ NOT IN THIS ZIP — these are not website changes
   never claim.
 - Property manager / realtor outbound. Relationship work.
 - Photo report. Still ops-only until the crew does it every time.
+
+
+========================================================
+ROUND 3 — CORRECTION: THE CONTACT GATE WASN'T SENDING
+========================================================
+
+WHAT WAS WRONG IN THE ROUND 2 ZIP
+--------------------------------------------------------
+rpSubmitContactGate() called rpSendEstimateToGoHighLevel(), which is a
+NO-OP STUB — it sets two flags and returns without sending anything:
+
+    function rpSendEstimateToGoHighLevel(extra = {}) {
+      /* Calendar-only confirmation gate: ... */
+      rpState.estimateSent = true;
+      rpState.preBookingWebhookSent = true;
+      return true;
+    }
+
+So the gate captured a name and phone into rpState and they never left
+the browser. The gate was decorative. Fixed below.
+
+This also answers "where do unfinished bookings go?" — before this
+round, NOWHERE. /book is the only endpoint the site called, and it
+hard-requires a valid appointment startTime (400s without one). Anyone
+who didn't reach the calendar and pick a slot vanished with no contact,
+no note, no tag.
+
+9. book/index.html — gate now posts for real
+--------------------------------------------------------
+rpSubmitContactGate() now POSTs directly to `${RP_BOOKING_API}/lead`,
+the only endpoint that accepts a contact with no appointment.
+
+  lead_type:        "website_partial"
+  call_outcome:     "Saw price online - did not book"
+  csr_lead_source:  "Website Estimator"
+  + service, quoted_price, size/bed/bath/condition summary,
+    ad attribution, timestamp
+
+  keepalive: true  — survives the customer closing the tab
+  .catch(() => {}) — a failed post NEVER blocks the price screen
+                     (verified with the network aborted: price still renders)
+
+10. workers/PATCH-lead-endpoint.md — NEW
+--------------------------------------------------------
+Three exact find/replace blocks for the rpc-booking-api Worker.
+Delivered as a patch rather than a regenerated file so there's no risk
+of a transcription slip breaking your production API.
+
+WHY IT'S NEEDED: /lead hardcodes source "RPC Call Console (no booking)"
+and the tag "call-no-booking" on everything. Without the patch, website
+abandons show up as Christa's phone calls and corrupt call reporting.
+After the patch they get source "Red Prairie Website (price viewed, no
+booking)" and tags website-partial-lead / price-viewed-no-booking.
+
+Phone leads from /call are unaffected — lead_type defaults to phone
+when absent, and /call doesn't send it.
+
+*** DEPLOY ORDER: Worker patch FIRST, then the site. ***
+Site-before-Worker means website leads get mislabelled as phone leads
+until you catch up.
+
+*** CHECK BEFORE DEPLOYING ***
+The stub existed for a reason — almost certainly to stop GHL texting
+confirmations to people who hadn't booked. You are now creating
+contacts before any booking exists. Audit every GHL workflow that
+triggers on contact-created or tag-added and confirm none send a
+customer-facing confirmation. Partial leads should fire an INTERNAL
+notification only.
+
+VERIFIED THIS ROUND
+--------------------------------------------------------
+  Gate posts exactly one /lead call with correct payload   PASS
+  Advances to price screen after posting                   PASS
+  Network failure -> price still renders, no error         PASS
+  Lead step still prefills name/phone from gate            PASS
+  All prices unchanged (3rd consecutive check)             PASS

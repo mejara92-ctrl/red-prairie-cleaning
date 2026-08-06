@@ -3346,10 +3346,19 @@ function rpContactGateScreen(eyebrow) {
   </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
 }
 
-/* Posts a PARTIAL lead immediately. This is the whole point of the gate:
-   if they take one look at the number and leave, Christa still has a name
-   and a number to call, and the paid click isn't wasted. Fire-and-forget —
-   a failed post must never block the customer from seeing their price. */
+/* Posts a real PARTIAL lead to the Worker's /lead endpoint. This is the
+   whole point of the gate: if they take one look at the number and
+   leave, Christa still has a name and a number to call, and the paid
+   click isn't wasted.
+
+   NOTE: this deliberately does NOT go through rpSendEstimateToGoHighLevel(),
+   which is a no-op stub — it sets two flags and returns without sending
+   anything. /book can't be used here either: it hard-requires a valid
+   appointment startTime and 400s without one. /lead is the only endpoint
+   that accepts a contact with no appointment.
+
+   Fire-and-forget with keepalive so the request survives the customer
+   closing the tab. A failed post must never block the price screen. */
 function rpSubmitContactGate() {
   const nameEl = document.getElementById("rpGateName");
   const phoneEl = document.getElementById("rpGatePhone");
@@ -3373,15 +3382,46 @@ function rpSubmitContactGate() {
   errorBox.style.display = "none";
   rpState.fullName = fullName;
   rpState.phone = phone;
-
   rpTrack("contact_gate_submitted", { service: rpState.service });
+
+  const serviceName = rpServices[rpState.service]?.name || "Not selected";
+  const quoted = rpIsCustomQuoteOnly() ? "Custom quote required" : rpPriceLabel();
+  const sizeSummary = [
+    rpSqftTier() ? `Size: ${rpSqftTier().label}` : "",
+    rpState.bedrooms ? `Bedrooms: ${rpState.bedrooms}` : "",
+    rpState.bathrooms ? `Bathrooms: ${rpState.bathrooms}` : "",
+    rpState.condition && rpState.condition !== "Standard Condition" ? `Condition: ${rpState.condition}` : "",
+    rpState.frequency && rpState.frequency !== "One-Time" ? `Frequency: ${rpState.frequency}` : "",
+    rpState.cleanerCount ? `Cleaners: ${rpState.cleanerCount}` : "",
+    rpState.hourCount ? `Hours: ${rpState.hourCount}` : ""
+  ].filter(Boolean).join(" | ");
+
   try {
-    rpSendEstimateToGoHighLevel({
-      booking_status: "Partial Lead - Contact Captured Before Price Shown",
-      booking_source: "website_estimator_contact_gate",
-      customer_action_needed: "Customer has not seen the price yet - call if they drop off",
-      should_send_booking_confirmation: "No - partial lead only"
-    });
+    fetch(`${RP_BOOKING_API}/lead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        lead_type: "website_partial",
+        call_outcome: "Saw price online - did not book",
+        csr_lead_source: "Website Estimator",
+        full_name: fullName,
+        phone: phone,
+        service: serviceName,
+        quoted_price: quoted,
+        details: [
+          "WEBSITE PARTIAL LEAD",
+          "Customer entered name and phone, then was shown their price.",
+          "If no appointment follows, they saw the number and left. CALL THEM.",
+          "",
+          `Service: ${serviceName}`,
+          `Price shown: ${quoted}`,
+          sizeSummary || "",
+          `Attribution: ${rpAttributionSummary()}`
+        ].filter(Boolean).join("\n"),
+        submitted_at: new Date().toISOString()
+      })
+    }).catch(() => {});
   } catch (e) { /* never block the price screen on a failed post */ }
 
   rpAdvance();
