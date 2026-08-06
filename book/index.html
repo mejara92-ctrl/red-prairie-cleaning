@@ -2887,7 +2887,7 @@ function rpScreenHtml() {
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
-          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Targeted Clean", desc:"Only want certain areas done? Book us by the hour." }) : ""}
+          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Only want certain areas done? Book us by the hour." }) : ""}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -3980,7 +3980,7 @@ function rpSubmitLeadAndShowCalendar() {
     { field: fields.rpPostalCode, valid: postalLooksValid, message: "Please enter a valid ZIP code." }
   ];
 
-  /* Targeted Clean sells time against a priority list. Without that list the
+  /* Hourly Cleaning sells time against a priority list. Without that list the
      crew has nothing to work from and the job fails on arrival, so it's the
      one service where notes are mandatory. */
   if (rpState.service === "hourly") {
@@ -4230,7 +4230,11 @@ const rpPreselectedService = (function rpApplyServicePreselect() {
 const rpResumedSession = rpPreselectedService ? false : rpLoadPersistedState();
 if (rpHistoryNavAvailable) {
   try {
-    const flow = rpResumedSession ? (rpFlows[rpState.service] || []) : [];
+    /* MUST be rpCurrentFlow(), not rpFlows[...] — rpFlows is the raw
+       table and does not contain the injected "contactgate" step. Reading
+       the raw table here rebuilt one history entry too few on a resumed
+       session, so back landed on the wrong screen. */
+    const flow = rpResumedSession ? rpCurrentFlow() : [];
     const targetIdx = flow.indexOf(rpState.step);
     if (rpResumedSession && targetIdx > -1) {
       /* Resuming straight into, say, step 4 of 8 used to replace the

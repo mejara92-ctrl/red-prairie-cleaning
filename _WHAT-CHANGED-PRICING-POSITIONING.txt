@@ -86,7 +86,7 @@ GHL: add "Targeted Clean -> Other" to the Service Needed dropdown.
 currently NO mapping for Hourly at all, so once renamed you'd be sending
 a value the dropdown doesn't have. The Worker degrades gracefully
 (retries without custom fields) but you'd silently lose service_needed
-on every Targeted Clean booking.
+on every Hourly Cleaning booking.
 
 NOT DONE (by your call)
 - Sona prompt: deactivated, untouched. It still contains the OLD move-out
@@ -253,3 +253,57 @@ VERIFIED THIS ROUND
   Network failure -> price still renders, no error         PASS
   Lead step still prefills name/phone from gate            PASS
   All prices unchanged (3rd consecutive check)             PASS
+
+
+========================================================
+ROUND 4 — RENAME (per Mike)
+========================================================
+"Targeted Clean" -> "Hourly Cleaning" everywhere.
+3-hour minimum KEPT ($150 floor at 1 cleaner).
+
+  js/rp-pricing-engine.js   rpServices.hourly.name = "Hourly Cleaning"
+                            RP_TARGETED_CLEAN_PUBLIC renamed to
+                            RP_HOURLY_PUBLIC (the kill switch)
+  book/index.html           service row title
+  call/index.html           CSR comments
+  pricing/index.html        section heading + card title
+
+Internal key is still "hourly" — unchanged since round 1, so nothing in
+GHL, the Worker, or saved state is affected.
+
+  >>> GHL ACTION UPDATED: the Service Needed dropdown option should be
+      "Hourly Cleaning -> Other", NOT "Targeted Clean". If you already
+      added Targeted Clean, change it.
+
+Verified: service list, hours picker (3-8), $150 at 3h x 1 cleaner,
+kill switch, all other prices unchanged.
+
+
+========================================================
+ROUND 5 — BACK BUTTON
+========================================================
+REPORTED: "can't hit back after selecting move-in/move-out"
+
+DIAGNOSIS: the screenshot showed "STEP 2 OF 10". This build reports
+"STEP 2 OF 11" — the contact gate adds one step. So the site being
+tested was the LIVE, un-deployed build, not this one. Back button and
+native browser back both verified working in this build at that exact
+step and window size.
+
+FIXED ANYWAY — a real bug found while investigating:
+book/index.html, session-resume history rebuild read the raw flow table
+instead of the computed flow:
+
+  BEFORE: const flow = rpResumedSession ? (rpFlows[rpState.service] || []) : [];
+  AFTER:  const flow = rpResumedSession ? rpCurrentFlow() : [];
+
+rpFlows is the raw table and does NOT contain the injected "contactgate"
+step; only rpCurrentFlow() does. On a resumed session (refresh, or
+returning to a half-finished estimate within 3 hours) this rebuilt one
+history entry too few, so back landed on the wrong screen. Introduced in
+round 2 with the contact gate.
+
+VERIFIED
+  forward:      included -> sqft -> bedrooms
+  native back:  sqft -> included -> service
+  on-screen back from included -> service

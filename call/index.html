@@ -335,7 +335,7 @@ const SERVICE_ANGLES = {
     objection: "You're not paying for rooms you don't want touched \u2014 the whole booking goes to what you actually care about.",
     urgencyNoun: "openings this week",
     seasonNote: "a busy week",
-    /* ASK THIS FIRST. Living-in-it \u2192 book Targeted Clean, easy. Moving out
+    /* ASK THIS FIRST. Living-in-it \u2192 book Hourly Cleaning, easy. Moving out
        \u2192 be straight about the guarantee before booking. Some upgrade on the
        spot; the ones who don't were never paying $379 anyway, and a booked
        slot beats a lost call. */
@@ -455,7 +455,7 @@ function resolveScript(step){
     listen: typeof e.listen==="function"?e.listen():e.listen,
     watch: typeof e.watch==="function"?e.watch():e.watch
   };
-  /* Targeted Clean is the one service where the CSR can create real
+  /* Hourly Cleaning is the one service where the CSR can create real
      downstream risk: a partial clean sold to a move-out caller who then
      fails inspection. Force the qualifier and the guarantee carve-out
      into the rail at the steps where they actually matter. */

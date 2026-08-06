@@ -30,7 +30,7 @@ const rpServices = {
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
-  hourly:      { name: "Targeted Clean",                   emoji: "⏱" },
+  hourly:      { name: "Hourly Cleaning",                  emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
 
@@ -105,8 +105,7 @@ function rpMoveoutIsCustomSqft() {
   return ["moveout", "deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8";
 }
 
-/* Targeted Clean (internal key stays "hourly" so no webhook/GHL/state
-   plumbing has to change) — flat rate per cleaner per hour. No condition
+/* Hourly Cleaning — flat rate per cleaner per hour. No condition
    step; the customer sets scope via cleaner count + hours.
 
    IMPORTANT — this service sells TIME, NOT COMPLETION. The customer ranks
@@ -122,24 +121,24 @@ const HOURLY_MIN_HOURS = 3;
 const HOURLY_MAX_HOURS = 8;
 const HOURLY_MAX_CLEANERS = 4;
 
-/* PEAK-SEASON KILL SWITCH — flip to false to pull Targeted Clean off the
+/* PEAK-SEASON KILL SWITCH — flip to false to pull Hourly Cleaning off the
    public /book service list in one line (e.g. during peak PCS weeks when
    a $150 3-hour booking would otherwise eat a Friday slot a $379+
    move-out wanted). /call is unaffected: CSRs can always book it by
    phone, so turning this off routes the demand through Christa and Liz
    instead of killing it. */
-const RP_TARGETED_CLEAN_PUBLIC = true;
+const RP_HOURLY_PUBLIC = true;
 
 /* Services hidden from the PUBLIC /book service picker. /call ignores
    this entirely. */
 function rpServiceIsPublic(key) {
-  if (key === "hourly") return RP_TARGETED_CLEAN_PUBLIC;
+  if (key === "hourly") return RP_HOURLY_PUBLIC;
   return true;
 }
 
 /* Partial-scope work can't carry the Defend Your Deposit guarantee — we
    didn't control the scope, so we can't stand behind the inspection
-   outcome. Surfaced on the Targeted Clean estimate screen and in the
+   outcome. Surfaced on the Hourly Cleaning estimate screen and in the
    booking confirmation. */
 const RP_GUARANTEE_EXCLUDED_SERVICES = ["hourly"];
 function rpGuaranteeApplies() {
