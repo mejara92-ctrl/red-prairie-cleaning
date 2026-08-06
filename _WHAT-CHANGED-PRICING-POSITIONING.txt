@@ -478,3 +478,75 @@ STILL OPEN (recommended, not built)
   Internal per-room target times in the field guide — for spotting jobs
   that run long and repricing that customer next time. Do NOT publish
   them; customers treat published times as promises.
+
+
+========================================================
+ROUND 9 — MINIMUM CHARGE
+========================================================
+BRIEF: "$150 minimum per thing we clean." Analysis found 22 price
+points below $150 — ALL Basic Cleaning. Worst case $99.90 (weekly,
+<=1000 sq ft, with military discount).
+
+DECISIONS MADE (each one is reversible — flagged for veto)
+
+1. RAISED THE PUBLISHED PRICE RATHER THAN HIDING A FLOOR
+   Basic tier 1 base: $139 -> $150.
+   A silent floor would contradict the whole position — the pricing
+   page said $139 while the estimator charged $150. "The price you see
+   is the price you pay" has to survive contact with the price list.
+   The floor stays only as a safety net for edge cases.
+   NOTE: this leaves a $5 step from t1 ($150) to t2 ($155) where other
+   steps are ~$20. Cosmetically odd, same as the deep $255/$259 gap you
+   chose to keep. Left alone rather than repricing the whole ladder.
+
+2. TWO FLOORS, NOT ONE
+   RP_ONE_TIME_MIN            = 150
+   RP_RECURRING_MIN_PER_VISIT = 115
+
+   Deliberately different. A one-time visit IS the whole relationship
+   so it must stand alone. On a recurring plan the ACCOUNT is the unit
+   of economics: a weekly customer at $120/visit is ~$6,200/year and is
+   one of the best accounts on the book. A blanket $150 would have
+   refused that business for no reason.
+
+3. FLOOR APPLIES AFTER THE MILITARY DISCOUNT
+   Applied before it, the discount punches straight through the floor
+   ($150 becomes $135). CONSEQUENCE, ACCEPTED: a customer already at
+   the floor gets no military discount. Basic t1 one-time is $150 with
+   or without it. Unavoidable with a hard floor — the alternative is
+   letting the floor be broken.
+
+4. FLOOR COVERS THE CLEANING ONLY, NOT ADD-ONS
+   Add-ons stack on top, so a thin base can't ride in on an expensive
+   junk haul that carries its own disposal cost.
+
+NEW IN THE ENGINE
+   RP_ONE_TIME_MIN, RP_RECURRING_MIN_PER_VISIT
+   rpIsRecurringBooking(), rpServiceFloorCents(),
+   rpNetServiceCents(), rpFloorApplied()
+   rpFinalPriceCents / rpMaintenanceBasePerVisit / rpMonthlyTotal /
+   rpFirstVisitTotalCents all route through rpNetServiceCents().
+
+PRICING PAGE UPDATED TO MATCH
+   Basic tier 1 now published at $150; minimum stated in the hero
+   promises and the footer fine print; Basic table gained the condition
+   ladder and the first-visit Deep note (round 8 changes that hadn't
+   reached the page yet).
+
+VERIFIED
+   0 of 22 previously-below-floor cases remain below floor.
+   Headline prices UNCHANGED: move-out 1500 3/2 $379 / $354 military,
+   deep $339, carpet 3rm $225, Basic t3 3/2 biweekly $187,
+   recurring first visit $339.
+
+NOT CHANGED, AND WHY
+   Move-out and Deep floors ($229 / $199) already clear $150 by a wide
+   margin even with the military discount. Left alone.
+   Add-on prices unchanged — they attach to a job that already cleared
+   the floor, so they don't need their own minimum.
+
+STILL RECOMMENDED, NOT BUILT (needs your data, not code)
+   Track actual hours per job. Every floor here is reasoned from
+   assumed labour times. The number that really governs profitability
+   is revenue per cleaner-hour — target $55+. Until jobs are timed,
+   these floors are educated estimates.

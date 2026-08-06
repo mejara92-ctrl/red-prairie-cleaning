@@ -70,7 +70,7 @@ const rpDeepSqftTiers = [
    since a recurring visit is a lighter touch than a full reset. The
    frequency discount (rpFrequencyPlan) still applies on top of this. */
 const rpMaintenanceSqftTiers = [
-  { key: "t1", label: "Up to 1,000 sq ft",     base: 139 },
+  { key: "t1", label: "Up to 1,000 sq ft",     base: 150 },
   { key: "t2", label: "1,001–1,400 sq ft",     base: 155 },
   { key: "t3", label: "1,401–1,800 sq ft",     base: 175 },
   { key: "t4", label: "1,801–2,200 sq ft",     base: 195 },
@@ -437,12 +437,53 @@ function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }
 /* Add-ons are fixed price and are never discounted by the military offer. */
 function rpAddonsOnceCharge() { return rpAddonsTotal(); }
 
+/* ---------------------------------------------------------------------
+   MINIMUM CHARGE
+   A crew still burns drive time, setup and supplies on a small job, so
+   below a certain ticket the trip loses money once acquisition cost is
+   counted. Enforced AFTER the military discount — applied before it, the
+   discount punches straight through the floor.
+
+   Two floors on purpose. For a ONE-TIME job the visit is the whole
+   relationship, so it has to stand on its own. For a RECURRING plan the
+   ACCOUNT is the unit of economics, not the visit: a weekly customer at
+   $120/visit is ~$6,200 a year and is one of the best accounts on the
+   book. Refusing that because one visit prints under $150 would be a
+   mistake, so recurring carries a lower floor.
+
+   The floor covers the CLEANING only. Add-ons are priced separately and
+   stack on top, so a thin base can't ride in on an expensive add-on.
+   --------------------------------------------------------------------- */
+const RP_ONE_TIME_MIN = 150;
+const RP_RECURRING_MIN_PER_VISIT = 115;
+
+function rpIsRecurringBooking() {
+  return rpState.service === "maintenance"
+    && !!rpState.frequency
+    && rpState.frequency !== "One-Time";
+}
+function rpServiceFloorCents() {
+  if (rpIsCustomQuoteOnly()) return 0;
+  return rpToCents(rpIsRecurringBooking() ? RP_RECURRING_MIN_PER_VISIT : RP_ONE_TIME_MIN);
+}
+/* Service subtotal after military discount, raised to the floor. */
+function rpNetServiceCents() {
+  const subtotal = rpPreDiscountSubtotalCents();
+  if (subtotal <= 0) return 0;
+  return Math.max(subtotal - rpMilitaryDiscountCents(), rpServiceFloorCents());
+}
+function rpFloorApplied() {
+  const subtotal = rpPreDiscountSubtotalCents();
+  if (subtotal <= 0 || rpIsCustomQuoteOnly()) return false;
+  return (subtotal - rpMilitaryDiscountCents()) < rpServiceFloorCents();
+}
+
 function rpFinalPriceCents() {
   if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
   const subtotal = rpPreDiscountSubtotalCents();
   const addons = rpAddonsCents();
   if (subtotal <= 0 && addons <= 0) return 0;
-  return subtotal - rpMilitaryDiscountCents() + addons;
+  return rpNetServiceCents() + addons;
 }
 
 /* Pre-discount subtotal INCLUDING add-ons — used only where the code needs
@@ -524,17 +565,17 @@ function rpFirstVisitTotalCents() {
   const discount = rpState.militaryDiscount
     ? Math.min(Math.round(deep * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP))
     : 0;
-  return deep - discount + rpAddonsCents();
+  return Math.max(deep - discount, rpToCents(RP_ONE_TIME_MIN)) + rpAddonsCents();
 }
 function rpFirstVisitTotal() { return rpCentsToDollars(rpFirstVisitTotalCents()); }
 
 function rpMaintenanceBasePerVisit() {
   if (rpState.service !== "maintenance" || !rpState.bedrooms) return 0;
-  return rpCentsToDollars(rpPreDiscountSubtotalCents() - rpMilitaryDiscountCents());
+  return rpCentsToDollars(rpNetServiceCents());
 }
 function rpMonthlyTotal() {
   const plan = rpFrequencyPlan();
-  const basePerVisitCents = Math.round(rpPreDiscountSubtotalCents() - rpMilitaryDiscountCents());
+  const basePerVisitCents = rpNetServiceCents();
   if (!plan || !basePerVisitCents) return 0;
   return rpCentsToDollars(basePerVisitCents * plan.visitsPerMonth);
 }
