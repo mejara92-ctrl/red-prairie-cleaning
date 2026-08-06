@@ -1,0 +1,179 @@
+RED PRAIRIE — POSITIONING & PRICING-PAGE SPRINT
+================================================
+
+FILES CHANGED (5) + 1 NEW
+  js/rp-pricing-engine.js   modified
+  book/index.html           modified
+  call/index.html           modified
+  index.html                modified
+  sitemap.xml               modified
+  pricing/index.html        NEW
+
+--------------------------------------------------------
+1. js/rp-pricing-engine.js
+--------------------------------------------------------
+- rpServices.hourly.name: "Hourly Cleaning & Organizing" -> "Targeted Clean"
+  (internal key stays "hourly" — no state/webhook plumbing changed)
+- HOURLY_MIN_HOURS: 4 -> 3   (3 hrs x 1 cleaner = $150 floor)
+- NEW  RP_TARGETED_CLEAN_PUBLIC = true
+       Peak-season kill switch. Set false to pull Targeted Clean off the
+       PUBLIC /book service list in one line. /call is unaffected — CSRs
+       can always book it by phone.
+- NEW  rpServiceIsPublic(key)
+- NEW  RP_GUARANTEE_EXCLUDED_SERVICES / rpGuaranteeApplies()
+       Defend Your Deposit does not apply to partial-scope work.
+- rpIncludes.hourly rewritten: sells TIME, not COMPLETION.
+
+  NO EXISTING PRICE WAS CHANGED. Verified:
+    Move-out 1,500sf 3/2            $379.00
+    Move-out 1,500sf 3/2 + military $354.00
+    Move-out 1,500sf 3/2 heavy      $454.80
+    Deep 1,500sf 3/2                $339.00
+    Basic t3 3/2 biweekly           $187.00
+    Carpet 3 rooms                  $225.00
+    Targeted 3h x1                  $150.00
+
+--------------------------------------------------------
+2. book/index.html
+--------------------------------------------------------
+- Service row renamed to "Targeted Clean", gated behind rpServiceIsPublic()
+- Estimate screen guarantee line is now service-aware:
+    guaranteed services -> full "Defend Your Deposit" promise
+    Targeted Clean      -> explicit carve-out + steer to move-out clean
+- Notes field on Targeted Clean becomes "Your priority areas — most
+  important first", with an example placeholder, and is REQUIRED
+  (min 5 chars) before the lead can submit. Without a priority list the
+  crew has nothing to work from.
+
+--------------------------------------------------------
+3. call/index.html
+--------------------------------------------------------
+- Service picker description updated with the 3-hr minimum and the
+  qualifying question.
+- SERVICE_ANGLES.hourly rewritten + two new fields:
+    qualifier         "Is this a move-out, or a house you're living in?"
+    guaranteeWarning  what to say if they ARE moving out
+    scopeWarning      get the priority list before quoting
+- resolveScript() now injects those into the rail on the
+  cleaners/hours (qualifier + guarantee) and quote/contact (scope) steps.
+
+--------------------------------------------------------
+4. index.html (homepage)
+--------------------------------------------------------
+- "Pricing" added to primary nav
+- Hero subhead replaced with the Defend Your Deposit 48-hour promise
+  (was buried as FAQ answer #1)
+- Hero microcopy now leads with the three differentiators:
+  real price not a callback / no upcharges at the door /
+  oven, fridge, cabinets & closets included
+- Added "See every price up front ->" link under the CTA
+
+--------------------------------------------------------
+5. pricing/index.html (NEW)
+--------------------------------------------------------
+Full public price list: move-out, deep, basic, carpet, targeted, add-ons,
+military discount. Matches Prairie Glass (Manrope + DM Serif, #d00000).
+Centerpiece is the included-vs-add-on ledger under the move-out table.
+Includes Service + AggregateRating schema. No competitor is named
+anywhere — comparisons are generic ("commonly quoted as a paid add-on
+elsewhere"), which is both accurate and legally safe.
+
+--------------------------------------------------------
+!! BEFORE YOU DEPLOY !!
+--------------------------------------------------------
+GHL: add "Targeted Clean -> Other" to the Service Needed dropdown.
+/book line ~4021 sends rpServices[service].name to the Worker. There is
+currently NO mapping for Hourly at all, so once renamed you'd be sending
+a value the dropdown doesn't have. The Worker degrades gracefully
+(retries without custom fields) but you'd silently lose service_needed
+on every Targeted Clean booking.
+
+NOT DONE (by your call)
+- Sona prompt: deactivated, untouched. It still contains the OLD move-out
+  tiers ($399/$449/$499 for the top three brackets) against the engine's
+  current $419/$479/$549, and knows nothing about Targeted Clean. Leave it
+  off until it's updated or it will quote wrong.
+- Deep Cleaning 1,001–1,400 sq ft left at $255 as you decided.
+- Photo report: intentionally NOT on the site yet. Run it manually 2–3
+  weeks first, then add it.
+- js/rp-canonical-estimator.js + tools/apply-canonical-estimator.py are
+  still present but fully dereferenced. Harmless.
+
+
+========================================================
+ROUND 2 — CONVERSION FIXES
+========================================================
+
+6. js/rp-pricing-engine.js  — CONTACT GATE
+--------------------------------------------------------
+NEW  RP_CONTACT_GATE = true
+     rpCurrentFlow() now injects a "contactgate" step immediately
+     before "estimate" on EVERY service flow.
+
+WHY: price used to render before any contact was captured. Anyone who
+balked at the number left completely anonymous — no name, no phone, no
+callback, no retargeting. On a paid LSA or Ads click that's the whole
+lead burned on a price objection you never got to answer.
+
+Set RP_CONTACT_GATE = false to restore the old price-first order.
+
+*** WATCH THE RIGHT METRIC ***
+Funnel COMPLETION RATE WILL GET WORSE. That's by design — you're
+trading some top-of-funnel completion for a much higher share of
+REACHABLE leads. Judge this on booked jobs and on callable leads in
+GHL, not on estimator completion. Give it 3-4 weeks before deciding.
+
+7. book/index.html — contact gate screen
+--------------------------------------------------------
+- rpContactGateScreen(): name + phone ONLY. Address block stays on the
+  lead step and is prefilled from here (verified).
+- Framed as "where should we send it" — the quote genuinely does get
+  texted. Reads as a delivery question, not a paywall.
+- rpSubmitContactGate() posts a PARTIAL lead immediately:
+      booking_status: "Partial Lead - Contact Captured Before Price Shown"
+      booking_source: "website_estimator_contact_gate"
+  Fire-and-forget in a try/catch — a failed post never blocks the
+  customer from seeing their price.
+- New analytics events: contact_gate_submitted, gate_validation_error
+
+  >>> GHL ACTION: build a workflow on booking_source =
+      "website_estimator_contact_gate" where booking_status is still
+      "Partial Lead". Those are people who saw the price and left.
+      They are your highest-intent callback list. Right now nothing
+      picks them up.
+
+8. call/index.html — price-question bridge
+--------------------------------------------------------
+New FIRST objection: "How much for a move-out clean?" asked before any
+details. On a paid LSA call this fires within ~20 seconds and is where
+most calls are lost. Script bridges to sq ft + bed/bath BEFORE quoting,
+then quotes bundled with what's included, then pauses.
+
+Placed first in OBJECTIONS deliberately. QUOTE_SCREEN_OBJECTION_KEYS
+references objections by exact text, not index, so the quote screen
+picker is unaffected.
+
+--------------------------------------------------------
+PRICE REGRESSION — RE-VERIFIED AFTER ROUND 2
+--------------------------------------------------------
+  Move-out 1,500sf 3/2            $379.00
+  Move-out 1,500sf 3/2 + military $354.00
+  Deep 1,500sf 3/2                $339.00
+  Basic t3 3/2 biweekly           $187.00
+  Targeted Clean 3h x1            $150.00
+  Carpet 3 rooms                  $225.00
+  No price changed in either round.
+
+--------------------------------------------------------
+NOT IN THIS ZIP — these are not website changes
+--------------------------------------------------------
+- Google Ads restructure (200 combos -> ~8 intent-based ad groups).
+  Google Ads console.
+- Missed-call text-back within 60 seconds. GHL automation. Probably
+  your single highest-ROI fix and it isn't code — every unanswered
+  LSA ring is a lead you already paid for, and Google factors
+  responsiveness into LSA ranking.
+- LSA bad-lead disputes. LSA dashboard. Free money most operators
+  never claim.
+- Property manager / realtor outbound. Relationship work.
+- Photo report. Still ops-only until the crew does it every time.

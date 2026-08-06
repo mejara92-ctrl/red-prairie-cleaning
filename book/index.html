@@ -2887,7 +2887,7 @@ function rpScreenHtml() {
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home." })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
-          ${rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning & Organizing", desc:"General help around the house, billed by the hour." })}
+          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Targeted Clean", desc:"Only want certain areas done? Book us by the hour." }) : ""}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -3070,6 +3070,7 @@ function rpScreenHtml() {
 
   if (rpState.step === "addons") return rpAddonsScreen(eyebrow);
   if (rpState.step === "estimate") return rpEstimateScreen(eyebrow);
+  if (rpState.step === "contactgate") return rpContactGateScreen(eyebrow);
   if (rpState.step === "lead") return rpLeadScreen(eyebrow);
   if (rpState.step === "calendar") return rpCalendarScreen(eyebrow);
   return { scroll: "" };
@@ -3265,7 +3266,9 @@ function rpEstimateScreen(eyebrow) {
           <strong>${rpPriceLabel()}</strong>
           <span>${service.name}</span>
         </div>
-        <div class="rp-guarantee-light">${rpIcon("check","rp-ic rp-ic-sm")} If we miss something, we’ll come back and fix it.</div>
+        ${rpGuaranteeApplies()
+          ? `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit</strong> — if your landlord flags something we missed, text us within 48 hours and we come back free.</div>`
+          : `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it — not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply to this service. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
@@ -3325,6 +3328,65 @@ function rpLeadFieldFocus(element) {
     try { element.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (error) {}
   }, 180);
 }
+/* Two fields, no address block — the address is asked for on the lead
+   step afterwards, prefilled from here. Framed as "where do we send it"
+   rather than "give us your number", because the price genuinely does
+   get texted and people abandon a form that reads like a paywall. */
+function rpContactGateScreen(eyebrow) {
+  return { scroll: `<div class="rp-center">
+    ${eyebrow}
+    <h2>Your price is ready</h2>
+    <p class="rp-sub">Where should we send it? We'll text you a copy so you have it in writing — and if anything about your place is unusual, we can sort it out before you book.</p>
+    <div class="rp-lead-form">
+      <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-error" id="rpGateError" style="display:none"></div>
+      <p class="rp-fineprint">No spam and no sales calls — we text the quote and leave you alone unless you reply.</p>
+    </div>
+  </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+}
+
+/* Posts a PARTIAL lead immediately. This is the whole point of the gate:
+   if they take one look at the number and leave, Christa still has a name
+   and a number to call, and the paid click isn't wasted. Fire-and-forget —
+   a failed post must never block the customer from seeing their price. */
+function rpSubmitContactGate() {
+  const nameEl = document.getElementById("rpGateName");
+  const phoneEl = document.getElementById("rpGatePhone");
+  const errorBox = document.getElementById("rpGateError");
+  const fullName = nameEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  [nameEl, phoneEl].forEach(el => el.classList.remove("is-invalid"));
+  let bad = null;
+  if (fullName.length < 2) bad = { el: nameEl, msg: "Please enter your full name." };
+  else if (phoneDigits.length < 10) bad = { el: phoneEl, msg: "Please enter a valid 10-digit phone number." };
+  if (bad) {
+    bad.el.classList.add("is-invalid");
+    errorBox.textContent = bad.msg;
+    errorBox.style.display = "block";
+    bad.el.focus({ preventScroll: true });
+    rpTrack("gate_validation_error", { field: bad.el.id });
+    return;
+  }
+  errorBox.style.display = "none";
+  rpState.fullName = fullName;
+  rpState.phone = phone;
+
+  rpTrack("contact_gate_submitted", { service: rpState.service });
+  try {
+    rpSendEstimateToGoHighLevel({
+      booking_status: "Partial Lead - Contact Captured Before Price Shown",
+      booking_source: "website_estimator_contact_gate",
+      customer_action_needed: "Customer has not seen the price yet - call if they drop off",
+      should_send_booking_confirmation: "No - partial lead only"
+    });
+  } catch (e) { /* never block the price screen on a failed post */ }
+
+  rpAdvance();
+}
+
 function rpLeadScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
@@ -3370,7 +3432,7 @@ function rpLeadScreen(eyebrow) {
           </label>
         </div>
       </div>
-      <div class="rp-lead-field"><label for="rpSpecialInstructions">Notes (optional)</label><textarea id="rpSpecialInstructions" placeholder="Gate code, pets, stains, access instructions…" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea></div>
+      <div class="rp-lead-field"><label for="rpSpecialInstructions">${rpState.service === "hourly" ? "Your priority areas — most important first" : "Notes (optional)"}</label><textarea id="rpSpecialInstructions" placeholder="${rpState.service === "hourly" ? "e.g. 1) Kitchen incl. oven  2) Both bathrooms  3) Living room floors — plus gate code, pets, access" : "Gate code, pets, stains, access instructions…"}" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea>${rpState.service === "hourly" ? `<p class="rp-fineprint" style="margin-top:6px">We work this list in order for the hours you book.</p>` : ""}</div>
     </div>
     <div id="rpFormError" class="rp-error"></div>
     <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
@@ -3877,6 +3939,17 @@ function rpSubmitLeadAndShowCalendar() {
     { field: fields.rpCity, valid: !!city, message: "Please enter your city." },
     { field: fields.rpPostalCode, valid: postalLooksValid, message: "Please enter a valid ZIP code." }
   ];
+
+  /* Targeted Clean sells time against a priority list. Without that list the
+     crew has nothing to work from and the job fails on arrival, so it's the
+     one service where notes are mandatory. */
+  if (rpState.service === "hourly") {
+    checks.push({
+      field: document.getElementById("rpSpecialInstructions"),
+      valid: specialInstructions.length >= 5,
+      message: "Please list your priority areas so we know where to start."
+    });
+  }
 
   Object.values(fields).forEach((el) => el.classList.remove("is-invalid"));
   const firstInvalid = checks.find((check) => !check.valid);

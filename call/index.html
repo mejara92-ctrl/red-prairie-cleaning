@@ -330,11 +330,18 @@ const SERVICE_ANGLES = {
     seasonNote: "a busy week for carpet jobs"
   },
   hourly: {
-    value: "that's flexible time with as many cleaners as you need, working on exactly what you point them to",
+    value: "that's our time on your priority list, in the order you set it \u2014 whatever we reach in those hours gets done right",
     addon: "",
-    objection: "You're not locked into a fixed scope like a flat-rate clean \u2014 the crew spends the whole time on what you actually want done.",
+    objection: "You're not paying for rooms you don't want touched \u2014 the whole booking goes to what you actually care about.",
     urgencyNoun: "openings this week",
-    seasonNote: "a busy week"
+    seasonNote: "a busy week",
+    /* ASK THIS FIRST. Living-in-it \u2192 book Targeted Clean, easy. Moving out
+       \u2192 be straight about the guarantee before booking. Some upgrade on the
+       spot; the ones who don't were never paying $379 anyway, and a booked
+       slot beats a lost call. */
+    qualifier: "Is this a move-out, or a house you're living in?",
+    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and the Defend Your Deposit guarantee only covers the full reset. If you want it inspection-backed, that's the Move-Out Clean.\"",
+    scopeWarning: "GET THE PRIORITY LIST BEFORE YOU QUOTE. Most important first. Type it into notes verbatim \u2014 the crew works it in that order. Never promise the list gets finished."
   },
   airbnb: {
     value: "that's a full guest-ready turnover \u2014 kitchens, bathrooms, floors \u2014 ready before your next check-in",
@@ -443,11 +450,26 @@ const SCRIPT = {
 };
 function resolveScript(step){
   const e=SCRIPT[step]; if(!e) return null;
-  return {
+  const out = {
     say: typeof e.say==="function"?e.say():e.say,
     listen: typeof e.listen==="function"?e.listen():e.listen,
     watch: typeof e.watch==="function"?e.watch():e.watch
   };
+  /* Targeted Clean is the one service where the CSR can create real
+     downstream risk: a partial clean sold to a move-out caller who then
+     fails inspection. Force the qualifier and the guarantee carve-out
+     into the rail at the steps where they actually matter. */
+  const a = angle();
+  if(rpState.service === "hourly"){
+    if(step === "cleaners" || step === "hours"){
+      if(a.qualifier) out.say = `\u201c${a.qualifier}\u201d  \u2014 then: ` + out.say;
+      out.watch = [a.guaranteeWarning, out.watch].filter(Boolean).join("  \u2022  ");
+    }
+    if(step === "contact" || step === "quote"){
+      out.watch = [a.scopeWarning, out.watch].filter(Boolean).join("  \u2022  ");
+    }
+  }
+  return out;
 }
 
 function objectionPriceAnswer(){
@@ -474,6 +496,14 @@ function doBetterPriceAnswer(){
   return `\u201cI can't move the base price, but if you're military or first responder that's 10% off.${removeLine}\u201d`;
 }
 const OBJECTIONS = [
+  /* FIRST, because on a paid LSA call this fires within about 20 seconds
+     and it's where most of them are lost. Quoting a bare number here
+     just hands the caller what the website already gives away free —
+     the whole value of a paid phone lead is the human in the middle.
+     Bridge, get the two facts, THEN quote bundled with what's included. */
+  {q:"\u201cHow much for a move-out clean?\u201d (asked before you've got any details)",
+   a:"\u201cHappy to \u2014 it's based on square footage and condition, so let me get it exactly right instead of guessing high. About how big is the place, and how many bedrooms and full baths?\u201d",
+   n:"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's $379, and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause."},
   {q:"\u201cHave you done this before? / Are you legit?\u201d",
    a:"\u201cWe're a veteran-owned local company, fully insured, with over 50 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
    n:"Real, verifiable numbers only \u2014 don't round up or guess. If the review count changes, this line needs updating too."},
@@ -668,7 +698,7 @@ function screenHtml(){
   if(s==="service"){
     const items = Object.entries(rpServices).map(([k,v])=>
       opt(v.name, `pickService('${k}')`, rpState.service===k,
-        k==="hourly" ? "General help \u2014 covers anything that doesn't fit the options above." : null)
+        k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
     ).join("");
     const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
       "Commercial, specialty, or one-of-a-kind \u2014 we'll follow up with a real quote.");

@@ -30,7 +30,7 @@ const rpServices = {
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
-  hourly:      { name: "Hourly Cleaning & Organizing",     emoji: "⏱" },
+  hourly:      { name: "Targeted Clean",                   emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
 
@@ -105,12 +105,46 @@ function rpMoveoutIsCustomSqft() {
   return ["moveout", "deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8";
 }
 
-/* Hourly Cleaning & Organizing — flat rate per cleaner per hour. No
-   condition step; the customer sets scope via cleaner count + hours. */
+/* Targeted Clean (internal key stays "hourly" so no webhook/GHL/state
+   plumbing has to change) — flat rate per cleaner per hour. No condition
+   step; the customer sets scope via cleaner count + hours.
+
+   IMPORTANT — this service sells TIME, NOT COMPLETION. The customer ranks
+   priority areas and the crew works that list in order for the hours
+   booked. Nothing promises the list gets finished. That framing is what
+   keeps a partial-scope job from turning into a "you missed things"
+   review, so don't soften it in the UI copy.
+
+   Minimum is 3 hours @ 1 cleaner = $150, which sits just above the
+   maintenance floor so it doesn't cannibalise a full clean. */
 const HOURLY_RATE_PER_CLEANER = 50;
-const HOURLY_MIN_HOURS = 4;
+const HOURLY_MIN_HOURS = 3;
 const HOURLY_MAX_HOURS = 8;
 const HOURLY_MAX_CLEANERS = 4;
+
+/* PEAK-SEASON KILL SWITCH — flip to false to pull Targeted Clean off the
+   public /book service list in one line (e.g. during peak PCS weeks when
+   a $150 3-hour booking would otherwise eat a Friday slot a $379+
+   move-out wanted). /call is unaffected: CSRs can always book it by
+   phone, so turning this off routes the demand through Christa and Liz
+   instead of killing it. */
+const RP_TARGETED_CLEAN_PUBLIC = true;
+
+/* Services hidden from the PUBLIC /book service picker. /call ignores
+   this entirely. */
+function rpServiceIsPublic(key) {
+  if (key === "hourly") return RP_TARGETED_CLEAN_PUBLIC;
+  return true;
+}
+
+/* Partial-scope work can't carry the Defend Your Deposit guarantee — we
+   didn't control the scope, so we can't stand behind the inspection
+   outcome. Surfaced on the Targeted Clean estimate screen and in the
+   booking confirmation. */
+const RP_GUARANTEE_EXCLUDED_SERVICES = ["hourly"];
+function rpGuaranteeApplies() {
+  return !RP_GUARANTEE_EXCLUDED_SERVICES.includes(rpState.service);
+}
 
 /* Condition step — Move-Out and Deep Cleaning, automatic percentage
    model. Standard is the lowest advertised price (no pre-cleaned
@@ -201,8 +235,8 @@ const rpIncludes = {
     items: ["Hot-water extraction cleaning", "Pre-treatment included", "Normal spot treatment", "For the rooms you select"]
   },
   hourly: {
-    intro: "Flexible, general help around the house—cleaning, organizing, decluttering, and light tidying—billed by the hour with as many cleaners as you need.",
-    items: ["Cleaning & light tidying", "Organizing & decluttering", "As many cleaners as you need", "Billed by the hour"]
+    intro: "For when you only want certain things done. Tell us your priority areas, we work that list in order for the time you book. You're booking our time, not a finished checklist — whatever we reach in those hours gets our full attention.",
+    items: ["You set the priority order", "Kitchens, bathrooms, or any specific rooms", "Organizing, decluttering & light tidying", "Billed by the hour — 3-hour minimum", "Not an inspection-ready clean — see note below"]
   },
   airbnb: {
     intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request.",
@@ -222,7 +256,30 @@ const rpFlows = {
   airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
 };
 
-function rpCurrentFlow() { return rpFlows[rpState.service] || []; }
+/* CONTACT GATE — the single biggest leak in the old funnel.
+   Price used to render before any contact was captured, so anyone who
+   balked at the number left completely anonymous: no name, no phone, no
+   callback, no retargeting. A paid LSA/Ads click would produce a price
+   objection we never got to answer.
+
+   The gate asks for name + phone ONLY (not the full address block —
+   that stays on the lead step, prefilled). It posts a partial lead the
+   moment it's submitted, so a bounce at the price screen still lands a
+   callable contact in GHL.
+
+   Set false to restore the old price-first order. Worth revisiting with
+   real numbers: this trades some top-of-funnel completion for a much
+   higher share of *reachable* leads. Watch booked jobs, not funnel
+   completion rate — completion will look worse by design. */
+const RP_CONTACT_GATE = true;
+
+function rpCurrentFlow() {
+  const flow = rpFlows[rpState.service] || [];
+  if (!RP_CONTACT_GATE) return flow;
+  const at = flow.indexOf("estimate");
+  if (at === -1 || flow.includes("contactgate")) return flow;
+  return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
+}
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
 function rpTimeEstimate() {
