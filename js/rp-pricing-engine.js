@@ -218,8 +218,17 @@ const rpServiceAddons = {
 
 const rpIncludes = {
   moveout: {
-    intro: "A complete top-to-bottom reset of the entire interior — every room, surface, and appliance inside and out. Built for move-outs, move-ins, and getting a home show-ready for sale.",
-    items: ["The entire interior, cleaned top to bottom", "Bathrooms, scrubbed top to bottom", "Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout"]
+    intro: "This is the complete interior reset — every room, every surface, every appliance inside and out. Not a checklist of extras: if it's inside the home, it's covered.",
+    /* The list can never say "everything" — a reader stops reading it as
+       scope and starts hunting for what's missing. So it's framed as
+       PROOF (the expensive parts are already in) rather than as the
+       definition of scope, and the exclusions are named outright. Naming
+       three or four exclusions is what makes "everything else" credible;
+       leaving them vague is what makes people suspicious. */
+    itemsLead: "Including the parts most companies bill as add-ons:",
+    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"],
+    outcome: "Built to pass a landlord or property manager walkthrough — and to photograph well if you're listing the home for sale.",
+    excludes: "Outside the home — exterior windows, the garage floor, carpet extraction and junk removal — isn't part of this. All four are available as add-ons on a later step."
   },
   deep: {
     intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
@@ -249,7 +258,7 @@ const rpIncludes = {
 const rpFlows = {
   moveout:     ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
   deep:        ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  maintenance: ["included", "sqft", "bedrooms", "bathrooms", "frequency", "addons", "estimate", "lead", "calendar"],
+  maintenance: ["included", "sqft", "bedrooms", "bathrooms", "condition", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
@@ -275,8 +284,16 @@ const RP_CONTACT_GATE = true;
 function rpCurrentFlow() {
   const flow = rpFlows[rpState.service] || [];
   if (!RP_CONTACT_GATE) return flow;
-  const at = flow.indexOf("estimate");
-  if (at === -1 || flow.includes("contactgate")) return flow;
+  if (flow.includes("contactgate")) return flow;
+  /* Insert before "addons", NOT before "estimate". The add-ons screen
+     carries a live "Current estimate" chip, so gating only at the
+     estimate screen still let the customer read their full price a step
+     early and leave without giving a number. Blanking that chip instead
+     would mean choosing add-ons with no idea what they cost, which is
+     worse. Flows without an add-ons step fall back to the estimate. */
+  let at = flow.indexOf("addons");
+  if (at === -1) at = flow.indexOf("estimate");
+  if (at === -1) return flow;
   return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
 }
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
@@ -306,17 +323,24 @@ function rpTeamSize() {
 function rpConditionKey() {
   return rpConditionKeys[rpState.condition] || null;
 }
-/* Automatic condition multiplier for Move-Out and Deep Cleaning — 0 for
+/* Basic Cleaning was the only priced service with NO condition step: it
+   went straight from size to frequency, so a 1,500 sq ft home with three
+   kids and a dog was billed identically to a tidy one the same size. That
+   variance came straight out of margin. Basic now carries the same
+   Standard / Heavy +20% / Extreme +50% ladder as the other two. */
+const RP_CONDITION_PRICED_SERVICES = ["moveout", "deep", "maintenance"];
+
+/* Automatic condition multiplier for Move-Out, Deep and Basic — 0 for
    Standard, 0.20 for Heavy, 0.50 for Extreme. Specialty has no multiplier
    (null); it's handled as a custom quote via rpIsSpecialtyCondition()
    instead. */
 function rpConditionMultiplier() {
-  if (!["moveout", "deep"].includes(rpState.service)) return 0;
+  if (!RP_CONDITION_PRICED_SERVICES.includes(rpState.service)) return 0;
   const m = RP_CONDITION_MULTIPLIER[rpConditionKey()];
   return typeof m === "number" ? m : 0;
 }
 function rpIsSpecialtyCondition() {
-  return ["moveout", "deep"].includes(rpState.service) && rpConditionKey() === "specialty";
+  return RP_CONDITION_PRICED_SERVICES.includes(rpState.service) && rpConditionKey() === "specialty";
 }
 function rpIsCustomQuoteOnly() {
   return rpState.service === "airbnb"
@@ -365,9 +389,13 @@ function rpPreDiscountSubtotalCents() {
   }
   if (rpState.service === "maintenance") {
     if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft()) return 0;
+    /* Order matters: condition first (it reflects real labour), then the
+       frequency discount (a loyalty discount on the true price). Reversing
+       these would discount the buildup surcharge too. */
     const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
+    const conditioned = rpCentsToDollars(Math.round(rpToCents(base) * (1 + rpConditionMultiplier())));
     const plan = rpFrequencyPlan();
-    const discountedBase = plan ? Math.round(base * (1 - plan.discount)) : base;
+    const discountedBase = plan ? Math.round(conditioned * (1 - plan.discount)) : conditioned;
     return rpToCents(discountedBase);
   }
   if (["moveout", "deep"].includes(rpState.service)) {
@@ -439,6 +467,67 @@ function rpPriceLabel() {
 function rpIsRecurringPlan() {
   return rpState.service === "maintenance" && !!rpFrequencyPlan() && rpFrequencyPlan().visitsPerMonth > 1;
 }
+
+/* ---------------------------------------------------------------------
+   REQUIRED FIRST-VISIT DEEP CLEAN ON RECURRING PLANS
+   Visit one of a recurring plan absorbs months of accumulated buildup at
+   the maintenance rate — the standard way cleaners lose money on
+   recurring accounts. Setting the baseline with a Deep Clean makes every
+   later visit genuinely predictable, because we controlled the starting
+   condition. Trade practice, and it's disclosed up front rather than
+   sprung on arrival.
+
+   Applies to ANY recurring frequency including Monthly (visitsPerMonth
+   is 1 for Monthly, so rpIsRecurringPlan() is false for it — that's why
+   this checks frequency directly instead). One-Time Basic cleans are
+   unaffected.
+
+   Set false to sell recurring with no required first Deep.
+   --------------------------------------------------------------------- */
+const RP_RECURRING_REQUIRES_DEEP_FIRST = true;
+
+function rpRecurringNeedsDeepFirst() {
+  return RP_RECURRING_REQUIRES_DEEP_FIRST
+    && rpState.service === "maintenance"
+    && !!rpState.frequency
+    && rpState.frequency !== "One-Time"
+    && !rpIsCustomQuoteOnly();
+}
+
+/* Price of that first-visit Deep, using the same size/bed/bath/condition
+   the customer already gave us. Computed by briefly swapping the service
+   so it reuses rpServiceBasePrice() rather than duplicating the formula —
+   state is always restored, including on error. */
+function rpRecurringDeepFirstCents() {
+  if (!rpRecurringNeedsDeepFirst()) return 0;
+  const prevService = rpState.service;
+  try {
+    rpState.service = "deep";
+    const tier = rpSqftTier();
+    if (!tier || tier.base === null) return 0;
+    return rpToCents(rpServiceBasePrice());
+  } finally {
+    rpState.service = prevService;
+  }
+}
+function rpRecurringDeepFirstPrice() {
+  return rpCentsToDollars(rpRecurringDeepFirstCents());
+}
+
+/* What the customer actually pays on booking day: the required Deep plus
+   any add-ons, with the military discount applied to the Deep. The
+   recurring per-visit rate starts from visit two. */
+function rpFirstVisitTotalCents() {
+  if (!rpRecurringNeedsDeepFirst()) return rpFinalPriceCents();
+  const deep = rpRecurringDeepFirstCents();
+  if (deep <= 0) return rpFinalPriceCents();
+  const discount = rpState.militaryDiscount
+    ? Math.min(Math.round(deep * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP))
+    : 0;
+  return deep - discount + rpAddonsCents();
+}
+function rpFirstVisitTotal() { return rpCentsToDollars(rpFirstVisitTotalCents()); }
+
 function rpMaintenanceBasePerVisit() {
   if (rpState.service !== "maintenance" || !rpState.bedrooms) return 0;
   return rpCentsToDollars(rpPreDiscountSubtotalCents() - rpMilitaryDiscountCents());

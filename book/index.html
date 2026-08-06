@@ -2902,11 +2902,14 @@ function rpScreenHtml() {
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>Here's what your ${svcName} includes</h2>
-      <p class="rp-sub">${rpState.service === "moveout" ? "Whether you're moving out, moving in, or listing for sale — here's everything included." : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
+      <h2>${rpState.service === "moveout" ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
+      <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
+      ${inc && inc.itemsLead ? `<p class="rp-included-note" style="margin:0 0 10px;text-align:left">${inc.itemsLead}</p>` : ""}
       <ul class="rp-included-list">
         ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
       </ul>
+      ${inc && inc.outcome ? `<p class="rp-included-note" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
+      ${inc && inc.excludes ? `<p class="rp-included-note" style="text-align:left">${inc.excludes}</p>` : ""}
       <p class="rp-included-note">Need something specific? You can add extras on the next steps, or text us anytime.</p>
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good — continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
@@ -3256,15 +3259,19 @@ function rpEstimateScreen(eyebrow) {
   return { scroll: `<div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
-      ${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}
+      ${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? `
+      <div class="rp-recurring-total"><span><strong>First visit — Deep Clean (required)</strong></span><strong>$${rpRecurringDeepFirstPrice().toFixed(2)}</strong></div>
+      <div class="rp-recurring-total"><span>Then ${rpState.frequency.toLowerCase()} visits</span><strong>$${rpMaintenanceBasePerVisit().toFixed(2)} each</strong></div>
+      <p class="rp-fineprint" style="margin:8px 0 0">Recurring plans start with one Deep Clean so every visit after it stays on schedule and on price. You're charged the Deep rate on visit one only.</p>
+      ` : `${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}`}
       ${rpIsRecurringPlan() && rpAddonsOnceCharge() ? `<div class="rp-recurring-total"><span>Add-ons for this visit (one-time)</span><strong>+$${rpAddonsOnceCharge()}</strong></div>` : ""}
       <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
     </div>` : ""}
     <div class="rp-invoice">
       <div class="rp-price-section">
         <div class="rp-price-block ${noGuaranteedPrice ? "is-quote" : ""}">
-          <strong>${rpPriceLabel()}</strong>
-          <span>${service.name}</span>
+          <strong>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? rpFormatMoney(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong>
+          <span>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? "Due on your first visit" : service.name}</span>
         </div>
         ${rpGuaranteeApplies()
           ? `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit</strong> — if your landlord flags something we missed, text us within 48 hours and we come back free.</div>`
@@ -3336,7 +3343,7 @@ function rpContactGateScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Your price is ready</h2>
-    <p class="rp-sub">Where should we send it? We'll text you a copy so you have it in writing — and if anything about your place is unusual, we can sort it out before you book.</p>
+    <p class="rp-sub">Where should we send it? We'll text you a copy so you have it in writing — and if anything about your place is unusual, we can sort it out before you book. Next you'll pick any extras, then see your total.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>

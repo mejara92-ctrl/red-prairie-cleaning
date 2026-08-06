@@ -307,3 +307,174 @@ VERIFIED
   forward:      included -> sqft -> bedrooms
   native back:  sqft -> included -> service
   on-screen back from included -> service
+
+
+========================================================
+ROUND 6 — GATE LEAK: PRICE VISIBLE BEFORE CONTACT
+========================================================
+REPORTED: "I can see the price before inputting info."
+
+CAUSE: the add-ons screen carries a live "Current estimate" chip
+(book/index.html line ~3227). The gate was injected before "estimate",
+so the customer read their full price one step early on the add-ons
+screen and could leave without giving a number.
+
+FIX: rpCurrentFlow() now injects the gate before "addons", falling back
+to "estimate" for flows with no add-ons step (carpet). Blanking the chip
+instead was rejected — customers would be picking add-ons with no idea
+what they cost.
+
+  moveout/deep  ... condition -> CONTACTGATE -> addons -> estimate
+  maintenance   ... frequency -> CONTACTGATE -> addons -> estimate
+  hourly        ... hours     -> CONTACTGATE -> addons -> estimate
+  carpet        ... details   -> CONTACTGATE -> estimate
+
+Gate copy updated: now says extras come next, then the total.
+
+VERIFIED — no dollar figure on any step before the gate for
+moveout/deep/maintenance/carpet.
+
+*** KNOWN AND ACCEPTED: HOURLY CLEANING IS DIFFERENT ***
+The cleaners step shows $50/hr per cleaner and the hours step shows
+running totals ($150, $200, $250...). Both are BEFORE the gate and both
+have to be — nobody can pick a cleaner count or an hour count without
+seeing what it costs. Hourly is a published rate anyway, so there is
+nothing to protect. Not a bug. Left as is.
+
+*** STRATEGIC TENSION WORTH A DECISION ***
+The /pricing page publishes every bracket, adder and multiplier. Anyone
+willing to do the arithmetic can compute their own number without ever
+touching the funnel. The gate is therefore a SOFT gate: it catches the
+majority who won't do the math, not the determined shopper.
+
+That is a direct consequence of two recommendations pulling opposite
+ways — publish everything for trust, hide the personalised number to
+capture contacts. Both can't be fully true at once. Options:
+
+  a) Leave as is. Soft gate + full transparency. (current)
+  b) Publish "starting at" prices only, drop the tables. Harder gate,
+     weaker transparency positioning.
+  c) Drop the gate, keep full transparency, capture contacts by phone
+     via LSA instead.
+
+No action taken — this is a business call, not a code fix.
+
+
+========================================================
+ROUND 7 — "EVERYTHING INSIDE" MESSAGING
+========================================================
+GOAL: convey that move-out is a COMPLETE interior clean built to pass
+inspection or list the home, not a list of 7 included items.
+
+BUG FOUND: rpIncludes.moveout.intro already held good totality copy but
+book/index.html never rendered it — the subhead was hardcoded. That copy
+had been dead the whole time. The screen now renders inc.intro, so copy
+lives in ONE place (the engine) and /call sees the same text.
+
+WHY THE OLD SCREEN UNDERSOLD IT: a checklist BOUNDS scope. A reader
+stops reading it as "what I get" and starts hunting for what's missing —
+garage? outside windows? carpets? A list can never say "everything",
+however long it is.
+
+FOUR CHANGES (js/rp-pricing-engine.js -> rpIncludes.moveout)
+  1. Headline is now the claim, not a label:
+     "Here's what your Move-In / Move-Out Cleaning includes"
+       -> "Everything inside the home"
+  2. intro asserts totality up front:
+     "...if it's inside the home, it's covered."
+  3. NEW itemsLead — reframes the list as PROOF, not scope:
+     "Including the parts most companies bill as add-ons:"
+     Reordered so oven/fridge/cabinets/closets (the ones competitors
+     charge $25-75 each for) lead. Last item is now the catch-all
+     "Every other room and surface inside the home".
+  4. NEW outcome — names the job it's built to do:
+     "Built to pass a landlord or property manager walkthrough — and to
+      photograph well if you're listing the home for sale."
+  5. NEW excludes — names what ISN'T in it:
+     exterior windows, garage floor, carpet extraction, junk removal.
+
+  The exclusions line is the counterintuitive one and it is load-bearing.
+  Claiming "everything" while staying vague about the garage and the
+  carpets makes people suspicious. Naming three or four exclusions is
+  precisely what makes "everything else" believable — and each one is an
+  add-on you sell on a later step anyway.
+
+Renderer now supports optional itemsLead / outcome / excludes on ANY
+service. Only moveout defines them today; deep, maintenance, carpet and
+hourly fall back to their existing intro copy and are unchanged
+(verified).
+
+
+========================================================
+ROUND 8 — BASIC CONDITION LADDER + FIRST-VISIT DEEP
+========================================================
+CONTEXT: raised the question of billing Deep/Basic hourly. Rejected —
+hourly billing means the customer doesn't know the price until the job
+is over, which is structurally the same uncertainty we're attacking a
+competitor for, and it kills recurring signups (people budget those).
+The real problem was variance in occupied homes. Fixed with a variance
+mechanism instead of a billing-model change.
+
+A. BASIC CLEANING NOW HAS A CONDITION STEP
+--------------------------------------------------------
+Basic was the ONLY priced service with no condition step — it went
+straight from size to frequency, so a 1,500 sq ft home with three kids
+and a dog billed identically to a tidy one the same size. That variance
+came out of margin.
+
+  NEW  RP_CONDITION_PRICED_SERVICES = ["moveout","deep","maintenance"]
+       rpConditionMultiplier() / rpIsSpecialtyCondition() now read this
+       list instead of a hardcoded ["moveout","deep"].
+  Flow: ... bathrooms -> CONDITION -> frequency -> ...
+
+  ORDER OF OPERATIONS (deliberate): condition multiplier applies FIRST
+  (real labour), THEN the frequency discount (loyalty discount on the
+  true price). Reversed, you'd be discounting the buildup surcharge.
+
+  Basic, 1,401-1,800 sq ft, 3 bed / 2 bath, one-time:
+    Standard  $220.00   (unchanged)
+    Heavy     $264.00   (+20%)
+    Extreme   $330.00   (+50%)
+
+B. REQUIRED FIRST-VISIT DEEP CLEAN ON RECURRING
+--------------------------------------------------------
+  NEW  RP_RECURRING_REQUIRES_DEEP_FIRST = true
+       rpRecurringNeedsDeepFirst(), rpRecurringDeepFirstCents/Price(),
+       rpFirstVisitTotalCents/Total()
+
+Visit one of a recurring plan was absorbing months of buildup at the
+maintenance rate. Now visit one is priced as a Deep Clean using the same
+size/bed/bath/condition already collected; visit two onward runs at the
+recurring rate.
+
+  Applies to Weekly, Biweekly AND Monthly. Note rpIsRecurringPlan()
+  returns false for Monthly (visitsPerMonth is 1), so the new check
+  tests frequency directly. One-Time Basic is unaffected.
+
+  Basic, 1,401-1,800 sq ft, 3 bed / 2 bath, standard:
+    Biweekly   first $339.00, then $187.00/visit
+    Weekly     first $339.00, then $176.00/visit
+    Monthly    first $339.00, then $198.00/visit
+    Biweekly + Heavy Buildup: first $406.80, then $224.00/visit
+
+  Estimate screen headline now reads the first-visit total with the
+  label "Due on your first visit", and the summary shows both numbers
+  plus a plain-English reason. Disclosed before booking — never sprung
+  on arrival, which would break the no-upcharge promise.
+
+  Set RP_RECURRING_REQUIRES_DEEP_FIRST = false to sell recurring with
+  no required first Deep.
+
+REGRESSION — ALL UNCHANGED
+  Move-out 1,500sf 3/2 $379.00 | + military $354.00
+  Deep $339.00 | Hourly 3h x1 $150.00 | Carpet 3 rooms $225.00
+  Basic one-time standard $220.00 | Basic biweekly standard $187.00
+
+STILL OPEN (recommended, not built)
+  Disclosed re-quote clause: if the home on arrival is materially worse
+  than described, crew calls the office and the office calls the
+  customer with a revised price BEFORE starting. Policy + CSR script,
+  not code.
+  Internal per-room target times in the field guide — for spotting jobs
+  that run long and repricing that customer next time. Do NOT publish
+  them; customers treat published times as promises.
