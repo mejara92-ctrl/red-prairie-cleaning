@@ -1,0 +1,1105 @@
+RED PRAIRIE — POSITIONING & PRICING-PAGE SPRINT
+================================================
+
+FILES CHANGED (5) + 1 NEW
+  js/rp-pricing-engine.js   modified
+  book/index.html           modified
+  call/index.html           modified
+  index.html                modified
+  sitemap.xml               modified
+  pricing/index.html        NEW
+
+--------------------------------------------------------
+1. js/rp-pricing-engine.js
+--------------------------------------------------------
+- rpServices.hourly.name: "Hourly Cleaning & Organizing" -> "Targeted Clean"
+  (internal key stays "hourly" — no state/webhook plumbing changed)
+- HOURLY_MIN_HOURS: 4 -> 3   (3 hrs x 1 cleaner = $150 floor)
+- NEW  RP_TARGETED_CLEAN_PUBLIC = true
+       Peak-season kill switch. Set false to pull Targeted Clean off the
+       PUBLIC /book service list in one line. /call is unaffected — CSRs
+       can always book it by phone.
+- NEW  rpServiceIsPublic(key)
+- NEW  RP_GUARANTEE_EXCLUDED_SERVICES / rpGuaranteeApplies()
+       Defend Your Deposit does not apply to partial-scope work.
+- rpIncludes.hourly rewritten: sells TIME, not COMPLETION.
+
+  NO EXISTING PRICE WAS CHANGED. Verified:
+    Move-out 1,500sf 3/2            $379.00
+    Move-out 1,500sf 3/2 + military $354.00
+    Move-out 1,500sf 3/2 heavy      $454.80
+    Deep 1,500sf 3/2                $339.00
+    Basic t3 3/2 biweekly           $187.00
+    Carpet 3 rooms                  $225.00
+    Targeted 3h x1                  $150.00
+
+--------------------------------------------------------
+2. book/index.html
+--------------------------------------------------------
+- Service row renamed to "Targeted Clean", gated behind rpServiceIsPublic()
+- Estimate screen guarantee line is now service-aware:
+    guaranteed services -> full "Defend Your Deposit" promise
+    Targeted Clean      -> explicit carve-out + steer to move-out clean
+- Notes field on Targeted Clean becomes "Your priority areas — most
+  important first", with an example placeholder, and is REQUIRED
+  (min 5 chars) before the lead can submit. Without a priority list the
+  crew has nothing to work from.
+
+--------------------------------------------------------
+3. call/index.html
+--------------------------------------------------------
+- Service picker description updated with the 3-hr minimum and the
+  qualifying question.
+- SERVICE_ANGLES.hourly rewritten + two new fields:
+    qualifier         "Is this a move-out, or a house you're living in?"
+    guaranteeWarning  what to say if they ARE moving out
+    scopeWarning      get the priority list before quoting
+- resolveScript() now injects those into the rail on the
+  cleaners/hours (qualifier + guarantee) and quote/contact (scope) steps.
+
+--------------------------------------------------------
+4. index.html (homepage)
+--------------------------------------------------------
+- "Pricing" added to primary nav
+- Hero subhead replaced with the Defend Your Deposit 48-hour promise
+  (was buried as FAQ answer #1)
+- Hero microcopy now leads with the three differentiators:
+  real price not a callback / no upcharges at the door /
+  oven, fridge, cabinets & closets included
+- Added "See every price up front ->" link under the CTA
+
+--------------------------------------------------------
+5. pricing/index.html (NEW)
+--------------------------------------------------------
+Full public price list: move-out, deep, basic, carpet, targeted, add-ons,
+military discount. Matches Prairie Glass (Manrope + DM Serif, #d00000).
+Centerpiece is the included-vs-add-on ledger under the move-out table.
+Includes Service + AggregateRating schema. No competitor is named
+anywhere — comparisons are generic ("commonly quoted as a paid add-on
+elsewhere"), which is both accurate and legally safe.
+
+--------------------------------------------------------
+!! BEFORE YOU DEPLOY !!
+--------------------------------------------------------
+GHL: add "Targeted Clean -> Other" to the Service Needed dropdown.
+/book line ~4021 sends rpServices[service].name to the Worker. There is
+currently NO mapping for Hourly at all, so once renamed you'd be sending
+a value the dropdown doesn't have. The Worker degrades gracefully
+(retries without custom fields) but you'd silently lose service_needed
+on every Hourly Cleaning booking.
+
+NOT DONE (by your call)
+- Sona prompt: deactivated, untouched. It still contains the OLD move-out
+  tiers ($399/$449/$499 for the top three brackets) against the engine's
+  current $419/$479/$549, and knows nothing about Targeted Clean. Leave it
+  off until it's updated or it will quote wrong.
+- Deep Cleaning 1,001–1,400 sq ft left at $255 as you decided.
+- Photo report: intentionally NOT on the site yet. Run it manually 2–3
+  weeks first, then add it.
+- js/rp-canonical-estimator.js + tools/apply-canonical-estimator.py are
+  still present but fully dereferenced. Harmless.
+
+
+========================================================
+ROUND 2 — CONVERSION FIXES
+========================================================
+
+6. js/rp-pricing-engine.js  — CONTACT GATE
+--------------------------------------------------------
+NEW  RP_CONTACT_GATE = true
+     rpCurrentFlow() now injects a "contactgate" step immediately
+     before "estimate" on EVERY service flow.
+
+WHY: price used to render before any contact was captured. Anyone who
+balked at the number left completely anonymous — no name, no phone, no
+callback, no retargeting. On a paid LSA or Ads click that's the whole
+lead burned on a price objection you never got to answer.
+
+Set RP_CONTACT_GATE = false to restore the old price-first order.
+
+*** WATCH THE RIGHT METRIC ***
+Funnel COMPLETION RATE WILL GET WORSE. That's by design — you're
+trading some top-of-funnel completion for a much higher share of
+REACHABLE leads. Judge this on booked jobs and on callable leads in
+GHL, not on estimator completion. Give it 3-4 weeks before deciding.
+
+7. book/index.html — contact gate screen
+--------------------------------------------------------
+- rpContactGateScreen(): name + phone ONLY. Address block stays on the
+  lead step and is prefilled from here (verified).
+- Framed as "where should we send it" — the quote genuinely does get
+  texted. Reads as a delivery question, not a paywall.
+- rpSubmitContactGate() posts a PARTIAL lead immediately:
+      booking_status: "Partial Lead - Contact Captured Before Price Shown"
+      booking_source: "website_estimator_contact_gate"
+  Fire-and-forget in a try/catch — a failed post never blocks the
+  customer from seeing their price.
+- New analytics events: contact_gate_submitted, gate_validation_error
+
+  >>> GHL ACTION: build a workflow on booking_source =
+      "website_estimator_contact_gate" where booking_status is still
+      "Partial Lead". Those are people who saw the price and left.
+      They are your highest-intent callback list. Right now nothing
+      picks them up.
+
+8. call/index.html — price-question bridge
+--------------------------------------------------------
+New FIRST objection: "How much for a move-out clean?" asked before any
+details. On a paid LSA call this fires within ~20 seconds and is where
+most calls are lost. Script bridges to sq ft + bed/bath BEFORE quoting,
+then quotes bundled with what's included, then pauses.
+
+Placed first in OBJECTIONS deliberately. QUOTE_SCREEN_OBJECTION_KEYS
+references objections by exact text, not index, so the quote screen
+picker is unaffected.
+
+--------------------------------------------------------
+PRICE REGRESSION — RE-VERIFIED AFTER ROUND 2
+--------------------------------------------------------
+  Move-out 1,500sf 3/2            $379.00
+  Move-out 1,500sf 3/2 + military $354.00
+  Deep 1,500sf 3/2                $339.00
+  Basic t3 3/2 biweekly           $187.00
+  Targeted Clean 3h x1            $150.00
+  Carpet 3 rooms                  $225.00
+  No price changed in either round.
+
+--------------------------------------------------------
+NOT IN THIS ZIP — these are not website changes
+--------------------------------------------------------
+- Google Ads restructure (200 combos -> ~8 intent-based ad groups).
+  Google Ads console.
+- Missed-call text-back within 60 seconds. GHL automation. Probably
+  your single highest-ROI fix and it isn't code — every unanswered
+  LSA ring is a lead you already paid for, and Google factors
+  responsiveness into LSA ranking.
+- LSA bad-lead disputes. LSA dashboard. Free money most operators
+  never claim.
+- Property manager / realtor outbound. Relationship work.
+- Photo report. Still ops-only until the crew does it every time.
+
+
+========================================================
+ROUND 3 — CORRECTION: THE CONTACT GATE WASN'T SENDING
+========================================================
+
+WHAT WAS WRONG IN THE ROUND 2 ZIP
+--------------------------------------------------------
+rpSubmitContactGate() called rpSendEstimateToGoHighLevel(), which is a
+NO-OP STUB — it sets two flags and returns without sending anything:
+
+    function rpSendEstimateToGoHighLevel(extra = {}) {
+      /* Calendar-only confirmation gate: ... */
+      rpState.estimateSent = true;
+      rpState.preBookingWebhookSent = true;
+      return true;
+    }
+
+So the gate captured a name and phone into rpState and they never left
+the browser. The gate was decorative. Fixed below.
+
+This also answers "where do unfinished bookings go?" — before this
+round, NOWHERE. /book is the only endpoint the site called, and it
+hard-requires a valid appointment startTime (400s without one). Anyone
+who didn't reach the calendar and pick a slot vanished with no contact,
+no note, no tag.
+
+9. book/index.html — gate now posts for real
+--------------------------------------------------------
+rpSubmitContactGate() now POSTs directly to `${RP_BOOKING_API}/lead`,
+the only endpoint that accepts a contact with no appointment.
+
+  lead_type:        "website_partial"
+  call_outcome:     "Saw price online - did not book"
+  csr_lead_source:  "Website Estimator"
+  + service, quoted_price, size/bed/bath/condition summary,
+    ad attribution, timestamp
+
+  keepalive: true  — survives the customer closing the tab
+  .catch(() => {}) — a failed post NEVER blocks the price screen
+                     (verified with the network aborted: price still renders)
+
+10. workers/PATCH-lead-endpoint.md — NEW
+--------------------------------------------------------
+Three exact find/replace blocks for the rpc-booking-api Worker.
+Delivered as a patch rather than a regenerated file so there's no risk
+of a transcription slip breaking your production API.
+
+WHY IT'S NEEDED: /lead hardcodes source "RPC Call Console (no booking)"
+and the tag "call-no-booking" on everything. Without the patch, website
+abandons show up as Christa's phone calls and corrupt call reporting.
+After the patch they get source "Red Prairie Website (price viewed, no
+booking)" and tags website-partial-lead / price-viewed-no-booking.
+
+Phone leads from /call are unaffected — lead_type defaults to phone
+when absent, and /call doesn't send it.
+
+*** DEPLOY ORDER: Worker patch FIRST, then the site. ***
+Site-before-Worker means website leads get mislabelled as phone leads
+until you catch up.
+
+*** CHECK BEFORE DEPLOYING ***
+The stub existed for a reason — almost certainly to stop GHL texting
+confirmations to people who hadn't booked. You are now creating
+contacts before any booking exists. Audit every GHL workflow that
+triggers on contact-created or tag-added and confirm none send a
+customer-facing confirmation. Partial leads should fire an INTERNAL
+notification only.
+
+VERIFIED THIS ROUND
+--------------------------------------------------------
+  Gate posts exactly one /lead call with correct payload   PASS
+  Advances to price screen after posting                   PASS
+  Network failure -> price still renders, no error         PASS
+  Lead step still prefills name/phone from gate            PASS
+  All prices unchanged (3rd consecutive check)             PASS
+
+
+========================================================
+ROUND 4 — RENAME (per Mike)
+========================================================
+"Targeted Clean" -> "Hourly Cleaning" everywhere.
+3-hour minimum KEPT ($150 floor at 1 cleaner).
+
+  js/rp-pricing-engine.js   rpServices.hourly.name = "Hourly Cleaning"
+                            RP_TARGETED_CLEAN_PUBLIC renamed to
+                            RP_HOURLY_PUBLIC (the kill switch)
+  book/index.html           service row title
+  call/index.html           CSR comments
+  pricing/index.html        section heading + card title
+
+Internal key is still "hourly" — unchanged since round 1, so nothing in
+GHL, the Worker, or saved state is affected.
+
+  >>> GHL ACTION UPDATED: the Service Needed dropdown option should be
+      "Hourly Cleaning -> Other", NOT "Targeted Clean". If you already
+      added Targeted Clean, change it.
+
+Verified: service list, hours picker (3-8), $150 at 3h x 1 cleaner,
+kill switch, all other prices unchanged.
+
+
+========================================================
+ROUND 5 — BACK BUTTON
+========================================================
+REPORTED: "can't hit back after selecting move-in/move-out"
+
+DIAGNOSIS: the screenshot showed "STEP 2 OF 10". This build reports
+"STEP 2 OF 11" — the contact gate adds one step. So the site being
+tested was the LIVE, un-deployed build, not this one. Back button and
+native browser back both verified working in this build at that exact
+step and window size.
+
+FIXED ANYWAY — a real bug found while investigating:
+book/index.html, session-resume history rebuild read the raw flow table
+instead of the computed flow:
+
+  BEFORE: const flow = rpResumedSession ? (rpFlows[rpState.service] || []) : [];
+  AFTER:  const flow = rpResumedSession ? rpCurrentFlow() : [];
+
+rpFlows is the raw table and does NOT contain the injected "contactgate"
+step; only rpCurrentFlow() does. On a resumed session (refresh, or
+returning to a half-finished estimate within 3 hours) this rebuilt one
+history entry too few, so back landed on the wrong screen. Introduced in
+round 2 with the contact gate.
+
+VERIFIED
+  forward:      included -> sqft -> bedrooms
+  native back:  sqft -> included -> service
+  on-screen back from included -> service
+
+
+========================================================
+ROUND 6 — GATE LEAK: PRICE VISIBLE BEFORE CONTACT
+========================================================
+REPORTED: "I can see the price before inputting info."
+
+CAUSE: the add-ons screen carries a live "Current estimate" chip
+(book/index.html line ~3227). The gate was injected before "estimate",
+so the customer read their full price one step early on the add-ons
+screen and could leave without giving a number.
+
+FIX: rpCurrentFlow() now injects the gate before "addons", falling back
+to "estimate" for flows with no add-ons step (carpet). Blanking the chip
+instead was rejected — customers would be picking add-ons with no idea
+what they cost.
+
+  moveout/deep  ... condition -> CONTACTGATE -> addons -> estimate
+  maintenance   ... frequency -> CONTACTGATE -> addons -> estimate
+  hourly        ... hours     -> CONTACTGATE -> addons -> estimate
+  carpet        ... details   -> CONTACTGATE -> estimate
+
+Gate copy updated: now says extras come next, then the total.
+
+VERIFIED — no dollar figure on any step before the gate for
+moveout/deep/maintenance/carpet.
+
+*** KNOWN AND ACCEPTED: HOURLY CLEANING IS DIFFERENT ***
+The cleaners step shows $50/hr per cleaner and the hours step shows
+running totals ($150, $200, $250...). Both are BEFORE the gate and both
+have to be — nobody can pick a cleaner count or an hour count without
+seeing what it costs. Hourly is a published rate anyway, so there is
+nothing to protect. Not a bug. Left as is.
+
+*** STRATEGIC TENSION WORTH A DECISION ***
+The /pricing page publishes every bracket, adder and multiplier. Anyone
+willing to do the arithmetic can compute their own number without ever
+touching the funnel. The gate is therefore a SOFT gate: it catches the
+majority who won't do the math, not the determined shopper.
+
+That is a direct consequence of two recommendations pulling opposite
+ways — publish everything for trust, hide the personalised number to
+capture contacts. Both can't be fully true at once. Options:
+
+  a) Leave as is. Soft gate + full transparency. (current)
+  b) Publish "starting at" prices only, drop the tables. Harder gate,
+     weaker transparency positioning.
+  c) Drop the gate, keep full transparency, capture contacts by phone
+     via LSA instead.
+
+No action taken — this is a business call, not a code fix.
+
+
+========================================================
+ROUND 7 — "EVERYTHING INSIDE" MESSAGING
+========================================================
+GOAL: convey that move-out is a COMPLETE interior clean built to pass
+inspection or list the home, not a list of 7 included items.
+
+BUG FOUND: rpIncludes.moveout.intro already held good totality copy but
+book/index.html never rendered it — the subhead was hardcoded. That copy
+had been dead the whole time. The screen now renders inc.intro, so copy
+lives in ONE place (the engine) and /call sees the same text.
+
+WHY THE OLD SCREEN UNDERSOLD IT: a checklist BOUNDS scope. A reader
+stops reading it as "what I get" and starts hunting for what's missing —
+garage? outside windows? carpets? A list can never say "everything",
+however long it is.
+
+FOUR CHANGES (js/rp-pricing-engine.js -> rpIncludes.moveout)
+  1. Headline is now the claim, not a label:
+     "Here's what your Move-In / Move-Out Cleaning includes"
+       -> "Everything inside the home"
+  2. intro asserts totality up front:
+     "...if it's inside the home, it's covered."
+  3. NEW itemsLead — reframes the list as PROOF, not scope:
+     "Including the parts most companies bill as add-ons:"
+     Reordered so oven/fridge/cabinets/closets (the ones competitors
+     charge $25-75 each for) lead. Last item is now the catch-all
+     "Every other room and surface inside the home".
+  4. NEW outcome — names the job it's built to do:
+     "Built to pass a landlord or property manager walkthrough — and to
+      photograph well if you're listing the home for sale."
+  5. NEW excludes — names what ISN'T in it:
+     exterior windows, garage floor, carpet extraction, junk removal.
+
+  The exclusions line is the counterintuitive one and it is load-bearing.
+  Claiming "everything" while staying vague about the garage and the
+  carpets makes people suspicious. Naming three or four exclusions is
+  precisely what makes "everything else" believable — and each one is an
+  add-on you sell on a later step anyway.
+
+Renderer now supports optional itemsLead / outcome / excludes on ANY
+service. Only moveout defines them today; deep, maintenance, carpet and
+hourly fall back to their existing intro copy and are unchanged
+(verified).
+
+
+========================================================
+ROUND 8 — BASIC CONDITION LADDER + FIRST-VISIT DEEP
+========================================================
+CONTEXT: raised the question of billing Deep/Basic hourly. Rejected —
+hourly billing means the customer doesn't know the price until the job
+is over, which is structurally the same uncertainty we're attacking a
+competitor for, and it kills recurring signups (people budget those).
+The real problem was variance in occupied homes. Fixed with a variance
+mechanism instead of a billing-model change.
+
+A. BASIC CLEANING NOW HAS A CONDITION STEP
+--------------------------------------------------------
+Basic was the ONLY priced service with no condition step — it went
+straight from size to frequency, so a 1,500 sq ft home with three kids
+and a dog billed identically to a tidy one the same size. That variance
+came out of margin.
+
+  NEW  RP_CONDITION_PRICED_SERVICES = ["moveout","deep","maintenance"]
+       rpConditionMultiplier() / rpIsSpecialtyCondition() now read this
+       list instead of a hardcoded ["moveout","deep"].
+  Flow: ... bathrooms -> CONDITION -> frequency -> ...
+
+  ORDER OF OPERATIONS (deliberate): condition multiplier applies FIRST
+  (real labour), THEN the frequency discount (loyalty discount on the
+  true price). Reversed, you'd be discounting the buildup surcharge.
+
+  Basic, 1,401-1,800 sq ft, 3 bed / 2 bath, one-time:
+    Standard  $220.00   (unchanged)
+    Heavy     $264.00   (+20%)
+    Extreme   $330.00   (+50%)
+
+B. REQUIRED FIRST-VISIT DEEP CLEAN ON RECURRING
+--------------------------------------------------------
+  NEW  RP_RECURRING_REQUIRES_DEEP_FIRST = true
+       rpRecurringNeedsDeepFirst(), rpRecurringDeepFirstCents/Price(),
+       rpFirstVisitTotalCents/Total()
+
+Visit one of a recurring plan was absorbing months of buildup at the
+maintenance rate. Now visit one is priced as a Deep Clean using the same
+size/bed/bath/condition already collected; visit two onward runs at the
+recurring rate.
+
+  Applies to Weekly, Biweekly AND Monthly. Note rpIsRecurringPlan()
+  returns false for Monthly (visitsPerMonth is 1), so the new check
+  tests frequency directly. One-Time Basic is unaffected.
+
+  Basic, 1,401-1,800 sq ft, 3 bed / 2 bath, standard:
+    Biweekly   first $339.00, then $187.00/visit
+    Weekly     first $339.00, then $176.00/visit
+    Monthly    first $339.00, then $198.00/visit
+    Biweekly + Heavy Buildup: first $406.80, then $224.00/visit
+
+  Estimate screen headline now reads the first-visit total with the
+  label "Due on your first visit", and the summary shows both numbers
+  plus a plain-English reason. Disclosed before booking — never sprung
+  on arrival, which would break the no-upcharge promise.
+
+  Set RP_RECURRING_REQUIRES_DEEP_FIRST = false to sell recurring with
+  no required first Deep.
+
+REGRESSION — ALL UNCHANGED
+  Move-out 1,500sf 3/2 $379.00 | + military $354.00
+  Deep $339.00 | Hourly 3h x1 $150.00 | Carpet 3 rooms $225.00
+  Basic one-time standard $220.00 | Basic biweekly standard $187.00
+
+STILL OPEN (recommended, not built)
+  Disclosed re-quote clause: if the home on arrival is materially worse
+  than described, crew calls the office and the office calls the
+  customer with a revised price BEFORE starting. Policy + CSR script,
+  not code.
+  Internal per-room target times in the field guide — for spotting jobs
+  that run long and repricing that customer next time. Do NOT publish
+  them; customers treat published times as promises.
+
+
+========================================================
+ROUND 9 — MINIMUM CHARGE
+========================================================
+BRIEF: "$150 minimum per thing we clean." Analysis found 22 price
+points below $150 — ALL Basic Cleaning. Worst case $99.90 (weekly,
+<=1000 sq ft, with military discount).
+
+DECISIONS MADE (each one is reversible — flagged for veto)
+
+1. RAISED THE PUBLISHED PRICE RATHER THAN HIDING A FLOOR
+   Basic tier 1 base: $139 -> $150.
+   A silent floor would contradict the whole position — the pricing
+   page said $139 while the estimator charged $150. "The price you see
+   is the price you pay" has to survive contact with the price list.
+   The floor stays only as a safety net for edge cases.
+   NOTE: this leaves a $5 step from t1 ($150) to t2 ($155) where other
+   steps are ~$20. Cosmetically odd, same as the deep $255/$259 gap you
+   chose to keep. Left alone rather than repricing the whole ladder.
+
+2. TWO FLOORS, NOT ONE
+   RP_ONE_TIME_MIN            = 150
+   RP_RECURRING_MIN_PER_VISIT = 115
+
+   Deliberately different. A one-time visit IS the whole relationship
+   so it must stand alone. On a recurring plan the ACCOUNT is the unit
+   of economics: a weekly customer at $120/visit is ~$6,200/year and is
+   one of the best accounts on the book. A blanket $150 would have
+   refused that business for no reason.
+
+3. FLOOR APPLIES AFTER THE MILITARY DISCOUNT
+   Applied before it, the discount punches straight through the floor
+   ($150 becomes $135). CONSEQUENCE, ACCEPTED: a customer already at
+   the floor gets no military discount. Basic t1 one-time is $150 with
+   or without it. Unavoidable with a hard floor — the alternative is
+   letting the floor be broken.
+
+4. FLOOR COVERS THE CLEANING ONLY, NOT ADD-ONS
+   Add-ons stack on top, so a thin base can't ride in on an expensive
+   junk haul that carries its own disposal cost.
+
+NEW IN THE ENGINE
+   RP_ONE_TIME_MIN, RP_RECURRING_MIN_PER_VISIT
+   rpIsRecurringBooking(), rpServiceFloorCents(),
+   rpNetServiceCents(), rpFloorApplied()
+   rpFinalPriceCents / rpMaintenanceBasePerVisit / rpMonthlyTotal /
+   rpFirstVisitTotalCents all route through rpNetServiceCents().
+
+PRICING PAGE UPDATED TO MATCH
+   Basic tier 1 now published at $150; minimum stated in the hero
+   promises and the footer fine print; Basic table gained the condition
+   ladder and the first-visit Deep note (round 8 changes that hadn't
+   reached the page yet).
+
+VERIFIED
+   0 of 22 previously-below-floor cases remain below floor.
+   Headline prices UNCHANGED: move-out 1500 3/2 $379 / $354 military,
+   deep $339, carpet 3rm $225, Basic t3 3/2 biweekly $187,
+   recurring first visit $339.
+
+NOT CHANGED, AND WHY
+   Move-out and Deep floors ($229 / $199) already clear $150 by a wide
+   margin even with the military discount. Left alone.
+   Add-on prices unchanged — they attach to a job that already cleared
+   the floor, so they don't need their own minimum.
+
+STILL RECOMMENDED, NOT BUILT (needs your data, not code)
+   Track actual hours per job. Every floor here is reasoned from
+   assumed labour times. The number that really governs profitability
+   is revenue per cleaner-hour — target $55+. Until jobs are timed,
+   these floors are educated estimates.
+
+
+========================================================
+ROUND 10 — CARPET PRICE CUT + "COMPLETE CLEAN" AS MAIN MESSAGE
+========================================================
+
+A. CARPET CLEANING: $75/room -> $50/room, standalone and bundled alike
+--------------------------------------------------------
+Was two prices for the same work: $75/room booked on its own, $50/room
+bundled onto another service. Now a single $50/room rate regardless of
+how it's booked — nothing about cleaning a carpet changes based on that.
+
+  js/rp-pricing-engine.js   standalone carpet formula now reads
+                            rpAddonCatalog.carpet.bundlePrice ($50)
+                            instead of a hardcoded 75
+  book/index.html           carpet step subhead: "$75 per room" -> "$50"
+  pricing/index.html        carpet card: $75 -> $50 flat, note updated to
+                            "same rate whether booked on its own or added"
+                            add-ons table: removed the now-redundant
+                            "carpet, added to another service $50/room"
+                            row since it no longer differs from the
+                            standalone price
+
+  *** INTERACTION WITH THE ROUND-9 FLOOR, WORTH KNOWING ***
+  At $50/room the $150 one-time floor now absorbs BOTH the 2-room and
+  3-room jobs into the same $150 price:
+    2 rooms   $150  (floor — would be $100 uncapped)
+    3 rooms   $150  (exactly at the floor)
+    4 rooms   $200
+    5 rooms   $250
+  This is a direct consequence of two decisions made in separate
+  conversations (the $150 floor, then the $50/room cut) interacting.
+  Not a bug — both decisions stand on their own — but a 3-room carpet
+  customer now pays the same as a 2-room customer, which is worth
+  knowing before Christa gets the "why is 3 rooms not more than 2?"
+  question on the phone. If that bothers you, the fix is either raising
+  the carpet floor's room minimum to 3, or accepting it as a rounding
+  quirk at the bottom of the range.
+
+  Add-on carpet (bundled onto move-out/deep/etc.) is NOT floored — it
+  never was, add-ons stack on top of a job that already cleared the
+  floor on its own. Verified: move-out + 3-room carpet add-on = $529.00,
+  i.e. $379 + $150 (3 x $50), unaffected by this change.
+
+B. HOMEPAGE HERO REWRITTEN — "EVERYTHING INSIDE" IS NOW THE HEADLINE
+--------------------------------------------------------
+The totality message built for the /book "included" screen in round 7
+was live there but not on the homepage, which still led with an
+outcome-only headline. Ported the same idea up to the H1 — it's now the
+first thing anyone sees, not just something they reach two steps into
+the estimator.
+
+  H1: "Move-Out Cleaning That Protects Your Deposit — Or Your Sale."
+   -> "Every Room. Every Surface. The Complete Move-Out Clean."
+
+  New paragraph directly under the trust badges:
+  "Inside & out — oven, fridge, cabinets, closets, baseboards, every
+  room. Not a checklist of extras: if it's inside the home, it's
+  covered. Built to pass a landlord walkthrough — or list the home for
+  sale." — same totality-then-outcome structure as the /book screen, so
+  the message is now consistent top of funnel through to the estimate.
+
+  Microcopy reordered so Defend Your Deposit leads (it's the strongest
+  asset on the page) ahead of the no-upcharge and speed promises.
+
+  Meta title/description tags were checked and don't reference the old
+  H1 wording, so they needed no changes.
+
+*** THIS FILE (index.html) HAS NEVER SUCCESSFULLY DEPLOYED ***
+Live-site checks this session confirmed the homepage is still running
+pre-round-1 copy — no Pricing nav link, old hero, old microcopy — even
+though every zip since round 1 has had the correct file. book/index.html
+and js/rp-pricing-engine.js ARE confirmed live (verified via screenshot
+showing "Everything inside the home"). Root index.html specifically is
+the one file that keeps not landing. Re-upload it deliberately and
+confirm via a hard refresh or cache-busted URL before assuming this
+round's changes are visible.
+
+VERIFIED
+  Carpet 2rm $150 / 3rm $150 / 4rm $200 / 5rm $250 (floor working as
+  intended given the new per-room rate)
+  Move-out + 3rm carpet add-on unaffected: $529.00
+  Homepage H1 and microcopy render correctly, no console errors
+  Regression: move-out $379, deep $339, basic biweekly $187, hourly $150
+  — all unchanged
+
+
+========================================================
+ROUND 11 — /book HERO REWRITTEN (WAS NEVER TOUCHED BEFORE)
+========================================================
+FOUND WHILE ANSWERING "is this the best we can do": the /book page has
+its OWN hero, entirely separate from index.html's homepage hero. It had
+never been edited in any prior round, so it still said "A spotless
+home. A protected deposit. Your price in 60 seconds." — generic enough
+that a competitor could say the same thing — and its service-area line
+was stale ("Lawton · Fort Sill · Elgin · Cache, OK", missing Medicine
+Park and Duncan that every other page lists).
+
+FIRST PASS: swapped the generic H1 for a differentiator-forward one
+("Every room, every surface. No upcharges at the door.") and replaced
+the "Licensed & Insured" trust badge with "Defend Your Deposit™" —
+insurance is table stakes every competitor claims, the guarantee isn't.
+
+SECOND PASS (per Mike's direction — name the nickel-and-diming problem
+directly, state both outcomes):
+  H1:  "No nickel-and-diming. The price you see is the price you pay."
+  NEW subhead (rp-hero-onphoto-sub, new CSS class):
+       "A home that passes inspection. A home that's ready for the next
+        tenant." — covers both buyers (PCS family being inspected,
+        seller/landlord prepping for the next occupant) with no hedging
+        language ("built to", "designed for").
+  Move-out row desc tightened to match: "Oven, fridge, cabinets &
+  closets included — not add-ons at the door."
+  Service-area eyebrow fixed to the full 6-city list used everywhere
+  else on the site.
+  Badges: Google rating, Defend Your Deposit™, Same-Day Availability.
+
+VERIFIED: no console errors, H1/subhead render correctly, JS syntax
+checks pass on the largest inline script block.
+
+STILL OPEN, FLAGGED NOT FIXED
+  No link to /pricing from this hero — the claim "no nickel-and-diming"
+  has no easy way for a skeptical visitor to verify it without leaving
+  the funnel. The homepage carries that link; this hero doesn't.
+  Hero photo is generic stock-style; a real before/after or crew-in-
+  frame photo would carry more weight than any more copy could.
+  Six-city eyebrow line wraps to two lines on narrow mobile widths —
+  cosmetic, not fixed, since dropping cities was the earlier mistake
+  here in the first place.
+
+
+========================================================
+ROUND 12 — DEEP & BASIC MOVE TO FLAT TIME-ANCHORED PRICING
+========================================================
+BRIEF: quoting every home size was the actual problem. Replace Deep and
+Basic's sqft-bracket pricing with a flat anchor: 3 hours/$150 for Basic,
+6 hours/$300 for Deep. Extra hours addable at booking, $50/hr, so size/
+mess variance is absorbed by hours instead of a size bracket. Move-Out
+is UNCHANGED — still sqft-bracket priced, since a size-based number
+matters there for the no-upcharge promise on the flagship service.
+
+Basic and Deep also move OFF the Defend Your Deposit guarantee onto a
+new Satisfaction Guarantee — Mike's call, made independently but it
+directly resolves an honesty problem: a flat-time service can't promise
+a completed whole-home reset the way Defend Your Deposit implies.
+
+--------------------------------------------------------
+A. PRICING MODEL (js/rp-pricing-engine.js)
+--------------------------------------------------------
+NEW constants: RP_BASIC_ANCHOR_HOURS=3, RP_BASIC_ANCHOR_PRICE=150,
+RP_DEEP_ANCHOR_HOURS=6, RP_DEEP_ANCHOR_PRICE=300, RP_EXTRA_HOUR_RATE=50.
+
+NEW addon: rpAddonCatalog.extraHours ($50/hr), offered on Deep and Basic
+only (rpServiceAddons). Mirrors the existing laundry-loads pattern
+exactly — quantity picker, 1-4 hours.
+
+rpServiceBasePrice(): now Move-Out ONLY. Deep's branch removed (returns
+0 if ever called directly, so a stale caller fails loudly instead of
+silently inheriting Move-Out's sqft math).
+
+NEW rpDisplayBasePrice(): single source of truth for what "Base Service"
+displays for ANY service — moveout uses rpServiceBasePrice(), deep/
+maintenance return their flat anchor. Used by both /book's invoice and
+/call's CSR summary so the two can't drift apart from each other again.
+
+rpPreDiscountSubtotalCents(): deep now returns flat RP_DEEP_ANCHOR_PRICE
+immediately, no sqft/bedroom/condition lookup at all. Maintenance now
+uses RP_BASIC_ANCHOR_PRICE as its base instead of the old sqft-tier
+rpMaintenancePrice() call, still runs through the frequency discount
+exactly as before.
+
+RP_CONDITION_PRICED_SERVICES: ["moveout","deep","maintenance"] ->
+["moveout"] only. Condition step (Standard/Heavy/Extreme) removed from
+Deep and Basic entirely — extra hours do that job now.
+
+  *** FLAGGED, NOT SILENTLY DROPPED: the "Specialty or Unsafe
+  Conditions" custom-quote carve-out (biohazard, active pests, PPE
+  situations) doesn't exist for Deep/Basic anymore since there's no
+  condition step to select it from. Move-Out still has this protection.
+  For Deep/Basic that safety net now depends entirely on what the
+  customer writes in special instructions and the office catching it
+  before the appointment — worth deciding if that's sufficient. ***
+
+rpRecurringDeepFirstCents(): dramatically simplified. Used to swap
+rpState.service to "deep" and read a sqft-bracket price (fragile —
+depended on whatever sqft/bedroom fields happened to still be in state
+from the Basic flow). Now just returns the flat RP_DEEP_ANCHOR_PRICE
+directly. No state-swapping, no dependency, no silent-$0 failure mode.
+
+rpTimeEstimate(): Deep/Basic now report the real anchor + any extra
+hours purchased ("6 hours" or "8 hours (6 + 2 extra)") instead of the
+old static "Up to 6 hours" / "Up to 4 hours" placeholder text.
+
+--------------------------------------------------------
+B. GUARANTEE SYSTEM — THREE TIERS INSTEAD OF ONE ON/OFF SWITCH
+--------------------------------------------------------
+NEW rpGuaranteeType() returns "deposit" | "satisfaction" | "none":
+  deposit       Move-Out only — Defend Your Deposit, unchanged wording.
+  satisfaction  Deep + Basic (NEW) — "not happy with something we
+                cleaned? Tell us within 48 hours and we'll come back and
+                make it right, free." Deliberately does NOT promise a
+                completed whole-home reset, since the service is now
+                sold as anchored time, not a size-matched guarantee.
+  none          Hourly — unchanged, scope-directed carve-out.
+
+  rpGuaranteeApplies() kept as a boolean wrapper (true unless "none")
+  for any caller that only needs yes/no.
+
+  *** FLAGGED, NOT CHANGED: Carpet still falls through to "deposit" by
+  default (rpGuaranteeType()'s fallback case) even though a standalone
+  carpet job has no deposit/inspection outcome either. Pre-existing
+  oddity, out of scope for what was asked this round — worth a decision
+  later. ***
+
+book/index.html estimate screen: the old two-way ternary is now a
+three-way IIFE branching on rpGuaranteeType(). All three states verified
+rendering correctly.
+
+--------------------------------------------------------
+C. FLOWS, ADD-ON UI, INVOICE, INCLUDED SCREENS
+--------------------------------------------------------
+rpFlows: deep and maintenance no longer collect sqft/bedrooms/bathrooms/
+condition at all.
+  deep:        included -> addons -> estimate -> lead -> calendar
+  maintenance: included -> frequency -> addons -> estimate -> lead -> calendar
+  (contactgate still auto-injects before addons exactly as before)
+
+book/index.html: full Extra Time add-on UI added, mirroring the laundry
+pattern at every touch point — isSelected map, cardMeta, summaryFor(),
+bodyFor() picker (1-4 hours), rpSelectExtraHours()/rpClearAddon(),
+customer-facing invoice row (rpAddonSummaryRows), office-facing GHL
+summary (jobDetails string + addonsList).
+
+Invoice display: "Home Size" row is now Move-Out only. New "Included
+Time" row shows the anchor hours for Deep/Basic. "Base Service" row for
+all three priced services now reads rpDisplayBasePrice() instead of two
+different ad-hoc formulas.
+
+rpIncludes.deep / rpIncludes.maintenance intro copy rewritten to explain
+the anchor-hours model plainly ("Includes 6 hours... a bigger or
+heavily-soiled home just means adding extra time on the next step, not
+a different quote") so the flat price isn't a surprise on the estimate
+screen. Item checklists themselves untouched (deep/basic keep the round-
+7-style itemized list; only Move-Out sells pure theory/result per round
+11's direction).
+
+--------------------------------------------------------
+D. /call (CSR CONSOLE) — PARTIALLY UPDATED, GAP FLAGGED
+--------------------------------------------------------
+Confirmed NOT a billing risk: /call's final quoted number always comes
+from the shared rpFinalPrice() engine function (verified — every price
+display and every GHL post in call/index.html calls it), so whatever
+Christa books will correctly reflect the flat anchor. This is a
+workflow/UX gap, not a pricing bug.
+
+FIXED: the one line that displayed a genuinely WRONG number — "Base
+(before discount)" for Maintenance was computing off the old
+rpMaintenancePrice(bedrooms,bathrooms) sqft formula, which no longer
+matches what's actually charged. Now reads rpDisplayBasePrice().
+
+*** NOT DONE, FLAGGED AS A FOLLOW-UP TASK — /call has its own hardcoded
+step arrays (DEEP_STEPS, MAINTENANCE_STEPS, separate from rpFlows) that
+still walk Christa through sqft -> bedrooms -> bathrooms -> condition
+for Deep and Basic. Those answers now have ZERO effect on the price —
+she'll click through four questions that don't do anything, which is
+confusing on a live call even though it doesn't cause a wrong quote.
+Fixing this properly means reworking call/index.html's STEP arrays,
+screen renderers, and SERVICE_ANGLES script text for these two services
+— a distinct task from this round, not done here. Recommend doing this
+before Christa starts taking Deep/Basic calls under the new model. ***
+
+--------------------------------------------------------
+E. PRICING PAGE (pricing/index.html)
+--------------------------------------------------------
+Deep and Basic's sqft-bracket tables replaced with flat-price cards
+matching the Hourly Cleaning card style already on the page. Both state
+the anchor hours, the flat price, and the $50/hr extra-time option.
+Basic's card also keeps the recurring-discount and first-visit-Deep
+notes from round 8/9. Schema.org lowPrice fixed from $139 (no longer a
+real price anywhere) to $150. Extra Time added to the published add-ons
+table.
+
+--------------------------------------------------------
+!! FOUND DURING TESTING — FLAGGED, NOT FIXED, NEEDS A DECISION !!
+--------------------------------------------------------
+Basic Cleaning's anchor price ($150) is EXACTLY EQUAL to the round-9
+one-time floor (RP_ONE_TIME_MIN = 150). Consequence: the military
+discount is completely swallowed on every one-time Basic booking.
+
+  Basic one-time, no military:      $150.00
+  Basic one-time, WITH military:    $150.00 (should be $135.00 — the
+                                     $15 discount gets floored right
+                                     back up to $150)
+
+Deep is unaffected — its $300 anchor sits well above the $150 floor, so
+$300 - $25 (capped) = $275 works correctly.
+
+This is two decisions from different rounds colliding, not a bug in
+either decision alone. Needs Mike's call: either exempt Basic's anchor
+from the one-time floor (since $150 was already the deliberately-chosen
+"lowest sustainable price," a further discount below it may not be
+desired anyway), or accept that one-time Basic simply doesn't discount
+and recurring Basic (which uses the lower $115 floor) does.
+
+--------------------------------------------------------
+VERIFIED THIS ROUND
+--------------------------------------------------------
+  Deep, no size inputs at all:        $300.00
+  Deep + 2 extra hours:               $400.00
+  Basic one-time:                     $150.00
+  Basic biweekly (15% off):           $128.00 (Math.round of 127.50,
+                                       consistent with existing rounding
+                                       behavior elsewhere, not new)
+  Basic biweekly + 1 extra hour:      $178.00
+  Recurring first-visit Deep:         $300.00 flat, no sqft dependency
+  Guarantee types: moveout=deposit, deep/maintenance=satisfaction,
+                   hourly=none, carpet=deposit (unchanged, flagged above)
+  Full regression — UNCHANGED: move-out $379/$354 mil/$454.80 heavy,
+  hourly 3h $150, carpet 3rm $150 (floor)/5rm $250
+  Playwright walkthrough: deep flow skips size steps entirely, shows
+  "Included Time: 6 hours", Satisfaction Guaranteed text, no Home Size
+  row. Maintenance biweekly shows correct first-visit total, base
+  service, and Satisfaction Guaranteed text. Zero console errors.
+  pricing/index.html: HTML nesting validated, zero errors.
+
+
+========================================================
+ROUND 13 — PUNCH LIST: READABILITY, FONTS, PRICE BADGES, CHECKLIST REMOVAL
+========================================================
+Built during a "talk it out" punch-list session. Items below were
+approved individually before being built; a few (contact-gate rewrite,
+Deep/Basic checklist copy) were flagged as still-pending when the
+session paused, then finished once confirmed.
+
+1. SERVICE ROW PRICE BADGES (book/index.html)
+   All five service rows now show a bold price pill (rpRowBtn's existing
+   val/valNote slot) instead of burying the number in the description:
+     Move-In/Move-Out   From $229   (still sqft-bracket priced, so "from")
+     Deep Cleaning       $300
+     Basic Cleaning      $150
+     Carpet Cleaning     $50 /room
+     Hourly Cleaning     $50 /hr
+   Move-out's description also updated: "Oven, fridge, cabinets & closets
+   included — not add-ons at the door." -> "A complete top-to-bottom
+   cleaning of the home — no add-ons needed." (plainer, no assumed
+   context about what "add-ons at the door" means).
+   Carpet's description trimmed to drop a price that's now redundant
+   with the badge ("Hot-water extraction, not a rental machine. $50/room."
+   -> "Hot-water extraction — not a rental machine.").
+
+2. GLOBAL READABILITY FIX — --rp-master-glass opacity
+   Found: the round-6 opacity fix from earlier in this project NEVER
+   ACTUALLY WORKED. There are two separate `:root { --rp-master-glass }`
+   definitions in the file; the later one always wins in the cascade and
+   was still low-opacity (rgba ~.64/.48), applied via !important to every
+   .rp-center panel, .rp-row, the invoice, form fields, and the footer
+   dock across the ENTIRE funnel. My earlier single-selector fix was
+   silently overridden by this shared token every time.
+
+   FIXED: raised BOTH --rp-master-glass definitions to rgba(...,.93)/
+   rgba(...,.86) — consistent, so a future edit to one doesn't
+   reintroduce the mismatch. This is an app-wide fix, not a per-screen
+   patch — every "included" screen, not just the ones screenshotted,
+   benefits from this.
+
+   NOTE FOR THE RECORD: the low opacity was documented in the code as a
+   DELIBERATE design choice ("so the photo remains visible instead of
+   turning into opaque vanilla panes"), not a bug. Raising it trades some
+   of that glass/photo-through look for actual text contrast. Given
+   repeated readability complaints across multiple screens (screenshotted
+   independently on Move-out, Hourly, Deep, Basic x2, Carpet), contrast
+   won. Flagging in case the visual trade-off matters to revisit later.
+
+3. FONT-SIZE MISMATCH ON "INCLUDED" SCREENS
+   Found: outcome and exclusions paragraphs were styled with
+   .rp-included-note (13.5px) — a class built for actual fine print (the
+   trailing "need something specific?" line). Once the itemized checklist
+   was removed (round 7 for Move-out, this round for Deep/Basic — see
+   below), outcome/exclusions became the MAIN body content of the screen,
+   but kept the old footnote-sized styling. Next to the 17px intro
+   paragraph, that reads as mismatched fonts because it functionally is
+   one — same typeface, jarring size jump with no visual signal (like a
+   bullet or divider) explaining why.
+
+   FIXED: new .rp-included-body class (16px/500 weight, matches rp-sub's
+   proportions) for outcome/exclusions. .rp-included-note now reserved
+   for genuine fine print only.
+
+4. DEEP & BASIC INCLUDED SCREENS — CHECKLIST REMOVED (finishes a change
+   started earlier this session and left half-wired)
+   Per direction: "our cleaners will prioritize getting the most results
+   and have checklists [internally] — customers either like the clean or
+   they won't." Deep and Basic now sell the same way Move-out does:
+   theory + binary outcome, no itemized list for the customer to check
+   items off or hunt for gaps in.
+
+   js/rp-pricing-engine.js — rpIncludes.deep / rpIncludes.maintenance:
+     intro rewritten to state the anchor hours + "our crew works from
+     their own priority checklist on-site, so nothing gets missed... you
+     don't need to track what's included, that's our job."
+     NEW outcome field (mirrors moveout's pattern): "You'll either love
+     the clean or you won't. Tell us within 48 hours and we'll come back
+     and make it right — free." — directly reflects the binary framing
+     from this session, and lines up with the Satisfaction Guarantee
+     wording from round 12.
+     items array KEPT UNCHANGED — still feeds /call's CSR reference rail,
+     which needs a fast scannable list on a live phone call. Not rendered
+     on /book anymore for these two services.
+
+   book/index.html — the isMoveout-only checklist-suppression flag
+   generalized to sellsResultOnly = ["moveout","deep","maintenance"].
+   Carpet and Hourly deliberately EXCLUDED — their lists are short
+   value-prop bullets, not scope-bounding checklists, and weren't part
+   of what was approved this round.
+
+VERIFIED
+  Price badges render correctly on all 5 rows (From $229 / $300 / $150 /
+  $50 per room / $50 per hr), no console errors.
+  hasChecklist: Deep=false, Basic=false, Carpet=true, Hourly=true (exactly
+  as scoped).
+  Font size consistent top-to-bottom on Move-out AND Deep's included
+  screen (verified via screenshot, re-rendered the exact failing screens
+  from the complaint).
+  Card background solid enough that no photo detail bleeds through text
+  on any re-tested screen.
+  All syntax-checked, zero console errors across every test.
+
+
+========================================================
+ROUND 14 — REAL BUGS FOUND, INCLUDING THINGS I SAID WERE DONE AND WEREN'T
+========================================================
+Several items below were PROPOSED and approved earlier in the session
+but never actually shipped to the file — I described the change and the
+conversation moved on before I confirmed building it. Verified every
+item against the live file this round rather than trusting memory of
+what was discussed. Listed honestly below.
+
+1. CARPET ROOM-PRICE PREVIEW — REAL PRICING BUG, NOW FIXED
+   The standalone Carpet Cleaning room-count picker (book/index.html,
+   step "rooms") showed a price badge on each button computed with a
+   HARDCODED `n*75` — a leftover from the price BEFORE round 10 cut
+   Carpet to $50/room. The subheading directly above it correctly said
+   "$50 per room," while the buttons below it were still doing $75/room
+   math. Also never applied the $150 one-time floor from round 9.
+
+     Old (wrong):  2 rooms $150 / 3 rooms $225 / 4 $300 / 5 $375 / 6+ $450
+     New (correct): 2 rooms $150 / 3 rooms $150 / 4 $200 / 5 $250 / 6+ $300
+
+   NEW js/rp-pricing-engine.js: rpCarpetOptionPrice(n) — single formula
+   (2-room minimum, $150 floor, $50/room) used by the picker so a preview
+   price can never drift from the real charge again. Verified: every
+   preview price matches rpFinalPrice() exactly for n=2 through 6.
+
+   Checked the OTHER carpet room picker (the add-on version, bundled onto
+   Move-out/Deep/etc.) — that one only shows room counts, no per-button
+   price, so it was never exposed to this bug.
+
+2. HOURLY CLEANING — CONFUSING LINE REMOVED, INTRO SIMPLIFIED
+   Removed "Not an inspection-ready clean — see note below" from the
+   included-screen checklist — the "note below" it referenced doesn't
+   exist on that screen (the actual explanation lives on the ESTIMATE
+   screen's guarantee carve-out, two steps later), so it read as a
+   broken reference/confusing non-sequitur.
+   Intro rewritten per direct feedback that the old version "sounds
+   crazy": three sentences of qualifiers ("not a finished checklist...
+   whatever we reach...") collapsed into one: "For when you only want
+   certain areas done. Tell us what to prioritize, and we work that list
+   for the hours you book."
+
+3. DEEP & BASIC — LOGICAL CONTRADICTION FIXED, NOW SHIPPED
+   This was proposed two messages before the punch-list pause and
+   approved implicitly by moving on — but never actually written to the
+   file. Verified it was still live with the bug before fixing.
+   The contradiction: old copy said "nothing gets missed in the time
+   booked" in the same paragraph as explaining why Extra Hours exist —
+   which only makes sense if something COULD get missed without them.
+   New copy, matched to strictly parallel structure per direct request
+   ("if deep starts with 6 hours..., basic should start with 3 hours..."):
+     Deep: "6 hours of detailed, top-to-bottom cleaning. Bigger home or
+     extra mess? Add time on the next step — same crew, same standard,
+     just more of it."
+     Basic: "3 hours of routine cleaning to keep an already-tidy home
+     fresh. Bigger home or need more done? Add time on the next step."
+   Also dropped the "our crew works their own priority checklist"
+   sentence from both — internal-ops detail that wasn't adding customer
+   value and was part of what made the old copy feel wordy/awkward.
+
+4. CONTACT GATE — REWRITE FINALLY SHIPPED
+   "Your price is ready" / "We'll text you a copy" was flagged as WRONG
+   two full conversation-rounds ago (the site can't actually text quotes)
+   and a replacement was drafted and approved — then never built. Verified
+   it was still live with the old broken copy before fixing.
+   Restructured as short H2 + subhead (matching the site's established
+   pattern elsewhere, e.g. "Everything inside the home" / intro
+   paragraph) instead of cramming a full sentence into the headline:
+     H2: "Almost there"
+     Sub: "Just a name and number, then your price is right here."
+     Fine print (tightened to match Deep/Basic's new punchy
+     question-then-answer rhythm): "Something look off about your
+     quote? We'll reach out before you book. Otherwise — no spam, no
+     pressure."
+
+5. FONT AUDIT — COMPUTED STYLES CHECKED, NO CODE BUG FOUND
+   Ran a full computed-style audit (font-family/size/weight) across
+   every text element on all five "included" screens rather than
+   eyeballing another screenshot. Result: everything uses Manrope except
+   the H2, which uses DM Serif Display — the site's deliberate serif-
+   headline/sans-body brand pairing, consistent everywhere. Sizes are
+   consistent by role: 17px intro, 16px body/list, 13.5px fine print,
+   39px headline. Weights vary appropriately for hierarchy (500 body,
+   600 list items, 700 bold emphasis, 400 fine print).
+   NOT claiming this is fixed, because there was no font-FAMILY bug to
+   fix. What likely reads as "too many fonts" is the visual density of
+   bold emphasis + regular weight + the serif/sans split landing close
+   together on a small card — a hierarchy/spacing perception issue, not
+   a broken stylesheet. Flagged honestly rather than claiming a fix that
+   wouldn't show up in the actual rendered output.
+
+VERIFIED THIS ROUND
+  Carpet preview prices match real engine output exactly, all 5 room
+  counts (2-6).
+  Hourly included screen: confusing line gone, intro simplified,
+  verified via live render.
+  Deep/Basic included screens: contradiction gone, parallel "N hours
+  of..." opening confirmed on both via live render.
+  Contact gate: new H2/sub/fineprint all confirmed rendering via live
+  render (not just source inspection).
+  Full price regression unchanged: move-out $379, deep $300, basic $150,
+  hourly 3h $150.
+  Zero console errors across every test.
+
+
+========================================================
+ROUND 15 — FRIDGE & LAUNDRY REMOVED FROM DEEP/BASIC ADD-ONS
+========================================================
+js/rp-pricing-engine.js — rpServiceAddons:
+  deep:        was ["extraHours","fridge","carpet","laundry","windows","garage","yard"]
+               now ["extraHours","carpet","windows","garage","yard"]
+  maintenance: was ["extraHours","laundry","windows","yard"]
+               now ["extraHours","windows","yard"]
+
+Rationale: for a crew already on site for an anchored block of time,
+fridge interior and laundry are small enough to just note in special
+instructions rather than needing their own priced add-on step.
+
+Move-out and Hourly UNCHANGED — both still offer fridge/laundry. Hourly
+in particular is already instruction-driven for its whole scope, so
+fridge/laundry fit the same pattern as any other priority-list item.
+
+Verified: addon key arrays directly confirmed (not just UI inspection)
+— deep and maintenance no longer contain "fridge" or "laundry". Public
+pricing page's add-ons table already lists these generically without
+tying them to a specific service, so no copy there needed to change.

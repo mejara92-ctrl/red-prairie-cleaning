@@ -1,0 +1,35 @@
+RED PRAIRIE /BOOK → CLOUDFLARE → HIGHLEVEL CUSTOM-FIELD MAPPING
+
+FILES
+- Website: this repository; only book/index.html was changed.
+- Worker: deploy red-prairie-booking-worker-v28.js separately in Cloudflare.
+
+WHAT MAPS WHERE
+- Standard contact fields: First name, Last name, Email, Phone, Street address, City, State, Postal code, Contact source.
+- Special Instructions → {{contact.special_instructions}}
+- Estimated Price → {{contact.estimated_price}}
+- Service Type → {{contact.service_type}}
+- Service Needed → {{contact.service_needed}}
+- Bathrooms → {{contact.bathrooms}}
+- Bedrooms → {{contact.bedrooms}}
+- Notes → {{contact.notes}}
+- Full details also stay in the confirmed appointment notes as a safety copy.
+
+SERVICE NEEDED DROPDOWN MAPPING
+- Factory Reset Move-Out → Move Out Cleaning
+- Deep Cleaning → Deep Cleaning
+- Maintenance Cleaning → Recurring Cleaning
+- Carpet Cleaning → Carpet Cleaning
+- Airbnb Turnover → Other
+
+DEPLOYMENT ORDER
+1. In the HighLevel private integration, enable read access for location/contact custom fields (locations/customFields.readonly). Keep the existing contact/calendar permissions.
+2. Paste/deploy red-prairie-booking-worker-v28.js in the existing rpc-booking-api Worker. Do not change the existing variables.
+3. Upload/commit this repository to GitHub.
+4. Make one real test booking with a unique test name.
+5. Confirm the contact fields and appointment notes are populated.
+
+SAFETY
+- No inbound-webhook URL was added back to the website.
+- No workflow was deleted or changed.
+- If HighLevel rejects a custom field, the Worker retries the contact without custom fields and still creates the appointment, preserving all details in appointment notes.
