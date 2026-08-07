@@ -550,3 +550,88 @@ STILL RECOMMENDED, NOT BUILT (needs your data, not code)
    assumed labour times. The number that really governs profitability
    is revenue per cleaner-hour — target $55+. Until jobs are timed,
    these floors are educated estimates.
+
+
+========================================================
+ROUND 10 — CARPET PRICE CUT + "COMPLETE CLEAN" AS MAIN MESSAGE
+========================================================
+
+A. CARPET CLEANING: $75/room -> $50/room, standalone and bundled alike
+--------------------------------------------------------
+Was two prices for the same work: $75/room booked on its own, $50/room
+bundled onto another service. Now a single $50/room rate regardless of
+how it's booked — nothing about cleaning a carpet changes based on that.
+
+  js/rp-pricing-engine.js   standalone carpet formula now reads
+                            rpAddonCatalog.carpet.bundlePrice ($50)
+                            instead of a hardcoded 75
+  book/index.html           carpet step subhead: "$75 per room" -> "$50"
+  pricing/index.html        carpet card: $75 -> $50 flat, note updated to
+                            "same rate whether booked on its own or added"
+                            add-ons table: removed the now-redundant
+                            "carpet, added to another service $50/room"
+                            row since it no longer differs from the
+                            standalone price
+
+  *** INTERACTION WITH THE ROUND-9 FLOOR, WORTH KNOWING ***
+  At $50/room the $150 one-time floor now absorbs BOTH the 2-room and
+  3-room jobs into the same $150 price:
+    2 rooms   $150  (floor — would be $100 uncapped)
+    3 rooms   $150  (exactly at the floor)
+    4 rooms   $200
+    5 rooms   $250
+  This is a direct consequence of two decisions made in separate
+  conversations (the $150 floor, then the $50/room cut) interacting.
+  Not a bug — both decisions stand on their own — but a 3-room carpet
+  customer now pays the same as a 2-room customer, which is worth
+  knowing before Christa gets the "why is 3 rooms not more than 2?"
+  question on the phone. If that bothers you, the fix is either raising
+  the carpet floor's room minimum to 3, or accepting it as a rounding
+  quirk at the bottom of the range.
+
+  Add-on carpet (bundled onto move-out/deep/etc.) is NOT floored — it
+  never was, add-ons stack on top of a job that already cleared the
+  floor on its own. Verified: move-out + 3-room carpet add-on = $529.00,
+  i.e. $379 + $150 (3 x $50), unaffected by this change.
+
+B. HOMEPAGE HERO REWRITTEN — "EVERYTHING INSIDE" IS NOW THE HEADLINE
+--------------------------------------------------------
+The totality message built for the /book "included" screen in round 7
+was live there but not on the homepage, which still led with an
+outcome-only headline. Ported the same idea up to the H1 — it's now the
+first thing anyone sees, not just something they reach two steps into
+the estimator.
+
+  H1: "Move-Out Cleaning That Protects Your Deposit — Or Your Sale."
+   -> "Every Room. Every Surface. The Complete Move-Out Clean."
+
+  New paragraph directly under the trust badges:
+  "Inside & out — oven, fridge, cabinets, closets, baseboards, every
+  room. Not a checklist of extras: if it's inside the home, it's
+  covered. Built to pass a landlord walkthrough — or list the home for
+  sale." — same totality-then-outcome structure as the /book screen, so
+  the message is now consistent top of funnel through to the estimate.
+
+  Microcopy reordered so Defend Your Deposit leads (it's the strongest
+  asset on the page) ahead of the no-upcharge and speed promises.
+
+  Meta title/description tags were checked and don't reference the old
+  H1 wording, so they needed no changes.
+
+*** THIS FILE (index.html) HAS NEVER SUCCESSFULLY DEPLOYED ***
+Live-site checks this session confirmed the homepage is still running
+pre-round-1 copy — no Pricing nav link, old hero, old microcopy — even
+though every zip since round 1 has had the correct file. book/index.html
+and js/rp-pricing-engine.js ARE confirmed live (verified via screenshot
+showing "Everything inside the home"). Root index.html specifically is
+the one file that keeps not landing. Re-upload it deliberately and
+confirm via a hard refresh or cache-busted URL before assuming this
+round's changes are visible.
+
+VERIFIED
+  Carpet 2rm $150 / 3rm $150 / 4rm $200 / 5rm $250 (floor working as
+  intended given the new per-room rate)
+  Move-out + 3rm carpet add-on unaffected: $529.00
+  Homepage H1 and microcopy render correctly, no console errors
+  Regression: move-out $379, deep $339, basic biweekly $187, hourly $150
+  — all unchanged

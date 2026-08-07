@@ -385,7 +385,13 @@ function rpPreDiscountSubtotalCents() {
   if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
   if (rpState.service === "carpet") {
     const rooms = Math.max(2, Number(rpState.carpetRooms || 0)); // 2-room minimum
-    return rpState.carpetRooms ? rpToCents(rooms * 75) : 0;
+    /* $50/room whether carpet is booked standalone or bundled onto another
+       service — used to be $75 standalone, which meant the exact same
+       carpet work cost 50% more depending on how it was booked. Nothing
+       about cleaning a carpet changes based on that. The 2-room minimum
+       plus the $150 one-time floor still protect against an unprofitable
+       single-room trip. */
+    return rpState.carpetRooms ? rpToCents(rooms * rpAddonCatalog.carpet.bundlePrice) : 0;
   }
   if (rpState.service === "maintenance") {
     if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft()) return 0;
