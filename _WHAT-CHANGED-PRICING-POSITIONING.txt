@@ -1103,3 +1103,113 @@ Verified: addon key arrays directly confirmed (not just UI inspection)
 — deep and maintenance no longer contain "fridge" or "laundry". Public
 pricing page's add-ons table already lists these generically without
 tying them to a specific service, so no copy there needed to change.
+
+
+========================================================
+ROUND 16 — STEP 2 REBUILT (ALL 5 SERVICES), EM DASHES REMOVED SITE-WIDE ON /book
+========================================================
+Two separate directives handled together since they touched the same
+screens: (1) stop using em dashes on /book, rephrase for plain flow,
+(2) step 2 is ugly/hard to read for every service, find a better format.
+
+A. STEP 2 COMPLETELY REBUILT — ONE FORMAT FOR ALL FIVE SERVICES
+--------------------------------------------------------
+Old state (the actual "ugly" problem): five DIFFERENT layouts. Move-out/
+Deep/Basic had dropped their checklists in earlier rounds and were
+running 2-3 back-to-back paragraphs of prose (a wall of text). Carpet
+and Hourly still had the old itemized-checklist format nobody had asked
+to change. No consistency across the funnel, and the paragraph-heavy
+services were genuinely hard to scan.
+
+NEW: one shared template for every service.
+  1. H2 (short, unchanged logic: Move-out gets "Everything inside the
+     home", others get "Here's what your X includes")
+  2. ONE short intro sentence (not a paragraph)
+  3. Three scannable fact chips (NEW .rp-highlight-row/.rp-highlight-chip
+     CSS, reuses .rp-row-val's pill visual language so it reads as the
+     same design system, not a new pattern)
+  4. ONE bold outcome line
+  5. Fine print
+
+  Chips per service:
+    moveout: "Every room, inside & out" / "Oven, fridge & cabinets
+      included" / "Defend Your Deposit"
+    deep:    "6 hours included" / "Add time for a bigger home" /
+      "Satisfaction Guaranteed"
+    basic:   "3 hours included" / "Add time for a bigger home" /
+      "Satisfaction Guaranteed"
+    carpet:  "Hot-water extraction" / "Pre-treatment included" /
+      "$50 per room"
+    hourly:  "3-hour minimum" / "You set the priorities" / "$50 per hour"
+
+  Move-out's old "excludes" paragraph folded into fine print instead of
+  its own block (still names exterior windows/garage/carpet/junk as not
+  included, which is what makes "everything" credible, just doesn't
+  need a whole separate paragraph now that chips carry the enumeration).
+
+  items array UNCHANGED in every entry, kept ONLY because /call's CSR
+  reference rail still reads it for a fast on-call checklist. Verified
+  directly in /call's runtime: all 5 still return correct entry counts
+  (moveout 7, deep 6, maintenance 5, carpet 4, hourly 4). Not rendered
+  on /book for ANY service anymore (previously Carpet/Hourly still
+  rendered theirs there).
+
+B. CARPET CAPTION — "NOT A RENTAL MACHINE" REMOVED
+--------------------------------------------------------
+Per direct feedback nobody was assuming that. Old: "Hot-water
+extraction, not a rental machine." New service-row description:
+"Professional hot-water extraction cleaning." New step-2 outcome line
+replaces the objection-answering framing with a professional, result-
+focused one: "Lifts dirt and allergens deep in the fibers, not just the
+surface."
+
+C. HOURLY CAPTION — NOW EXPLICITLY SAYS "CLEANING AND ORGANIZING"
+--------------------------------------------------------
+Per direct feedback. Service-row description: "Only want certain areas
+done? Book us by the hour." -> "Cleaning and organizing, just the areas
+you choose." Step-2 intro: "For when you only want certain areas cleaned
+and organized." Both now state the full scope plainly instead of
+implying "organizing" only via the checklist underneath (which no
+longer renders on /book at all per section A).
+NOTE: title itself stays "Hourly Cleaning" (locked in explicitly a few
+rounds back: "Just call it hourly cleaning"). If the intent was actually
+to rename the SERVICE TITLE back to "Hourly Cleaning & Organizing" rather
+than just fixing the caption/description, say so and it's a one-line
+change.
+
+D. CONTACT GATE FINE PRINT — REPHRASED PER SUGGESTED WORDING
+--------------------------------------------------------
+"Something look off about your quote? We'll reach out before you book.
+Otherwise, no spam, no pressure." -> "If something seems unusual about
+your quote, we'll reach out before you book. No spam, no pressure
+otherwise." (closely matches the wording given, em dash removed.)
+
+E. EVERY CUSTOMER-FACING EM DASH ON /book REMOVED
+--------------------------------------------------------
+18 source edits across book/index.html plus the 4 condition-description
+strings in js/rp-pricing-engine.js (rpConditionCopy — the only remaining
+em dashes found by the live-render sweep below). Covered: hero subhead,
+all 5 service-row descriptions, service-picker fine print, sqft-step
+subhead, frequency-step sub/fineprint, recurring summary labels, all
+three guarantee-type lines (deposit/satisfaction/hourly carve-out),
+contact gate, Hourly's lead-step label/placeholder, calendar "don't see
+what you need" line, and Move-out's 4 condition-level descriptions.
+
+VERIFICATION METHOD: rather than trust a source-code grep (which can
+miss dynamically-assembled strings), walked EVERY step of EVERY service
+flow in an actual rendered browser and scanned the live rendered text
+for the em-dash character. First pass found 4 remaining instances (the
+condition descriptions, missed by earlier rounds since that screen
+hadn't been touched before). Fixed, re-ran the full live-render sweep:
+zero em dashes found across every step of every service. Zero console
+errors throughout.
+
+VERIFIED
+  Live-render em-dash sweep: 0 found across all 5 services x all steps.
+  Screenshot comparison: all 5 step-2 screens now structurally identical
+  (headline, 1-sentence intro, 3 chips, bold outcome, fine print).
+  Price regression unchanged: moveout $379, deep $300, basic $150,
+  hourly $150, carpet 5rm $250.
+  /call's items-array dependency confirmed intact and correct entry
+  counts for all 5 services, checked in /call's actual runtime.
+  Both files syntax-clean.

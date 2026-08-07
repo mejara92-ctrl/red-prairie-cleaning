@@ -213,10 +213,10 @@ const rpConditionKeys = {
   "Specialty or Unsafe Conditions": "specialty"
 };
 const rpConditionCopy = {
-  "Standard Condition": "Normal lived-in condition — no loose trash, no major oven or fridge buildup, no heavy grime.",
-  "Heavy Buildup": "More buildup than standard — some trash, grease in the oven or stovetop, major soap scum or hard water buildup, dust or pet hair throughout.",
-  "Extreme Buildup": "Requires significant extra time and labor — heavy grease, trash in multiple rooms, noticeable pet odor, or visible mold.",
-  "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Still bookable online — we'll confirm a custom quote before your cleaning date."
+  "Standard Condition": "Normal lived-in condition. No loose trash, no major oven or fridge buildup, no heavy grime.",
+  "Heavy Buildup": "More buildup than standard. Some trash, grease in the oven or stovetop, major soap scum or hard water buildup, dust or pet hair throughout.",
+  "Extreme Buildup": "Requires significant extra time and labor. Heavy grease, trash in multiple rooms, noticeable pet odor, or visible mold.",
+  "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Still bookable online, we'll confirm a custom quote before your cleaning date."
 };
 const RP_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
 
@@ -278,68 +278,79 @@ const rpServiceAddons = {
 };
 
 const rpIncludes = {
+  /* Round-16 rebuild: every service now uses ONE shared step-2 format
+     instead of five slightly different layouts (some with checklists,
+     some without, mismatched font sizes between them). A short intro
+     line, three scannable fact chips, one outcome line, no em dashes
+     anywhere. `highlights` is an array of [iconKey, text] pairs (pass
+     null for iconKey to render a plain text chip, used for the two
+     price-only chips below since there's no dollar-sign icon in the
+     set). `items` stays in every entry ONLY because /call's CSR
+     reference rail (call/index.html, ~line 936) still reads it for a
+     fast on-call checklist — not rendered on /book anymore for ANY
+     service as of this round. Do not delete items. */
   moveout: {
-    /* CUSTOMER-FACING (/book "included" screen): sells the theory and the
-       result, not a room-by-room checklist. A checklist bounds scope — the
-       reader stops reading it as "everything" and starts hunting for what's
-       missing. This states the rule once ("if it's inside, it's covered")
-       and moves straight to the outcome, which is the thing being sold. */
-    intro: "This isn't a room-by-room checklist — it's a full interior reset. Oven, fridge, cabinets, closets, bathrooms, baseboards, windows, floors: if it's inside the home, it's already done, not billed separately.",
-    outcome: "Built to pass a landlord or property manager walkthrough — and to photograph well if you're listing the home for sale.",
-    /* Exclusions stay even though the checklist is gone — this is the line
-       that makes "everything" credible. Claiming totality while staying
-       vague about the garage and the carpets reads as evasive; naming
-       three or four exclusions is what makes "everything else" believable,
-       and each one is an add-on sold two steps later anyway. */
-    excludes: "Outside the home — exterior windows, the garage floor, carpet extraction and junk removal — isn't part of this. All four are available as add-ons on a later step.",
-    /* items is NOT rendered on the customer-facing /book screen anymore —
-       kept here only because /call's CSR reference rail (call/index.html,
-       ~line 936) still reads this array for its own quick-scan checklist
-       while a rep is on the phone. That's a different job (fast lookup,
-       not persuasion) so it keeps the itemized format. Do not delete. */
+    intro: "This isn't a checklist. It's a full interior reset: oven, fridge, cabinets, closets, bathrooms, baseboards, windows, and floors, all included and nothing billed separately.",
+    highlights: [
+      ["home", "Every room, inside & out"],
+      ["check", "Oven, fridge & cabinets included"],
+      ["shield", "Defend Your Deposit"]
+    ],
+    outcome: "Built to pass a landlord walkthrough, or to photograph well if you're listing the home for sale.",
+    /* Exclusions folded into the fine print instead of their own
+       paragraph — this is what makes "everything" credible (naming a
+       few exclusions beats staying vague about them), but it doesn't
+       need to be a whole separate block anymore now that chips do the
+       main enumeration work. */
+    fineprint: "Exterior windows, the garage floor, carpet extraction, and junk removal aren't included, but you can add any of them on the next step. Need something else? Text us anytime.",
     itemsLead: "Including the parts most companies bill as add-ons:",
-    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
+    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets, inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
   },
   deep: {
-    /* Sells the same way Move-Out does — theory + result, no itemized
-       checklist. Every house is different, so a fixed list either sells
-       short or invites "did you do X too?" questions. The crew works
-       their own priority checklist on-site; the customer gets the
-       outcome, not a room-by-room inventory.
-
-       Rewritten to fix a real contradiction: the old copy promised
-       "nothing gets missed" in the same breath as explaining why extra
-       hours exist — which only makes sense if something COULD get missed
-       without them. Also matched to Basic's opening structure exactly
-       ("N hours of..." as the first four words of both) since they're
-       the same pricing model and should read as a matched pair. */
-    intro: "6 hours of detailed, top-to-bottom cleaning. Bigger home or extra mess? Add time on the next step — same crew, same standard, just more of it.",
-    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
-    /* items kept ONLY for /call's CSR reference rail (call/index.html,
-       ~line 936), which needs a fast scannable checklist during a phone
-       call. Not rendered on the customer-facing /book screen. */
+    intro: "A detailed, top-to-bottom clean of every room.",
+    highlights: [
+      ["clock", "6 hours included"],
+      ["zap", "Add time for a bigger home"],
+      ["shield", "Satisfaction Guaranteed"]
+    ],
+    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll make it right, free.",
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "3 hours of routine cleaning to keep an already-tidy home fresh. Bigger home or need more done? Add time on the next step.",
-    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
+    intro: "A routine clean to keep an already-tidy home fresh.",
+    highlights: [
+      ["clock", "3 hours included"],
+      ["zap", "Add time for a bigger home"],
+      ["shield", "Satisfaction Guaranteed"]
+    ],
+    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll make it right, free.",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {
-    intro: "Professional hot-water extraction with pre-treatment and normal spot treatment for the carpeted rooms you select.",
+    /* "Not a rental machine" removed per direct feedback: nobody was
+       assuming that, so the line was answering an objection nobody
+       raised instead of just describing the service. */
+    intro: "Hot-water extraction cleaning for the rooms you choose.",
+    highlights: [
+      ["droplet", "Hot-water extraction"],
+      ["check", "Pre-treatment included"],
+      [null, "$50 per room"]
+    ],
+    outcome: "Lifts dirt and allergens deep in the fibers, not just the surface.",
     items: ["Hot-water extraction cleaning", "Pre-treatment included", "Normal spot treatment", "For the rooms you select"]
   },
   hourly: {
-    /* Simplified per direct feedback that the old version "sounds crazy."
-       Old version buried the point in three sentences of qualifiers
-       ("not a finished checklist... whatever we reach..."). This says the
-       same thing in one line: you decide what gets done first. */
-    intro: "For when you only want certain areas done. Tell us what to prioritize, and we work that list for the hours you book.",
-    items: ["You set the priority order", "Kitchens, bathrooms, or any specific rooms", "Organizing, decluttering & light tidying", "Billed by the hour — 3-hour minimum"]
-  },
-  airbnb: {
-    intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request.",
-    items: ["Guest-ready kitchens & bathrooms", "Floors & everyday surfaces", "Laundry & restocking on request", "Same-day service available"]
+    /* Description now explicitly says "cleaning and organizing" so the
+       full scope of the service is stated plainly, not just implied by
+       the checklist underneath it. */
+    intro: "For when you only want certain areas cleaned and organized.",
+    highlights: [
+      ["clock", "3-hour minimum"],
+      ["check", "You set the priorities"],
+      [null, "$50 per hour"]
+    ],
+    outcome: "Tell us what matters most, and we'll work that list for the hours you book.",
+    items: ["You set the priority order", "Kitchens, bathrooms, or any specific rooms", "Organizing, decluttering & light tidying", "Billed by the hour, 3-hour minimum"]
   }
 };
 

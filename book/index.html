@@ -1187,6 +1187,22 @@ details.rp-includes li::before {
   margin: 16px 3px 0; color: var(--ink); font-size: 16px; font-weight: 500;
   line-height: 1.48; max-width: 440px;
 }
+/* Round-16: replaces the old wall-of-paragraphs step-2 layout with a
+   scannable row of short fact chips, same format for all five services.
+   Reuses the visual language of .rp-row-val (bold pill, warm border)
+   so it reads as part of the same design system, not a new pattern. */
+.rp-highlight-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.rp-highlight-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 13px; border-radius: 999px;
+  background: rgba(255,247,238,.78); border: 1px solid rgba(167,126,93,.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+  font-size: 13.5px; font-weight: 800; color: var(--ink); white-space: nowrap;
+}
+.rp-highlight-chip .rp-ic { color: var(--red); width: 14px; height: 14px; flex-shrink: 0; }
+@media (max-width: 390px) {
+  .rp-highlight-chip { font-size: 12.5px; padding: 7px 11px; }
+}
 @media (max-width: 390px) {
   .rp-included-list li { padding: 12px 14px; font-size: 15px; gap: 11px; }
   .rp-included-check { width: 24px; height: 24px; }
@@ -2889,7 +2905,7 @@ function rpScreenHtml() {
       <div class="rp-hero-onphoto ${introActive ? "is-intro" : ""}">
         <p class="rp-eyebrow red">Lawton · Fort Sill · Cache · Elgin · Medicine Park · Duncan</p>
         <h1>From move-out to move-in, we've got your home covered.</h1>
-        <p class="rp-hero-onphoto-sub">We stand behind every clean — and we always do right by you.</p>
+        <p class="rp-hero-onphoto-sub">We stand behind every clean, and we always do right by you.</p>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Transparent Pricing</span>
@@ -2900,13 +2916,13 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home — no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${rpSqftTiers[0].base}` })}
-          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom — add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home, with no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${rpSqftTiers[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction — not a rental machine.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
-          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Only want certain areas done? Book us by the hour.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" }) : ""}
+          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
+          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Cleaning and organizing, just the areas you choose.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" }) : ""}
         </div>
-        <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
+        <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a>, or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
     `,
       footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get My 60-Second Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
@@ -2915,32 +2931,20 @@ function rpScreenHtml() {
 
   if (rpState.step === "included") {
     const inc = rpIncludes[rpState.service];
-    const items = (inc && inc.items) || [];
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
-    /* Move-out, Deep, and Basic sell the theory and the result — no
-       itemized checklist. A list bounds scope in the reader's head;
-       naming a rule once and moving straight to the outcome does more
-       work than rows of bullets ever could. Extended from Move-out
-       (round 7) to Deep/Basic (round 13) once both moved to flat
-       time-anchored pricing — a size-blind checklist made even less
-       sense once the price stopped being size-blind too. Carpet and
-       Hourly keep their itemized lists; those are short value-prop
-       lists rather than scope-bounding ones, and weren't part of the ask. */
-    const sellsResultOnly = ["moveout", "deep", "maintenance"].includes(rpState.service);
     const isMoveout = rpState.service === "moveout";
+    const highlights = (inc && inc.highlights) || [];
+    const fine = (inc && inc.fineprint) || "Need something specific? You can add extras on the next step, or text us anytime.";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>${isMoveout ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
-      <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
-      ${sellsResultOnly ? "" : `
-      ${inc && inc.itemsLead ? `<p class="rp-included-note" style="margin:0 0 10px;text-align:left">${inc.itemsLead}</p>` : ""}
-      <ul class="rp-included-list">
-        ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
-      </ul>`}
+      <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this, no add-ons required.`}</p>
+      ${highlights.length ? `<div class="rp-highlight-row">
+        ${highlights.map(([iconKey, text]) => `<span class="rp-highlight-chip">${iconKey ? rpIcon(iconKey, "rp-ic") : ""}${text}</span>`).join("")}
+      </div>` : ""}
       ${inc && inc.outcome ? `<p class="rp-included-body" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
-      ${inc && inc.excludes ? `<p class="rp-included-body" style="text-align:left">${inc.excludes}</p>` : ""}
-      <p class="rp-included-note">Need something specific? You can add extras on the next steps, or text us anytime.</p>
-    </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good — continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+      <p class="rp-included-note">${fine}</p>
+    </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
   if (rpState.step === "sqft") {
@@ -3021,7 +3025,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>What's the condition of the home?</h2>
-      <p class="rp-sub">Just a rough sense — we confirm it when we arrive.</p>
+      <p class="rp-sub">Just a rough sense. We confirm it when we arrive.</p>
       <div class="rp-rows">
         ${rpConditionOrder.map(label => rpRowBtn({
           onclick: `rpSelectCondition('${label}', this)`,
@@ -3037,14 +3041,14 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How often would you like cleanings?</h2>
-      <p class="rp-sub">Recurring plans save you money — cancel or reschedule anytime, no contract.</p>
+      <p class="rp-sub">Recurring plans save you money, and you can cancel or reschedule anytime. No contract.</p>
       <div class="rp-rows">
         ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly', this)", title:"Weekly", desc:"Our most popular recurring plan.", val:"Save 20%", selected: rpState.frequency === "Weekly" })}
         ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly', this)", title:"Biweekly", desc:"Every two weeks.", val:"Save 15%", selected: rpState.frequency === "Biweekly" })}
         ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly', this)", title:"Monthly", desc:"Once-a-month upkeep.", val:"Save 10%", selected: rpState.frequency === "Monthly" })}
         ${rpRowBtn({ onclick:"rpSelectFrequency('One-Time', this)", title:"One-Time", desc:"A single visit, no recurring plan.", selected: rpState.frequency === "One-Time" })}
       </div>
-      <p class="rp-fineprint">Recurring plans are billed per visit — no long-term contract, and you can cancel or change your schedule anytime.</p>
+      <p class="rp-fineprint">Recurring plans are billed per visit. No long-term contract, and you can cancel or change your schedule anytime.</p>
     </div>` };
   }
 
@@ -3302,12 +3306,12 @@ function rpEstimateScreen(eyebrow) {
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
       ${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? `
-      <div class="rp-recurring-total"><span><strong>First visit — Deep Clean (required)</strong></span><strong>$${rpRecurringDeepFirstPrice().toFixed(2)}</strong></div>
+      <div class="rp-recurring-total"><span><strong>First visit: Deep Clean (required)</strong></span><strong>$${rpRecurringDeepFirstPrice().toFixed(2)}</strong></div>
       <div class="rp-recurring-total"><span>Then ${rpState.frequency.toLowerCase()} visits</span><strong>$${rpMaintenanceBasePerVisit().toFixed(2)} each</strong></div>
       <p class="rp-fineprint" style="margin:8px 0 0">Recurring plans start with one Deep Clean so every visit after it stays on schedule and on price. You're charged the Deep rate on visit one only.</p>
       ` : `${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}`}
       ${rpIsRecurringPlan() && rpAddonsOnceCharge() ? `<div class="rp-recurring-total"><span>Add-ons for this visit (one-time)</span><strong>+$${rpAddonsOnceCharge()}</strong></div>` : ""}
-      <span class="rp-no-contract">✓ No contract — cancel or reschedule anytime</span>
+      <span class="rp-no-contract">✓ No contract, cancel or reschedule anytime</span>
     </div>` : ""}
     <div class="rp-invoice">
       <div class="rp-price-section">
@@ -3317,9 +3321,9 @@ function rpEstimateScreen(eyebrow) {
         </div>
         ${(() => {
           const gtype = rpGuaranteeType();
-          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit</strong> — if your landlord flags something we missed, text us within 48 hours and we come back free.</div>`;
-          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Satisfaction Guaranteed</strong> — not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</div>`;
-          return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it — not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply to this service. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`;
+          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit.</strong> If your landlord flags something we missed, text us within 48 hours and we'll come back free.</div>`;
+          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</div>`;
+          return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`;
         })()}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
       </div>
@@ -3393,7 +3397,7 @@ function rpContactGateScreen(eyebrow) {
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-error" id="rpGateError" style="display:none"></div>
-      <p class="rp-fineprint">Something look off about your quote? We'll reach out before you book. Otherwise — no spam, no pressure.</p>
+      <p class="rp-fineprint">If something seems unusual about your quote, we'll reach out before you book. No spam, no pressure otherwise.</p>
     </div>
   </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
 }
@@ -3524,7 +3528,7 @@ function rpLeadScreen(eyebrow) {
           </label>
         </div>
       </div>
-      <div class="rp-lead-field"><label for="rpSpecialInstructions">${rpState.service === "hourly" ? "Your priority areas — most important first" : "Notes (optional)"}</label><textarea id="rpSpecialInstructions" placeholder="${rpState.service === "hourly" ? "e.g. 1) Kitchen incl. oven  2) Both bathrooms  3) Living room floors — plus gate code, pets, access" : "Gate code, pets, stains, access instructions…"}" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea>${rpState.service === "hourly" ? `<p class="rp-fineprint" style="margin-top:6px">We work this list in order for the hours you book.</p>` : ""}</div>
+      <div class="rp-lead-field"><label for="rpSpecialInstructions">${rpState.service === "hourly" ? "Your priority areas, most important first" : "Notes (optional)"}</label><textarea id="rpSpecialInstructions" placeholder="${rpState.service === "hourly" ? "e.g. 1) Kitchen incl. oven  2) Both bathrooms  3) Living room floors. Plus gate code, pets, access" : "Gate code, pets, stains, access instructions…"}" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea>${rpState.service === "hourly" ? `<p class="rp-fineprint" style="margin-top:6px">We work this list in order for the hours you book.</p>` : ""}</div>
     </div>
     <div id="rpFormError" class="rp-error"></div>
     <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
@@ -3658,7 +3662,7 @@ function rpCalendarMonthGrid() {
 }
 function rpPreferredTimeMessage(kind = "time") {
   const need = kind === "date" ? "date" : "time";
-  return `<p class="rp-preferred-time"><strong>Don’t see the ${need} you need?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'}); return gtag_report_conversion('tel:5802150915');">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a>—we may still be able to fit you in.</p>`;
+  return `<p class="rp-preferred-time"><strong>Don’t see the ${need} you need?</strong> <a href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'calendar'}); return gtag_report_conversion('tel:5802150915');">Call</a> or <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'calendar'})">text us</a>, we may still be able to fit you in.</p>`;
 }
 function rpCalendarScreen(eyebrow) {
   const dates = rpAvailableDateKeys();
