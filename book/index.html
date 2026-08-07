@@ -1065,10 +1065,10 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 .rp-screen:not(.step-service) .rp-center,
 .rp-screen.step-calendar .rp-screen-scroll>div{
   margin-block:0;
-  position:relative;background:linear-gradient(150deg,rgba(248,240,229,.66),rgba(243,232,216,.40));
-  border:1px solid rgba(255,246,232,.42);border-radius:28px;padding:24px 18px 20px;
-  box-shadow:0 24px 60px rgba(59,39,23,.10),inset 0 1px 0 rgba(255,255,255,.50);
-  backdrop-filter:blur(16px) saturate(1.1);-webkit-backdrop-filter:blur(16px) saturate(1.1)
+  position:relative;background:linear-gradient(150deg,rgba(250,244,235,.94),rgba(246,237,224,.88));
+  border:1px solid rgba(255,246,232,.6);border-radius:28px;padding:24px 18px 20px;
+  box-shadow:0 24px 60px rgba(59,39,23,.10),inset 0 1px 0 rgba(255,255,255,.60);
+  backdrop-filter:blur(20px) saturate(1.1);-webkit-backdrop-filter:blur(20px) saturate(1.1)
 }
 .rp-screen:not(.step-service) .rp-center::before{
   content:"BUILDING YOUR ESTIMATE";display:block;margin:0 0 13px;color:#8f2b31;
@@ -2545,6 +2545,7 @@ const rpState = {
   hourCount: null,
   carpetRooms: 0,
   addonCarpetRooms: 0,
+  addonExtraHours: 0,
   expandedAddon: null,
   showMoreAddons: false,
   windowsTier: null,
@@ -2769,7 +2770,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "windowsTier", "yardTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -2873,8 +2874,8 @@ function rpScreenHtml() {
       scroll: `
       <div class="rp-hero-onphoto ${introActive ? "is-intro" : ""}">
         <p class="rp-eyebrow red">Lawton · Fort Sill · Cache · Elgin · Medicine Park · Duncan</p>
-        <h1>No nickel-and-diming. The price you see is the price you pay.</h1>
-        <p class="rp-hero-onphoto-sub">A home that passes inspection. A home that's ready for the next tenant.</p>
+        <h1>From move-out to move-in, we've got your home covered.</h1>
+        <p class="rp-hero-onphoto-sub">If it's not right, we make it right — free.</p>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Defend Your Deposit™</span>
@@ -2902,14 +2903,22 @@ function rpScreenHtml() {
     const inc = rpIncludes[rpState.service];
     const items = (inc && inc.items) || [];
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
+    /* Move-out sells the theory and the result — no itemized checklist.
+       A list bounds scope in the reader's head; naming a rule once
+       ("if it's inside, it's covered") and moving straight to the outcome
+       does more work than seven rows ever could. Deep/Basic/Carpet/Hourly
+       keep the itemized list below since this specific problem was only
+       raised for move-out — revisit if the same logic should extend. */
+    const isMoveout = rpState.service === "moveout";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>${rpState.service === "moveout" ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
+      <h2>${isMoveout ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
       <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
+      ${isMoveout ? "" : `
       ${inc && inc.itemsLead ? `<p class="rp-included-note" style="margin:0 0 10px;text-align:left">${inc.itemsLead}</p>` : ""}
       <ul class="rp-included-list">
         ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
-      </ul>
+      </ul>`}
       ${inc && inc.outcome ? `<p class="rp-included-note" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
       ${inc && inc.excludes ? `<p class="rp-included-note" style="text-align:left">${inc.excludes}</p>` : ""}
       <p class="rp-included-note">Need something specific? You can add extras on the next steps, or text us anytime.</p>
@@ -3090,7 +3099,8 @@ function rpAddonsScreen(eyebrow) {
     garage: rpState.garageWash,
     laundry: rpState.laundryLoads > 0,
     fridge: rpState.fridgeAddon,
-    yard: !!rpState.yardTier
+    yard: !!rpState.yardTier,
+    extraHours: rpState.addonExtraHours > 0
   };
   const cardMeta = {
     carpet:  { icon: "layers", label: "Carpet Cleaning", desc: "Hot-water extraction for a deeper carpet clean." },
@@ -3099,7 +3109,8 @@ function rpAddonsScreen(eyebrow) {
     garage:  { icon: "car",    label: "Garage Floor Wash", desc: "A soft wash lifts embedded oils, then we scrub the concrete floor." },
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
     fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
-    yard:    { icon: "leaf",   label: "Yard Refresh", desc: "Mow, trim, edge, and clear hard surfaces." }
+    yard:    { icon: "leaf",   label: "Yard Refresh", desc: "Mow, trim, edge, and clear hard surfaces." },
+    extraHours: { icon: "clock", label: "Extra Time", desc: "Bigger or messier than typical? Add time so nothing gets rushed." }
   };
   function summaryFor(key) {
     if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
@@ -3112,6 +3123,7 @@ function rpAddonsScreen(eyebrow) {
       const yardLabels = { normal: "Yard Refresh · $100", overgrown: "Overgrown · $150", xl: "XL Yard · $200", xlOvergrown: "XL Overgrown · from $250" };
       return yardLabels[rpState.yardTier] || "";
     }
+    if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}`;
     return "";
   }
   function bodyFor(key) {
@@ -3167,6 +3179,15 @@ function rpAddonsScreen(eyebrow) {
         <div class="rp-choice-grid">
           <button class="rp-pill ${rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(true)">Yes<br><small>$${rpAddonCatalog.fridge.price}</small></button>
           <button class="rp-pill ${!rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(false)">No</button>
+        </div>`;
+    }
+    if (key === "extraHours") {
+      const svcName = rpServices[rpState.service] ? rpServices[rpState.service].name : "clean";
+      const anchor = rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
+      return `
+        <p class="rp-tap-note">Your ${svcName} includes ${anchor} hours. How many extra? <span style="color:var(--muted)">· $${RP_EXTRA_HOUR_RATE} per hour</span></p>
+        <div class="rp-pill-grid">
+          ${[1,2,3,4].map(n => `<button class="rp-pill ${rpState.addonExtraHours === n ? "is-selected" : ""}" onclick="rpSelectExtraHours(${n})">+${n}<br><small>hour${n===1?"":"s"}</small></button>`).join("")}
         </div>`;
     }
     return "";
@@ -3249,6 +3270,7 @@ function rpAddonSummaryRows() {
   if (rpState.yardTier === "overgrown") rows.push(`<div class="rp-mini-row"><span>Overgrown Yard Refresh</span><strong>$150</strong></div>`);
   if (rpState.yardTier === "xl") rows.push(`<div class="rp-mini-row"><span>XL Yard Refresh</span><strong>$200</strong></div>`);
   if (rpState.yardTier === "xlOvergrown") rows.push(`<div class="rp-mini-row"><span>XL Overgrown Yard</span><strong>Starting at $250</strong></div>`);
+  if (rpState.addonExtraHours) rows.push(`<div class="rp-mini-row"><span>Extra Time (+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"})</span><strong>$${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}</strong></div>`);
   return rows.join("");
 }
 
@@ -3275,20 +3297,23 @@ function rpEstimateScreen(eyebrow) {
           <strong>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? rpFormatMoney(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong>
           <span>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? "Due on your first visit" : service.name}</span>
         </div>
-        ${rpGuaranteeApplies()
-          ? `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit</strong> — if your landlord flags something we missed, text us within 48 hours and we come back free.</div>`
-          : `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it — not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply to this service. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`}
+        ${(() => {
+          const gtype = rpGuaranteeType();
+          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit</strong> — if your landlord flags something we missed, text us within 48 hours and we come back free.</div>`;
+          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Satisfaction Guaranteed</strong> — not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</div>`;
+          return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it — not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply to this service. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`;
+        })()}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
-      ${["moveout","deep","maintenance"].includes(rpState.service) && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
+      ${rpState.service === "moveout" && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
+      ${["deep","maintenance"].includes(rpState.service) ? `<div class="rp-mini-row"><span>Included Time</span><strong>${rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS} hours</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.hourCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hourCount}</strong></div>` : ""}
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
-      ${["moveout","deep"].includes(rpState.service) && rpState.bedrooms && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpServiceBasePrice().toFixed(2)}</strong></div>` : ""}
-      ${rpState.service === "maintenance" && rpState.bedrooms && rpState.sqft ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms).toFixed(2)}</strong></div>` : ""}
+      ${["moveout","deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpDisplayBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
@@ -3821,6 +3846,7 @@ function rpClearAddon(key) {
   else if (key === "yard") rpState.yardTier = null;
   else if (key === "laundry") rpState.laundryLoads = 0;
   else if (key === "fridge") rpState.fridgeAddon = false;
+  else if (key === "extraHours") rpState.addonExtraHours = 0;
   rpState.expandedAddon = null;
   rpTrack("addon_removed", { addon: key });
   rpRefresh();
@@ -3833,6 +3859,7 @@ function rpSelectYardTier(tier) { rpState.yardTier = tier; rpState.expandedAddon
 function rpSelectLaundryLoads(n) { rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
 function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectExtraHours(n) { rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
 
 /* =========================================================================
    PAYLOAD + CALENDAR HANDOFF — verbatim from the homepage estimator.
@@ -3868,10 +3895,11 @@ function rpGetEstimatePayload() {
     rpState.garageWash ? "Garage Floor Wash" : "",
     rpState.laundryLoads ? `Laundry Service: ${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"}` : "",
     rpState.fridgeAddon ? "Refrigerator Interior" : "",
-    rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : ""
+    rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : "",
+    rpState.addonExtraHours ? `Extra Time: +${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"}` : ""
   ].filter(Boolean).join(", ") || "None";
-  const isConditionPriced = ["moveout", "deep"].includes(rpState.service) && !rpIsCustomQuoteOnly();
-  const baseServicePrice = rpServiceBasePrice();
+  const isConditionPriced = ["moveout", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
+  const baseServicePrice = rpDisplayBasePrice();
   const militaryDiscountAmount = rpMilitaryDiscountAmount();
   /* Pricing status shown to the office: "Confirmed" for a normal instant
      estimate, "Custom Quote" for Airbnb, over 3,400 sq ft on Move-Out or
@@ -3919,7 +3947,7 @@ function rpGetEstimatePayload() {
     addons: addonsList,
     condition: rpState.condition || "N/A",
     base_service_price: isConditionPriced ? baseServicePrice.toFixed(2) : "N/A",
-    condition_adjustment_percent: ["moveout", "deep"].includes(rpState.service) ? Math.round(conditionMultiplier * 100) : 0,
+    condition_adjustment_percent: rpState.service === "moveout" ? Math.round(conditionMultiplier * 100) : 0,
     condition_specialty_flag: isSpecialtyCondition ? "Yes — custom quote required" : "No",
     condition_flag_note: conditionFlagNote,
     frequency: rpState.frequency || "N/A",

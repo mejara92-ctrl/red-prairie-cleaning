@@ -129,6 +129,28 @@ const HOURLY_MAX_CLEANERS = 4;
    instead of killing it. */
 const RP_HOURLY_PUBLIC = true;
 
+/* ---------------------------------------------------------------------
+   BASIC & DEEP CLEANING — FLAT TIME-ANCHORED PRICING (replaces the old
+   sqft-bracket + bedroom/bathroom + condition-multiplier model for these
+   two services only. Move-Out keeps sqft brackets; it's the one service
+   where a size-based number matters for the "no upcharges" promise).
+
+   Rationale: quoting every possible home size was the actual problem,
+   not the pricing model. A flat anchor removes the guessing — $150 or
+   $300 is easy to sell and easy for a CSR to quote instantly — and
+   EXTRA HOURS (an add-on, $50/hr) absorb the variance a sqft bracket
+   used to handle. A big or heavily-soiled home just costs more because
+   more hours get added, not because it landed in a higher bracket.
+
+   This also means Basic and Deep no longer collect sqft/bedrooms/
+   bathrooms/condition at all (see rpFlows below) — the customer is
+   buying an anchored block of time, not a size-priced job. */
+const RP_BASIC_ANCHOR_HOURS = 3;
+const RP_BASIC_ANCHOR_PRICE = 150;
+const RP_DEEP_ANCHOR_HOURS = 6;
+const RP_DEEP_ANCHOR_PRICE = 300;
+const RP_EXTRA_HOUR_RATE = 50;
+
 /* Services hidden from the PUBLIC /book service picker. /call ignores
    this entirely. */
 function rpServiceIsPublic(key) {
@@ -136,13 +158,44 @@ function rpServiceIsPublic(key) {
   return true;
 }
 
-/* Partial-scope work can't carry the Defend Your Deposit guarantee — we
-   didn't control the scope, so we can't stand behind the inspection
-   outcome. Surfaced on the Hourly Cleaning estimate screen and in the
-   booking confirmation. */
-const RP_GUARANTEE_EXCLUDED_SERVICES = ["hourly"];
+/* Guarantee tiers, not a single on/off switch:
+
+   - "deposit"      Move-Out only. This is the one service with an
+                     inspection/deposit outcome to stand behind, so it
+                     keeps the specific, provable Defend Your Deposit
+                     promise: come back free if a landlord flags something.
+
+   - "satisfaction" Deep and Basic. These no longer promise a completed
+                     whole-home reset regardless of size — the customer
+                     buys an anchored block of time and can add hours.
+                     A deposit-style completion guarantee wouldn't be
+                     honest against a job that's intentionally scoped by
+                     time rather than by square footage. A satisfaction
+                     guarantee is: we stand behind the QUALITY of what we
+                     did clean, not a promise that everything in a large
+                     or heavily-soiled home got reached in the time booked.
+
+   - "none"         Hourly only. Scope is entirely customer-directed (their
+                     priority list, in their order), so neither guarantee
+                     applies — unchanged from the original hourly carve-out.
+
+   Carpet is not covered by this function and still falls through to the
+   old rpGuaranteeApplies()-style "true" behavior at the call site (shows
+   the Defend Your Deposit line). That's a pre-existing oddity — a
+   carpet-only booking has no deposit/inspection outcome either — flagged
+   in the round log as unresolved, not silently changed here since it
+   wasn't part of what was asked. */
+function rpGuaranteeType() {
+  if (rpState.service === "moveout") return "deposit";
+  if (rpState.service === "deep" || rpState.service === "maintenance") return "satisfaction";
+  if (rpState.service === "hourly") return "none";
+  return "deposit";
+}
+/* Kept for any other caller still checking a boolean — true for anything
+   that shows SOME guarantee line (deposit or satisfaction), false only
+   for the scope-directed hourly carve-out. */
 function rpGuaranteeApplies() {
-  return !RP_GUARANTEE_EXCLUDED_SERVICES.includes(rpState.service);
+  return rpGuaranteeType() !== "none";
 }
 
 /* Condition step — Move-Out and Deep Cleaning, automatic percentage
@@ -206,36 +259,46 @@ const rpAddonCatalog = {
   garage:  { label: "Garage Floor Wash",   price: 150 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
-  yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 }
+  yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 },
+  extraHours: { label: "Extra Time", unit: "hour", pricePerHour: RP_EXTRA_HOUR_RATE }
 };
 
 const rpServiceAddons = {
   moveout:     ["carpet", "junk", "windows", "garage", "yard"],
-  deep:        ["fridge", "carpet", "laundry", "windows", "garage", "yard"],
-  maintenance: ["laundry", "windows", "yard"],
+  deep:        ["extraHours", "fridge", "carpet", "laundry", "windows", "garage", "yard"],
+  maintenance: ["extraHours", "laundry", "windows", "yard"],
   hourly:      ["fridge", "laundry", "windows", "garage", "yard"]
 };
 
 const rpIncludes = {
   moveout: {
-    intro: "This is the complete interior reset — every room, every surface, every appliance inside and out. Not a checklist of extras: if it's inside the home, it's covered.",
-    /* The list can never say "everything" — a reader stops reading it as
-       scope and starts hunting for what's missing. So it's framed as
-       PROOF (the expensive parts are already in) rather than as the
-       definition of scope, and the exclusions are named outright. Naming
-       three or four exclusions is what makes "everything else" credible;
-       leaving them vague is what makes people suspicious. */
-    itemsLead: "Including the parts most companies bill as add-ons:",
-    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"],
+    /* CUSTOMER-FACING (/book "included" screen): sells the theory and the
+       result, not a room-by-room checklist. A checklist bounds scope — the
+       reader stops reading it as "everything" and starts hunting for what's
+       missing. This states the rule once ("if it's inside, it's covered")
+       and moves straight to the outcome, which is the thing being sold. */
+    intro: "This isn't a room-by-room checklist — it's a full interior reset. Oven, fridge, cabinets, closets, bathrooms, baseboards, windows, floors: if it's inside the home, it's already done, not billed separately.",
     outcome: "Built to pass a landlord or property manager walkthrough — and to photograph well if you're listing the home for sale.",
-    excludes: "Outside the home — exterior windows, the garage floor, carpet extraction and junk removal — isn't part of this. All four are available as add-ons on a later step."
+    /* Exclusions stay even though the checklist is gone — this is the line
+       that makes "everything" credible. Claiming totality while staying
+       vague about the garage and the carpets reads as evasive; naming
+       three or four exclusions is what makes "everything else" believable,
+       and each one is an add-on sold two steps later anyway. */
+    excludes: "Outside the home — exterior windows, the garage floor, carpet extraction and junk removal — isn't part of this. All four are available as add-ons on a later step.",
+    /* items is NOT rendered on the customer-facing /book screen anymore —
+       kept here only because /call's CSR reference rail (call/index.html,
+       ~line 936) still reads this array for its own quick-scan checklist
+       while a rep is on the phone. That's a different job (fast lookup,
+       not persuasion) so it keeps the itemized format. Do not delete. */
+    itemsLead: "Including the parts most companies bill as add-ons:",
+    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
   },
   deep: {
-    intro: "A detailed top-to-bottom clean of kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces—including inside the oven and microwave.",
+    intro: "Includes 6 hours of detailed cleaning — kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces, including inside the oven and microwave. One flat price, no size brackets: a bigger or heavily-soiled home just means adding extra time on the next step, not a different quote.",
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "A complete routine clean of kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh.",
+    intro: "Includes 3 hours of routine cleaning — kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh. One flat price for a typical home; need more time for a larger space? Add extra hours on the next step.",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {
@@ -257,8 +320,11 @@ const rpIncludes = {
    "What's included" on the estimate screen. */
 const rpFlows = {
   moveout:     ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  deep:        ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
-  maintenance: ["included", "sqft", "bedrooms", "bathrooms", "condition", "frequency", "addons", "estimate", "lead", "calendar"],
+  /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
+     both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
+     above) with Extra Time as an add-on instead of a size bracket. */
+  deep:        ["included", "addons", "estimate", "lead", "calendar"],
+  maintenance: ["included", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
@@ -300,8 +366,14 @@ function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
 function rpTimeEstimate() {
   if (rpState.service === "moveout") return "6–10 hours";
-  if (rpState.service === "deep") return "Up to 6 hours";
-  if (rpState.service === "maintenance") return "Up to 4 hours";
+  if (rpState.service === "deep") {
+    const extra = Number(rpState.addonExtraHours || 0);
+    return extra > 0 ? `${RP_DEEP_ANCHOR_HOURS + extra} hours (${RP_DEEP_ANCHOR_HOURS} + ${extra} extra)` : `${RP_DEEP_ANCHOR_HOURS} hours`;
+  }
+  if (rpState.service === "maintenance") {
+    const extra = Number(rpState.addonExtraHours || 0);
+    return extra > 0 ? `${RP_BASIC_ANCHOR_HOURS + extra} hours (${RP_BASIC_ANCHOR_HOURS} + ${extra} extra)` : `${RP_BASIC_ANCHOR_HOURS} hours`;
+  }
   if (rpState.service === "hourly") return rpState.hourCount ? `${rpState.hourCount} hour${rpState.hourCount === 1 ? "" : "s"}` : `${HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "airbnb") return "Varies by property size";
   if (rpState.service === "carpet") return "Varies by room count";
@@ -323,12 +395,14 @@ function rpTeamSize() {
 function rpConditionKey() {
   return rpConditionKeys[rpState.condition] || null;
 }
-/* Basic Cleaning was the only priced service with NO condition step: it
-   went straight from size to frequency, so a 1,500 sq ft home with three
-   kids and a dog was billed identically to a tidy one the same size. That
-   variance came straight out of margin. Basic now carries the same
-   Standard / Heavy +20% / Extreme +50% ladder as the other two. */
-const RP_CONDITION_PRICED_SERVICES = ["moveout", "deep", "maintenance"];
+/* Move-Out is the only condition-priced service now. Deep and Basic used
+   to carry this same Standard/Heavy/Extreme ladder (added in an earlier
+   round specifically to fix Basic having no size-variance protection at
+   all), but both moved to flat time-anchored pricing with an Extra Time
+   add-on instead — see RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE above.
+   Extra hours now do the job condition multipliers used to do for those
+   two services, so this list shrank rather than grew. */
+const RP_CONDITION_PRICED_SERVICES = ["moveout"];
 
 /* Automatic condition multiplier for Move-Out, Deep and Basic — 0 for
    Standard, 0.20 for Heavy, 0.50 for Extreme. Specialty has no multiplier
@@ -356,7 +430,7 @@ function rpIsCustomQuoteOnly() {
    price. */
 function rpServiceBasePrice() {
   const mult = rpConditionMultiplier();
-  if (rpState.service === "moveout" || rpState.service === "deep") {
+  if (rpState.service === "moveout") {
     if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition()) return 0;
     const tier = rpSqftTier();
     if (!tier || tier.base === null) return 0;
@@ -367,6 +441,20 @@ function rpServiceBasePrice() {
     const preConditionCents = rpToCents(tier.base + bedAdj + bathAdj);
     return rpCentsToDollars(Math.round(preConditionCents * (1 + mult)));
   }
+  /* Deep is now a flat anchor price (see RP_DEEP_ANCHOR_PRICE) — it no
+     longer runs through this sqft-bracket formula. Kept returning 0 here
+     rather than deleting the branch, so any stale caller fails loudly
+     (a visible $0) instead of silently inheriting Move-Out's math. */
+  return 0;
+}
+
+/* Single source of truth for what "Base Service" should display for any
+   service, used by both /book's invoice and /call's CSR summary so the
+   two never drift apart. */
+function rpDisplayBasePrice() {
+  if (rpState.service === "moveout") return rpServiceBasePrice();
+  if (rpState.service === "deep") return RP_DEEP_ANCHOR_PRICE;
+  if (rpState.service === "maintenance") return RP_BASIC_ANCHOR_PRICE;
   return 0;
 }
 
@@ -393,18 +481,25 @@ function rpPreDiscountSubtotalCents() {
        single-room trip. */
     return rpState.carpetRooms ? rpToCents(rooms * rpAddonCatalog.carpet.bundlePrice) : 0;
   }
+  if (rpState.service === "deep") {
+    /* Flat anchor — see RP_DEEP_ANCHOR_PRICE block above for the reasoning.
+       No sqft/bedroom/condition inputs anymore; size and buildup variance
+       is absorbed by the Extra Time add-on instead. */
+    return rpToCents(RP_DEEP_ANCHOR_PRICE);
+  }
   if (rpState.service === "maintenance") {
-    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft()) return 0;
-    /* Order matters: condition first (it reflects real labour), then the
-       frequency discount (a loyalty discount on the true price). Reversing
-       these would discount the buildup surcharge too. */
-    const base = rpMaintenancePrice(rpState.bedrooms, rpState.bathrooms);
+    /* Flat anchor, same reasoning as Deep. Condition multiplier no longer
+       applies here (RP_CONDITION_PRICED_SERVICES is Move-Out only now),
+       so rpConditionMultiplier() naturally returns 0 for this service —
+       the line below is left in place rather than special-cased so a
+       future change to that list doesn't silently stop applying here. */
+    const base = RP_BASIC_ANCHOR_PRICE;
     const conditioned = rpCentsToDollars(Math.round(rpToCents(base) * (1 + rpConditionMultiplier())));
     const plan = rpFrequencyPlan();
     const discountedBase = plan ? Math.round(conditioned * (1 - plan.discount)) : conditioned;
     return rpToCents(discountedBase);
   }
-  if (["moveout", "deep"].includes(rpState.service)) {
+  if (rpState.service === "moveout") {
     if (!rpState.bedrooms) return 0;
     return rpToCents(rpServiceBasePrice());
   }
@@ -437,6 +532,7 @@ function rpAddonsTotal() {
   if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
   if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
+  if (rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
   return total;
 }
 function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }
@@ -547,15 +643,13 @@ function rpRecurringNeedsDeepFirst() {
    state is always restored, including on error. */
 function rpRecurringDeepFirstCents() {
   if (!rpRecurringNeedsDeepFirst()) return 0;
-  const prevService = rpState.service;
-  try {
-    rpState.service = "deep";
-    const tier = rpSqftTier();
-    if (!tier || tier.base === null) return 0;
-    return rpToCents(rpServiceBasePrice());
-  } finally {
-    rpState.service = prevService;
-  }
+  /* Used to swap rpState.service to "deep" and read a sqft-bracket price,
+     which made the recurring first visit only as reliable as whatever
+     sqft/bedroom values happened to still be in state from the Basic
+     Cleaning flow. Deep is a flat anchor now, so the first visit is just
+     that anchor — no state-swapping, no sqft dependency, no chance of
+     silently returning $0 because a tier field was empty. */
+  return rpToCents(RP_DEEP_ANCHOR_PRICE);
 }
 function rpRecurringDeepFirstPrice() {
   return rpCentsToDollars(rpRecurringDeepFirstCents());

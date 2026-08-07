@@ -921,7 +921,7 @@ function renderRail(){
   if(rpState.bedrooms) rows.push(["Bedrooms",rpState.bedrooms]);
   if(rpState.bathrooms) rows.push(["Bathrooms",rpState.bathrooms]);
   if(rpState.condition) rows.push(["Condition",rpState.condition.replace(/ Conditions?$/,"")]);
-  if(rpState.service==="maintenance" && rpState.bedrooms && rpState.sqft) rows.push(["Base (before discount)","$"+rpMaintenancePrice(rpState.bedrooms,rpState.bathrooms).toFixed(2)]);
+  if(rpState.service==="maintenance" && !rpIsCustomQuoteOnly()) rows.push(["Base (before discount)","$"+rpDisplayBasePrice().toFixed(2)]);
   if(rpState.frequency) rows.push(["Frequency",rpState.frequency]);
   if(rpAddonsTotal()>0) rows.push(["Add-ons","+$"+rpAddonsTotal().toFixed(2)]);
   if(rpState.militaryDiscount&&rpMilitaryDiscountAmount()>0) rows.push(["Military","\u2212$"+rpMilitaryDiscountAmount().toFixed(2)]);

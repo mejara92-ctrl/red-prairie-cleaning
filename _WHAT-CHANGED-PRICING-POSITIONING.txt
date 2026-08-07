@@ -679,3 +679,198 @@ STILL OPEN, FLAGGED NOT FIXED
   Six-city eyebrow line wraps to two lines on narrow mobile widths —
   cosmetic, not fixed, since dropping cities was the earlier mistake
   here in the first place.
+
+
+========================================================
+ROUND 12 — DEEP & BASIC MOVE TO FLAT TIME-ANCHORED PRICING
+========================================================
+BRIEF: quoting every home size was the actual problem. Replace Deep and
+Basic's sqft-bracket pricing with a flat anchor: 3 hours/$150 for Basic,
+6 hours/$300 for Deep. Extra hours addable at booking, $50/hr, so size/
+mess variance is absorbed by hours instead of a size bracket. Move-Out
+is UNCHANGED — still sqft-bracket priced, since a size-based number
+matters there for the no-upcharge promise on the flagship service.
+
+Basic and Deep also move OFF the Defend Your Deposit guarantee onto a
+new Satisfaction Guarantee — Mike's call, made independently but it
+directly resolves an honesty problem: a flat-time service can't promise
+a completed whole-home reset the way Defend Your Deposit implies.
+
+--------------------------------------------------------
+A. PRICING MODEL (js/rp-pricing-engine.js)
+--------------------------------------------------------
+NEW constants: RP_BASIC_ANCHOR_HOURS=3, RP_BASIC_ANCHOR_PRICE=150,
+RP_DEEP_ANCHOR_HOURS=6, RP_DEEP_ANCHOR_PRICE=300, RP_EXTRA_HOUR_RATE=50.
+
+NEW addon: rpAddonCatalog.extraHours ($50/hr), offered on Deep and Basic
+only (rpServiceAddons). Mirrors the existing laundry-loads pattern
+exactly — quantity picker, 1-4 hours.
+
+rpServiceBasePrice(): now Move-Out ONLY. Deep's branch removed (returns
+0 if ever called directly, so a stale caller fails loudly instead of
+silently inheriting Move-Out's sqft math).
+
+NEW rpDisplayBasePrice(): single source of truth for what "Base Service"
+displays for ANY service — moveout uses rpServiceBasePrice(), deep/
+maintenance return their flat anchor. Used by both /book's invoice and
+/call's CSR summary so the two can't drift apart from each other again.
+
+rpPreDiscountSubtotalCents(): deep now returns flat RP_DEEP_ANCHOR_PRICE
+immediately, no sqft/bedroom/condition lookup at all. Maintenance now
+uses RP_BASIC_ANCHOR_PRICE as its base instead of the old sqft-tier
+rpMaintenancePrice() call, still runs through the frequency discount
+exactly as before.
+
+RP_CONDITION_PRICED_SERVICES: ["moveout","deep","maintenance"] ->
+["moveout"] only. Condition step (Standard/Heavy/Extreme) removed from
+Deep and Basic entirely — extra hours do that job now.
+
+  *** FLAGGED, NOT SILENTLY DROPPED: the "Specialty or Unsafe
+  Conditions" custom-quote carve-out (biohazard, active pests, PPE
+  situations) doesn't exist for Deep/Basic anymore since there's no
+  condition step to select it from. Move-Out still has this protection.
+  For Deep/Basic that safety net now depends entirely on what the
+  customer writes in special instructions and the office catching it
+  before the appointment — worth deciding if that's sufficient. ***
+
+rpRecurringDeepFirstCents(): dramatically simplified. Used to swap
+rpState.service to "deep" and read a sqft-bracket price (fragile —
+depended on whatever sqft/bedroom fields happened to still be in state
+from the Basic flow). Now just returns the flat RP_DEEP_ANCHOR_PRICE
+directly. No state-swapping, no dependency, no silent-$0 failure mode.
+
+rpTimeEstimate(): Deep/Basic now report the real anchor + any extra
+hours purchased ("6 hours" or "8 hours (6 + 2 extra)") instead of the
+old static "Up to 6 hours" / "Up to 4 hours" placeholder text.
+
+--------------------------------------------------------
+B. GUARANTEE SYSTEM — THREE TIERS INSTEAD OF ONE ON/OFF SWITCH
+--------------------------------------------------------
+NEW rpGuaranteeType() returns "deposit" | "satisfaction" | "none":
+  deposit       Move-Out only — Defend Your Deposit, unchanged wording.
+  satisfaction  Deep + Basic (NEW) — "not happy with something we
+                cleaned? Tell us within 48 hours and we'll come back and
+                make it right, free." Deliberately does NOT promise a
+                completed whole-home reset, since the service is now
+                sold as anchored time, not a size-matched guarantee.
+  none          Hourly — unchanged, scope-directed carve-out.
+
+  rpGuaranteeApplies() kept as a boolean wrapper (true unless "none")
+  for any caller that only needs yes/no.
+
+  *** FLAGGED, NOT CHANGED: Carpet still falls through to "deposit" by
+  default (rpGuaranteeType()'s fallback case) even though a standalone
+  carpet job has no deposit/inspection outcome either. Pre-existing
+  oddity, out of scope for what was asked this round — worth a decision
+  later. ***
+
+book/index.html estimate screen: the old two-way ternary is now a
+three-way IIFE branching on rpGuaranteeType(). All three states verified
+rendering correctly.
+
+--------------------------------------------------------
+C. FLOWS, ADD-ON UI, INVOICE, INCLUDED SCREENS
+--------------------------------------------------------
+rpFlows: deep and maintenance no longer collect sqft/bedrooms/bathrooms/
+condition at all.
+  deep:        included -> addons -> estimate -> lead -> calendar
+  maintenance: included -> frequency -> addons -> estimate -> lead -> calendar
+  (contactgate still auto-injects before addons exactly as before)
+
+book/index.html: full Extra Time add-on UI added, mirroring the laundry
+pattern at every touch point — isSelected map, cardMeta, summaryFor(),
+bodyFor() picker (1-4 hours), rpSelectExtraHours()/rpClearAddon(),
+customer-facing invoice row (rpAddonSummaryRows), office-facing GHL
+summary (jobDetails string + addonsList).
+
+Invoice display: "Home Size" row is now Move-Out only. New "Included
+Time" row shows the anchor hours for Deep/Basic. "Base Service" row for
+all three priced services now reads rpDisplayBasePrice() instead of two
+different ad-hoc formulas.
+
+rpIncludes.deep / rpIncludes.maintenance intro copy rewritten to explain
+the anchor-hours model plainly ("Includes 6 hours... a bigger or
+heavily-soiled home just means adding extra time on the next step, not
+a different quote") so the flat price isn't a surprise on the estimate
+screen. Item checklists themselves untouched (deep/basic keep the round-
+7-style itemized list; only Move-Out sells pure theory/result per round
+11's direction).
+
+--------------------------------------------------------
+D. /call (CSR CONSOLE) — PARTIALLY UPDATED, GAP FLAGGED
+--------------------------------------------------------
+Confirmed NOT a billing risk: /call's final quoted number always comes
+from the shared rpFinalPrice() engine function (verified — every price
+display and every GHL post in call/index.html calls it), so whatever
+Christa books will correctly reflect the flat anchor. This is a
+workflow/UX gap, not a pricing bug.
+
+FIXED: the one line that displayed a genuinely WRONG number — "Base
+(before discount)" for Maintenance was computing off the old
+rpMaintenancePrice(bedrooms,bathrooms) sqft formula, which no longer
+matches what's actually charged. Now reads rpDisplayBasePrice().
+
+*** NOT DONE, FLAGGED AS A FOLLOW-UP TASK — /call has its own hardcoded
+step arrays (DEEP_STEPS, MAINTENANCE_STEPS, separate from rpFlows) that
+still walk Christa through sqft -> bedrooms -> bathrooms -> condition
+for Deep and Basic. Those answers now have ZERO effect on the price —
+she'll click through four questions that don't do anything, which is
+confusing on a live call even though it doesn't cause a wrong quote.
+Fixing this properly means reworking call/index.html's STEP arrays,
+screen renderers, and SERVICE_ANGLES script text for these two services
+— a distinct task from this round, not done here. Recommend doing this
+before Christa starts taking Deep/Basic calls under the new model. ***
+
+--------------------------------------------------------
+E. PRICING PAGE (pricing/index.html)
+--------------------------------------------------------
+Deep and Basic's sqft-bracket tables replaced with flat-price cards
+matching the Hourly Cleaning card style already on the page. Both state
+the anchor hours, the flat price, and the $50/hr extra-time option.
+Basic's card also keeps the recurring-discount and first-visit-Deep
+notes from round 8/9. Schema.org lowPrice fixed from $139 (no longer a
+real price anywhere) to $150. Extra Time added to the published add-ons
+table.
+
+--------------------------------------------------------
+!! FOUND DURING TESTING — FLAGGED, NOT FIXED, NEEDS A DECISION !!
+--------------------------------------------------------
+Basic Cleaning's anchor price ($150) is EXACTLY EQUAL to the round-9
+one-time floor (RP_ONE_TIME_MIN = 150). Consequence: the military
+discount is completely swallowed on every one-time Basic booking.
+
+  Basic one-time, no military:      $150.00
+  Basic one-time, WITH military:    $150.00 (should be $135.00 — the
+                                     $15 discount gets floored right
+                                     back up to $150)
+
+Deep is unaffected — its $300 anchor sits well above the $150 floor, so
+$300 - $25 (capped) = $275 works correctly.
+
+This is two decisions from different rounds colliding, not a bug in
+either decision alone. Needs Mike's call: either exempt Basic's anchor
+from the one-time floor (since $150 was already the deliberately-chosen
+"lowest sustainable price," a further discount below it may not be
+desired anyway), or accept that one-time Basic simply doesn't discount
+and recurring Basic (which uses the lower $115 floor) does.
+
+--------------------------------------------------------
+VERIFIED THIS ROUND
+--------------------------------------------------------
+  Deep, no size inputs at all:        $300.00
+  Deep + 2 extra hours:               $400.00
+  Basic one-time:                     $150.00
+  Basic biweekly (15% off):           $128.00 (Math.round of 127.50,
+                                       consistent with existing rounding
+                                       behavior elsewhere, not new)
+  Basic biweekly + 1 extra hour:      $178.00
+  Recurring first-visit Deep:         $300.00 flat, no sqft dependency
+  Guarantee types: moveout=deposit, deep/maintenance=satisfaction,
+                   hourly=none, carpet=deposit (unchanged, flagged above)
+  Full regression — UNCHANGED: move-out $379/$354 mil/$454.80 heavy,
+  hourly 3h $150, carpet 3rm $150 (floor)/5rm $250
+  Playwright walkthrough: deep flow skips size steps entirely, shows
+  "Included Time: 6 hours", Satisfaction Guaranteed text, no Home Size
+  row. Maintenance biweekly shows correct first-visit total, base
+  service, and Satisfaction Guaranteed text. Zero console errors.
+  pricing/index.html: HTML nesting validated, zero errors.
