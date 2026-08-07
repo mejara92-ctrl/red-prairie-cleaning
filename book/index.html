@@ -3057,7 +3057,7 @@ function rpScreenHtml() {
         ${[2,3,4,5,6].map(n => rpRowBtn({
           onclick:`rpSelectCarpetOnlyRooms(${n}, this)`,
           title:`${n}${n===6?"+":""} rooms`,
-          val:`$${n*75}${n===6?"+":""}`,
+          val:`$${rpCarpetOptionPrice(n)}${n===6?"+":""}`,
           selected: rpState.carpetRooms === n
         })).join("")}
       </div>
@@ -3387,13 +3387,13 @@ function rpLeadFieldFocus(element) {
 function rpContactGateScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
-    <h2>Your price is ready</h2>
-    <p class="rp-sub">Where should we send it? We'll text you a copy so you have it in writing — and if anything about your place is unusual, we can sort it out before you book. Next you'll pick any extras, then see your total.</p>
+    <h2>Almost there</h2>
+    <p class="rp-sub">Just a name and number, then your price is right here.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-error" id="rpGateError" style="display:none"></div>
-      <p class="rp-fineprint">No spam, no pressure — if you don't book, we may follow up once by text or call to see if you have questions.</p>
+      <p class="rp-fineprint">Something look off about your quote? We'll reach out before you book. Otherwise — no spam, no pressure.</p>
     </div>
   </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
 }

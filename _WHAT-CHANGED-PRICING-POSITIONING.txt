@@ -976,3 +976,130 @@ VERIFIED
   Card background solid enough that no photo detail bleeds through text
   on any re-tested screen.
   All syntax-checked, zero console errors across every test.
+
+
+========================================================
+ROUND 14 — REAL BUGS FOUND, INCLUDING THINGS I SAID WERE DONE AND WEREN'T
+========================================================
+Several items below were PROPOSED and approved earlier in the session
+but never actually shipped to the file — I described the change and the
+conversation moved on before I confirmed building it. Verified every
+item against the live file this round rather than trusting memory of
+what was discussed. Listed honestly below.
+
+1. CARPET ROOM-PRICE PREVIEW — REAL PRICING BUG, NOW FIXED
+   The standalone Carpet Cleaning room-count picker (book/index.html,
+   step "rooms") showed a price badge on each button computed with a
+   HARDCODED `n*75` — a leftover from the price BEFORE round 10 cut
+   Carpet to $50/room. The subheading directly above it correctly said
+   "$50 per room," while the buttons below it were still doing $75/room
+   math. Also never applied the $150 one-time floor from round 9.
+
+     Old (wrong):  2 rooms $150 / 3 rooms $225 / 4 $300 / 5 $375 / 6+ $450
+     New (correct): 2 rooms $150 / 3 rooms $150 / 4 $200 / 5 $250 / 6+ $300
+
+   NEW js/rp-pricing-engine.js: rpCarpetOptionPrice(n) — single formula
+   (2-room minimum, $150 floor, $50/room) used by the picker so a preview
+   price can never drift from the real charge again. Verified: every
+   preview price matches rpFinalPrice() exactly for n=2 through 6.
+
+   Checked the OTHER carpet room picker (the add-on version, bundled onto
+   Move-out/Deep/etc.) — that one only shows room counts, no per-button
+   price, so it was never exposed to this bug.
+
+2. HOURLY CLEANING — CONFUSING LINE REMOVED, INTRO SIMPLIFIED
+   Removed "Not an inspection-ready clean — see note below" from the
+   included-screen checklist — the "note below" it referenced doesn't
+   exist on that screen (the actual explanation lives on the ESTIMATE
+   screen's guarantee carve-out, two steps later), so it read as a
+   broken reference/confusing non-sequitur.
+   Intro rewritten per direct feedback that the old version "sounds
+   crazy": three sentences of qualifiers ("not a finished checklist...
+   whatever we reach...") collapsed into one: "For when you only want
+   certain areas done. Tell us what to prioritize, and we work that list
+   for the hours you book."
+
+3. DEEP & BASIC — LOGICAL CONTRADICTION FIXED, NOW SHIPPED
+   This was proposed two messages before the punch-list pause and
+   approved implicitly by moving on — but never actually written to the
+   file. Verified it was still live with the bug before fixing.
+   The contradiction: old copy said "nothing gets missed in the time
+   booked" in the same paragraph as explaining why Extra Hours exist —
+   which only makes sense if something COULD get missed without them.
+   New copy, matched to strictly parallel structure per direct request
+   ("if deep starts with 6 hours..., basic should start with 3 hours..."):
+     Deep: "6 hours of detailed, top-to-bottom cleaning. Bigger home or
+     extra mess? Add time on the next step — same crew, same standard,
+     just more of it."
+     Basic: "3 hours of routine cleaning to keep an already-tidy home
+     fresh. Bigger home or need more done? Add time on the next step."
+   Also dropped the "our crew works their own priority checklist"
+   sentence from both — internal-ops detail that wasn't adding customer
+   value and was part of what made the old copy feel wordy/awkward.
+
+4. CONTACT GATE — REWRITE FINALLY SHIPPED
+   "Your price is ready" / "We'll text you a copy" was flagged as WRONG
+   two full conversation-rounds ago (the site can't actually text quotes)
+   and a replacement was drafted and approved — then never built. Verified
+   it was still live with the old broken copy before fixing.
+   Restructured as short H2 + subhead (matching the site's established
+   pattern elsewhere, e.g. "Everything inside the home" / intro
+   paragraph) instead of cramming a full sentence into the headline:
+     H2: "Almost there"
+     Sub: "Just a name and number, then your price is right here."
+     Fine print (tightened to match Deep/Basic's new punchy
+     question-then-answer rhythm): "Something look off about your
+     quote? We'll reach out before you book. Otherwise — no spam, no
+     pressure."
+
+5. FONT AUDIT — COMPUTED STYLES CHECKED, NO CODE BUG FOUND
+   Ran a full computed-style audit (font-family/size/weight) across
+   every text element on all five "included" screens rather than
+   eyeballing another screenshot. Result: everything uses Manrope except
+   the H2, which uses DM Serif Display — the site's deliberate serif-
+   headline/sans-body brand pairing, consistent everywhere. Sizes are
+   consistent by role: 17px intro, 16px body/list, 13.5px fine print,
+   39px headline. Weights vary appropriately for hierarchy (500 body,
+   600 list items, 700 bold emphasis, 400 fine print).
+   NOT claiming this is fixed, because there was no font-FAMILY bug to
+   fix. What likely reads as "too many fonts" is the visual density of
+   bold emphasis + regular weight + the serif/sans split landing close
+   together on a small card — a hierarchy/spacing perception issue, not
+   a broken stylesheet. Flagged honestly rather than claiming a fix that
+   wouldn't show up in the actual rendered output.
+
+VERIFIED THIS ROUND
+  Carpet preview prices match real engine output exactly, all 5 room
+  counts (2-6).
+  Hourly included screen: confusing line gone, intro simplified,
+  verified via live render.
+  Deep/Basic included screens: contradiction gone, parallel "N hours
+  of..." opening confirmed on both via live render.
+  Contact gate: new H2/sub/fineprint all confirmed rendering via live
+  render (not just source inspection).
+  Full price regression unchanged: move-out $379, deep $300, basic $150,
+  hourly 3h $150.
+  Zero console errors across every test.
+
+
+========================================================
+ROUND 15 — FRIDGE & LAUNDRY REMOVED FROM DEEP/BASIC ADD-ONS
+========================================================
+js/rp-pricing-engine.js — rpServiceAddons:
+  deep:        was ["extraHours","fridge","carpet","laundry","windows","garage","yard"]
+               now ["extraHours","carpet","windows","garage","yard"]
+  maintenance: was ["extraHours","laundry","windows","yard"]
+               now ["extraHours","windows","yard"]
+
+Rationale: for a crew already on site for an anchored block of time,
+fridge interior and laundry are small enough to just note in special
+instructions rather than needing their own priced add-on step.
+
+Move-out and Hourly UNCHANGED — both still offer fridge/laundry. Hourly
+in particular is already instruction-driven for its whole scope, so
+fridge/laundry fit the same pattern as any other priority-list item.
+
+Verified: addon key arrays directly confirmed (not just UI inspection)
+— deep and maintenance no longer contain "fridge" or "laundry". Public
+pricing page's add-ons table already lists these generically without
+tying them to a specific service, so no copy there needed to change.

@@ -265,8 +265,15 @@ const rpAddonCatalog = {
 
 const rpServiceAddons = {
   moveout:     ["carpet", "junk", "windows", "garage", "yard"],
-  deep:        ["extraHours", "fridge", "carpet", "laundry", "windows", "garage", "yard"],
-  maintenance: ["extraHours", "laundry", "windows", "yard"],
+  /* Fridge and laundry pulled from Deep/Basic — for a crew already on
+     site for hours with an anchored-time model, these are small enough
+     that "note it in special instructions" covers it without needing a
+     separate priced add-on step. Move-out and Hourly keep both: Move-out
+     because the crew isn't necessarily told anything beyond the standard
+     scope, and Hourly because the whole service is instruction-driven
+     anyway, so fridge/laundry fit the same pattern as any other request. */
+  deep:        ["extraHours", "carpet", "windows", "garage", "yard"],
+  maintenance: ["extraHours", "windows", "yard"],
   hourly:      ["fridge", "laundry", "windows", "garage", "yard"]
 };
 
@@ -298,8 +305,15 @@ const rpIncludes = {
        checklist. Every house is different, so a fixed list either sells
        short or invites "did you do X too?" questions. The crew works
        their own priority checklist on-site; the customer gets the
-       outcome, not a room-by-room inventory. */
-    intro: "6 hours of detailed, top-to-bottom cleaning. Our crew works from their own priority checklist on-site, so nothing gets missed in the time booked — you don't need to track what's included, that's our job. Bigger or messier than typical? Add extra hours on the next step, not a different quote.",
+       outcome, not a room-by-room inventory.
+
+       Rewritten to fix a real contradiction: the old copy promised
+       "nothing gets missed" in the same breath as explaining why extra
+       hours exist — which only makes sense if something COULD get missed
+       without them. Also matched to Basic's opening structure exactly
+       ("N hours of..." as the first four words of both) since they're
+       the same pricing model and should read as a matched pair. */
+    intro: "6 hours of detailed, top-to-bottom cleaning. Bigger home or extra mess? Add time on the next step — same crew, same standard, just more of it.",
     outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
     /* items kept ONLY for /call's CSR reference rail (call/index.html,
        ~line 936), which needs a fast scannable checklist during a phone
@@ -307,7 +321,7 @@ const rpIncludes = {
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "3 hours of routine cleaning to keep an already-tidy home fresh. Our crew works from their own priority checklist, so the visit stays efficient without you having to spell out every task. Need more time for a larger home? Add extra hours on the next step.",
+    intro: "3 hours of routine cleaning to keep an already-tidy home fresh. Bigger home or need more done? Add time on the next step.",
     outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
@@ -316,8 +330,12 @@ const rpIncludes = {
     items: ["Hot-water extraction cleaning", "Pre-treatment included", "Normal spot treatment", "For the rooms you select"]
   },
   hourly: {
-    intro: "For when you only want certain things done. Tell us your priority areas, we work that list in order for the time you book. You're booking our time, not a finished checklist — whatever we reach in those hours gets our full attention.",
-    items: ["You set the priority order", "Kitchens, bathrooms, or any specific rooms", "Organizing, decluttering & light tidying", "Billed by the hour — 3-hour minimum", "Not an inspection-ready clean — see note below"]
+    /* Simplified per direct feedback that the old version "sounds crazy."
+       Old version buried the point in three sentences of qualifiers
+       ("not a finished checklist... whatever we reach..."). This says the
+       same thing in one line: you decide what gets done first. */
+    intro: "For when you only want certain areas done. Tell us what to prioritize, and we work that list for the hours you book.",
+    items: ["You set the priority order", "Kitchens, bathrooms, or any specific rooms", "Organizing, decluttering & light tidying", "Billed by the hour — 3-hour minimum"]
   },
   airbnb: {
     intro: "A guest-ready turnover of kitchens, bathrooms, floors, and everyday surfaces, with laundry, restocking, and same-day service available by request.",
@@ -530,6 +548,19 @@ function rpMilitaryDiscountCents() {
   return Math.min(Math.round(subtotal * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP));
 }
 function rpMilitaryDiscountAmount() { return rpCentsToDollars(rpMilitaryDiscountCents()); }
+
+/* Single source of truth for "what would N rooms of standalone Carpet
+   Cleaning cost" — used by the room-count picker on /book so its preview
+   prices can never silently drift from the real formula again. Before
+   this existed, the picker had its own hardcoded `n*75` — a leftover
+   from the pre-round-10 rate that never got updated when the price cut
+   to $50/room, so the page quoted $75/room math right below a subheading
+   that said "$50 per room." Applies the same 2-room minimum and $150
+   one-time floor as the real engine calculation. */
+function rpCarpetOptionPrice(n) {
+  const rooms = Math.max(2, Number(n || 0));
+  return Math.max(rooms * rpAddonCatalog.carpet.bundlePrice, RP_ONE_TIME_MIN);
+}
 
 function rpAddonsTotal() {
   let total = 0;
