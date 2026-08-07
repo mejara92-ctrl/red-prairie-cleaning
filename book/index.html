@@ -1173,6 +1173,20 @@ details.rp-includes li::before {
   margin: 16px 3px 0; color: var(--muted);
   font-size: 13.5px; line-height: 1.5; max-width: 440px;
 }
+/* Round-12/13 fix: outcome and exclusions used to be the last two rows
+   of a bulleted checklist, where 13.5px fine print made sense as a
+   trailing note. Once the checklist was removed (round 7/12 direction —
+   sell the theory and result, not a list), these became the MAIN body
+   content of the screen, but kept the old footnote-sized class. Next to
+   the 17px intro paragraph that reads as mismatched fonts, because it
+   effectively is one. This class matches rp-sub's size/weight so intro,
+   outcome, and exclusions read as one consistent voice; rp-included-note
+   stays reserved for genuine fine print (the trailing "need something
+   specific?" line only). */
+.rp-included-body {
+  margin: 16px 3px 0; color: var(--ink); font-size: 16px; font-weight: 500;
+  line-height: 1.48; max-width: 440px;
+}
 @media (max-width: 390px) {
   .rp-included-list li { padding: 12px 14px; font-size: 15px; gap: 11px; }
   .rp-included-check { width: 24px; height: 24px; }
@@ -1819,7 +1833,7 @@ details.rp-includes,
    Final visual consistency and mobile form stability pass.
    ======================================================================== */
 :root {
-  --rp-master-glass: linear-gradient(150deg, rgba(244,235,222,.68), rgba(228,211,192,.52));
+  --rp-master-glass: linear-gradient(150deg, rgba(250,244,235,.93), rgba(240,229,213,.86));
   --rp-master-border: rgba(255,247,235,.42);
   --rp-master-shadow: 0 20px 52px rgba(34,22,15,.15), inset 0 1px 0 rgba(255,255,255,.48);
   --rp-master-blur: blur(18px) saturate(1.08);
@@ -2151,7 +2165,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
    photo remains visible instead of turning into opaque vanilla panes.
    ======================================================================== */
 :root {
-  --rp-master-glass: linear-gradient(150deg, rgba(249,242,232,.64), rgba(235,220,201,.48));
+  --rp-master-glass: linear-gradient(150deg, rgba(250,244,235,.93), rgba(240,229,213,.86));
   --rp-master-control: linear-gradient(150deg, rgba(255,249,240,.38), rgba(239,224,207,.27));
   --rp-master-border: rgba(255,249,239,.50);
   --rp-master-control-border: rgba(255,249,239,.42);
@@ -2875,10 +2889,10 @@ function rpScreenHtml() {
       <div class="rp-hero-onphoto ${introActive ? "is-intro" : ""}">
         <p class="rp-eyebrow red">Lawton · Fort Sill · Cache · Elgin · Medicine Park · Duncan</p>
         <h1>From move-out to move-in, we've got your home covered.</h1>
-        <p class="rp-hero-onphoto-sub">If it's not right, we make it right — free.</p>
+        <p class="rp-hero-onphoto-sub">We stand behind every clean — and we always do right by you.</p>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
-          <span>${rpIcon("shield","rp-ic rp-ic-sm")} Defend Your Deposit™</span>
+          <span>${rpIcon("shield","rp-ic rp-ic-sm")} Transparent Pricing</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day Availability</span>
         </div>
       </div>
@@ -2886,11 +2900,11 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"Oven, fridge, cabinets & closets included — not add-ons at the door.", featured:true, badge:"Most Popular" })}
-          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. No contract." })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction, not a rental machine. $50/room." })}
-          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Only want certain areas done? Book us by the hour." }) : ""}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home — no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${rpSqftTiers[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom — add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction — not a rental machine.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
+          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Only want certain areas done? Book us by the hour.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" }) : ""}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -2903,24 +2917,28 @@ function rpScreenHtml() {
     const inc = rpIncludes[rpState.service];
     const items = (inc && inc.items) || [];
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
-    /* Move-out sells the theory and the result — no itemized checklist.
-       A list bounds scope in the reader's head; naming a rule once
-       ("if it's inside, it's covered") and moving straight to the outcome
-       does more work than seven rows ever could. Deep/Basic/Carpet/Hourly
-       keep the itemized list below since this specific problem was only
-       raised for move-out — revisit if the same logic should extend. */
+    /* Move-out, Deep, and Basic sell the theory and the result — no
+       itemized checklist. A list bounds scope in the reader's head;
+       naming a rule once and moving straight to the outcome does more
+       work than rows of bullets ever could. Extended from Move-out
+       (round 7) to Deep/Basic (round 13) once both moved to flat
+       time-anchored pricing — a size-blind checklist made even less
+       sense once the price stopped being size-blind too. Carpet and
+       Hourly keep their itemized lists; those are short value-prop
+       lists rather than scope-bounding ones, and weren't part of the ask. */
+    const sellsResultOnly = ["moveout", "deep", "maintenance"].includes(rpState.service);
     const isMoveout = rpState.service === "moveout";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>${isMoveout ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
       <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this — no add-ons required.`}</p>
-      ${isMoveout ? "" : `
+      ${sellsResultOnly ? "" : `
       ${inc && inc.itemsLead ? `<p class="rp-included-note" style="margin:0 0 10px;text-align:left">${inc.itemsLead}</p>` : ""}
       <ul class="rp-included-list">
         ${items.map(item => `<li>${rpIcon("check","rp-ic rp-included-check")}<span>${item}</span></li>`).join("")}
       </ul>`}
-      ${inc && inc.outcome ? `<p class="rp-included-note" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
-      ${inc && inc.excludes ? `<p class="rp-included-note" style="text-align:left">${inc.excludes}</p>` : ""}
+      ${inc && inc.outcome ? `<p class="rp-included-body" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
+      ${inc && inc.excludes ? `<p class="rp-included-body" style="text-align:left">${inc.excludes}</p>` : ""}
       <p class="rp-included-note">Need something specific? You can add extras on the next steps, or text us anytime.</p>
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good — continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
@@ -3375,7 +3393,7 @@ function rpContactGateScreen(eyebrow) {
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-error" id="rpGateError" style="display:none"></div>
-      <p class="rp-fineprint">No spam and no sales calls — we text the quote and leave you alone unless you reply.</p>
+      <p class="rp-fineprint">No spam, no pressure — if you don't book, we may follow up once by text or call to see if you have questions.</p>
     </div>
   </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
 }

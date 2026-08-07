@@ -294,11 +294,21 @@ const rpIncludes = {
     items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets — inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
   },
   deep: {
-    intro: "Includes 6 hours of detailed cleaning — kitchens, bathrooms, baseboards, doors, fixtures, floors, and reachable surfaces, including inside the oven and microwave. One flat price, no size brackets: a bigger or heavily-soiled home just means adding extra time on the next step, not a different quote.",
+    /* Sells the same way Move-Out does — theory + result, no itemized
+       checklist. Every house is different, so a fixed list either sells
+       short or invites "did you do X too?" questions. The crew works
+       their own priority checklist on-site; the customer gets the
+       outcome, not a room-by-room inventory. */
+    intro: "6 hours of detailed, top-to-bottom cleaning. Our crew works from their own priority checklist on-site, so nothing gets missed in the time booked — you don't need to track what's included, that's our job. Bigger or messier than typical? Add extra hours on the next step, not a different quote.",
+    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
+    /* items kept ONLY for /call's CSR reference rail (call/index.html,
+       ~line 936), which needs a fast scannable checklist during a phone
+       call. Not rendered on the customer-facing /book screen. */
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "Includes 3 hours of routine cleaning — kitchens, bathrooms, dusting, floors, and everyday surfaces to keep the home consistently fresh. One flat price for a typical home; need more time for a larger space? Add extra hours on the next step.",
+    intro: "3 hours of routine cleaning to keep an already-tidy home fresh. Our crew works from their own priority checklist, so the visit stays efficient without you having to spell out every task. Need more time for a larger home? Add extra hours on the next step.",
+    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll come back and make it right — free.",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {

@@ -874,3 +874,105 @@ VERIFIED THIS ROUND
   row. Maintenance biweekly shows correct first-visit total, base
   service, and Satisfaction Guaranteed text. Zero console errors.
   pricing/index.html: HTML nesting validated, zero errors.
+
+
+========================================================
+ROUND 13 — PUNCH LIST: READABILITY, FONTS, PRICE BADGES, CHECKLIST REMOVAL
+========================================================
+Built during a "talk it out" punch-list session. Items below were
+approved individually before being built; a few (contact-gate rewrite,
+Deep/Basic checklist copy) were flagged as still-pending when the
+session paused, then finished once confirmed.
+
+1. SERVICE ROW PRICE BADGES (book/index.html)
+   All five service rows now show a bold price pill (rpRowBtn's existing
+   val/valNote slot) instead of burying the number in the description:
+     Move-In/Move-Out   From $229   (still sqft-bracket priced, so "from")
+     Deep Cleaning       $300
+     Basic Cleaning      $150
+     Carpet Cleaning     $50 /room
+     Hourly Cleaning     $50 /hr
+   Move-out's description also updated: "Oven, fridge, cabinets & closets
+   included — not add-ons at the door." -> "A complete top-to-bottom
+   cleaning of the home — no add-ons needed." (plainer, no assumed
+   context about what "add-ons at the door" means).
+   Carpet's description trimmed to drop a price that's now redundant
+   with the badge ("Hot-water extraction, not a rental machine. $50/room."
+   -> "Hot-water extraction — not a rental machine.").
+
+2. GLOBAL READABILITY FIX — --rp-master-glass opacity
+   Found: the round-6 opacity fix from earlier in this project NEVER
+   ACTUALLY WORKED. There are two separate `:root { --rp-master-glass }`
+   definitions in the file; the later one always wins in the cascade and
+   was still low-opacity (rgba ~.64/.48), applied via !important to every
+   .rp-center panel, .rp-row, the invoice, form fields, and the footer
+   dock across the ENTIRE funnel. My earlier single-selector fix was
+   silently overridden by this shared token every time.
+
+   FIXED: raised BOTH --rp-master-glass definitions to rgba(...,.93)/
+   rgba(...,.86) — consistent, so a future edit to one doesn't
+   reintroduce the mismatch. This is an app-wide fix, not a per-screen
+   patch — every "included" screen, not just the ones screenshotted,
+   benefits from this.
+
+   NOTE FOR THE RECORD: the low opacity was documented in the code as a
+   DELIBERATE design choice ("so the photo remains visible instead of
+   turning into opaque vanilla panes"), not a bug. Raising it trades some
+   of that glass/photo-through look for actual text contrast. Given
+   repeated readability complaints across multiple screens (screenshotted
+   independently on Move-out, Hourly, Deep, Basic x2, Carpet), contrast
+   won. Flagging in case the visual trade-off matters to revisit later.
+
+3. FONT-SIZE MISMATCH ON "INCLUDED" SCREENS
+   Found: outcome and exclusions paragraphs were styled with
+   .rp-included-note (13.5px) — a class built for actual fine print (the
+   trailing "need something specific?" line). Once the itemized checklist
+   was removed (round 7 for Move-out, this round for Deep/Basic — see
+   below), outcome/exclusions became the MAIN body content of the screen,
+   but kept the old footnote-sized styling. Next to the 17px intro
+   paragraph, that reads as mismatched fonts because it functionally is
+   one — same typeface, jarring size jump with no visual signal (like a
+   bullet or divider) explaining why.
+
+   FIXED: new .rp-included-body class (16px/500 weight, matches rp-sub's
+   proportions) for outcome/exclusions. .rp-included-note now reserved
+   for genuine fine print only.
+
+4. DEEP & BASIC INCLUDED SCREENS — CHECKLIST REMOVED (finishes a change
+   started earlier this session and left half-wired)
+   Per direction: "our cleaners will prioritize getting the most results
+   and have checklists [internally] — customers either like the clean or
+   they won't." Deep and Basic now sell the same way Move-out does:
+   theory + binary outcome, no itemized list for the customer to check
+   items off or hunt for gaps in.
+
+   js/rp-pricing-engine.js — rpIncludes.deep / rpIncludes.maintenance:
+     intro rewritten to state the anchor hours + "our crew works from
+     their own priority checklist on-site, so nothing gets missed... you
+     don't need to track what's included, that's our job."
+     NEW outcome field (mirrors moveout's pattern): "You'll either love
+     the clean or you won't. Tell us within 48 hours and we'll come back
+     and make it right — free." — directly reflects the binary framing
+     from this session, and lines up with the Satisfaction Guarantee
+     wording from round 12.
+     items array KEPT UNCHANGED — still feeds /call's CSR reference rail,
+     which needs a fast scannable list on a live phone call. Not rendered
+     on /book anymore for these two services.
+
+   book/index.html — the isMoveout-only checklist-suppression flag
+   generalized to sellsResultOnly = ["moveout","deep","maintenance"].
+   Carpet and Hourly deliberately EXCLUDED — their lists are short
+   value-prop bullets, not scope-bounding checklists, and weren't part
+   of what was approved this round.
+
+VERIFIED
+  Price badges render correctly on all 5 rows (From $229 / $300 / $150 /
+  $50 per room / $50 per hr), no console errors.
+  hasChecklist: Deep=false, Basic=false, Carpet=true, Hourly=true (exactly
+  as scoped).
+  Font size consistent top-to-bottom on Move-out AND Deep's included
+  screen (verified via screenshot, re-rendered the exact failing screens
+  from the complaint).
+  Card background solid enough that no photo detail bleeds through text
+  on any re-tested screen.
+  All syntax-checked, zero console errors across every test.
