@@ -1187,70 +1187,94 @@ details.rp-includes li::before {
   margin: 16px 3px 0; color: var(--ink); font-size: 16px; font-weight: 500;
   line-height: 1.48; max-width: 440px;
 }
-/* Round-18: step-2 spec sheet. Grouped by area of the home, short terms
-   instead of sentences, sized to fit a phone screen without scrolling.
-   Two type sizes total on this screen (label 10.5px caps, items 14px),
-   plus the shared h2/.rp-sub the rest of the funnel already uses. */
-.rp-spec {
-  margin: 14px 0 0; text-align: left; overflow: hidden;
+/* Round-19: step-2 claim + proof. The headline carries the message;
+   the card exists only to prove it with the specific items competitors
+   upcharge for. Two type sizes in the card, one accent color. */
+.rp-claim {
+  margin: 13px 0 0; text-align: left; padding: 13px 15px 12px;
   border: 1px solid var(--line); border-radius: 18px;
   background: linear-gradient(150deg, rgba(255,255,255,.92), rgba(255,252,247,.80));
   box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.92);
 }
-.rp-spec-row {
-  display: grid; grid-template-columns: 30px 1fr; gap: 11px; align-items: start;
-  padding: 11px 14px; border-bottom: 1px solid rgba(70,52,37,.09);
+.rp-claim-lead {
+  margin: 0 0 9px; color: var(--ink);
+  font-size: 13.5px; font-weight: 800; line-height: 1.35;
 }
-.rp-spec-row:last-child { border-bottom: 0; }
-.rp-spec-ic {
-  width: 30px; height: 30px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(159,32,39,.08); color: var(--red);
+.rp-claim-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.rp-claim-list li {
+  display: flex; align-items: center; gap: 9px;
+  color: var(--ink); font-size: 15px; font-weight: 700; line-height: 1.3;
 }
-.rp-spec-ic .rp-ic { width: 16px; height: 16px; }
-.rp-spec-main { min-width: 0; }
-.rp-spec-label {
-  margin: 1px 0 3px; color: var(--red);
-  font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+.rp-claim-tick {
+  flex-shrink: 0; width: 20px; height: 20px; padding: 3px;
+  color: #fff; background: var(--red); border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(159,32,39,.24);
 }
-.rp-spec-items { margin: 0; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.42; }
-.rp-spec-note {
-  margin: 12px 2px 0; color: var(--muted);
+.rp-claim-kicker {
+  margin: 11px 0 0; padding-top: 10px; border-top: 1px solid rgba(70,52,37,.10);
+  color: var(--red); font-size: 14px; font-weight: 800; line-height: 1.3;
+}
+/* Full checklist, behind a tap — present for the minority who want to
+   audit it, invisible for everyone else. */
+.rp-more { margin: 10px 2px 0; }
+.rp-more summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  list-style: none; cursor: pointer; padding: 9px 0;
+  color: var(--red); font-size: 13px; font-weight: 800;
+}
+.rp-more summary::-webkit-details-marker { display: none; }
+.rp-more summary::after { content: "+"; font-size: 19px; font-weight: 400; line-height: 1; }
+.rp-more[open] summary::after { content: "\2013"; }
+.rp-more ul {
+  list-style: none; margin: 0 0 4px; padding: 0;
+  display: grid; gap: 5px;
+}
+.rp-more li {
+  position: relative; padding-left: 15px;
+  color: var(--muted); font-size: 13px; font-weight: 500; line-height: 1.42;
+}
+.rp-more li::before {
+  content: ""; position: absolute; left: 3px; top: 8px;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--red); opacity: .55;
+}
+.rp-claim-note {
+  margin: 11px 2px 0; color: var(--muted);
   font-size: 12.5px; font-weight: 500; line-height: 1.5; text-align: left;
 }
-.rp-spec-note b {
+.rp-claim-note b {
   display: block; margin-bottom: 2px; color: var(--ink);
   font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
 }
 @media (max-width: 390px) {
-  .rp-spec-row { padding: 9px 12px; gap: 10px; grid-template-columns: 27px 1fr; }
-  .rp-spec-ic { width: 27px; height: 27px; border-radius: 9px; }
-  .rp-spec-items { font-size: 13.2px; line-height: 1.38; }
-  .rp-spec-note { font-size: 11.5px; margin-top: 10px; }
+  .rp-claim { padding: 12px 13px 11px; }
+  .rp-claim-list li { font-size: 14.2px; }
+  .rp-claim-note { font-size: 11.8px; }
 }
 @media (max-height: 800px) {
-  .rp-spec { margin-top: 10px; }
-  .rp-spec-row { padding: 8px 12px; gap: 10px; }
-  .rp-spec-items { font-size: 13px; line-height: 1.35; }
-  .rp-spec-label { margin-bottom: 2px; }
-  .rp-spec-note { margin-top: 8px; font-size: 11.5px; }
+  .rp-claim { margin-top: 11px; padding: 11px 13px 10px; }
+  .rp-claim-list { gap: 6px; }
+  .rp-claim-list li { font-size: 14px; }
+  .rp-claim-kicker { margin-top: 9px; padding-top: 8px; font-size: 13.4px; }
+  .rp-more { margin-top: 7px; }
+  .rp-more summary { padding: 7px 0; }
+  .rp-claim-note { margin-top: 9px; font-size: 11.8px; }
 }
 @media (max-height: 700px) {
-  .rp-spec { margin-top: 7px; }
-  .rp-spec-row { padding: 5.5px 11px; gap: 9px; grid-template-columns: 25px 1fr; }
-  .rp-spec-ic { width: 25px; height: 25px; border-radius: 8px; }
-  .rp-spec-ic .rp-ic { width: 14px; height: 14px; }
-  .rp-spec-items { font-size: 12.4px; line-height: 1.32; }
-  .rp-spec-note { margin-top: 6px; font-size: 10.8px; line-height: 1.38; }
+  .rp-claim { margin-top: 9px; padding: 10px 12px 9px; }
+  .rp-claim-lead { margin-bottom: 7px; font-size: 12.8px; }
+  .rp-claim-list { gap: 5px; }
+  .rp-claim-list li { font-size: 13.2px; gap: 8px; }
+  .rp-claim-tick { width: 18px; height: 18px; }
+  .rp-claim-kicker { margin-top: 8px; padding-top: 7px; font-size: 12.6px; }
+  .rp-claim-note { margin-top: 8px; font-size: 11px; line-height: 1.42; }
 }
-/* This screen is a reassurance beat, not a question — the headline
-   doesn't need question-sized type, and shrinking it buys the vertical
-   room that keeps the spec sheet on one screen. */
-.step-included h2 { font-size: 25px; line-height: 1.12; }
+/* This screen is a confidence beat, not a question — the headline is
+   the message, so it gets room, but it doesn't need question-sized type. */
+.step-included h2 { font-size: 26px; line-height: 1.12; }
 .step-included .rp-sub { margin-bottom: 0; font-size: 15px; }
-@media (max-width: 390px) { .step-included h2 { font-size: 22.5px; } .step-included .rp-sub { font-size: 14px; } }
-@media (max-height: 800px) { .step-included h2 { font-size: 21.5px; } .step-included .rp-sub { font-size: 13.6px; } }
-@media (max-height: 700px) { .step-included h2 { font-size: 19.5px; } .step-included .rp-sub { font-size: 12.8px; } }
+@media (max-width: 390px) { .step-included h2 { font-size: 23px; } .step-included .rp-sub { font-size: 14px; } }
+@media (max-height: 800px) { .step-included h2 { font-size: 22.5px; } .step-included .rp-sub { font-size: 13.6px; } }
+@media (max-height: 700px) { .step-included h2 { font-size: 20px; } .step-included .rp-sub { font-size: 12.8px; } }
 
 /* Round-17: highlight-chip row retired — step 2 now renders a real
    checklist (.rp-included-list) instead of wrapping pill chips, so
@@ -2955,63 +2979,63 @@ function rpBack() {
    it stays untouched. This only changes what /book renders.
    ========================================================================= */
 const RP_STEP2 = {
+  /* Round-19: this screen is no longer an inventory of cleaning tasks.
+     A task list is the weakest thing we can say here — every cleaning
+     company on earth cleans toilets and baseboards, and the old layout
+     spent 30 seconds saying so right before we ask for a phone number.
+
+     It now makes ONE claim and proves it with the specific items
+     competitors bill as add-ons. That does real work: it makes the
+     price feel like a deal before the number appears, and it pre-empts
+     the "why is it that much" objection the CSRs field on the phone.
+
+     The exhaustive checklist still exists, behind a tap, sourced from
+     rpIncludes[].items in the pricing engine so there's one source of
+     truth and the /call CSR rail keeps working untouched. */
   moveout: {
-    title: "Everything inside is included",
-    lead: "One price, no add-ons needed for anything inside the home.",
-    groups: [
-      ["fridge",  "Kitchen",    "Oven &amp; fridge inside · Cabinets in &amp; out · Counters &amp; sink · Appliance exteriors"],
-      ["droplet", "Bathrooms",  "Tubs &amp; showers · Toilets · Sinks &amp; mirrors · Tile scrubbed"],
-      ["home",    "Every room", "Closets inside · Interior windows &amp; tracks · Baseboards, doors &amp; trim · Fans &amp; vents"],
-      ["layers",  "Floors",     "Vacuumed throughout · Hard floors mopped"]
-    ],
+    claim: "If it's inside the home, it's included",
+    lead: "One price covers the whole interior. No upcharges at the door.",
+    proofLead: "Most companies charge extra for these. We don't:",
+    proof: ["Inside the oven", "Inside the fridge", "Inside cabinets &amp; closets", "Interior windows, sills &amp; tracks", "Baseboards, doors &amp; trim"],
+    kicker: "All one price.",
     noteLabel: "Add on next if you need them",
     note: "Exterior windows · Garage floor · Carpet extraction · Junk removal"
   },
   deep: {
-    title: "What a Deep Cleaning covers",
-    lead: "6 hours of detailed cleaning. Add time for a bigger home.",
-    groups: [
-      ["fridge",  "Kitchen",    "Oven inside · Microwave inside · Cabinet fronts · Counters &amp; sink"],
-      ["droplet", "Bathrooms",  "Tubs &amp; showers · Toilets · Sinks &amp; mirrors"],
-      ["home",    "Every room", "Dusted throughout · Baseboards, doors &amp; trim · Fans &amp; vents"],
-      ["layers",  "Floors",     "Vacuumed throughout · Hard floors mopped"]
-    ],
+    claim: "Six hours of detail, top to bottom",
+    lead: "A full detailed clean of every room. No upcharges at the door.",
+    proofLead: "Most companies charge extra for these. We don't:",
+    proof: ["Inside the oven", "Inside the microwave", "Cabinet fronts", "Baseboards, doors &amp; trim", "Ceiling fans &amp; vents"],
+    kicker: "All one price. Add time for a bigger home.",
     noteLabel: "Add on next if you need them",
     note: "Carpet extraction · Exterior windows · Garage floor · Yard work"
   },
   maintenance: {
-    title: "What a Basic Cleaning covers",
-    lead: "3 hours to reset an already-tidy home. No contract.",
-    groups: [
-      ["fridge",  "Kitchen",    "Counters &amp; sink · Appliance exteriors · Cabinet fronts"],
-      ["droplet", "Bathrooms",  "Toilets · Sinks &amp; mirrors · Tubs &amp; showers wiped"],
-      ["home",    "Every room", "Dusted throughout · Surfaces tidied &amp; reset"],
-      ["layers",  "Floors",     "Vacuumed throughout · Hard floors mopped"]
-    ],
+    claim: "Three hours to reset your home",
+    lead: "A light refresh for an already-tidy home.",
+    proofLead: "What you can count on, every visit:",
+    proof: ["Kitchen cleaned &amp; wiped down", "Bathrooms cleaned &amp; sanitized", "Dusted throughout", "Floors vacuumed &amp; mopped", "Same price every visit"],
+    kicker: "No contract. Cancel or reschedule anytime.",
     noteLabel: "Add on next if you need them",
     note: "Carpet extraction · Exterior windows · Yard work"
   },
   carpet: {
-    title: "What Carpet Cleaning covers",
-    lead: "Hot-water extraction on the rooms you pick.",
-    groups: [
-      ["droplet", "The clean",     "Pre-treatment · Hot-water extraction · Hot-water rinse · Strong recovery for faster drying"],
-      ["layers",  "Problem areas", "Traffic lanes · Normal spot treatment"],
-      ["check",   "Pricing",       "$50 per room · You choose the rooms"]
-    ],
+    claim: "Hot-water extraction, $50 a room",
+    lead: "You pick the rooms. We handle the rest.",
+    proofLead: "Included in every room we clean:",
+    proof: ["Pre-treatment", "Hot-water extraction", "Hot-water rinse", "Traffic-lane focus", "Normal spot treatment"],
+    kicker: "Strong recovery means faster dry times.",
     noteLabel: "Quoted separately by severity",
     note: "Pet odor treatment · Deep-set or older stains. Some discoloration depends on carpet age and prior treatment."
   },
   hourly: {
-    title: "How Hourly Cleaning works",
-    lead: "You set the list. We work it in your order.",
-    groups: [
-      ["home",  "You choose", "Any rooms you want · Priority order is yours"],
-      ["check", "We can do",  "Cleaning · Organizing · Decluttering · Light tidying"],
-      ["clock", "Billing",    "$50 per hour, per cleaner · 3-hour minimum"]
-    ],
+    claim: "You set the list. We work it.",
+    lead: "$50 an hour per cleaner, 3-hour minimum.",
+    proofLead: "Your hours, your priorities:",
+    proof: ["Any rooms you choose", "Priority order is yours", "Cleaning &amp; organizing", "Decluttering &amp; light tidying", "No contract"],
+    kicker: "We work your list in your order.",
     noteLabel: "Worth knowing",
-    note: "You're booking time, not a finished checklist. If you need the whole home done to a standard, a Deep or Move-Out Clean is the better fit."
+    note: "You're booking time, not a finished checklist. Need the whole home done to a standard? A Deep or Move-Out Clean is the better fit."
   }
 };
 
@@ -3069,31 +3093,31 @@ function rpScreenHtml() {
   if (rpState.step === "included") {
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
     const s2 = RP_STEP2[rpState.service];
-    /* Fallback keeps the screen safe if a new service is added to
-       rpFlows before its RP_STEP2 entry exists. */
+    /* Full checklist comes from the pricing engine so /book and the
+       /call CSR rail can never drift apart. */
+    const fullList = (rpIncludes[rpState.service] && rpIncludes[rpState.service].items) || [];
     if (!s2) {
-      const inc = rpIncludes[rpState.service] || {};
       return { scroll: `<div class="rp-center">
         ${eyebrow}
         <h2>What your ${svcName} includes</h2>
-        <p class="rp-sub">${inc.intro || ""}</p>
       </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
     }
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>${s2.title}</h2>
+      <h2>${s2.claim}</h2>
       <p class="rp-sub">${s2.lead}</p>
-      <div class="rp-spec">
-        ${s2.groups.map(([iconKey, label, items]) => `
-        <div class="rp-spec-row">
-          <span class="rp-spec-ic" aria-hidden="true">${rpIcon(iconKey)}</span>
-          <div class="rp-spec-main">
-            <p class="rp-spec-label">${label}</p>
-            <p class="rp-spec-items">${items}</p>
-          </div>
-        </div>`).join("")}
+      <div class="rp-claim">
+        <p class="rp-claim-lead">${s2.proofLead}</p>
+        <ul class="rp-claim-list">
+          ${s2.proof.map(item => `<li><span class="rp-claim-tick" aria-hidden="true">${rpIcon("check")}</span>${item}</li>`).join("")}
+        </ul>
+        ${s2.kicker ? `<p class="rp-claim-kicker">${s2.kicker}</p>` : ""}
       </div>
-      ${s2.note ? `<div class="rp-spec-note"><b>${s2.noteLabel}</b>${s2.note}</div>` : ""}
+      ${fullList.length ? `<details class="rp-more" ontoggle="rpTrack('included_full_list_toggle',{open:this.open})">
+        <summary>See everything that's included</summary>
+        <ul>${fullList.map(i => `<li>${i}</li>`).join("")}</ul>
+      </details>` : ""}
+      ${s2.note ? `<div class="rp-claim-note"><b>${s2.noteLabel}</b>${s2.note}</div>` : ""}
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
