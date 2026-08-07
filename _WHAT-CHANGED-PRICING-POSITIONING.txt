@@ -635,3 +635,47 @@ VERIFIED
   Homepage H1 and microcopy render correctly, no console errors
   Regression: move-out $379, deep $339, basic biweekly $187, hourly $150
   — all unchanged
+
+
+========================================================
+ROUND 11 — /book HERO REWRITTEN (WAS NEVER TOUCHED BEFORE)
+========================================================
+FOUND WHILE ANSWERING "is this the best we can do": the /book page has
+its OWN hero, entirely separate from index.html's homepage hero. It had
+never been edited in any prior round, so it still said "A spotless
+home. A protected deposit. Your price in 60 seconds." — generic enough
+that a competitor could say the same thing — and its service-area line
+was stale ("Lawton · Fort Sill · Elgin · Cache, OK", missing Medicine
+Park and Duncan that every other page lists).
+
+FIRST PASS: swapped the generic H1 for a differentiator-forward one
+("Every room, every surface. No upcharges at the door.") and replaced
+the "Licensed & Insured" trust badge with "Defend Your Deposit™" —
+insurance is table stakes every competitor claims, the guarantee isn't.
+
+SECOND PASS (per Mike's direction — name the nickel-and-diming problem
+directly, state both outcomes):
+  H1:  "No nickel-and-diming. The price you see is the price you pay."
+  NEW subhead (rp-hero-onphoto-sub, new CSS class):
+       "A home that passes inspection. A home that's ready for the next
+        tenant." — covers both buyers (PCS family being inspected,
+        seller/landlord prepping for the next occupant) with no hedging
+        language ("built to", "designed for").
+  Move-out row desc tightened to match: "Oven, fridge, cabinets &
+  closets included — not add-ons at the door."
+  Service-area eyebrow fixed to the full 6-city list used everywhere
+  else on the site.
+  Badges: Google rating, Defend Your Deposit™, Same-Day Availability.
+
+VERIFIED: no console errors, H1/subhead render correctly, JS syntax
+checks pass on the largest inline script block.
+
+STILL OPEN, FLAGGED NOT FIXED
+  No link to /pricing from this hero — the claim "no nickel-and-diming"
+  has no easy way for a skeptical visitor to verify it without leaving
+  the funnel. The homepage carries that link; this hero doesn't.
+  Hero photo is generic stock-style; a real before/after or crew-in-
+  frame photo would carry more weight than any more copy could.
+  Six-city eyebrow line wraps to two lines on narrow mobile widths —
+  cosmetic, not fixed, since dropping cities was the earlier mistake
+  here in the first place.

@@ -345,6 +345,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-hero-onphoto.is-intro { padding-bottom: 6px; }
 .rp-hero-onphoto .rp-eyebrow.red { color: #f4d4c5; text-shadow: 0 1px 14px rgba(0,0,0,.34); }
 .rp-hero-onphoto h1 { color: #fffaf3; text-shadow: 0 3px 22px rgba(0,0,0,.34); max-width: 480px; }
+.rp-hero-onphoto-sub { color: #f3ece2; text-shadow: 0 2px 16px rgba(0,0,0,.4); font-weight: 600; font-size: 15px; margin: 8px 0 18px; max-width: 460px; }
 .rp-hero-onphoto .rp-trust {
   color: rgba(255,255,255,.94);
   display: grid;
@@ -2871,22 +2872,23 @@ function rpScreenHtml() {
       bg: `<div class="rp-bg-photo"><img src="/images/hero/front-photo-fullbleed-648.webp" alt="" width="648" height="1146" fetchpriority="high"/></div>`,
       scroll: `
       <div class="rp-hero-onphoto ${introActive ? "is-intro" : ""}">
-        <p class="rp-eyebrow red">Lawton · Fort Sill · Elgin · Cache, OK</p>
-        <h1>A spotless home. A protected deposit. Your price in 60 seconds.</h1>
+        <p class="rp-eyebrow red">Lawton · Fort Sill · Cache · Elgin · Medicine Park · Duncan</p>
+        <h1>No nickel-and-diming. The price you see is the price you pay.</h1>
+        <p class="rp-hero-onphoto-sub">A home that passes inspection. A home that's ready for the next tenant.</p>
         <div class="rp-trust">
           <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
-          <span>${rpIcon("shield","rp-ic rp-ic-sm")} Licensed &amp; Insured</span>
-          <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day</span>
+          <span>${rpIcon("shield","rp-ic rp-ic-sm")} Defend Your Deposit™</span>
+          <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day Availability</span>
         </div>
       </div>
       <div class="rp-sheet ${introActive ? "is-intro-hidden" : ""}" id="rpServiceSheet">
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"Inspection-ready, top-to-bottom, with no hidden fees.", featured:true, badge:"Most Popular" })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"Oven, fridge, cabinets & closets included — not add-ons at the door.", featured:true, badge:"Most Popular" })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"A meticulous whole-home reset, room by room." })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home." })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional extraction for a visibly renewed carpet." })}
+          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. No contract." })}
+          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction, not a rental machine. $50/room." })}
           ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Only want certain areas done? Book us by the hour." }) : ""}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a> — or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
