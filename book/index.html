@@ -1250,14 +1250,14 @@ details.rp-includes li::before {
   .rp-claim-list li { font-size: 14.2px; }
   .rp-claim-note { font-size: 11.8px; }
 }
-@media (max-height: 800px) {
-  .rp-claim { margin-top: 11px; padding: 11px 13px 10px; }
-  .rp-claim-list { gap: 6px; }
-  .rp-claim-list li { font-size: 14px; }
+@media (max-height: 920px) {
+  .rp-claim { margin-top: 9px; padding: 9px 13px 9px; }
+  .rp-claim-list { gap: 5px; }
+  .rp-claim-list li { font-size: 13.6px; }
   .rp-claim-kicker { margin-top: 9px; padding-top: 8px; font-size: 13.4px; }
-  .rp-more { margin-top: 7px; }
-  .rp-more summary { padding: 7px 0; }
-  .rp-claim-note { margin-top: 9px; font-size: 11.8px; }
+  .rp-more { margin-top: 5px; }
+  .rp-more summary { padding: 6px 0; }
+  .rp-claim-note { margin-top: 8px; font-size: 11.6px; }
 }
 @media (max-height: 700px) {
   .rp-claim { margin-top: 9px; padding: 10px 12px 9px; }
@@ -1268,12 +1268,53 @@ details.rp-includes li::before {
   .rp-claim-kicker { margin-top: 8px; padding-top: 7px; font-size: 12.6px; }
   .rp-claim-note { margin-top: 8px; font-size: 11px; line-height: 1.42; }
 }
+/* First-clean steer on Basic. Gold/amber, not red — it's advice, not
+   another primary action competing with the footer CTA. */
+.rp-nudge {
+  margin: 11px 0 0; padding: 11px 13px 12px; text-align: left;
+  border: 1px solid rgba(198,161,100,.42); border-radius: 16px;
+  background: linear-gradient(150deg, rgba(255,250,238,.95), rgba(250,240,220,.85));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+.rp-nudge-label {
+  display: flex; align-items: center; gap: 7px; margin: 0 0 5px;
+  color: #8a6516; font-size: 12.5px; font-weight: 800; line-height: 1.3;
+}
+.rp-nudge-label .rp-ic { color: #b8892a; flex-shrink: 0; }
+.rp-nudge-body { margin: 0 0 9px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.45; }
+.rp-nudge-cta {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 10px 13px;
+  border: 1px solid rgba(159,32,39,.28); border-radius: 12px;
+  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(255,246,240,.9));
+  color: var(--red); font-size: 13.5px; font-weight: 800;
+  box-shadow: 0 4px 12px rgba(48,32,19,.07), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.rp-nudge-cta:active { transform: scale(.985); }
+.rp-nudge-fine { margin: 7px 0 0; color: var(--muted); font-size: 11.5px; font-weight: 500; line-height: 1.4; }
+@media (max-height: 920px) {
+  .rp-nudge { margin-top: 8px; padding: 8px 12px 9px; }
+  .rp-nudge-label { margin-bottom: 4px; }
+  .rp-nudge-body { font-size: 12px; line-height: 1.4; margin-bottom: 7px; }
+  .rp-nudge-cta { padding: 8px 12px; font-size: 12.8px; }
+  .rp-nudge-fine { font-size: 11px; }
+}
+@media (max-height: 730px) {
+  .rp-nudge-body { display: none; }
+}
+@media (max-height: 700px) {
+  .rp-nudge { margin-top: 6px; padding: 7px 11px 8px; border-radius: 14px; }
+  .rp-nudge-label { font-size: 11.8px; margin-bottom: 4px; }
+  .rp-nudge-body { font-size: 11.8px; line-height: 1.38; margin-bottom: 7px; }
+  .rp-nudge-cta { padding: 8px 11px; font-size: 12.4px; }
+  .rp-nudge-fine { font-size: 10.5px; margin-top: 6px; }
+}
 /* This screen is a confidence beat, not a question — the headline is
    the message, so it gets room, but it doesn't need question-sized type. */
 .step-included h2 { font-size: 26px; line-height: 1.12; }
 .step-included .rp-sub { margin-bottom: 0; font-size: 15px; }
 @media (max-width: 390px) { .step-included h2 { font-size: 23px; } .step-included .rp-sub { font-size: 14px; } }
-@media (max-height: 800px) { .step-included h2 { font-size: 22.5px; } .step-included .rp-sub { font-size: 13.6px; } }
+@media (max-height: 920px) { .step-included h2 { font-size: 22.5px; } .step-included .rp-sub { font-size: 13.6px; } }
 @media (max-height: 700px) { .step-included h2 { font-size: 20px; } .step-included .rp-sub { font-size: 12.8px; } }
 
 /* Round-17: highlight-chip row retired — step 2 now renders a real
@@ -3014,8 +3055,21 @@ const RP_STEP2 = {
     claim: "Three hours to reset your home",
     lead: "A light refresh for an already-tidy home.",
     proofLead: "What you can count on, every visit:",
-    proof: ["Kitchen cleaned &amp; wiped down", "Bathrooms cleaned &amp; sanitized", "Dusted throughout", "Floors vacuumed &amp; mopped", "Same price every visit"],
+    proof: ["Kitchen cleaned &amp; wiped down", "Bathrooms cleaned &amp; sanitized", "Dusted throughout", "Floors vacuumed &amp; mopped"],
     kicker: "No contract. Cancel or reschedule anytime.",
+    /* Basic is a maintenance service — it assumes the home is already at
+       a baseline. On a first clean it usually isn't, which is how a
+       customer ends up disappointed at a fair price. Steering them to
+       Deep here is both the honest call and the better sale. Recurring
+       plans already force a Deep first visit
+       (rpRecurringNeedsDeepFirst), so the fine print says so rather
+       than pushing someone to switch for a benefit they'd get anyway. */
+    nudge: {
+      label: "First time? Start with a Deep Clean",
+      body: "Basic keeps up a home that's already been maintained. First clean with us? Start with a Deep.",
+      service: "deep",
+      cta: "Switch to Deep Cleaning"
+    },
     noteLabel: "Add on next if you need them",
     note: "Carpet extraction · Exterior windows · Yard work"
   },
@@ -3117,6 +3171,12 @@ function rpScreenHtml() {
         <summary>See everything that's included</summary>
         <ul>${fullList.map(i => `<li>${i}</li>`).join("")}</ul>
       </details>` : ""}
+      ${s2.nudge ? `<div class="rp-nudge">
+        <p class="rp-nudge-label">${rpIcon("zap","rp-ic rp-ic-sm")}${s2.nudge.label}</p>
+        <p class="rp-nudge-body">${s2.nudge.body}</p>
+        <button type="button" class="rp-nudge-cta" onclick="rpTrack('step2_upgrade_tap',{from:'${rpState.service}',to:'${s2.nudge.service}'});rpSelectService('${s2.nudge.service}', this)">${s2.nudge.cta} · $${RP_DEEP_ANCHOR_PRICE} ${rpIcon("chev","rp-ic rp-ic-sm")}</button>
+        ${s2.nudge.fine ? `<p class="rp-nudge-fine">${s2.nudge.fine}</p>` : ""}
+      </div>` : ""}
       ${s2.note ? `<div class="rp-claim-note"><b>${s2.noteLabel}</b>${s2.note}</div>` : ""}
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
