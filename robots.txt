@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# The booking funnel and the internal CSR tool are application screens,
+# not landing pages. /book already sends noindex,follow in its own head;
+# this keeps crawl budget on the pages that can actually rank.
+Disallow: /call
+Disallow: /call/
+
+Sitemap: https://redprairiecleaning.com/sitemap.xml
