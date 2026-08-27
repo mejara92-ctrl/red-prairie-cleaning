@@ -40,15 +40,59 @@ const rpServices = {
    1-bed homes since it ignored home size entirely. Base includes up to
    2 bedrooms and 1 full bathroom. "base: null" (over 3,400 sq ft) is a
    custom quote — see rpIsCustomQuoteOnly(). */
+/* PRICING MODEL REBUILT (round 18) — replaces the round-17 sqft-bracket
+   system with a bedroom-tier base + a surcharge that only kicks in on
+   large homes, per direct instruction: "should only really add money on
+   extra large homes, reduce the number of brackets."
+
+   This is, structurally, the same model Red Prairie used BEFORE the
+   sqft-bracket system existed (flat bedroom tiers: 1:$199, 2:$299,
+   3:$399, 4:$499, 5:$599) — that model was replaced specifically because
+   it couldn't tell a compact home from a sprawling one at the same
+   bedroom count. This version keeps the bedroom tier as the simple,
+   easy-to-quote base, but fixes that exact flaw with rpSqftTiers below,
+   which is now a SURCHARGE table (only 5 steps, only matters above
+   2,200 sq ft) instead of the entire pricing engine.
+
+   NOTE — open question, not resolved by this change: the Hourly Move-Out
+   option (RP_MOVEOUT_HOURLY_RATE, $80/hr) was calibrated in round 17 so
+   an 8-hour standard 3bed/2bath job priced at $640 on both the flat and
+   hourly paths. The new 3-bed flat price is $449, so that agreement no
+   longer holds — a customer could get a meaningfully different number
+   depending which path they pick for what might be the same actual job.
+   Left as-is since it wasn't part of this request, but flagging clearly:
+   worth deciding whether to adjust the hourly rate, or accept the two
+   paths pricing differently now. */
+const RP_MOVEOUT_BEDROOM_TIERS = [
+  { min: 1, max: 2, base: 399, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 3, max: 3, base: 499, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 599, includedBathrooms: 2, label: "4 bedrooms" },
+  /* 5+ base ($699) continues the confirmed $100 step pattern from the
+     other three tiers ($399/$499/$599) — not given directly, but follows
+     the same logic Mike confirmed for the rest of the table. */
+  { min: 5, max: 999, base: 699, includedBathrooms: 3, label: "5+ bedrooms" }
+];
+function rpMoveoutBedroomTier(beds) {
+  const b = Number(beds || 0);
+  return RP_MOVEOUT_BEDROOM_TIERS.find(t => b >= t.min && b <= t.max) || null;
+}
+/* $50/extra bathroom beyond whatever's included at that bedroom tier —
+   raised from $40 to stay proportional now that the base tiers moved up
+   by $100 each. */
+const RP_MOVEOUT_EXTRA_BATH_RATE = 50;
+
+/* Large-home surcharge — the ONLY place square footage still affects
+   Move-Out price. Threshold and step sizes below 2,200 sq ft don't
+   matter at all now; a compact and a mid-size home under that line pay
+   the same bedroom-tier price. Step amounts ($100/$200/$300) are
+   defaults, not numbers given directly — easy to adjust, they're the
+   only unspecified part of this table. */
 const rpSqftTiers = [
-  { key: "t1", label: "Up to 1,000 sq ft",     base: 229 },
-  { key: "t2", label: "1,001–1,400 sq ft",     base: 259 },
-  { key: "t3", label: "1,401–1,800 sq ft",     base: 299 },
-  { key: "t4", label: "1,801–2,200 sq ft",     base: 349 },
-  { key: "t5", label: "2,201–2,600 sq ft",     base: 419 },
-  { key: "t6", label: "2,601–3,000 sq ft",     base: 479 },
-  { key: "t7", label: "3,001–3,400 sq ft",     base: 549 },
-  { key: "t8", label: "Over 3,400 sq ft",      base: null }
+  { key: "t1", label: "Under 2,200 sq ft",     base: 0 },
+  { key: "t2", label: "2,200\u20132,600 sq ft",     base: 100 },
+  { key: "t3", label: "2,600\u20133,000 sq ft",     base: 200 },
+  { key: "t4", label: "3,000\u20133,400 sq ft",     base: 300 },
+  { key: "t5", label: "Over 3,400 sq ft",      base: null }
 ];
 /* Deep Cleaning sq-ft tiers — same bracket structure and included
    bed/bath convention as Move-Out (RP_MOVEOUT_* constants below), just
@@ -79,10 +123,11 @@ const rpMaintenanceSqftTiers = [
   { key: "t7", label: "3,001–3,400 sq ft",     base: 275 },
   { key: "t8", label: "Over 3,400 sq ft",      base: null }
 ];
-const RP_MOVEOUT_INCLUDED_BEDROOMS = 2;
-const RP_MOVEOUT_INCLUDED_BATHROOMS = 1;
-const RP_MOVEOUT_BEDROOM_RATE = 45;   // $ per bedroom above the included 2 — also used by Deep, same convention
-const RP_MOVEOUT_BATHROOM_RATE = 35;  // $ per full bathroom above the included 1 — also used by Deep
+/* RP_MOVEOUT_INCLUDED_BEDROOMS/BATHROOMS and the flat per-unit rates
+   that used to live here are gone — replaced by RP_MOVEOUT_BEDROOM_TIERS
+   above, where included bathrooms now vary BY bedroom tier (1 for a
+   1-2bed home, 2 for 3-4bed, 3 for 5+) rather than a single fixed
+   number for every size. */
 const RP_MAINTENANCE_INCLUDED_BEDROOMS = 1;
 const RP_MAINTENANCE_INCLUDED_BATHROOMS = 1;
 const RP_MAINTENANCE_BEDROOM_RATE = 15;
@@ -97,12 +142,15 @@ function rpSqftTiersForService(service) {
   return rpSqftTiers; // moveout, and safe default
 }
 function rpSqftTier() { return rpSqftTiersForService(rpState.service).find(t => t.key === rpState.sqft) || null; }
-/* Over-3,400-sq-ft custom-quote check — covers Move-Out, Deep, and
-   Maintenance (all three are sq-ft-tiered now). Name kept as-is even
-   though it now covers more than Move-Out, to avoid touching every call
-   site across /book and /call for a rename. */
+/* Over-size custom-quote check. Move-Out's table shrank to 5 tiers in
+   round 18 (was 8), so the "last tier = custom quote" key changed from
+   t8 to t5. Deep/Basic no longer use a sqft step at all (round 12), so
+   their branches here are dead but harmless — kept rather than removed
+   to avoid touching every call site for a rename, same reasoning as
+   before. */
 function rpMoveoutIsCustomSqft() {
-  return ["moveout", "deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8";
+  return (rpState.service === "moveout" && rpState.sqft === "t5")
+    || (["deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8");
 }
 
 /* Hourly Cleaning — flat rate per cleaner per hour. No condition
@@ -186,6 +234,13 @@ function rpServiceIsPublic(key) {
    in the round log as unresolved, not silently changed here since it
    wasn't part of what was asked. */
 function rpGuaranteeType() {
+  /* Split by billing mode, not just service. Flat-rate Move-Out is paid
+     for an OUTCOME (an inspection-ready home) — the deposit guarantee
+     protects that outcome. Hourly Move-Out is paid for TIME — if the
+     crew stops when the clock runs out, promising the same outcome
+     guarantee wouldn't hold together, so it gets the same time-based
+     Satisfaction Guarantee Deep/Basic already use instead. */
+  if (rpIsMoveoutHourly()) return "satisfaction";
   if (rpState.service === "moveout") return "deposit";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "satisfaction";
   if (rpState.service === "hourly") return "none";
@@ -260,7 +315,13 @@ const rpAddonCatalog = {
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
   yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 },
-  extraHours: { label: "Extra Time", unit: "hour", pricePerHour: RP_EXTRA_HOUR_RATE }
+  extraHours: { label: "Extra Time", unit: "hour", pricePerHour: RP_EXTRA_HOUR_RATE },
+  /* Deep Cleaning only. Priced per hour actually booked (anchor hours
+     plus any Extra Time already purchased), not a flat number — a 2nd
+     cleaner for 6 hours costs the same $50/hr as the 1st, so the price
+     has to track whatever the total hours end up being. See
+     rpSecondCleanerPrice() for the calculation. */
+  secondCleaner: { label: "Additional Cleaner", pricePerHour: RP_EXTRA_HOUR_RATE }
 };
 
 const rpServiceAddons = {
@@ -272,10 +333,22 @@ const rpServiceAddons = {
      because the crew isn't necessarily told anything beyond the standard
      scope, and Hourly because the whole service is instruction-driven
      anyway, so fridge/laundry fit the same pattern as any other request. */
-  deep:        ["extraHours", "carpet", "windows", "garage", "yard"],
+  deep:        ["extraHours", "secondCleaner", "carpet", "windows", "garage", "yard"],
   maintenance: ["extraHours", "windows", "yard"],
   hourly:      ["fridge", "laundry", "windows", "garage", "yard"]
 };
+
+/* Second cleaner costs the same $50/hr as the base rate, for however
+   many hours are actually booked (the 6-hour anchor plus any Extra Time
+   already added) — a 2nd person working 8 hours costs the same as the
+   1st person working 8 hours. Recomputed live so adding/removing Extra
+   Time updates this price automatically instead of going stale. */
+function rpSecondCleanerHours() {
+  return RP_DEEP_ANCHOR_HOURS + Number(rpState.addonExtraHours || 0);
+}
+function rpSecondCleanerPrice() {
+  return rpSecondCleanerHours() * rpAddonCatalog.secondCleaner.pricePerHour;
+}
 
 const rpIncludes = {
   /* Round-16 rebuild: every service now uses ONE shared step-2 format
@@ -294,7 +367,8 @@ const rpIncludes = {
     highlights: [
       ["home", "Every room, inside & out"],
       ["check", "Oven, fridge & cabinets included"],
-      ["shield", "Defend Your Deposit"]
+      ["shield", "Defend Your Deposit"],
+      ["repeat", "2-cleaner crew"]
     ],
     outcome: "Built to pass a landlord walkthrough, or to photograph well if you're listing the home for sale.",
     /* Exclusions folded into the fine print instead of their own
@@ -358,7 +432,11 @@ const rpIncludes = {
    read-only "includes" screen — that content lives as an expandable
    "What's included" on the estimate screen. */
 const rpFlows = {
-  moveout:     ["included", "sqft", "bedrooms", "bathrooms", "condition", "addons", "estimate", "lead", "calendar"],
+  /* Move-Out's actual flow is computed in rpCurrentFlow() below, not
+     read directly from this array — it branches on rpState.moveoutMode
+     ("flat" vs "hourly"). This entry is the flat-rate path, kept as the
+     default/fallback. */
+  moveout:     ["included", "moveoutmode", "bedrooms", "bathrooms", "sqft", "condition", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -386,10 +464,55 @@ const rpFlows = {
    completion rate — completion will look worse by design. */
 const RP_CONTACT_GATE = true;
 
+/* ---------------------------------------------------------------------
+   MOVE-OUT HOURLY OPTION
+   New alternative to the flat sqft-bracket price: pay by the hour at a
+   rate that already bundles the standard 2-cleaner crew, no separate
+   cleaner-count picker needed. Priced to match the same labor economics
+   as the flat-rate table above — see rpSqftTiers comment for the shared
+   $80/hr benchmark both paths are built from.
+
+   Minimum is 4 hours (a full move-out reset rarely finishes faster than
+   that even for a small home) — adjustable if that's wrong in practice.
+   No condition step: like Deep/Basic, variance is absorbed by choosing
+   more hours rather than a size/condition multiplier. Still gets the
+   Defend Your Deposit guarantee (rpGuaranteeType() keys off the service,
+   not the billing mode) — this is still a real move-out job, just billed
+   differently, not a customer-directed scope like Hourly Cleaning. */
+const RP_MOVEOUT_HOURLY_RATE = 80;
+const RP_MOVEOUT_HOURLY_MIN_HOURS = 4;
+const RP_MOVEOUT_HOURLY_MAX_HOURS = 12;
+const RP_MOVEOUT_HOURLY_CLEANERS = 2;
+
+function rpIsMoveoutHourly() {
+  return rpState.service === "moveout" && rpState.moveoutMode === "hourly";
+}
+
 function rpCurrentFlow() {
-  const flow = rpFlows[rpState.service] || [];
+  let flow = rpFlows[rpState.service] || [];
+  if (rpState.service === "moveout") {
+    /* Questionnaire always comes first, before any billing-mode choice —
+       water/power/A/C/mold/pests decide whether the job can happen at
+       all, regardless of how it's priced. A "no"/"yes" that blocks the
+       job ends the flow right there (see "moveoutblocked" screen, which
+       captures a callback lead instead of dead-ending with nothing).
+
+       Past the questionnaire, flat-rate is the DEFAULT path straight
+       through to a real price — no upfront "how do you want this
+       priced?" choice anymore. Hourly is only reached by explicitly
+       choosing "Prefer an hourly clean?" from the estimate screen once
+       a flat price is already showing, not as a coin-flip before either
+       number exists. */
+    if (rpMoveoutBlocked()) {
+      flow = ["included", "moveoutquestionnaire", "moveoutblocked"];
+    } else if (rpIsMoveoutHourly()) {
+      flow = ["included", "moveoutquestionnaire", "moveouthours", "addons", "estimate", "lead", "calendar"];
+    } else {
+      flow = ["included", "moveoutquestionnaire", "bedrooms", "bathrooms", "sqft", "addons", "estimate", "lead", "calendar"];
+    }
+  }
   if (!RP_CONTACT_GATE) return flow;
-  if (flow.includes("contactgate")) return flow;
+  if (flow.includes("contactgate") || flow.includes("moveoutblocked")) return flow;
   /* Insert before "addons", NOT before "estimate". The add-ons screen
      carries a live "Current estimate" chip, so gating only at the
      estimate screen still let the customer read their full price a step
@@ -404,6 +527,7 @@ function rpCurrentFlow() {
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
 function rpTimeEstimate() {
+  if (rpIsMoveoutHourly()) return rpState.moveoutHours ? `${rpState.moveoutHours} hour${rpState.moveoutHours === 1 ? "" : "s"}` : `${RP_MOVEOUT_HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "moveout") return "6–10 hours";
   if (rpState.service === "deep") {
     const extra = Number(rpState.addonExtraHours || 0);
@@ -441,7 +565,52 @@ function rpConditionKey() {
    add-on instead — see RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE above.
    Extra hours now do the job condition multipliers used to do for those
    two services, so this list shrank rather than grew. */
-const RP_CONDITION_PRICED_SERVICES = ["moveout"];
+const RP_CONDITION_PRICED_SERVICES = [];
+/* ^ Empty now that Move-Out dropped condition-based pricing (see
+   rpServiceBasePrice's comment above). This safely makes
+   rpConditionMultiplier() and rpIsSpecialtyCondition() no-ops everywhere
+   they're still referenced, without hunting down and deleting every call
+   site individually. rpConditionOrder/rpConditionCopy stay defined but
+   are no longer wired into any active flow. */
+
+/* ---------------------------------------------------------------------
+   MOVE-OUT HARD-STOP QUESTIONNAIRE
+   Replaces the old self-reported condition scale entirely. Five plain
+   yes/no facts about whether the job can happen as booked, not how
+   dirty the home is. Any answer that fails routes straight to a phone
+   call instead of adjusting price, because this crew can't renegotiate
+   a number on-site, so there's no point pricing for dirtiness anymore,
+   only checking whether a normal crew can do a normal job here.
+
+   NOTE: mold and pests used to route through rpIsSpecialtyCondition()
+   (the old "Specialty or Unsafe Conditions" custom-quote tier). That
+   mechanism is gone along with condition pricing; this is now the only
+   path for those two flags on Move-Out. */
+function rpMoveoutQuestionnaireAnswered() {
+  return rpState.moveoutWaterOn !== null && rpState.moveoutPowerOn !== null &&
+         rpState.moveoutAcOn !== null && rpState.moveoutMold !== null &&
+         rpState.moveoutPests !== null;
+}
+function rpMoveoutBlocked() {
+  if (rpState.service !== "moveout") return false;
+  if (!rpMoveoutQuestionnaireAnswered()) return false;
+  return rpState.moveoutWaterOn === false
+      || rpState.moveoutPowerOn === false
+      || rpState.moveoutAcOn === false
+      || rpState.moveoutMold === true
+      || rpState.moveoutPests === true;
+}
+/* Which specific answer(s) triggered the block, used to write a useful
+   note for the office instead of a generic "blocked" flag. */
+function rpMoveoutBlockReasons() {
+  const reasons = [];
+  if (rpState.moveoutWaterOn === false) reasons.push("Water is off");
+  if (rpState.moveoutPowerOn === false) reasons.push("Power is off");
+  if (rpState.moveoutAcOn === false) reasons.push("A/C isn't working");
+  if (rpState.moveoutMold === true) reasons.push("Signs of mold");
+  if (rpState.moveoutPests === true) reasons.push("Signs of pests");
+  return reasons;
+}
 
 /* Automatic condition multiplier for Move-Out, Deep and Basic — 0 for
    Standard, 0.20 for Heavy, 0.50 for Extreme. Specialty has no multiplier
@@ -468,17 +637,27 @@ function rpIsCustomQuoteOnly() {
    credits for either service; Standard is always the lowest advertised
    price. */
 function rpServiceBasePrice() {
-  const mult = rpConditionMultiplier();
   if (rpState.service === "moveout") {
-    if (!rpState.sqft || !rpState.bedrooms || rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition()) return 0;
-    const tier = rpSqftTier();
-    if (!tier || tier.base === null) return 0;
-    const beds = Number(rpState.bedrooms);
-    const baths = Number(rpState.bathrooms || RP_MOVEOUT_INCLUDED_BATHROOMS);
-    const bedAdj = Math.max(0, beds - RP_MOVEOUT_INCLUDED_BEDROOMS) * RP_MOVEOUT_BEDROOM_RATE;
-    const bathAdj = Math.max(0, baths - RP_MOVEOUT_INCLUDED_BATHROOMS) * RP_MOVEOUT_BATHROOM_RATE;
-    const preConditionCents = rpToCents(tier.base + bedAdj + bathAdj);
-    return rpCentsToDollars(Math.round(preConditionCents * (1 + mult)));
+    /* Condition-based pricing (Standard/Heavy/Extreme multiplier) REMOVED
+       for Move-Out. Replaced by a hard-stop questionnaire (water, power,
+       A/C, mold, pests) — see rpMoveoutBlocked(). The reasoning: this
+       crew can't renegotiate a price on-site, so a self-reported
+       "how dirty is it" multiplier was never enforceable anyway. The new
+       model doesn't try to price dirtiness at all — it only checks
+       whether the job can happen as booked. If it can't, the flow stops
+       and routes to a phone call instead of adjusting the price. */
+    if (!rpState.bedrooms || rpMoveoutIsCustomSqft() || rpMoveoutBlocked()) return 0;
+    const tier = rpMoveoutBedroomTier(rpState.bedrooms);
+    if (!tier) return 0;
+    const baths = Number(rpState.bathrooms || tier.includedBathrooms);
+    const bathAdj = Math.max(0, baths - tier.includedBathrooms) * RP_MOVEOUT_EXTRA_BATH_RATE;
+    /* Large-home surcharge — 0 for anything under 2,200 sq ft. rpSqftTier()
+       returning null (sqft not yet answered) is treated the same as "no
+       surcharge" rather than blocking the price, since the surcharge is
+       secondary information now, not the primary driver. */
+    const sizeTier = rpSqftTier();
+    const sizeSurcharge = (sizeTier && sizeTier.base !== null) ? sizeTier.base : 0;
+    return tier.base + bathAdj + sizeSurcharge;
   }
   /* Deep is now a flat anchor price (see RP_DEEP_ANCHOR_PRICE) — it no
      longer runs through this sqft-bracket formula. Kept returning 0 here
@@ -491,6 +670,10 @@ function rpServiceBasePrice() {
    service, used by both /book's invoice and /call's CSR summary so the
    two never drift apart. */
 function rpDisplayBasePrice() {
+  if (rpIsMoveoutHourly()) {
+    const hours = Number(rpState.moveoutHours || 0);
+    return hours >= RP_MOVEOUT_HOURLY_MIN_HOURS ? hours * RP_MOVEOUT_HOURLY_RATE : 0;
+  }
   if (rpState.service === "moveout") return rpServiceBasePrice();
   if (rpState.service === "deep") return RP_DEEP_ANCHOR_PRICE;
   if (rpState.service === "maintenance") return RP_BASIC_ANCHOR_PRICE;
@@ -510,6 +693,15 @@ function rpFormatMoney(cents) { return `$${(Math.abs(cents) / 100).toFixed(2)}`;
    they're fixed price and never touched by condition or military discount. */
 function rpPreDiscountSubtotalCents() {
   if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
+  if (rpIsMoveoutHourly()) {
+    /* Flat $80/hr, 2 cleaners already bundled into that rate — no
+       separate cleaner-count picker needed, and no condition multiplier
+       (same reasoning as Deep/Basic: more hours absorbs a bigger or
+       messier home, not a size/condition bump on top of the rate). */
+    const hours = Number(rpState.moveoutHours || 0);
+    if (hours < RP_MOVEOUT_HOURLY_MIN_HOURS) return 0;
+    return rpToCents(hours * RP_MOVEOUT_HOURLY_RATE);
+  }
   if (rpState.service === "carpet") {
     const rooms = Math.max(2, Number(rpState.carpetRooms || 0)); // 2-room minimum
     /* $50/room whether carpet is booked standalone or bundled onto another
@@ -573,6 +765,15 @@ function rpCarpetOptionPrice(n) {
   return Math.max(rooms * rpAddonCatalog.carpet.bundlePrice, RP_ONE_TIME_MIN);
 }
 
+/* Pet enzyme treatment — carpet only, priced per room. Breaks down odor
+   and stains at the source rather than masking them; surfaced right
+   when "Pet odor" gets checked on the carpet details screen, since
+   that's the exact moment the customer's already thinking about it. */
+const RP_PET_ENZYME_RATE = 25;
+function rpPetEnzymePrice() {
+  return Math.max(1, Number(rpState.carpetRooms || 0)) * RP_PET_ENZYME_RATE;
+}
+
 function rpAddonsTotal() {
   let total = 0;
   if (rpState.addonCarpetRooms > 0) total += rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice;
@@ -585,6 +786,14 @@ function rpAddonsTotal() {
   if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
   if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
   if (rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
+  if (rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
+  /* Gated to carpet specifically — pet enzyme only makes sense for the
+     standalone Carpet Cleaning service, and stacking it here (rather than
+     inside rpPreDiscountSubtotalCents' carpet branch) keeps it OUTSIDE
+     the $150 one-time floor, same as every other add-on. A $100 carpet
+     job + $25 enzyme should floor-then-add to $175, not get absorbed
+     into a single floored $150. */
+  if (rpState.service === "carpet" && rpState.addonPetEnzyme) total += rpPetEnzymePrice();
   return total;
 }
 function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }

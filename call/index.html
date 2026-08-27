@@ -243,22 +243,6 @@ const RP_BOOKING_API = "https://rpc-booking-api.aged-breeze-c9a5.workers.dev";
 const LS_KEY = "rpCallConsole.v1";
 
 /* The engine reads this global. Field names match /book's rpState. */
-/* Lead-source options. LSA is split from ordinary Google traffic on purpose:
-   they bill differently and we could not previously tell them apart, so cost
-   per booked job was unknowable. Google plays a "new lead from Google" whisper
-   on LSA calls before connecting, which is how the CSR can tell them apart. */
-const RP_LEAD_SOURCES = [
-  "Google LSA (announced by Google)",
-  "Google Search / Website",
-  "Google Maps / Business Profile",
-  "Referral (friend or family)",
-  "Repeat customer",
-  "Property manager / Realtor",
-  "Facebook / Social",
-  "Drove by / Sign / Vehicle",
-  "Other"
-];
-
 const rpState = {
   step:"service", service:null,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
@@ -441,7 +425,7 @@ const SCRIPT = {
     watch:"If they hesitate, book One-Time. They can switch later; a lost booking can't."},
   rooms:{say:"\u201cHow many carpeted rooms are we cleaning?\u201d",
     listen:"Count rooms, not square footage.",
-    watch:"Carpet-only visits have a $150 minimum ($50/room, so 1\u20133 rooms all price at $150) \u2014 say that up front, not after they've said one room."},
+    watch:"There's a 2-room minimum \u2014 say that up front, not after they've said one room."},
   cleaners:{say:"\u201cHow many cleaners would you like?\u201d",
     listen:"Two is the normal default for most homes.",
     watch:"More cleaners is faster, not cheaper. Make sure they hear it's per cleaner, per hour."},
@@ -642,7 +626,7 @@ function phoneOk(v){ return normalizePhone(v).length===10; }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim()); }
 function stepValid(){
   switch(rpState.step){
-    case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone) && !!rpState.csrLeadSource;
+    case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone);
     case "service":   return !!rpState.service;
     case "sqft":      return !!rpState.sqft;
     case "bedrooms":  return !!rpState.bedrooms;
@@ -681,7 +665,7 @@ const TITLES = {
   bathrooms:["How many bathrooms?",""],
   condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
   frequency:["One-time or recurring?",""],
-  rooms:["How many carpeted rooms?","$50 per room, $150 minimum for carpet-only."],
+  rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
   hours:["How many hours?","4-hour minimum."],
   addons:["Anything to add on?","Ask carpet, junk, windows, and garage by name."],
@@ -706,10 +690,10 @@ function screenHtml(){
       <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" oninput="set('fullName',this.value)"></div>
     <div class="f"><label for="ph">Best callback number *</label>
       <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" oninput="set('phone',this.value)"></div>
-    <div class="f"><label for="src">How did they hear about us? *</label>
-      <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014 Pick one \u2014</option>
-      ${RP_LEAD_SOURCES.map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select>
-      <p class="sub" style="margin-top:6px">Google announces its own leads before you're connected \u2014 if you heard <b>"you have a new lead from Google"</b>, that's <b>Google LSA</b>. Anything else from Google is <b>Google Search / Website</b>. This is how we work out what our ads actually cost us per job.</p></div>`;
+    <div class="f"><label for="src">How did they hear about us? (Optional)</label>
+      <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014</option>
+      ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
+        .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
 
   if(s==="service"){
     const items = Object.entries(rpServices).map(([k,v])=>
@@ -988,30 +972,9 @@ function back(){ const f=flow(), i=stepIdx();
 function openDrawer(id){
   if(id==="drObj") el("objList").innerHTML=OBJECTIONS.map(o=>
     `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${o.n}</em></div>`).join("");
-  if(id==="drOut"){
-    /* A call that ends without a booking is still the most useful kind of
-       attribution data we have — it tells us which channel produces leads
-       that do not close. If the source never got picked on the caller step,
-       catch it here rather than writing another "N/A" into GHL. */
-    el("outList").innerHTML =
-      (rpState.csrLeadSource ? "" : `
-        <div class="f" style="margin-bottom:12px">
-          <label for="outSrc">How did they hear about us? *</label>
-          <select id="outSrc" onchange="setLeadSourceFromDrawer(this.value)">
-            <option value="">\u2014 Pick one \u2014</option>
-            ${RP_LEAD_SOURCES.map(o=>`<option>${o}</option>`).join("")}
-          </select>
-          <p class="sub" style="margin-top:6px">Needed before logging the outcome.</p>
-        </div>`)
-      + OUTCOMES.map(o=>
-        `<button class="out-btn"${rpState.csrLeadSource?"":" disabled style=\"opacity:.45;pointer-events:none\""} onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
-  }
+  if(id==="drOut") el("outList").innerHTML=OUTCOMES.map(o=>
+    `<button class="out-btn" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
   el(id).hidden=false; document.body.style.overflow="hidden";
-}
-function setLeadSourceFromDrawer(v){
-  if(!v) return;
-  rpState.csrLeadSource=v; save();
-  openDrawer("drOut");           // re-render so the outcome buttons unlock
 }
 function closeDrawer(id){ el(id).hidden=true; document.body.style.overflow=""; }
 
@@ -1230,10 +1193,6 @@ async function loadSlots(){
 }
 
 async function submitBooking(){
-  if(!rpState.csrLeadSource){
-    rpState.bookingError = "Pick how they heard about us before booking \u2014 tap Back to the caller step. Without it we cannot tell what this booking cost us in ad spend.";
-    render(); return;
-  }
   if(rpState.bookingSubmitting) return;
   if(!rpState.selectedStartTime){
     rpState.bookingError="Pick a date and time above first.";
@@ -1281,10 +1240,6 @@ async function submitBooking(){
 
 /* ---------- Custom Quote fallback: no booking, just a logged lead ---------- */
 async function submitCustomLead(){
-  if(!rpState.csrLeadSource){
-    rpState.customLeadError = "Pick how they heard about us first \u2014 tap Back to the caller step.";
-    render(); return;
-  }
   if(rpState.customLeadSaving) return;
   rpState.customLeadSaving=true; rpState.customLeadError=""; render();
   try{

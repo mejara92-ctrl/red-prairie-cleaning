@@ -1213,3 +1213,406 @@ VERIFIED
   /call's items-array dependency confirmed intact and correct entry
   counts for all 5 services, checked in /call's actual runtime.
   Both files syntax-clean.
+
+
+========================================================
+ROUND 17 — MOVE-OUT PRICE INCREASE, HOURLY MOVE-OUT OPTION, DEEP 2ND CLEANER
+========================================================
+Triggered by real labor cost data: a standard move-out (t3 + 3bed/2bath)
+is an 8-hour job for a 2-cleaner crew (lead $20/hr, assistant $15/hr =
+$280 labor cost), but was priced at $379 flat, only 26% gross margin.
+
+A. MOVE-OUT FLAT-RATE PRICING RAISED ~69%
+--------------------------------------------------------
+New anchor: the $80/hr Hourly Move-Out rate (section B) applied to the
+same 8-hour standard job = $640, which is 56% margin, consistent with
+what Deep/Basic already run at. Flat-rate tiers scaled by 640/379 =
+1.6887x, rounded to clean numbers, verified to land EXACTLY on $640 for
+the standard config (t3 + 1 extra bed + 1 extra bath):
+
+  Tier    Old    New
+  t1      $229   $385
+  t2      $259   $435
+  t3      $299   $505
+  t4      $349   $590
+  t5      $419   $710
+  t6      $479   $810
+  t7      $549   $930
+  Bedroom adder   $45 -> $75
+  Bathroom adder  $35 -> $60
+
+*** THIS IS THE SINGLE BIGGEST PRICING CHANGE IN THE ENTIRE PROJECT.
+Implemented per direct instruction ("Increase move-out cleaning") using
+the exact labor numbers given as the basis, not guessed. Flagged
+prominently, not buried, because the magnitude deserves scrutiny before
+this goes live — it's one multiplier (see rpSqftTiers comment in the
+engine) so it's easy to dial back if $640 is too aggressive a jump from
+$379 for market testing purposes. ***
+
+Public pricing page updated to match: table, adjustments, worked example
+($505+$150+$60=$715, $690 with military, verified against the live
+engine exactly), schema.org highPrice ($549 -> $930).
+
+B. NEW: HOURLY MOVE-OUT OPTION
+--------------------------------------------------------
+New constants: RP_MOVEOUT_HOURLY_RATE=80, RP_MOVEOUT_HOURLY_MIN_HOURS=4,
+RP_MOVEOUT_HOURLY_MAX_HOURS=12, RP_MOVEOUT_HOURLY_CLEANERS=2 (informational,
+already bundled into the $80/hr rate, no separate cleaner-count picker).
+
+New flow: after selecting Move-In/Move-Out Cleaning, a new "moveoutmode"
+step asks flat-rate vs hourly. Choosing hourly skips sqft/bedrooms/
+bathrooms/condition entirely and goes to a new "moveouthours" picker
+(mirrors the existing Hourly Cleaning service's hours-picker pattern).
+rpCurrentFlow() now computes Move-Out's flow dynamically based on
+rpState.moveoutMode instead of reading a single static array.
+
+Guarantee: STILL Defend Your Deposit in hourly mode, not the scope-
+directed carve-out Hourly Cleaning uses. Verified via rpGuaranteeType()
+— it keys off rpState.service, not billing mode, so this correctly stays
+"deposit". Reasoning: hourly move-out is still the same real move-out
+job, just billed differently, unlike Hourly Cleaning where the customer
+directs the scope.
+
+Priced so the two paths agree: 8 hours hourly = $640 = the flat-rate
+standard-config price, verified exact.
+
+C. NEW: DEEP CLEANING "ADDITIONAL CLEANER" ADD-ON
+--------------------------------------------------------
+New rpAddonCatalog.secondCleaner, offered on Deep only (not Basic — the
+request specifically said "for deep cleaning"). Priced per hour actually
+booked, not a flat number: rpSecondCleanerPrice() = (6-hour anchor +
+any Extra Time already purchased) x $50/hr, recalculated live so it
+never goes stale if Extra Time changes after the toggle is set.
+  Deep base, no 2nd cleaner:              $300
+  + 2nd cleaner (6hr anchor):             $600  (300 + 6x50)
+  + 2nd cleaner + 2 extra hours:          $800  (300 + 100 extra-hours
+                                                   + 8x50 2nd-cleaner)
+Wired through the full addon UI pattern (isSelected map, cardMeta,
+summaryFor, yes/no toggle body, select/clear handlers, customer invoice
+row, office-facing GHL summary line) — same pattern as every other
+boolean addon (fridge), not a shortcut.
+
+D. MOVE-OUT INCLUDED-SCREEN CHIP ADDED
+--------------------------------------------------------
+"2-cleaner crew" added as a 4th highlight chip (was 3) — true regardless
+of flat or hourly billing mode, since both bundle the same 2-person crew.
+
+E. rpTimeEstimate() AND rpDisplayBasePrice() FIXED FOR HOURLY MODE
+--------------------------------------------------------
+Both previously would have shown wrong/stale values in hourly mode
+(rpDisplayBasePrice would have returned $0 since it depended on sqft;
+rpTimeEstimate would have shown the generic flat-rate "6-10 hours"
+range regardless of actual hours selected). Caught via screenshot review,
+not assumed correct — fixed and re-verified live: hourly mode now shows
+"Estimated Time: 8 hours" (matching the actual selection) instead of a
+stale range.
+
+*** NOT DONE, FLAGGED — /call (the CSR phone console) has its OWN
+hardcoded step arrays, separate from rpFlows (same gap noted in round
+12 for Deep/Basic's stale sqft questions). Christa currently has no UI
+path to select "hourly move-out" or "additional cleaner" on a live call
+— the PRICING math is correct if those state values get set (verified:
+/call's shared engine computes $640 correctly), but there's no console
+screen to set them yet. This is a distinct follow-up task, not built
+this round. ***
+
+VERIFIED THIS ROUND
+  10-point assertion regression: all passed (moveout standard $640,
+  smallest tier $385, largest tier $930, hourly 8h $640, hourly min
+  4h=$320, deep base $300, deep+2nd-cleaner $600, basic/hourly-cleaning/
+  carpet all unchanged).
+  Full live-render walkthrough of every step of every service INCLUDING
+  both move-out billing modes: zero runtime errors.
+  Live-render em-dash sweep across all 6 configs (moveout-flat,
+  moveout-hourly, deep, maintenance, carpet, hourly): zero found.
+  Pricing page worked example verified exact against live engine output.
+  /call confirmed loads clean and correctly computes new moveout pricing
+  through the shared engine.
+  Both files syntax-clean.
+
+
+========================================================
+ROUND 18 — MOVE-OUT REPRICED: BEDROOM TIERS + LARGE-HOME SURCHARGE ONLY
+========================================================
+Replaces round 17's sqft-bracket system entirely, per direct instruction
+to reduce brackets and only add money on genuinely large homes. This is
+structurally the pre-sqft-bracket model Red Prairie used originally
+(flat bedroom tiers: 1:$199, 2:$299, 3:$399, 4:$499, 5:$599) — brought
+back deliberately, with the exact flaw that got it replaced the first
+time (couldn't tell a compact home from a sprawling one at the same
+bedroom count) fixed by the large-home surcharge below.
+
+NEW PRICES (exact numbers given, verified against live engine):
+  1-2 bedrooms:  $299
+  3 bedrooms:    $449
+  4 bedrooms:    $549
+  5+ bedrooms:   $649   <- default, not given directly, easy to adjust
+  Extra bathroom beyond what's included: $40 each  <- default amount
+  Included bathrooms by tier: 1 (1-2bed), 2 (3-4bed), 3 (5+bed)
+
+LARGE-HOME SURCHARGE (js/rp-pricing-engine.js, rpSqftTiers repurposed
+from an absolute-price table into a surcharge table — only 5 tiers now,
+down from 8, and the FIRST tier adds nothing):
+  Under 2,200 sq ft:      +$0    <- confirmed threshold
+  2,200-2,600 sq ft:      +$100  <- default step amount
+  2,600-3,000 sq ft:      +$200
+  3,000-3,400 sq ft:      +$300
+  Over 3,400 sq ft:       custom quote
+
+FLOW REORDERED: bedrooms now comes BEFORE bathrooms and sqft (was sqft
+first) — bedroom count is the primary price driver now, so it's asked
+first. Bathrooms step updated to state how many are included at the
+selected bedroom tier before showing the extra-bathroom cost. Sqft step
+copy changed to make clear most homes trigger nothing ("Most homes don't
+add anything here").
+
+REMOVED: RP_MOVEOUT_INCLUDED_BEDROOMS/BATHROOMS and the flat per-unit
+RP_MOVEOUT_BEDROOM_RATE/BATHROOM_RATE constants from round 17 — replaced
+by RP_MOVEOUT_BEDROOM_TIERS (bundles base price + included bathrooms per
+tier) and RP_MOVEOUT_EXTRA_BATH_RATE.
+
+rpMoveoutIsCustomSqft() updated: custom-quote key changed from "t8" to
+"t5" since the table shrank to 5 tiers. Deep/Basic's dead branches in
+that function left untouched (harmless, same reasoning as before).
+
+UI IMPROVEMENT: bedroom and bathroom picker rows now show live price
+previews next to each option ($299/$449/$549/$649 on the bedroom step;
+"Included" or "+$40"/"+$80" on the bathroom step) — extends the
+price-forward pattern from round 13 to these two screens, which
+previously showed no price until the estimate screen.
+
+*** FLAGGED, NOT RESOLVED — HOURLY MOVE-OUT NO LONGER AGREES WITH FLAT
+PRICING. Round 17 calibrated the $80/hr Hourly Move-Out option so an
+8-hour standard job priced identically on both paths ($640 = $640). The
+new 3-bed flat price is $449, so that agreement is broken — a customer
+could get a meaningfully different number for what might be the same
+actual job depending which path they choose (flat $449 vs. hourly $640
+for 8 hours). Left the hourly rate unchanged since it wasn't part of
+this request, but this needs a decision: adjust the hourly rate to
+match, or accept the two paths pricing differently now. Also: this
+round's own margin math (3bed flat at $449 on a real 8-hour/$280-labor
+job = 37.6% margin) is lower than the 56% target round 17 was built
+around — worth knowing you're intentionally trading margin on the
+typical case, presumably made up on the large-home surcharge and the
+higher end of the bedroom tiers. ***
+
+PRICING PAGE UPDATED: table replaced (bedroom tiers instead of sqft
+brackets), adjustments block rewritten, worked example recomputed and
+verified exact against the live engine ($489, $464 with military). The
+now-false "$640 hourly matches the flat-rate standard" claim from round
+17's callout removed since it's no longer true.
+
+VERIFIED THIS ROUND
+  All 4 bedroom-tier prices exact: $299 (1-2bed), $449 (3bed), $549
+  (4bed), $649 (5bed).
+  Extra-bathroom adder verified: 3bed+1 extra bath = $489, 1bed+1 extra
+  bath = $339.
+  Large-home surcharge verified at every threshold: under 2200=$449,
+  2200-2600=$549, 3000-3400=$749 (all for a 3bed/2bath base).
+  Full live-render walkthrough of every step of every service including
+  the new flow order: zero runtime errors.
+  Screenshot-verified: bedroom step shows price previews, bathroom step
+  correctly states "2 bathrooms included at this size" for a 3-bed home,
+  sqft step shows 5 simplified options with surcharge amounts, estimate
+  screen shows exactly $449 for the standard 3bed/2bath/compact config.
+  Live-render em-dash sweep across 8 configs (1bed/3bed/5bed/hourly
+  move-out + all 4 other services): zero found.
+  Pricing page worked example verified exact against live engine.
+  Regression confirmed unchanged: Deep $300, Basic $150, Hourly Cleaning
+  $150, Carpet $250, Hourly Move-Out $640 (unaffected by this round,
+  though flagged above as now inconsistent with the new flat pricing).
+  Both files syntax-clean, HTML validated on the pricing page.
+
+
+========================================================
+ROUND 18 — MOVE-OUT REBUILD: HARD-STOP QUESTIONNAIRE, GUARANTEE SPLIT,
+PREMIUM COPY, RENTAL/PM FIELDS, CARPET PET ENZYME
+========================================================
+Built from a long talk-it-out session, not a single request. Final
+numbers/decisions confirmed in conversation before anything was coded.
+
+A. BEDROOM-TIER PRICING FINALIZED
+--------------------------------------------------------
+An earlier round (between 17 and this one) had already replaced the
+sqft-bracket model with bedroom tiers, but with different numbers than
+what got finally confirmed. Updated to the LOCKED numbers:
+  1-2 bed: $299 -> $399
+  3 bed:   $449 -> $499
+  4 bed:   $549 -> $599
+  5+ bed:  $649 -> $699 (still a proposed number, following the same
+           $100 step as the other three — not given directly)
+  Bathroom adder: $40 -> $50/extra bathroom, to stay proportional.
+
+B. CONDITION MULTIPLIER REMOVED FROM MOVE-OUT ENTIRELY
+--------------------------------------------------------
+Standard/Heavy/Extreme dirtiness-based pricing is GONE for Move-Out.
+Reasoning, direct from the conversation: this crew can't renegotiate a
+price on-site, so a self-reported "how dirty is it" multiplier was
+never enforceable — someone could always just click "Standard." Rather
+than pricing for dirtiness, the new model only checks whether a normal
+crew can do a normal job here at all (see C).
+
+RP_CONDITION_PRICED_SERVICES emptied to [] (Move-Out was the last
+service using it). This makes rpConditionMultiplier()/
+rpIsSpecialtyCondition() no-ops everywhere without hunting down every
+call site. rpConditionOrder/rpConditionCopy left defined but no longer
+wired into any active flow.
+
+C. NEW: MOVE-OUT HARD-STOP QUESTIONNAIRE (replaces the condition step)
+--------------------------------------------------------
+Five yes/no facts, all on ONE screen (not five separate steps, to avoid
+inflating Move-Out's step count): Is the water on? Is the electricity
+on? Is the A/C working? Any signs of mold? Any signs of pests?
+
+This is NOT a pricing mechanism — it's a feasibility check. Any failing
+answer (water/power/AC = No, or mold/pests = Yes) routes to a NEW
+terminal screen ("moveoutblocked") instead of a price: states which
+specific answer(s) triggered it, captures name + phone, and posts to
+/lead with lead_type "website_partial" so it's a real callback, not a
+dead end with nothing captured. A confirmation screen follows submission.
+
+  NEW engine functions: rpMoveoutQuestionnaireAnswered(),
+  rpMoveoutBlocked(), rpMoveoutBlockReasons().
+  rpCurrentFlow() now checks rpMoveoutBlocked() FIRST and returns a
+  3-step terminal flow when true — verified this correctly short-
+  circuits before bedrooms/bathrooms/sqft/estimate are ever reached.
+
+D. FLOW REORDERED — PRICE SHOWN BEFORE HOURLY IS EVER OFFERED
+--------------------------------------------------------
+Old flow (round 17) opened with "how do you want this priced?" before
+the customer had seen a single number for either option — flagged
+directly as a coin-flip dressed as a choice. REMOVED entirely.
+
+New flow: included -> questionnaire -> bedrooms -> bathrooms -> sqft ->
+contactgate -> addons -> estimate (flat price, by default) -> lead ->
+calendar. Hourly is now reached ONLY via a "Prefer an hourly clean
+instead? $80/hr" link on the estimate screen itself — a quiet text link
+under the guarantee block, not a competing button, so it doesn't visually
+fight the number you actually want picked. Clicking it jumps straight to
+an hours-picker (bedrooms/bathrooms/sqft already known, not re-asked).
+A "Back to flat-rate pricing" link goes the other way, jumping straight
+back to the estimate since that price is already computable from state
+already in hand — no re-asking anything.
+
+  NEW: rpSwitchToHourlyMoveout(), rpSwitchToFlatMoveout() — direct step
+  jumps via rpGoToStep(), not rpAdvance(), since this is a lateral move
+  in the funnel, not a forward step in sequence.
+  REMOVED: the "moveoutmode" screen and rpSelectMoveoutMode() entirely
+  — confirmed no dangling references remain.
+
+E. GUARANTEE SPLIT — HOURLY MOVE-OUT NO LONGER GETS THE DEPOSIT PROMISE
+--------------------------------------------------------
+Direct correction from the conversation: "Hourly clean doesn't have the
+deposit defense guarantee. [Flat] ensures the home will be cleaned and
+inspection ready." The split is now by BILLING MODE within Move-Out, not
+just by service:
+  Flat-rate Move-Out  -> "deposit" (outcome-based — you're paying for an
+                          inspection-ready result)
+  Hourly Move-Out      -> "satisfaction" (time-based — same tier Deep/
+                          Basic already use, since a clock-based price
+                          can't honestly promise a completed outcome)
+  Deep/Basic            -> satisfaction (unchanged)
+  Hourly Cleaning       -> none (unchanged)
+
+  rpGuaranteeType() now checks rpIsMoveoutHourly() FIRST, before the
+  general moveout check. Verified both branches independently.
+
+F. PREMIUM REPOSITIONING COPY
+--------------------------------------------------------
+Direct instruction: "We are an expensive cleaning company... protecting
+the asset that is the home." Flat-rate guarantee copy rewritten:
+  OLD: "Defend Your Deposit. If your landlord flags something we
+       missed, text us within 48 hours and we'll come back free."
+  NEW: "We guarantee this clean. This is a full reset of the home, done
+       by a real crew, however long it takes to get there. If your
+       landlord flags something we missed, tell us within 48 hours and
+       we'll come back and make it right, free. That's Defend Your
+       Deposit™." — leads with the promise, names the specific guarantee
+       as proof underneath rather than as the whole message.
+
+  NEW flat-rate tagline, shown above the price ONLY in flat mode:
+  "Save the stress. Feel confident in your move-out team."
+
+  NOT YET DONE: pulling the bold price badges back from the 5 service-
+  picker rows (the other half of the premium-positioning recommendation
+  from this same conversation — "an expensive company confident in its
+  price doesn't need to advertise the number before you know what you're
+  buying"). Flagging clearly: this directly reverses an EXPLICIT round-13
+  request ("let's do it!" on bold price badges). Not touched without
+  a direct confirmation, since it's a real reversal of a prior explicit
+  instruction, not just an unstated recommendation.
+
+G. NEW: RENTAL-VS-SELLING + PROPERTY MANAGER/REALTOR FIELDS
+--------------------------------------------------------
+Added to the lead step, Move-Out only: "Is this a rental, or are you
+selling the home?" (Renting/Selling toggle) + "Who is the property
+manager or realtor? (optional)" text field.
+
+This REPLACES the old property-condition checkboxes (No AC / mold /
+pets / hazard) for Move-Out specifically, since those exact facts are
+now already collected (and would have already blocked the booking) by
+the new hard-stop questionnaire in section C — showing them again here
+would be redundant and confusing (the customer already said "no mold").
+The old checkboxes remain UNCHANGED for every other service that still
+uses this screen (Deep, Basic, etc. — they don't have the new
+questionnaire, so these checkboxes still do real work for them).
+
+H. NEW: CARPET PET ENZYME ADD-ON, $25/ROOM
+--------------------------------------------------------
+Surfaced right when "Pet odor" gets checked on the existing carpet
+details screen — that checkbox already existed, so this rides the exact
+moment a customer is already thinking about it rather than adding a new
+screen. Priced per room already selected, computed via rpPetEnzymePrice().
+
+Deliberately wired through the general rpAddonsTotal() (gated to
+service==="carpet") rather than into the base carpet subtotal, so it
+correctly stacks AFTER the $150 one-time floor instead of being silently
+absorbed into it — a $100 carpet job + $25 enzyme floors-then-adds to
+$175, not $150 flat.
+
+*** CAUGHT AND FIXED DURING VERIFICATION: the first draft of this
+add-on's description used an em dash, which directly violates the
+round-16 site-wide /book rule. Found via screenshot review before
+shipping, not assumed correct. Re-ran the full live-render em-dash
+sweep afterward across 7 configs including this one: zero found. ***
+
+I. PRICING PAGE UPDATED AND TWO STALE ITEMS FOUND ALONG THE WAY
+--------------------------------------------------------
+Move-out table/adjustments/worked example updated to the new $399/$499/
+$599/$699 + $50 bathroom numbers, condition-multiplier lines removed,
+new questionnaire explained in plain terms, hourly callout updated with
+the guarantee-split explanation. Worked example re-verified exact
+against the live engine ($549, $524 with military).
+
+Also found, while editing this page, TWO pieces of copy that should
+have been fixed in round 16 but were only fixed on /book, not here:
+the carpet card still said "not a rental machine" (removed per direct
+feedback that nobody assumed that), and had a stray em dash. Both fixed.
+Pet enzyme add-on added to the carpet card and the add-ons table.
+
+NOTE: the em-dash rule was scoped specifically to /book in the original
+instruction. This page still has several em dashes throughout untouched
+— flagging as a known gap rather than silently expanding scope to fix
+all of them without being asked.
+
+VERIFIED THIS ROUND
+  10-point pricing assertion suite: all passed (bedroom tiers x4, bath
+  adder + surcharge combo, questionnaire block/reasons x2, guarantee
+  split x2, carpet + enzyme, full regression on deep/basic/hourly-
+  cleaning/hourly-moveout).
+  Live-render walkthrough of the clear path, the blocked path, and the
+  hourly-switch path, plus all 4 unaffected services: zero runtime
+  errors across every step.
+  Live-render em-dash sweep across 7 configs including both new
+  move-out paths and the carpet enzyme screen: zero found (after fixing
+  one caught during the sweep).
+  Screenshots confirmed: questionnaire screen (Continue correctly
+  disabled until all 5 answered), blocked screen (states the specific
+  reason, e.g. "Water is off"), flat estimate screen (tagline + new
+  guarantee copy + hourly link all present and correctly ordered), lead
+  screen (rental/PM fields render, old checkboxes correctly suppressed
+  for Move-Out only), carpet enzyme upsell.
+  /call confirmed loads clean and computes the new $499 3-bed price
+  correctly through the shared engine.
+  Pricing page worked example verified exact against live engine.
+  Both files syntax-clean, pricing page HTML validated.

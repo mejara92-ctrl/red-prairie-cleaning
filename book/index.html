@@ -566,6 +566,19 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 .rp-pill small { display: block; font-weight: 700; font-size: 10.5px; color: var(--muted); }
 .rp-pill:active { transform: scale(.96); border-color: var(--red); }
+/* Move-out hard-stop questionnaire — each row is one fact, one Yes/No
+   pair. Reuses .rp-choice-grid/.rp-pill so it matches the visual
+   language already used for every other yes/no choice in the funnel. */
+.rp-quest-list { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.rp-quest-row { text-align: left; }
+.rp-quest-label { display: block; font-weight: 800; font-size: 15px; margin-bottom: 8px; color: var(--ink); }
+.rp-quest-pills { max-width: 260px; }
+.rp-moveout-tagline { font-weight: 800; font-size: 15px; color: var(--ink); margin: 0 0 6px; text-align: center; }
+.rp-moveout-switch {
+  display: block; margin: 10px auto 0; background: none; border: none; padding: 4px;
+  font-size: 13.5px; font-weight: 800; color: var(--red); text-decoration: underline;
+  cursor: pointer; text-align: center;
+}
 .rp-pill.is-selected { border-color: var(--red); background: linear-gradient(145deg, var(--red-bright), var(--red-dark)); color: #fff; }
 .rp-pill.is-selected small { color: rgba(255,255,255,.78); }
 .rp-choice-grid .rp-pill { font-size: 13px; padding: 11px 8px; }
@@ -1187,139 +1200,22 @@ details.rp-includes li::before {
   margin: 16px 3px 0; color: var(--ink); font-size: 16px; font-weight: 500;
   line-height: 1.48; max-width: 440px;
 }
-/* Round-19: step-2 claim + proof. The headline carries the message;
-   the card exists only to prove it with the specific items competitors
-   upcharge for. Two type sizes in the card, one accent color. */
-.rp-claim {
-  margin: 13px 0 0; text-align: left; padding: 13px 15px 12px;
-  border: 1px solid var(--line); border-radius: 18px;
-  background: linear-gradient(150deg, rgba(255,255,255,.92), rgba(255,252,247,.80));
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.92);
+/* Round-16: replaces the old wall-of-paragraphs step-2 layout with a
+   scannable row of short fact chips, same format for all five services.
+   Reuses the visual language of .rp-row-val (bold pill, warm border)
+   so it reads as part of the same design system, not a new pattern. */
+.rp-highlight-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.rp-highlight-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 13px; border-radius: 999px;
+  background: rgba(255,247,238,.78); border: 1px solid rgba(167,126,93,.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+  font-size: 13.5px; font-weight: 800; color: var(--ink); white-space: nowrap;
 }
-.rp-claim-lead {
-  margin: 0 0 9px; color: var(--ink);
-  font-size: 13.5px; font-weight: 800; line-height: 1.35;
-}
-.rp-claim-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
-.rp-claim-list li {
-  display: flex; align-items: center; gap: 9px;
-  color: var(--ink); font-size: 15px; font-weight: 700; line-height: 1.3;
-}
-.rp-claim-tick {
-  flex-shrink: 0; width: 20px; height: 20px; padding: 3px;
-  color: #fff; background: var(--red); border-radius: 50%;
-  box-shadow: 0 3px 8px rgba(159,32,39,.24);
-}
-.rp-claim-kicker {
-  margin: 11px 0 0; padding-top: 10px; border-top: 1px solid rgba(70,52,37,.10);
-  color: var(--red); font-size: 14px; font-weight: 800; line-height: 1.3;
-}
-/* Full checklist, behind a tap — present for the minority who want to
-   audit it, invisible for everyone else. */
-.rp-more { margin: 10px 2px 0; }
-.rp-more summary {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  list-style: none; cursor: pointer; padding: 9px 0;
-  color: var(--red); font-size: 13px; font-weight: 800;
-}
-.rp-more summary::-webkit-details-marker { display: none; }
-.rp-more summary::after { content: "+"; font-size: 19px; font-weight: 400; line-height: 1; }
-.rp-more[open] summary::after { content: "\2013"; }
-.rp-more ul {
-  list-style: none; margin: 0 0 4px; padding: 0;
-  display: grid; gap: 5px;
-}
-.rp-more li {
-  position: relative; padding-left: 15px;
-  color: var(--muted); font-size: 13px; font-weight: 500; line-height: 1.42;
-}
-.rp-more li::before {
-  content: ""; position: absolute; left: 3px; top: 8px;
-  width: 4px; height: 4px; border-radius: 50%; background: var(--red); opacity: .55;
-}
-.rp-claim-note {
-  margin: 11px 2px 0; color: var(--muted);
-  font-size: 12.5px; font-weight: 500; line-height: 1.5; text-align: left;
-}
-.rp-claim-note b {
-  display: block; margin-bottom: 2px; color: var(--ink);
-  font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
-}
+.rp-highlight-chip .rp-ic { color: var(--red); width: 14px; height: 14px; flex-shrink: 0; }
 @media (max-width: 390px) {
-  .rp-claim { padding: 12px 13px 11px; }
-  .rp-claim-list li { font-size: 14.2px; }
-  .rp-claim-note { font-size: 11.8px; }
+  .rp-highlight-chip { font-size: 12.5px; padding: 7px 11px; }
 }
-@media (max-height: 920px) {
-  .rp-claim { margin-top: 9px; padding: 9px 13px 9px; }
-  .rp-claim-list { gap: 5px; }
-  .rp-claim-list li { font-size: 13.6px; }
-  .rp-claim-kicker { margin-top: 9px; padding-top: 8px; font-size: 13.4px; }
-  .rp-more { margin-top: 5px; }
-  .rp-more summary { padding: 6px 0; }
-  .rp-claim-note { margin-top: 8px; font-size: 11.6px; }
-}
-@media (max-height: 700px) {
-  .rp-claim { margin-top: 9px; padding: 10px 12px 9px; }
-  .rp-claim-lead { margin-bottom: 7px; font-size: 12.8px; }
-  .rp-claim-list { gap: 5px; }
-  .rp-claim-list li { font-size: 13.2px; gap: 8px; }
-  .rp-claim-tick { width: 18px; height: 18px; }
-  .rp-claim-kicker { margin-top: 8px; padding-top: 7px; font-size: 12.6px; }
-  .rp-claim-note { margin-top: 8px; font-size: 11px; line-height: 1.42; }
-}
-/* First-clean steer on Basic. Gold/amber, not red — it's advice, not
-   another primary action competing with the footer CTA. */
-.rp-nudge {
-  margin: 11px 0 0; padding: 11px 13px 12px; text-align: left;
-  border: 1px solid rgba(198,161,100,.42); border-radius: 16px;
-  background: linear-gradient(150deg, rgba(255,250,238,.95), rgba(250,240,220,.85));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
-}
-.rp-nudge-label {
-  display: flex; align-items: center; gap: 7px; margin: 0 0 5px;
-  color: #8a6516; font-size: 12.5px; font-weight: 800; line-height: 1.3;
-}
-.rp-nudge-label .rp-ic { color: #b8892a; flex-shrink: 0; }
-.rp-nudge-body { margin: 0 0 9px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.45; }
-.rp-nudge-cta {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; padding: 10px 13px;
-  border: 1px solid rgba(159,32,39,.28); border-radius: 12px;
-  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(255,246,240,.9));
-  color: var(--red); font-size: 13.5px; font-weight: 800;
-  box-shadow: 0 4px 12px rgba(48,32,19,.07), inset 0 1px 0 rgba(255,255,255,.9);
-}
-.rp-nudge-cta:active { transform: scale(.985); }
-.rp-nudge-fine { margin: 7px 0 0; color: var(--muted); font-size: 11.5px; font-weight: 500; line-height: 1.4; }
-@media (max-height: 920px) {
-  .rp-nudge { margin-top: 8px; padding: 8px 12px 9px; }
-  .rp-nudge-label { margin-bottom: 4px; }
-  .rp-nudge-body { font-size: 12px; line-height: 1.4; margin-bottom: 7px; }
-  .rp-nudge-cta { padding: 8px 12px; font-size: 12.8px; }
-  .rp-nudge-fine { font-size: 11px; }
-}
-@media (max-height: 730px) {
-  .rp-nudge-body { display: none; }
-}
-@media (max-height: 700px) {
-  .rp-nudge { margin-top: 6px; padding: 7px 11px 8px; border-radius: 14px; }
-  .rp-nudge-label { font-size: 11.8px; margin-bottom: 4px; }
-  .rp-nudge-body { font-size: 11.8px; line-height: 1.38; margin-bottom: 7px; }
-  .rp-nudge-cta { padding: 8px 11px; font-size: 12.4px; }
-  .rp-nudge-fine { font-size: 10.5px; margin-top: 6px; }
-}
-/* This screen is a confidence beat, not a question — the headline is
-   the message, so it gets room, but it doesn't need question-sized type. */
-.step-included h2 { font-size: 26px; line-height: 1.12; }
-.step-included .rp-sub { margin-bottom: 0; font-size: 15px; }
-@media (max-width: 390px) { .step-included h2 { font-size: 23px; } .step-included .rp-sub { font-size: 14px; } }
-@media (max-height: 920px) { .step-included h2 { font-size: 22.5px; } .step-included .rp-sub { font-size: 13.6px; } }
-@media (max-height: 700px) { .step-included h2 { font-size: 20px; } .step-included .rp-sub { font-size: 12.8px; } }
-
-/* Round-17: highlight-chip row retired — step 2 now renders a real
-   checklist (.rp-included-list) instead of wrapping pill chips, so
-   this pattern is no longer used anywhere in the funnel. */
 @media (max-width: 390px) {
   .rp-included-list li { padding: 12px 14px; font-size: 15px; gap: 11px; }
   .rp-included-check { width: 24px; height: 24px; }
@@ -2693,6 +2589,17 @@ const rpState = {
   carpetRooms: 0,
   addonCarpetRooms: 0,
   addonExtraHours: 0,
+  addonSecondCleaner: false,
+  moveoutMode: "flat",
+  moveoutHours: null,
+  moveoutWaterOn: null,
+  moveoutPowerOn: null,
+  moveoutAcOn: null,
+  moveoutMold: null,
+  moveoutPests: null,
+  moveoutRentalOrSelling: null,
+  moveoutPmOrRealtor: "",
+  addonPetEnzyme: false,
   expandedAddon: null,
   showMoreAddons: false,
   windowsTier: null,
@@ -2806,14 +2713,7 @@ function rpRevealServiceSheet() {
   if (sheet) {
     sheet.classList.remove("is-intro-hidden");
     window.setTimeout(function() {
-      /* behavior:"auto" (instant), not "smooth" — a JS-triggered smooth
-         scroll can be interrupted by the same tap that started it (iOS
-         Safari cancels in-flight programmatic scroll animations on a
-         new touch), which was leaving this sheet resting mid-animation
-         with the hero heading cut off mid-line. Instant scroll always
-         reaches the correct final position with no animation to
-         interrupt. */
-      sheet.scrollIntoView({ behavior: "auto", block: "start" });
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 30);
   }
   rpSetThemeColor(RP_THEME_DEFAULT);
@@ -2846,7 +2746,7 @@ function rpRevealExpandedDetails(details) {
     const scroller = details.closest(".rp-screen-scroll");
     if (!scroller) return;
     const targetTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    scroller.scrollTo({ top: targetTop, behavior: "auto" });
+    scroller.scrollTo({ top: targetTop, behavior: "smooth" });
   }, 80);
 }
 document.addEventListener("toggle", function(event) {
@@ -2924,7 +2824,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "windowsTier", "yardTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutMode", "moveoutHours", "moveoutWaterOn", "moveoutPowerOn", "moveoutAcOn", "moveoutMold", "moveoutPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "addonPetEnzyme", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -3003,97 +2903,6 @@ function rpBack() {
 }
 
 /* =========================================================================
-   STEP 2 CONTENT (Round-18 rebuild).
-
-   Every previous version of this screen was a paragraph followed by a
-   vertical list of full sentences. That layout has two problems no
-   amount of restyling fixes: it doesn't fit on one phone screen (so the
-   customer scrolls to read a reassurance screen), and full sentences
-   can't be scanned — you have to actually read all seven of them.
-
-   This is a spec sheet instead: grouped by AREA OF THE HOME, with short
-   terms, not sentences. Same shape for every service, so the customer
-   learns the pattern once. Fits without scrolling.
-
-   Lives here rather than in rp-pricing-engine.js on purpose — the
-   engine's rpIncludes[].items is still read by the /call CSR rail, so
-   it stays untouched. This only changes what /book renders.
-   ========================================================================= */
-const RP_STEP2 = {
-  /* Round-19: this screen is no longer an inventory of cleaning tasks.
-     A task list is the weakest thing we can say here — every cleaning
-     company on earth cleans toilets and baseboards, and the old layout
-     spent 30 seconds saying so right before we ask for a phone number.
-
-     It now makes ONE claim and proves it with the specific items
-     competitors bill as add-ons. That does real work: it makes the
-     price feel like a deal before the number appears, and it pre-empts
-     the "why is it that much" objection the CSRs field on the phone.
-
-     The exhaustive checklist still exists, behind a tap, sourced from
-     rpIncludes[].items in the pricing engine so there's one source of
-     truth and the /call CSR rail keeps working untouched. */
-  moveout: {
-    claim: "If it's inside the home, it's included",
-    lead: "One price covers the whole interior. No upcharges at the door.",
-    proofLead: "Most companies charge extra for these. We don't:",
-    proof: ["Inside the oven", "Inside the fridge", "Inside cabinets &amp; closets", "Interior windows, sills &amp; tracks", "Baseboards, doors &amp; trim"],
-    kicker: "All one price.",
-    noteLabel: "Add on next if you need them",
-    note: "Exterior windows · Garage floor · Carpet extraction · Junk removal"
-  },
-  deep: {
-    claim: "Six hours of detail, top to bottom",
-    lead: "A full detailed clean of every room. No upcharges at the door.",
-    proofLead: "Most companies charge extra for these. We don't:",
-    proof: ["Inside the oven", "Inside the microwave", "Cabinet fronts", "Baseboards, doors &amp; trim", "Ceiling fans &amp; vents"],
-    kicker: "All one price. Add time for a bigger home.",
-    noteLabel: "Add on next if you need them",
-    note: "Carpet extraction · Exterior windows · Garage floor · Yard work"
-  },
-  maintenance: {
-    claim: "Three hours to reset your home",
-    lead: "A light refresh for an already-tidy home.",
-    proofLead: "What you can count on, every visit:",
-    proof: ["Kitchen cleaned &amp; wiped down", "Bathrooms cleaned &amp; sanitized", "Dusted throughout", "Floors vacuumed &amp; mopped"],
-    kicker: "No contract. Cancel or reschedule anytime.",
-    /* Basic is a maintenance service — it assumes the home is already at
-       a baseline. On a first clean it usually isn't, which is how a
-       customer ends up disappointed at a fair price. Steering them to
-       Deep here is both the honest call and the better sale. Recurring
-       plans already force a Deep first visit
-       (rpRecurringNeedsDeepFirst), so the fine print says so rather
-       than pushing someone to switch for a benefit they'd get anyway. */
-    nudge: {
-      label: "First time? Start with a Deep Clean",
-      body: "Basic keeps up a home that's already been maintained. First clean with us? Start with a Deep.",
-      service: "deep",
-      cta: "Switch to Deep Cleaning"
-    },
-    noteLabel: "Add on next if you need them",
-    note: "Carpet extraction · Exterior windows · Yard work"
-  },
-  carpet: {
-    claim: "Hot-water extraction, $50 a room",
-    lead: "You pick the rooms. We handle the rest.",
-    proofLead: "Included in every room we clean:",
-    proof: ["Pre-treatment", "Hot-water extraction", "Hot-water rinse", "Traffic-lane focus", "Normal spot treatment"],
-    kicker: "Strong recovery means faster dry times.",
-    noteLabel: "Quoted separately by severity",
-    note: "Pet odor treatment · Deep-set or older stains. Some discoloration depends on carpet age and prior treatment."
-  },
-  hourly: {
-    claim: "You set the list. We work it.",
-    lead: "$50 an hour per cleaner, 3-hour minimum.",
-    proofLead: "Your hours, your priorities:",
-    proof: ["Any rooms you choose", "Priority order is yours", "Cleaning &amp; organizing", "Decluttering &amp; light tidying", "No contract"],
-    kicker: "We work your list in your order.",
-    noteLabel: "Worth knowing",
-    note: "You're booking time, not a finished checklist. Need the whole home done to a standard? A Deep or Move-Out Clean is the better fit."
-  }
-};
-
-/* =========================================================================
    SCREENS — one screen, one decision, vertically balanced.
    ========================================================================= */
 function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, selected = false }) {
@@ -3145,39 +2954,20 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "included") {
+    const inc = rpIncludes[rpState.service];
     const svcName = (rpServices[rpState.service] && rpServices[rpState.service].name) || "cleaning";
-    const s2 = RP_STEP2[rpState.service];
-    /* Full checklist comes from the pricing engine so /book and the
-       /call CSR rail can never drift apart. */
-    const fullList = (rpIncludes[rpState.service] && rpIncludes[rpState.service].items) || [];
-    if (!s2) {
-      return { scroll: `<div class="rp-center">
-        ${eyebrow}
-        <h2>What your ${svcName} includes</h2>
-      </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
-    }
+    const isMoveout = rpState.service === "moveout";
+    const highlights = (inc && inc.highlights) || [];
+    const fine = (inc && inc.fineprint) || "Need something specific? You can add extras on the next step, or text us anytime.";
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>${s2.claim}</h2>
-      <p class="rp-sub">${s2.lead}</p>
-      <div class="rp-claim">
-        <p class="rp-claim-lead">${s2.proofLead}</p>
-        <ul class="rp-claim-list">
-          ${s2.proof.map(item => `<li><span class="rp-claim-tick" aria-hidden="true">${rpIcon("check")}</span>${item}</li>`).join("")}
-        </ul>
-        ${s2.kicker ? `<p class="rp-claim-kicker">${s2.kicker}</p>` : ""}
-      </div>
-      ${fullList.length ? `<details class="rp-more" ontoggle="rpTrack('included_full_list_toggle',{open:this.open})">
-        <summary>See everything that's included</summary>
-        <ul>${fullList.map(i => `<li>${i}</li>`).join("")}</ul>
-      </details>` : ""}
-      ${s2.nudge ? `<div class="rp-nudge">
-        <p class="rp-nudge-label">${rpIcon("zap","rp-ic rp-ic-sm")}${s2.nudge.label}</p>
-        <p class="rp-nudge-body">${s2.nudge.body}</p>
-        <button type="button" class="rp-nudge-cta" onclick="rpTrack('step2_upgrade_tap',{from:'${rpState.service}',to:'${s2.nudge.service}'});rpSelectService('${s2.nudge.service}', this)">${s2.nudge.cta} · $${RP_DEEP_ANCHOR_PRICE} ${rpIcon("chev","rp-ic rp-ic-sm")}</button>
-        ${s2.nudge.fine ? `<p class="rp-nudge-fine">${s2.nudge.fine}</p>` : ""}
+      <h2>${isMoveout ? "Everything inside the home" : `Here's what your ${svcName} includes`}</h2>
+      <p class="rp-sub">${inc && inc.intro ? inc.intro : `Every ${svcName.toLowerCase()} covers all of this, no add-ons required.`}</p>
+      ${highlights.length ? `<div class="rp-highlight-row">
+        ${highlights.map(([iconKey, text]) => `<span class="rp-highlight-chip">${iconKey ? rpIcon(iconKey, "rp-ic") : ""}${text}</span>`).join("")}
       </div>` : ""}
-      ${s2.note ? `<div class="rp-claim-note"><b>${s2.noteLabel}</b>${s2.note}</div>` : ""}
+      ${inc && inc.outcome ? `<p class="rp-included-body" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
+      <p class="rp-included-note">${fine}</p>
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
@@ -3185,9 +2975,9 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>About how big is the home?</h2>
-      <p class="rp-sub">Not sure of the exact number? A typical 3-bedroom home in this area runs 1,400–1,800 sq ft.</p>
+      <p class="rp-sub">Most homes don't add anything here. This only affects price on larger homes.</p>
       <div class="rp-choice-grid">
-        ${rpSqftTiersForService(rpState.service).map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}${t.base === null ? "<br><small>Custom Quote</small>" : ""}</button>`).join("")}
+        ${rpSqftTiersForService(rpState.service).map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}${t.base === null ? "<br><small>Custom Quote</small>" : (t.base > 0 ? `<br><small>+$${t.base}</small>` : "")}</button>`).join("")}
       </div>
     </div>` };
   }
@@ -3198,25 +2988,30 @@ function rpScreenHtml() {
       <h2>How many bedrooms?</h2>
       <div class="rp-q-gap"></div>
       <div class="rp-rows">
-        ${[1,2,3,4,5].map(n => rpRowBtn({
-          onclick:`rpSelectBedrooms(${n}, this)`,
-          title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-          val: rpMoveoutIsCustomSqft() ? "Custom Quote" : "",
-          selected: rpState.bedrooms === n
-        })).join("")}
+        ${[1,2,3,4,5].map(n => {
+          const t = rpState.service === "moveout" ? rpMoveoutBedroomTier(n) : null;
+          return rpRowBtn({
+            onclick:`rpSelectBedrooms(${n}, this)`,
+            title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
+            val: t ? `$${t.base}` : "",
+            selected: rpState.bedrooms === n
+          });
+        }).join("")}
       </div>
     </div>` };
   }
 
   if (rpState.step === "bathrooms") {
+    const moveoutTier = rpState.service === "moveout" ? rpMoveoutBedroomTier(rpState.bedrooms) : null;
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bathrooms?</h2>
-      <p class="rp-sub">Helps us plan your cleaning.</p>
+      <p class="rp-sub">${moveoutTier ? `${moveoutTier.includedBathrooms} bathroom${moveoutTier.includedBathrooms > 1 ? "s" : ""} included at this size. Extra bathrooms are $${RP_MOVEOUT_EXTRA_BATH_RATE} each.` : "Helps us plan your cleaning."}</p>
       <div class="rp-rows">
         ${[1,2,3,4].map(n => rpRowBtn({
           onclick:`rpSelectBathrooms(${n}, this)`,
           title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
+          val: moveoutTier ? (n > moveoutTier.includedBathrooms ? `+$${(n - moveoutTier.includedBathrooms) * RP_MOVEOUT_EXTRA_BATH_RATE}` : "Included") : "",
           selected: rpState.bathrooms === n
         })).join("")}
       </div>
@@ -3255,17 +3050,61 @@ function rpScreenHtml() {
     </div>` };
   }
 
-  if (rpState.step === "condition") {
+  if (rpState.step === "moveoutquestionnaire") {
+    const q = (field, label) => `
+      <div class="rp-quest-row">
+        <span class="rp-quest-label">${label}</span>
+        <div class="rp-choice-grid rp-quest-pills">
+          <button class="rp-pill ${rpState[field] === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', true)">Yes</button>
+          <button class="rp-pill ${rpState[field] === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', false)">No</button>
+        </div>
+      </div>`;
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>What's the condition of the home?</h2>
-      <p class="rp-sub">Just a rough sense. We confirm it when we arrive.</p>
+      <h2>A few quick facts first</h2>
+      <p class="rp-sub">Just checking the job can happen as booked. Doesn't affect your price.</p>
+      <div class="rp-quest-list">
+        ${q("moveoutWaterOn", "Is the water on?")}
+        ${q("moveoutPowerOn", "Is the electricity on?")}
+        ${q("moveoutAcOn", "Is the A/C working?")}
+        ${q("moveoutMold", "Any signs of mold?")}
+        ${q("moveoutPests", "Any signs of pests?")}
+      </div>
+    </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+  }
+
+  if (rpState.step === "moveoutblocked") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>Let's talk it through first</h2>
+      <p class="rp-sub">${rpMoveoutBlockReasons().join(", ")}. We can't price this online until we've talked it through. Leave your number and we'll call you directly, usually within the hour.</p>
+      <div class="rp-lead-form">
+        <div class="rp-lead-field"><label for="rpBlockedName">Full Name *</label><input id="rpBlockedName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)"></div>
+        <div class="rp-lead-field"><label for="rpBlockedPhone">Phone Number *</label><input id="rpBlockedPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)"></div>
+        <div class="rp-error" id="rpBlockedError" style="display:none"></div>
+      </div>
+    </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+  }
+
+  if (rpState.step === "moveoutblockedconfirmed") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>Got it, thanks</h2>
+      <p class="rp-sub">We'll call you shortly to sort out next steps. In the meantime, feel free to text or call us directly at (580) 215-0915.</p>
+    </div>` };
+  }
+
+  if (rpState.step === "moveouthours") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>How many hours?</h2>
+      <p class="rp-sub">${RP_MOVEOUT_HOURLY_MIN_HOURS}-hour minimum. A standard home usually runs about 8 hours with a 2-cleaner crew.</p>
       <div class="rp-rows">
-        ${rpConditionOrder.map(label => rpRowBtn({
-          onclick: `rpSelectCondition('${label}', this)`,
-          title: label,
-          desc: rpConditionCopy[label],
-          selected: rpState.condition === label
+        ${Array.from({ length: RP_MOVEOUT_HOURLY_MAX_HOURS - RP_MOVEOUT_HOURLY_MIN_HOURS + 1 }, (_, i) => i + RP_MOVEOUT_HOURLY_MIN_HOURS).map(n => rpRowBtn({
+          onclick:`rpSelectMoveoutHours(${n}, this)`,
+          title:`${n} hour${n > 1 ? "s" : ""}`,
+          val:`$${(n * RP_MOVEOUT_HOURLY_RATE).toFixed(2)}`,
+          selected: rpState.moveoutHours === n
         })).join("")}
       </div>
     </div>` };
@@ -3290,7 +3129,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many rooms need carpet cleaning?</h2>
-      <p class="rp-sub">$50 per room · $150 minimum</p>
+      <p class="rp-sub">$50 per room · 2-room minimum</p>
       <div class="rp-rows">
         ${[2,3,4,5,6].map(n => rpRowBtn({
           onclick:`rpSelectCarpetOnlyRooms(${n}, this)`,
@@ -3315,6 +3154,11 @@ function rpScreenHtml() {
         <input type="checkbox" ${rpState.petOdor ? "checked" : ""} onchange="rpTogglePetOdor(this.checked)">
         <div><strong>Pet odor</strong><span>Odor treatment may need special attention.</span></div>
       </label>
+      ${rpState.petOdor ? `
+      <label class="rp-checkbox-card rp-mt">
+        <input type="checkbox" ${rpState.addonPetEnzyme ? "checked" : ""} onchange="rpTogglePetEnzyme(this.checked)">
+        <div><strong>Pet enzyme treatment</strong><span>Breaks down odor and stains at the source, not just masks them. +$${RP_PET_ENZYME_RATE}/room${rpState.carpetRooms ? `, $${rpState.carpetRooms * RP_PET_ENZYME_RATE} total` : ""}</span></div>
+      </label>` : ""}
     </div>`, footer: `<button class="rp-primary" onclick="rpAdvance()">Review My Estimate</button>` };
   }
 
@@ -3356,7 +3200,8 @@ function rpAddonsScreen(eyebrow) {
     laundry: rpState.laundryLoads > 0,
     fridge: rpState.fridgeAddon,
     yard: !!rpState.yardTier,
-    extraHours: rpState.addonExtraHours > 0
+    extraHours: rpState.addonExtraHours > 0,
+    secondCleaner: rpState.addonSecondCleaner
   };
   const cardMeta = {
     carpet:  { icon: "layers", label: "Carpet Cleaning", desc: "Hot-water extraction for a deeper carpet clean." },
@@ -3366,7 +3211,8 @@ function rpAddonsScreen(eyebrow) {
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
     fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
     yard:    { icon: "leaf",   label: "Yard Refresh", desc: "Mow, trim, edge, and clear hard surfaces." },
-    extraHours: { icon: "clock", label: "Extra Time", desc: "Bigger or messier than typical? Add time so nothing gets rushed." }
+    extraHours: { icon: "clock", label: "Extra Time", desc: "Bigger or messier than typical? Add time so nothing gets rushed." },
+    secondCleaner: { icon: "repeat", label: "Additional Cleaner", desc: "A 2nd cleaner for the full time booked, so more gets done in the same visit." }
   };
   function summaryFor(key) {
     if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
@@ -3380,6 +3226,7 @@ function rpAddonsScreen(eyebrow) {
       return yardLabels[rpState.yardTier] || "";
     }
     if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}`;
+    if (key === "secondCleaner") return `${rpSecondCleanerHours()} hour${rpSecondCleanerHours() === 1 ? "" : "s"} · $${rpSecondCleanerPrice()}`;
     return "";
   }
   function bodyFor(key) {
@@ -3435,6 +3282,13 @@ function rpAddonsScreen(eyebrow) {
         <div class="rp-choice-grid">
           <button class="rp-pill ${rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(true)">Yes<br><small>$${rpAddonCatalog.fridge.price}</small></button>
           <button class="rp-pill ${!rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(false)">No</button>
+        </div>`;
+    }
+    if (key === "secondCleaner") {
+      return `
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.addonSecondCleaner ? "is-selected" : ""}" onclick="rpSelectSecondCleaner(true)">Yes<br><small>$${rpSecondCleanerPrice()} for ${rpSecondCleanerHours()} hrs</small></button>
+          <button class="rp-pill ${!rpState.addonSecondCleaner ? "is-selected" : ""}" onclick="rpSelectSecondCleaner(false)">No</button>
         </div>`;
     }
     if (key === "extraHours") {
@@ -3527,6 +3381,8 @@ function rpAddonSummaryRows() {
   if (rpState.yardTier === "xl") rows.push(`<div class="rp-mini-row"><span>XL Yard Refresh</span><strong>$200</strong></div>`);
   if (rpState.yardTier === "xlOvergrown") rows.push(`<div class="rp-mini-row"><span>XL Overgrown Yard</span><strong>Starting at $250</strong></div>`);
   if (rpState.addonExtraHours) rows.push(`<div class="rp-mini-row"><span>Extra Time (+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"})</span><strong>$${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}</strong></div>`);
+  if (rpState.addonSecondCleaner) rows.push(`<div class="rp-mini-row"><span>Additional Cleaner (${rpSecondCleanerHours()} hrs)</span><strong>$${rpSecondCleanerPrice()}</strong></div>`);
+  if (rpState.service === "carpet" && rpState.addonPetEnzyme) rows.push(`<div class="rp-mini-row"><span>Pet Enzyme Treatment</span><strong>$${rpPetEnzymePrice()}</strong></div>`);
   return rows.join("");
 }
 
@@ -3549,20 +3405,29 @@ function rpEstimateScreen(eyebrow) {
     </div>` : ""}
     <div class="rp-invoice">
       <div class="rp-price-section">
+        ${rpState.service === "moveout" && !rpIsMoveoutHourly() ? `<p class="rp-moveout-tagline">Save the stress. Feel confident in your move-out team.</p>` : ""}
         <div class="rp-price-block ${noGuaranteedPrice ? "is-quote" : ""}">
           <strong>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? rpFormatMoney(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong>
           <span>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? "Due on your first visit" : service.name}</span>
         </div>
         ${(() => {
           const gtype = rpGuaranteeType();
-          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Defend Your Deposit.</strong> If something was missed, text us within 48 hours and we'll come back and make it right, free.</div>`;
+          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>We guarantee this clean.</strong> This is a full reset of the home, done by a real crew, however long it takes to get there. If your landlord flags something we missed, tell us within 48 hours and we'll come back and make it right, free. That's Defend Your Deposit\u2122.</div>`;
           if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</div>`;
           return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`;
         })()}
+        ${rpState.service === "moveout" ? (
+          rpIsMoveoutHourly()
+            ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToFlatMoveout()">Back to flat-rate pricing \u2192</button>`
+            : `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToHourlyMoveout()">Prefer an hourly clean instead? $${RP_MOVEOUT_HOURLY_RATE}/hr \u2192</button>`
+        ) : ""}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
-      ${rpState.service === "moveout" && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
+      ${rpState.service === "moveout" && rpSqftTier() && !rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
+      ${rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Billing</span><strong>Hourly</strong></div>` : ""}
+      ${rpIsMoveoutHourly() && rpState.moveoutHours ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.moveoutHours}</strong></div>` : ""}
+      ${rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Rate</span><strong>$${RP_MOVEOUT_HOURLY_RATE}/hr (${RP_MOVEOUT_HOURLY_CLEANERS} cleaners included)</strong></div>` : ""}
       ${["deep","maintenance"].includes(rpState.service) ? `<div class="rp-mini-row"><span>Included Time</span><strong>${rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS} hours</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
@@ -3610,27 +3475,12 @@ function rpEscapeAttr(value) {
 function rpCaptureLeadField(field, value) {
   rpState[field] = value;
 }
-/* Live phone formatting — digits reformat to (XXX) XXX-XXXX as the user
-   types, matching the "(580) 000-0000" placeholder instead of showing
-   raw digits. Validation elsewhere already strips non-digits via
-   /\D/g, so this only changes what's displayed/stored, not what
-   counts as valid. Caret always lands at the end, which is a standard,
-   acceptable tradeoff for a field almost nobody edits mid-string. */
-function rpFormatPhoneInput(el) {
-  const digits = el.value.replace(/\D/g, "").slice(0, 10);
-  let formatted = digits;
-  if (digits.length > 6) formatted = `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
-  else if (digits.length > 3) formatted = `(${digits.slice(0,3)}) ${digits.slice(3)}`;
-  else if (digits.length > 0) formatted = `(${digits}`;
-  el.value = formatted;
-  return formatted;
-}
 function rpClearLeadFieldError(element) {
   if (element.classList.contains("is-invalid")) element.classList.remove("is-invalid");
 }
 function rpLeadFieldFocus(element) {
   window.setTimeout(() => {
-    try { element.scrollIntoView({ behavior: "auto", block: "center" }); } catch (error) {}
+    try { element.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (error) {}
   }, 180);
 }
 /* Two fields, no address block — the address is asked for on the lead
@@ -3644,7 +3494,7 @@ function rpContactGateScreen(eyebrow) {
     <p class="rp-sub">Just a name and number, then your price is right here.</p>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
-      <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',rpFormatPhoneInput(this));rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+      <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-error" id="rpGateError" style="display:none"></div>
       <p class="rp-fineprint">If something seems unusual about your quote, we'll reach out before you book. No spam, no pressure otherwise.</p>
     </div>
@@ -3739,7 +3589,7 @@ function rpLeadScreen(eyebrow) {
     <div class="rp-lead-form">
       <div class="rp-lead-row rp-lead-row-contact">
         <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
-        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',rpFormatPhoneInput(this));rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
       <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@email.com" oninput="rpCaptureLeadField('email',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" oninput="rpCaptureLeadField('address1',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
@@ -3747,6 +3597,17 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
+      ${rpState.service === "moveout" ? `
+      <div class="rp-prep-check">
+        <label class="rp-prep-check-label">One more thing</label>
+        <div class="rp-lead-field"><label for="rpMoveoutRentalOrSelling">Is this a rental, or are you selling the home?</label>
+          <div class="rp-choice-grid" style="margin-top:4px">
+            <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "renting" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('renting')">Renting</button>
+            <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "selling" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('selling')">Selling</button>
+          </div>
+        </div>
+        <div class="rp-lead-field" style="margin-top:12px"><label for="rpMoveoutPmOrRealtor">Who is the property manager or realtor? (optional)</label><input id="rpMoveoutPmOrRealtor" type="text" value="${rpEscapeAttr(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="rpCaptureLeadField('moveoutPmOrRealtor',this.value)"></div>
+      </div>` : `
       <div class="rp-prep-check">
         <label class="rp-prep-check-label">A few quick property details</label>
         <p class="rp-prep-check-note">This helps us bring the right equipment, schedule enough time, and confirm the final scope.</p>
@@ -3776,7 +3637,7 @@ function rpLeadScreen(eyebrow) {
             <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
           </label>
         </div>
-      </div>
+      </div>`}
       <div class="rp-lead-field"><label for="rpSpecialInstructions">${rpState.service === "hourly" ? "Your priority areas, most important first" : "Notes (optional)"}</label><textarea id="rpSpecialInstructions" placeholder="${rpState.service === "hourly" ? "e.g. 1) Kitchen incl. oven  2) Both bathrooms  3) Living room floors. Plus gate code, pets, access" : "Gate code, pets, stains, access instructions…"}" oninput="rpCaptureLeadField('specialInstructions',this.value)" onfocus="rpLeadFieldFocus(this)">${rpEscapeAttr(rpState.specialInstructions)}</textarea>${rpState.service === "hourly" ? `<p class="rp-fineprint" style="margin-top:6px">We work this list in order for the hours you book.</p>` : ""}</div>
     </div>
     <div id="rpFormError" class="rp-error"></div>
@@ -4045,6 +3906,18 @@ function rpResetServiceState() {
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
+  rpState.addonExtraHours = 0;
+  rpState.addonSecondCleaner = false;
+  rpState.moveoutMode = "flat";
+  rpState.moveoutHours = null;
+  rpState.moveoutWaterOn = null;
+  rpState.moveoutPowerOn = null;
+  rpState.moveoutAcOn = null;
+  rpState.moveoutMold = null;
+  rpState.moveoutPests = null;
+  rpState.moveoutRentalOrSelling = null;
+  rpState.moveoutPmOrRealtor = "";
+  rpState.addonPetEnzyme = false;
   rpState.junkSize = null;
   rpState.heavySoil = false;
   rpState.petOdor = false;
@@ -4087,16 +3960,85 @@ function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.
 function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
 function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
 function rpSelectHourCount(n, element) { rpCommitChoice(element, () => { rpState.hourCount = n; rpAdvance(); }); }
+function rpSelectMoveoutHours(n, element) { rpCommitChoice(element, () => { rpState.moveoutHours = n; rpAdvance(); }); }
+/* Toggles one questionnaire answer and re-renders in place (not
+   rpAdvance) — all 5 questions live on one screen, so answering one
+   doesn't move anywhere; the Continue button only becomes clickable
+   once all 5 have an answer (see rpMoveoutQuestionnaireAnswered()). */
+function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh(); }
+
+/* Switching billing mode from the ESTIMATE screen, not a dedicated
+   upfront choice screen. Hourly: nothing about the home size is known
+   yet, so go collect hours. Flat: bedrooms/bathrooms/sqft are already
+   in state (that's the only way to have reached hourly in the first
+   place), so jump straight back to the estimate instead of re-asking
+   size questions that were already answered. */
+function rpSwitchToHourlyMoveout() { rpState.moveoutMode = "hourly"; rpGoToStep("moveouthours", "forward"); }
+function rpSwitchToFlatMoveout() { rpState.moveoutMode = "flat"; rpGoToStep("estimate", "back"); }
+
+function rpSubmitMoveoutBlockedLead() {
+  const nameEl = document.getElementById("rpBlockedName");
+  const phoneEl = document.getElementById("rpBlockedPhone");
+  const errorBox = document.getElementById("rpBlockedError");
+  const fullName = nameEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  [nameEl, phoneEl].forEach(el => el.classList.remove("is-invalid"));
+  let bad = null;
+  if (fullName.length < 2) bad = { el: nameEl, msg: "Please enter your full name." };
+  else if (phoneDigits.length < 10) bad = { el: phoneEl, msg: "Please enter a valid 10-digit phone number." };
+  if (bad) {
+    bad.el.classList.add("is-invalid");
+    errorBox.textContent = bad.msg;
+    errorBox.style.display = "block";
+    bad.el.focus({ preventScroll: true });
+    return;
+  }
+  errorBox.style.display = "none";
+  rpState.fullName = fullName;
+  rpState.phone = phone;
+  rpTrack("moveout_blocked_lead_submitted", { reasons: rpMoveoutBlockReasons() });
+
+  try {
+    fetch(`${RP_BOOKING_API}/lead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        lead_type: "website_partial",
+        call_outcome: "Move-out blocked at questionnaire - needs a call before pricing",
+        csr_lead_source: "Website Estimator",
+        full_name: fullName,
+        phone: phone,
+        service: "Move-In / Move-Out Cleaning",
+        quoted_price: "No quote - blocked",
+        details: [
+          "MOVE-OUT BLOCKED AT QUESTIONNAIRE",
+          "Customer could not get a price online because:",
+          rpMoveoutBlockReasons().join(", "),
+          "Call them before quoting - this may not be a standard job.",
+          `Attribution: ${rpAttributionSummary()}`
+        ].filter(Boolean).join("\n"),
+        submitted_at: new Date().toISOString()
+      })
+    }).catch(() => {});
+  } catch (e) { /* never block the confirmation on a failed post */ }
+
+  rpGoToStep("moveoutblockedconfirmed", "forward");
+}
 function rpSelectCondition(label, element) { rpCommitChoice(element, () => { rpState.condition = label; rpAdvance(); }); }
 function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpState.frequency = label; rpAdvance(); }); }
 function rpSelectCarpetOnlyRooms(n, element) { rpCommitChoice(element, () => { rpState.carpetRooms = n; rpAdvance(); }); }
 function rpToggleHeavySoil(checked) { rpState.heavySoil = checked; rpRefresh(); }
-function rpTogglePetOdor(checked) { rpState.petOdor = checked; rpRefresh(); }
+function rpTogglePetOdor(checked) { rpState.petOdor = checked; if (!checked) rpState.addonPetEnzyme = false; rpRefresh(); }
+function rpTogglePetEnzyme(checked) { rpState.addonPetEnzyme = checked; rpRefresh(); }
 /* Property-condition flags (crew prep / safety, not pricing):
    captured on the contact step so the crew and Mike see them on the job
    card before arriving on-site. See rpGetEstimatePayload for how these
    surface in the booking notes sent to GoHighLevel. */
 function rpToggleNoAC(checked) { rpState.noAC = checked; rpRefresh(); }
+function rpSetMoveoutRentalOrSelling(value) { rpState.moveoutRentalOrSelling = value; rpRefresh(); }
 function rpToggleMoldConcern(checked) { rpState.moldConcern = checked; rpRefresh(); }
 function rpTogglePetWasteConcern(checked) { rpState.petWasteConcern = checked; rpRefresh(); }
 function rpToggleHazardConcern(checked) { rpState.hazardConcern = checked; rpRefresh(); }
@@ -4117,6 +4059,7 @@ function rpClearAddon(key) {
   else if (key === "yard") rpState.yardTier = null;
   else if (key === "laundry") rpState.laundryLoads = 0;
   else if (key === "fridge") rpState.fridgeAddon = false;
+  else if (key === "secondCleaner") rpState.addonSecondCleaner = false;
   else if (key === "extraHours") rpState.addonExtraHours = 0;
   rpState.expandedAddon = null;
   rpTrack("addon_removed", { addon: key });
@@ -4130,6 +4073,7 @@ function rpSelectYardTier(tier) { rpState.yardTier = tier; rpState.expandedAddon
 function rpSelectLaundryLoads(n) { rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
 function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectSecondCleaner(yes) { rpState.addonSecondCleaner = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectExtraHours(n) { rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
 
 /* =========================================================================
@@ -4167,7 +4111,10 @@ function rpGetEstimatePayload() {
     rpState.laundryLoads ? `Laundry Service: ${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"}` : "",
     rpState.fridgeAddon ? "Refrigerator Interior" : "",
     rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : "",
-    rpState.addonExtraHours ? `Extra Time: +${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"}` : ""
+    rpState.addonExtraHours ? `Extra Time: +${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"}` : "",
+    rpState.addonSecondCleaner ? `Additional Cleaner: ${rpSecondCleanerHours()} hrs, $${rpSecondCleanerPrice()}` : "",
+    (rpState.service === "carpet" && rpState.addonPetEnzyme) ? `Pet Enzyme Treatment: $${rpPetEnzymePrice()}` : "",
+    rpIsMoveoutHourly() ? `Billing: Hourly (${rpState.moveoutHours || 0} hrs @ $${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners)` : ""
   ].filter(Boolean).join(", ") || "None";
   const isConditionPriced = ["moveout", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
   const baseServicePrice = rpDisplayBasePrice();
@@ -4306,7 +4253,7 @@ function rpSubmitLeadAndShowCalendar() {
     checks.forEach((check) => { if (!check.valid) check.field.classList.add("is-invalid"); });
     errorBox.textContent = firstInvalid.message;
     errorBox.style.display = "block";
-    firstInvalid.field.scrollIntoView({ behavior: "auto", block: "center" });
+    firstInvalid.field.scrollIntoView({ behavior: "smooth", block: "center" });
     firstInvalid.field.focus({ preventScroll: true });
     rpTrack("lead_validation_error", { field: firstInvalid.field.id });
     return;
