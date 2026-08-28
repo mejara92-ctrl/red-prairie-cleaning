@@ -64,13 +64,12 @@ const rpServices = {
    worth deciding whether to adjust the hourly rate, or accept the two
    paths pricing differently now. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 399, includedBathrooms: 1, label: "1\u20132 bedrooms" },
-  { min: 3, max: 3, base: 499, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 599, includedBathrooms: 2, label: "4 bedrooms" },
-  /* 5+ base ($699) continues the confirmed $100 step pattern from the
-     other three tiers ($399/$499/$599) — not given directly, but follows
-     the same logic Mike confirmed for the rest of the table. */
-  { min: 5, max: 999, base: 699, includedBathrooms: 3, label: "5+ bedrooms" }
+  { min: 1, max: 2, base: 299, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 3, max: 3, base: 399, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 499, includedBathrooms: 2, label: "4 bedrooms" },
+  /* 5+ base ($599) continues the same $100 step as the other three tiers
+     ($299/$399/$499) — not given directly, follows the confirmed pattern. */
+  { min: 5, max: 999, base: 599, includedBathrooms: 3, label: "5+ bedrooms" }
 ];
 function rpMoveoutBedroomTier(beds) {
   const b = Number(beds || 0);
@@ -79,7 +78,13 @@ function rpMoveoutBedroomTier(beds) {
 /* $50/extra bathroom beyond whatever's included at that bedroom tier —
    raised from $40 to stay proportional now that the base tiers moved up
    by $100 each. */
-const RP_MOVEOUT_EXTRA_BATH_RATE = 50;
+/* $0/extra bathroom — per direct instruction, the ONLY extra charge on
+   top of the bedroom tier is now the large-home sqft surcharge below.
+   Bathroom count is still collected (crew planning, still shown on the
+   invoice) but no longer adds to price. Kept as a rate constant rather
+   than deleting the formula entirely, so restoring a bathroom charge
+   later is a one-line change if that's ever reversed. */
+const RP_MOVEOUT_EXTRA_BATH_RATE = 0;
 
 /* Large-home surcharge — the ONLY place square footage still affects
    Move-Out price. Threshold and step sizes below 2,200 sq ft don't
@@ -497,6 +502,12 @@ function rpCurrentFlow() {
        job ends the flow right there (see "moveoutblocked" screen, which
        captures a callback lead instead of dead-ending with nothing).
 
+       "moveoutintent" (rental vs. selling + PM/realtor name) now comes
+       right after "included" — asked the moment someone picks Move-Out,
+       not buried at the very end of the funnel where it used to live on
+       the lead step. Moved per direct feedback; no longer duplicated on
+       the lead screen (see rpLeadScreen).
+
        Past the questionnaire, flat-rate is the DEFAULT path straight
        through to a real price — no upfront "how do you want this
        priced?" choice anymore. Hourly is only reached by explicitly
@@ -504,11 +515,11 @@ function rpCurrentFlow() {
        a flat price is already showing, not as a coin-flip before either
        number exists. */
     if (rpMoveoutBlocked()) {
-      flow = ["included", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["included", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
     } else if (rpIsMoveoutHourly()) {
-      flow = ["included", "moveoutquestionnaire", "moveouthours", "addons", "estimate", "lead", "calendar"];
+      flow = ["included", "moveoutintent", "moveoutquestionnaire", "moveouthours", "addons", "estimate", "lead", "calendar"];
     } else {
-      flow = ["included", "moveoutquestionnaire", "bedrooms", "bathrooms", "sqft", "addons", "estimate", "lead", "calendar"];
+      flow = ["included", "moveoutintent", "moveoutquestionnaire", "bedrooms", "bathrooms", "sqft", "addons", "estimate", "lead", "calendar"];
     }
   }
   if (!RP_CONTACT_GATE) return flow;
@@ -627,7 +638,8 @@ function rpIsSpecialtyCondition() {
 function rpIsCustomQuoteOnly() {
   return rpState.service === "airbnb"
     || rpMoveoutIsCustomSqft()
-    || rpIsSpecialtyCondition();
+    || rpIsSpecialtyCondition()
+    || rpMoveoutBlocked();
 }
 
 /* Base price for Move-Out or Deep Cleaning — both are sq-ft bracket +

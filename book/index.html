@@ -742,8 +742,8 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 
 .rp-price-section {
   text-align: center;
-  padding: 14px 0 12px;
-  margin-bottom: 4px;
+  padding: 16px 0 16px;
+  margin-bottom: 8px;
   border-bottom: 1px solid rgba(70,52,37,.08);
 }
 .rp-price-block strong {
@@ -765,21 +765,23 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   letter-spacing: .01em;
 }
 .rp-guarantee-light {
-  width: fit-content;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  font-size: 10.5px; font-weight: 800; color: var(--red-dark);
-  background: rgba(159,32,39,.08);
-  border: 1px solid rgba(159,32,39,.20);
-  border-radius: 999px;
-  padding: 8px 11px;
-  margin: 12px auto 0;
+  width: 100%; box-sizing: border-box;
+  display: flex; align-items: flex-start; gap: 9px;
+  text-align: left;
+  font-size: 13.5px; font-weight: 600; line-height: 1.48; color: var(--ink);
+  background: rgba(159,32,39,.06);
+  border: 1px solid rgba(159,32,39,.18);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 16px 0 0;
 }
-.rp-guarantee-light .rp-ic-sm { color: var(--red-dark); }
+.rp-guarantee-light .rp-ic-sm { color: var(--red-dark); flex-shrink: 0; margin-top: 3px; }
+.rp-guarantee-light strong { color: var(--red-dark); }
 .rp-trust-signal {
   width: fit-content;
   display: flex; align-items: center; justify-content: center; gap: 6px;
   font-size: 10.5px; font-weight: 700; color: var(--muted);
-  margin: 8px auto 0;
+  margin: 14px auto 0;
 }
 .rp-trust-signal strong { color: var(--ink); font-weight: 800; }
 /* ============ ESTIMATE ============ */
@@ -875,7 +877,7 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 .rp-mini-row {
   display: flex; justify-content: space-between; gap: 12px;
-  font-size: 14px; padding: 10px 0;
+  font-size: 14px; padding: 12px 0;
   border-bottom: 1px solid rgba(70,52,37,.08);
 }
 .rp-mini-row:last-child { border-bottom: none; }
@@ -2931,7 +2933,7 @@ function rpScreenHtml() {
         <h1>From move-out to move-in, we've got your home covered.</h1>
         <p class="rp-hero-onphoto-sub">We stand behind every clean, and we always do right by you.</p>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 57+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 61+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Transparent Pricing</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day Availability</span>
         </div>
@@ -2940,7 +2942,7 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home, with no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${rpSqftTiers[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home, with no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_BEDROOM_TIERS[0].base}` })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
@@ -2988,15 +2990,11 @@ function rpScreenHtml() {
       <h2>How many bedrooms?</h2>
       <div class="rp-q-gap"></div>
       <div class="rp-rows">
-        ${[1,2,3,4,5].map(n => {
-          const t = rpState.service === "moveout" ? rpMoveoutBedroomTier(n) : null;
-          return rpRowBtn({
-            onclick:`rpSelectBedrooms(${n}, this)`,
-            title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-            val: t ? `$${t.base}` : "",
-            selected: rpState.bedrooms === n
-          });
-        }).join("")}
+        ${[1,2,3,4,5].map(n => rpRowBtn({
+          onclick:`rpSelectBedrooms(${n}, this)`,
+          title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
+          selected: rpState.bedrooms === n
+        })).join("")}
       </div>
     </div>` };
   }
@@ -3006,12 +3004,11 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bathrooms?</h2>
-      <p class="rp-sub">${moveoutTier ? `${moveoutTier.includedBathrooms} bathroom${moveoutTier.includedBathrooms > 1 ? "s" : ""} included at this size. Extra bathrooms are $${RP_MOVEOUT_EXTRA_BATH_RATE} each.` : "Helps us plan your cleaning."}</p>
+      <p class="rp-sub">${moveoutTier ? `${moveoutTier.includedBathrooms} bathroom${moveoutTier.includedBathrooms > 1 ? "s" : ""} included at this size.` : "Helps us plan your cleaning."}</p>
       <div class="rp-rows">
         ${[1,2,3,4].map(n => rpRowBtn({
           onclick:`rpSelectBathrooms(${n}, this)`,
           title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
-          val: moveoutTier ? (n > moveoutTier.includedBathrooms ? `+$${(n - moveoutTier.includedBathrooms) * RP_MOVEOUT_EXTRA_BATH_RATE}` : "Included") : "",
           selected: rpState.bathrooms === n
         })).join("")}
       </div>
@@ -3048,6 +3045,19 @@ function rpScreenHtml() {
         })).join("")}
       </div>
     </div>` };
+  }
+
+  if (rpState.step === "moveoutintent") {
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>Quick question first</h2>
+      <p class="rp-sub">Is this a rental, or are you selling the home?</p>
+      <div class="rp-choice-grid" style="margin-top:14px">
+        <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "renting" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('renting')">Renting</button>
+        <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "selling" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('selling')">Selling</button>
+      </div>
+      <div class="rp-lead-field" style="margin-top:18px;text-align:left"><label for="rpMoveoutPmOrRealtor">Who is the property manager or realtor? (optional)</label><input id="rpMoveoutPmOrRealtor" type="text" value="${rpEscapeAttr(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="rpCaptureLeadField('moveoutPmOrRealtor',this.value)"></div>
+    </div>`, footer: `<button class="rp-primary" ${rpState.moveoutRentalOrSelling ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
   if (rpState.step === "moveoutquestionnaire") {
@@ -3412,16 +3422,16 @@ function rpEstimateScreen(eyebrow) {
         </div>
         ${(() => {
           const gtype = rpGuaranteeType();
-          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>We guarantee this clean.</strong> This is a full reset of the home, done by a real crew, however long it takes to get there. If your landlord flags something we missed, tell us within 48 hours and we'll come back and make it right, free. That's Defend Your Deposit\u2122.</div>`;
-          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")} <strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</div>`;
-          return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")} You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</div>`;
+          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>We guarantee this clean.</strong> This is a full reset of the home, done by a real crew, however long it takes to get there. If your landlord flags something we missed, tell us within 48 hours and we'll come back and make it right, free. That's Defend Your Deposit\u2122.</span></div>`;
+          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</span></div>`;
+          return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")}<span>You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</span></div>`;
         })()}
         ${rpState.service === "moveout" ? (
           rpIsMoveoutHourly()
             ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToFlatMoveout()">Back to flat-rate pricing \u2192</button>`
             : `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToHourlyMoveout()">Prefer an hourly clean instead? $${RP_MOVEOUT_HOURLY_RATE}/hr \u2192</button>`
         ) : ""}
-        <div class="rp-trust-signal"><strong>★ 5.0</strong> · 57+ reviews · Veteran-owned & insured</div>
+        <div class="rp-trust-signal"><strong>★ 5.0</strong> · 61+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
       ${rpState.service === "moveout" && rpSqftTier() && !rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
@@ -3597,17 +3607,7 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      ${rpState.service === "moveout" ? `
-      <div class="rp-prep-check">
-        <label class="rp-prep-check-label">One more thing</label>
-        <div class="rp-lead-field"><label for="rpMoveoutRentalOrSelling">Is this a rental, or are you selling the home?</label>
-          <div class="rp-choice-grid" style="margin-top:4px">
-            <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "renting" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('renting')">Renting</button>
-            <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "selling" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('selling')">Selling</button>
-          </div>
-        </div>
-        <div class="rp-lead-field" style="margin-top:12px"><label for="rpMoveoutPmOrRealtor">Who is the property manager or realtor? (optional)</label><input id="rpMoveoutPmOrRealtor" type="text" value="${rpEscapeAttr(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="rpCaptureLeadField('moveoutPmOrRealtor',this.value)"></div>
-      </div>` : `
+      ${rpState.service === "moveout" ? "" : `
       <div class="rp-prep-check">
         <label class="rp-prep-check-label">A few quick property details</label>
         <p class="rp-prep-check-note">This helps us bring the right equipment, schedule enough time, and confirm the final scope.</p>
@@ -4141,6 +4141,9 @@ function rpGetEstimatePayload() {
     `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal().toFixed(2)}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit().toFixed(2)} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
+    rpState.service === "moveout" ? `Rental or selling: ${rpState.moveoutRentalOrSelling === "renting" ? "Renting" : rpState.moveoutRentalOrSelling === "selling" ? "Selling" : "N/A"}` : "",
+    (rpState.service === "moveout" && rpState.moveoutPmOrRealtor) ? `Property manager/realtor: ${rpState.moveoutPmOrRealtor}` : "",
+    rpState.service === "moveout" ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, Power ${rpState.moveoutPowerOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold ${rpState.moveoutMold ? "YES" : "No"}, Pests ${rpState.moveoutPests ? "YES" : "No"}` : "",
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,

@@ -1616,3 +1616,355 @@ VERIFIED THIS ROUND
   correctly through the shared engine.
   Pricing page worked example verified exact against live engine.
   Both files syntax-clean, pricing page HTML validated.
+
+
+========================================================
+ROUND 19 — BUGFIX PASS: $0 PRICE, LAYOUT, REVIEW COUNT, INTENT TIMING
+========================================================
+Caught from live screenshots of the deployed site, not assumed correct.
+
+A. REAL BUG: MOVE-OUT ROW SHOWED "FROM $0"
+--------------------------------------------------------
+The service-picker row's price badge read `rpSqftTiers[0].base`. That
+was correct back when rpSqftTiers WAS the base price table, but round
+18's bedroom-tier rebuild repurposed rpSqftTiers into a pure SURCHARGE
+table, where tier 1 ("Under 2,200 sq ft") is deliberately base:0 — the
+row badge kept reading that same array and displayed $0 instead of the
+actual $399 floor. Fixed to read RP_MOVEOUT_BEDROOM_TIERS[0].base
+instead. Checked for other stale references to the old meaning: none
+found. Verified live: badge now correctly shows "From $399".
+
+B. GUARANTEE BOX LAYOUT BUG (root cause of "crammed" screen)
+--------------------------------------------------------
+Found via computed-style inspection, not guessing: `.rp-guarantee-light`
+is `display:flex`, and the markup was `<div>{icon}<strong>Lead.</strong>
+Rest of sentence.</div>` — a bare trailing text node after a flex
+container's other children becomes its OWN anonymous flex item. That
+made the bold lead text ("We guarantee this clean.") wrap into a narrow
+~78px column completely separate from the rest of the sentence, which
+is what actually made the estimate screen look broken/crammed in the
+screenshots, not just tight spacing. FIXED: wrapped all guarantee text
+in a single <span> so it's one flex item alongside the icon. Verified
+via getBoundingClientRect(): was 2 text nodes rendering as 3 flex items
+(strong: 78x80px, oddly tall/narrow), now correctly 2 children (icon +
+one wide span). Applied to all three guarantee variants (deposit,
+satisfaction, hourly carve-out).
+
+Also widened breathing room: .rp-guarantee-light rebuilt as a proper
+card (was a pill sized for one short line, wrong shape entirely for
+round 18's paragraph-length guarantee text) — 16px padding, left-
+aligned, proper line-height. .rp-price-section padding/margin increased.
+.rp-mini-row padding increased slightly for less cramped detail rows.
+
+C. REVIEW COUNT: 57+ -> 61+
+--------------------------------------------------------
+Updated everywhere it appears: /book hero badge, /book estimate screen
+trust signal, and BOTH schema.org reviewCount fields (pricing/index.html
+AND index.html — the homepage's schema had its own copy that would have
+been missed by only checking /book and /pricing).
+
+D. BEDROOM/BATHROOM PRICE PREVIEWS REMOVED
+--------------------------------------------------------
+Per feedback to leave these blank. Bedroom step: dropped the per-option
+$ badge entirely (was showing $399/$399/$499/$599/$699 next to each
+choice — the identical $399 on both 1 and 2 bedroom options looked
+especially odd sitting side by side). Bathroom step: dropped the
+per-option price/"Included" badge AND removed the "$50 each" rate from
+the subheading text, so no pricing appears anywhere on either screen —
+price now first appears on the estimate screen only.
+
+E. RENTAL/SELLING + PM QUESTION MOVED TO THE FRONT OF THE FLOW
+--------------------------------------------------------
+Was on the lead step (very end of the funnel, round 18). Per direct
+feedback ("when you click move-out it should ask"), moved to a NEW
+dedicated screen ("moveoutintent") immediately after "included" — the
+first real question after picking the service, before even the hard-
+stop questionnaire. Requires the Renting/Selling choice to continue;
+PM/realtor name stays optional. REMOVED the now-duplicate block from
+the lead screen entirely — Move-Out's lead screen no longer shows the
+old AC/mold/pest checkboxes OR the rental/PM fields (both already
+covered earlier in the funnel now), just the standard contact fields.
+This directly serves the separate "too much going on" feedback too —
+one less block on the most cluttered screen.
+
+Verified rpMoveoutBlocked() is unaffected by the new step's position —
+it depends only on rpMoveoutQuestionnaireAnswered(), not on intent being
+answered, so the intent screen can't accidentally gate or skip the
+hard-stop questionnaire that follows it.
+
+VERIFIED THIS ROUND
+  Move-out row badge: "From $399" (was "From $0").
+  Full regression, all unchanged: 1-2bed $399, 3bed $499, hourly
+  moveout $640, deep $300, basic $150, hourly cleaning $150, carpet+
+  enzyme $225.
+  New flow order confirmed: included -> moveoutintent ->
+  moveoutquestionnaire -> bedrooms -> bathrooms -> sqft -> ...
+  Intent step confirmed NOT to affect pricing or blocking logic either
+  way (answered or not).
+  Guarantee box: children_count 2 (icon + span) on all 3 variants,
+  span width/height confirmed proportional (wide, not narrow+tall).
+  Screenshots re-confirmed: intent screen, blank bedroom/bathroom
+  pickers, redesigned estimate screen (all 3 guarantee variants).
+  Live-render em-dash sweep across 6 configs including both new
+  screens: zero found.
+  Both files syntax-clean.
+
+
+========================================================
+ROUND 20 — PRICING TONED DOWN, BATHROOM ADDER REMOVED, BUG SWEEP
+========================================================
+A. BEDROOM TIERS LOWERED
+--------------------------------------------------------
+  1-2 bed: $399 -> $299
+  3 bed:   $499 -> $399
+  4 bed:   $599 -> $499
+  5+ bed:  $699 -> $599 (still proposed, same $100-step pattern as the
+           other three, not given directly)
+
+B. BATHROOM ADDER REMOVED ENTIRELY
+--------------------------------------------------------
+Per "only extra charge for large homes" — interpreted as removing the
+per-bathroom charge, since it's the one adjustment that wasn't a large-
+home surcharge. FLAGGED THIS INTERPRETATION IN CHAT before building, in
+case the intent was to keep a small bathroom adder alongside this.
+
+RP_MOVEOUT_EXTRA_BATH_RATE: 50 -> 0. Bathroom count is still collected
+(crew planning, still shown on the invoice) and the includedBathrooms
+data per tier is untouched, but the formula's bathAdj term now always
+computes to 0. Kept as a rate constant rather than deleting the formula,
+so restoring a bathroom charge later is a one-line change.
+
+The ONLY remaining adjustment on top of the bedroom-tier base price is
+now the large-home sqft surcharge (2,200+ sq ft), unchanged from round 18.
+
+VERIFIED: 3bed/2bath and 3bed/4bath both price at exactly $399 — extra
+bathrooms confirmed to cost nothing, including live in the browser
+(screenshot), not just the assertion suite.
+
+C. FULL BUG SWEEP ("fix any bugs")
+--------------------------------------------------------
+Re-ran everything rather than assuming round 19's fixes still held:
+  - Searched for other stale rpSqftTiers[0]-style base-price assumptions
+    across all three files: none found (round 19's fix was isolated).
+  - Full 16-point pricing regression: all passed (new bedroom tiers x4,
+    bathroom-adder-removed x3, surcharge-still-works x2, hourly moveout +
+    guarantee split x3, full cross-service regression x6).
+  - Live-render walkthrough of 7 configs (moveout clear/blocked/hourly,
+    carpet+enzyme, deep, basic, hourly cleaning) across every step: zero
+    runtime errors, zero suspiciously-empty screens.
+  - Live-render em-dash sweep across the same 7 configs: zero found.
+  - Both files syntax-clean.
+
+D. PRICING PAGE SYNCED
+--------------------------------------------------------
+Bedroom table updated to $299/$399/$499/$599. Bathroom-adder line
+removed, replaced with a plain statement that bathroom count doesn't
+affect price. Worked example rewritten and re-verified exact against
+the live engine: 3bed/3bath under 2,200 sq ft = $399 ($374 with
+military), confirmed via direct engine call, not estimated.
+
+
+========================================================
+ROUND 21 — BUG SWEEP: FOUND A REAL DATA-LOSS BUG, FIXED
+========================================================
+Checked, all clean: full syntax (engine, book, call, index.html),
+full HTML structure validation (4 pages), CSS duplicate-selector scan
+(one false alarm — a second .rp-mini-row rule is a mobile media-query
+override, not a duplicate), stale constant-name scan (RP_MOVEOUT_
+BEDROOM_RATE/BATHROOM_RATE — the old pre-tier-table names — confirmed
+fully gone, only an accurate explanatory comment remains), full 16-point
+pricing regression (still passing), live-render walkthrough of 7 configs
+across every step (zero errors, zero empty screens).
+
+FOUND AND FIXED — a real one:
+The rental-vs-selling answer, the property manager/realtor name, and
+all 5 hard-stop questionnaire answers (water/power/A/C/mold/pests) were
+being collected into state and rendered on their own screens correctly,
+but were NEVER included in the actual booking payload sent to GHL when
+a customer completes a booking. rpGetEstimatePayload()'s job_details
+builder (the function that becomes the office-facing note on every real
+booking) had no line for any of it — so a customer could answer "this
+is a rental, managed by Acme Property Mgmt," pass all 5 safety
+questions, book successfully, and NONE of that would reach Liz or the
+crew. The property-manager lead capture (the whole reason that question
+was added, per the earlier conversation about PM relationships being
+the highest-leverage growth channel) would have silently gone nowhere
+on every completed booking.
+
+(The BLOCKED path was already fine — rpSubmitMoveoutBlockedLead() posts
+its own separate payload to /lead and already included the block
+reasons. This bug was specific to bookings that DID get a price and
+completed normally.)
+
+FIXED: added three lines to the job_details array in
+rpGetEstimatePayload():
+  "Rental or selling: Renting/Selling/N/A"
+  "Property manager/realtor: <name>" (only if provided)
+  "Pre-clean check: Water On, Power On, A/C Working, Mold No, Pests No"
+
+VERIFIED by calling rpGetEstimatePayload() directly (not just reading
+the source) with a full move-out state set — confirmed all three new
+lines appear correctly in the actual job_details string that gets sent:
+  "...Rental or selling: Renting | Property manager/realtor: Acme
+  Property Mgmt | Pre-clean check: Water On, Power On, A/C Working,
+  Mold No, Pests No..."
+
+STILL A KNOWN, PREVIOUSLY-FLAGGED GAP (not new, not fixed this round):
+/call has no UI at all for the intent question, the questionnaire, or
+hourly move-out billing — Liz's console still runs its own separate,
+older step arrays. Confirmed no references to any of the new state
+fields exist in call/index.html. This was already documented as a
+follow-up task in rounds 17-18; restating it here since this round's
+sweep re-confirmed it's still true, not because it's a new finding.
+
+VERIFIED THIS ROUND
+  Full syntax check: engine + book + call + index.html, all clean.
+  Full HTML structure validation: book/call/pricing/index all CLEAN.
+  rpGetEstimatePayload() called directly and job_details field printed
+  in full — confirmed the fix landed exactly where a real booking would
+  send it, not just added near the right code.
+  16-point pricing regression: all passed, unchanged.
+  Live-render walkthrough, 7 configs x every step: zero errors, zero
+  empty screens.
+
+
+========================================================
+ROUND 22 — /call BROUGHT TO PARITY WITH /book, PLUS THREE MORE BUGS FOUND
+========================================================
+Closes the gap flagged since round 17/18: Liz's console had no UI for
+the new Move-Out flow at all. Built it, then found and fixed three
+additional real bugs along the way via actual browser testing, not
+just reading the code.
+
+A. SHARED ENGINE: ONE-LINE FIX GIVES BOTH PAGES A SAFETY NET
+--------------------------------------------------------
+rpIsCustomQuoteOnly() now also returns true when rpMoveoutBlocked().
+This single change automatically activates /call's EXISTING "stop"
+guardrail ("Do not quote a price... custom-quote only") for the new
+hard-stop questionnaire — no new guardrail plumbing needed for that
+part. Verified /book is unaffected (blocked move-outs never reach a
+screen there that checks this flag anyway, per round 18's separate
+terminal flow).
+
+B. /call REBUILT FOR MOVE-OUT
+--------------------------------------------------------
+  FLOWS.moveout: added "intent" and "questionnaire" steps, removed
+  "condition" (dead — Standard/Heavy/Extreme pricing doesn't exist for
+  Move-Out anymore). Also removed sqft/bedrooms/bathrooms/condition from
+  FLOWS.deep and FLOWS.maintenance, and condition from deep specifically
+  — CLOSES THE OTHER long-flagged gap (round 12): Liz was still being
+  asked home-size questions for Deep/Basic that had zero effect on price.
+
+  NEW "intent" screen: Renting/Selling toggle + optional PM/realtor
+  field, matching /book's copy and field names exactly.
+  NEW "questionnaire" screen: same 5 yes/no questions as /book (water,
+  power, A/C, mold, pests).
+  NEW guardrail: fires the moment rpMoveoutBlocked() is true on any of
+  the intent/questionnaire/bedrooms/bathrooms/sqft/addons steps —
+  "Do not give a price on this call," states which specific answer(s)
+  triggered it, tells Liz what to do (take name/number, log as
+  callback-needed, do not continue toward a quote).
+  NEW hourly-billing toggle on the quote screen, offered AFTER the flat
+  price like /book (not a coin-flip up front) — toggling recomputes
+  price/guarantee live through the shared engine.
+
+C. /call ADDONS SCREEN — THREE MISSING ADD-ONS ADDED
+--------------------------------------------------------
+Extra Time and Additional Cleaner (Deep/Basic) and Pet Enzyme Treatment
+(Carpet) existed in the shared engine and on /book, but /call's addons
+renderer never had markup for any of them — a Deep or Carpet phone
+booking had no way to add them at all. Added all three, matching /book's
+pricing exactly (Additional Cleaner's price recalculates live against
+whatever Extra Time is also selected, same as /book).
+
+D. rpState IN /call WAS MISSING EVERY NEW FIELD ENTIRELY
+--------------------------------------------------------
+Not just unset — genuinely absent from the object. This mattered
+specifically for rpMoveoutQuestionnaireAnswered(), which checks
+`!== null` on each field; a truly undefined property still passes that
+check, which could have silently treated an unanswered questionnaire as
+complete. Added all 12 missing fields (addonExtraHours,
+addonSecondCleaner, addonPetEnzyme, moveoutMode, moveoutHours,
+moveoutWaterOn/PowerOn/AcOn/Mold/Pests, moveoutRentalOrSelling,
+moveoutPmOrRealtor) with correct null/0/false defaults.
+
+E. /call HAS ITS OWN SEPARATE jobDetails() — SAME BUG AS /book, FIXED
+--------------------------------------------------------
+/call never shared code with /book's rpGetEstimatePayload() (confirmed
+in round 21 to have the rental/PM/questionnaire fields). /call's OWN
+jobDetails() function had the exact same gap independently — fixing one
+never fixed the other since they're unrelated code paths. Added the
+same three categories of missing data (rental/selling, PM/realtor,
+pre-clean check) plus the missing Extra Time/Additional Cleaner/Pet
+Enzyme lines to the add-ons summary. Verified: a phone-booked move-out's
+notes now include "Rental or selling," "Property manager/realtor," and
+"Pre-clean check" exactly like a website booking's do.
+
+F. REAL BUG FOUND DURING TESTING: CROSS-SERVICE PRICE LEAK
+--------------------------------------------------------
+pickService() reset sqft/bedrooms/bathrooms/condition/frequency but had
+NEVER reset any addon field, ever — this predates this session's
+changes but got materially worse once 3 more leakable fields were added
+this round. Reproduced live: pick Deep, toggle Additional Cleaner
+(+$300), switch to Carpet without a page reload \u2014 the $300 silently
+carried onto Carpet's total ($525 shown instead of $225). This is a
+real risk on an actual multi-call shift where Liz doesn't reload the
+tab between calls.
+
+FIXED: pickService() now resets every addon field (carpetRooms,
+addonCarpetRooms, windowsTier, yardTier, garageWash, laundryLoads,
+fridgeAddon, junkSize, cleanerCount, hourCount, addonExtraHours,
+addonSecondCleaner, addonPetEnzyme, heavySoil, petOdor, noAC,
+moldConcern, petWasteConcern, hazardConcern) and all move-out-specific
+state, matching /book's rpResetServiceState() coverage.
+
+Re-verified through the REAL pickService() function afterward (not
+manual state mutation): Deep + 2nd cleaner \u2192 $600, correctly. Switch
+to Carpet \u2192 $150, correctly \u2014 zero leakage, addonSecondCleaner
+confirmed reset to false.
+
+G. REAL BUG FOUND DURING TESTING: SPOKEN SCRIPT CONTRADICTED THE
+   GUARANTEE SPLIT
+--------------------------------------------------------
+SERVICE_ANGLES.moveout.value and .objection were static strings used
+for BOTH the SAY script and the price-pushback objection response,
+regardless of billing mode. In hourly mode, Liz would have been told to
+say "so nothing gets flagged at the walkthrough" and "this is what it
+takes to pass a landlord's inspection" \u2014 language that directly
+promises the outcome guarantee Hourly Move-Out deliberately does NOT
+carry (Satisfaction Guaranteed, not Defend Your Deposit, per this
+session's earlier guarantee-split work).
+
+FIXED: both fields are now functions that check rpIsMoveoutHourly().
+Hourly gets honest time-based language ("2-cleaner crew for the hours
+you book") and the pushback response now explicitly steers toward
+flat-rate as the option that carries the inspection guarantee, instead
+of promising it on a quote that can't back it up.
+
+Updated the two call sites (the SAY-script builder and
+objectionPriceAnswer()) to resolve either a string or a function \u2014
+searched for any OTHER place .value/.objection get read directly and
+confirmed these were the only two consumers, so nothing else could
+silently print "function value() {...}" instead of resolved text.
+
+VERIFIED THIS ROUND
+  Full syntax check: engine + book + call, all clean.
+  Full HTML structure validation: book + call, both CLEAN.
+  16-point pricing regression: still passing, unchanged.
+  Auth-gate bypass confirmed working (localStorage keys set via
+  add_init_script) \u2014 actually rendered the real console UI, not just
+  called functions directly against a blank page.
+  Intent screen, questionnaire screen, and quote screen (both billing
+  modes) all confirmed rendering real content via #main innerText,
+  not assumed from source reading.
+  Blocking logic verified both ways: full questionnaire with water=No
+  \u2192 rpMoveoutBlocked() true, correct reason, guardrail fires,
+  rpIsCustomQuoteOnly() true. Full questionnaire all-clear \u2192 false,
+  no guardrail.
+  Cross-service leak fix verified through the real pickService()
+  function, not manual state mutation.
+  SAY script and pushback objection verified different between flat and
+  hourly, and confirmed Deep's script is completely unaffected.
+  Full walkthrough of every step of every service (moveout, deep,
+  maintenance, carpet, hourly, airbnb, custom) in /call: zero runtime
+  errors, zero empty screens.

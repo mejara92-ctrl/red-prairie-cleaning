@@ -251,6 +251,17 @@ const rpState = {
   garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null,
   militaryDiscount:false, militaryVerified:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
+  heavySoil:false, petOdor:false,
+  /* Below: fields the shared engine (rp-pricing-engine.js) reads that
+     this console's own rpState never declared. Missing entirely (not
+     just unset) matters here — rpMoveoutQuestionnaireAnswered() checks
+     `!== null`, and a genuinely undefined property still passes that
+     check, which would have silently treated an unanswered questionnaire
+     as complete. Declaring them explicitly as null/0/false closes that. */
+  addonExtraHours:0, addonSecondCleaner:false, addonPetEnzyme:false,
+  moveoutMode:"flat", moveoutHours:null,
+  moveoutWaterOn:null, moveoutPowerOn:null, moveoutAcOn:null, moveoutMold:null, moveoutPests:null,
+  moveoutRentalOrSelling:null, moveoutPmOrRealtor:"",
   fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
   specialInstructions:"", addressReadBack:false,
   customNotes:"",
@@ -268,9 +279,21 @@ const rpState = {
    logs it as a lead via /lead for the office to follow up with an
    in-person visit or photo request. */
 const FLOWS = {
-  moveout:     ["service","caller","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  deep:        ["service","caller","sqft","bedrooms","bathrooms","condition","addons","quote","contact","calendar","done"],
-  maintenance: ["service","caller","sqft","bedrooms","bathrooms","frequency","addons","quote","contact","calendar","done"],
+  /* "condition" removed for both moveout and deep — Standard/Heavy/
+     Extreme pricing was dropped entirely for moveout (see
+     rp-pricing-engine.js), and deep has been flat-anchor priced with no
+     sqft/bedroom/condition dependency since an earlier round — this
+     console just never caught up until now. That was a previously-
+     flagged gap (Liz was being asked size/condition questions that had
+     zero effect on Deep's price); fixed here alongside the moveout work.
+     Same for maintenance's sqft/bedrooms/bathrooms.
+
+     "intent" (rental vs. selling + PM/realtor) and "questionnaire"
+     (water/power/A/C/mold/pests hard-stop) added to moveout, matching
+     /book exactly. */
+  moveout:     ["service","caller","intent","questionnaire","bedrooms","bathrooms","sqft","addons","quote","contact","calendar","done"],
+  deep:        ["service","caller","addons","quote","contact","calendar","done"],
+  maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
   hourly:      ["service","caller","cleaners","hours","addons","quote","contact","calendar","done"],
   airbnb:      ["service","caller","bedrooms","bathrooms","quote","contact","calendar","done"],
@@ -302,9 +325,21 @@ function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i
    ========================================================================= */
 const SERVICE_ANGLES = {
   moveout: {
-    value: "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
+    /* Functions, not plain strings \u2014 the inspection/deposit promise
+       only holds for flat-rate (an outcome guarantee). Saying "nothing
+       gets flagged at the walkthrough" on an HOURLY quote would directly
+       contradict the guarantee split (hourly gets Satisfaction Guaranteed,
+       not Defend Your Deposit, because a clock-based price can't honestly
+       promise a completed outcome). angle() callers already just read
+       these as values, so a function needs (val/obj) computed at the
+       call site \u2014 see the two `typeof x === "function"` checks below. */
+    value: () => rpIsMoveoutHourly()
+      ? "that's a 2-cleaner crew for the hours you book, working the whole interior in that time"
+      : "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
     addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
-    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
+    objection: () => rpIsMoveoutHourly()
+      ? "Hourly gets you the same 2-cleaner crew at $80/hour \u2014 it's the flat-rate price that comes with the full inspection guarantee, since that one's priced for the whole job to get done, not just the time."
+      : "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
     urgencyNoun: "move-out slots",
     seasonNote: "our busiest moving season"
   },
@@ -360,7 +395,8 @@ function quoteSayLine(){
   if(rpState.bathrooms) bits.push(`${rpState.bathrooms} bathroom${rpState.bathrooms>1?"s":""}`);
   const desc = bits.length ? `for a ${bits.join(", ")}` : "for this job";
   const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : `$${rpFinalPrice().toFixed(2)}`;
-  const val = angle().value || "that's the full price, nothing added at the door";
+  const rawVal = angle().value;
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that's the full price, nothing added at the door";
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
 }
 function addonsSayLine(){
@@ -473,8 +509,10 @@ function resolveScript(step){
 }
 
 function objectionPriceAnswer(){
-  const val = angle().value || "that covers everything, nothing added at the door";
-  const obj = angle().objection || "";
+  const rawVal = angle().value;
+  const rawObj = angle().objection;
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that covers everything, nothing added at the door";
+  const obj = (typeof rawObj === "function" ? rawObj() : rawObj) || "";
   return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
 }
 /* Only names an add-on that's actually on THIS order — checked against
@@ -604,6 +642,9 @@ function guardrails(){
      (rpState.petWasteConcern||rpState.hazardConcern||rpState.moldConcern))
     g.push({level:"warn",title:"Condition looks under-tagged",
       body:"You flagged pets, trash, or mold but tagged the home Standard. If any of it is significant this should be Heavy or Extreme \u2014 otherwise the crew eats the extra hours."});
+  if(["questionnaire","bedrooms","bathrooms","sqft","addons"].includes(s) && rpMoveoutBlocked())
+    g.push({level:"stop",title:"Do not give a price on this call",
+      body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
   if(rpState.militaryDiscount && !rpState.militaryVerified)
     g.push({level:"warn",title:"Military discount not confirmed",
       body:"Ask: \u201cAre you active duty, retired, or a first responder?\u201d then tick the confirm box. Don't apply it just because they're calling from Lawton."});
@@ -632,6 +673,8 @@ function stepValid(){
     case "bedrooms":  return !!rpState.bedrooms;
     case "bathrooms": return !!rpState.bathrooms;
     case "condition": return !!rpState.condition;
+    case "intent":    return !!rpState.moveoutRentalOrSelling;
+    case "questionnaire": return rpMoveoutQuestionnaireAnswered();
     case "frequency": return !!rpState.frequency;
     case "rooms":     return Number(rpState.carpetRooms)>0;
     case "cleaners":  return !!rpState.cleanerCount;
@@ -664,6 +707,8 @@ const TITLES = {
   bedrooms:["How many bedrooms?",""],
   bathrooms:["How many bathrooms?",""],
   condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
+  intent:["Rental or selling?","Ask before pricing \u2014 capture the PM/realtor if there is one."],
+  questionnaire:["A few quick facts","Water, power, A/C, mold, pests. If anything fails, do not quote a price."],
   frequency:["One-time or recurring?",""],
   rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
@@ -709,6 +754,27 @@ function screenHtml(){
     <div class="f"><label for="cd">What do they need?</label>
       <textarea id="cd" placeholder="Describe the job \u2014 commercial space, specialty request, rough size, anything unusual\u2026" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
 
+  if(s==="intent") return `<div class="opts two">
+      ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
+      ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
+    </div>
+    <div class="f" style="margin-top:13px"><label for="pmName">Property manager or realtor (optional)</label>
+      <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="set('moveoutPmOrRealtor',this.value)"></div>`;
+
+  if(s==="questionnaire"){
+    const yn=(field,label)=>`<div style="margin-bottom:11px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:5px">${label}</div>
+        <div class="opts two">
+          ${opt("Yes",`pick('${field}',true)`,rpState[field]===true)}
+          ${opt("No",`pick('${field}',false)`,rpState[field]===false)}
+        </div></div>`;
+    return yn("moveoutWaterOn","Is the water on?")
+      + yn("moveoutPowerOn","Is the electricity on?")
+      + yn("moveoutAcOn","Is the A/C working?")
+      + yn("moveoutMold","Any signs of mold?")
+      + yn("moveoutPests","Any signs of pests?");
+  }
+
   if(s==="sqft") return `<div class="opts two">${rpSqftTiersForService(rpState.service)
     .map(t=>opt(t.label,`pick('sqft','${t.key}')`,rpState.sqft===t.key)).join("")}</div>`;
 
@@ -730,7 +796,8 @@ function screenHtml(){
     .map(f=>opt(f,`pick('frequency','${f}')`,rpState.frequency===f)).join("")}</div>`;
 
   if(s==="rooms") return `<div class="opts three">${[2,3,4,5,6,7]
-    .map(n=>opt(`${n} rooms`,`pick('carpetRooms',${n})`,Number(rpState.carpetRooms)===n)).join("")}</div>`;
+    .map(n=>opt(`${n} rooms`,`pick('carpetRooms',${n})`,Number(rpState.carpetRooms)===n)).join("")}</div>
+    <div class="opts" style="margin-top:13px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room${rpState.carpetRooms?` \u2014 $${rpPetEnzymePrice()} total`:""})`,`toggle('addonPetEnzyme')`,rpState.addonPetEnzyme)}</div>`;
 
   if(s==="cleaners") return `<div class="opts three">${[1,2,3,4]
     .map(n=>opt(`${n}`,`pick('cleanerCount',${n})`,rpState.cleanerCount===n)).join("")}</div>`;
@@ -753,18 +820,47 @@ function screenHtml(){
     h+=`<div class="opts">`;
     if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
     if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
-    h+=`</div><div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
+    h+=`</div>`;
+    /* Extra Time / Additional Cleaner — previously missing entirely from
+       this console, so a Deep/Basic phone booking had no way to add
+       either even though both exist in the shared engine and on /book.
+       Priced per hour actually booked (anchor + any Extra Time already
+       selected), matching rpSecondCleanerPrice()'s live recalculation. */
+    if(list.includes("extraHours")){
+      const anchorHrs = rpState.service==="deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
+      h+=`<div style="margin-bottom:9px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:5px">Extra time <span style="color:var(--muted);font-weight:500">includes ${anchorHrs}hrs \u00b7 +$${RP_EXTRA_HOUR_RATE}/hr beyond that</span></div>
+        <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`+${n}hr`,`pick('addonExtraHours',${n})`,Number(rpState.addonExtraHours)===n)).join("")}</div></div>`;
+    }
+    if(list.includes("secondCleaner"))
+      h+=`<div class="opts" style="margin-bottom:9px">${opt(`Additional cleaner (+$${rpSecondCleanerPrice()} for ${rpSecondCleanerHours()}hrs)`,`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner)}</div>`;
+    h+=`<div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
       ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed"):""}</div>`;
     return h;
   }
 
   if(s==="quote"){
     const custom=rpIsCustomQuoteOnly();
-    return `<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
+    /* Move-out only: offer hourly AFTER giving the flat number, same
+       order as /book (flat is the default quote; hourly is something
+       you offer once they've heard the real price, not a coin-flip
+       asked up front). Toggling switches rpState.moveoutMode and the
+       quote box recomputes live through the same shared engine. */
+    const moveoutHourlyToggle = (rpState.service==="moveout" && !custom) ? `
+      <div class="opts" style="margin-bottom:11px">${opt(
+        rpIsMoveoutHourly() ? "Switch back to flat-rate price" : `Prefer hourly instead? ($${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners)`,
+        `pick('moveoutMode', rpState.moveoutMode==='hourly' ? 'flat' : 'hourly')`,
+        rpIsMoveoutHourly()
+      )}</div>
+      ${rpIsMoveoutHourly() ? `<div style="margin-bottom:13px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:5px">How many hours? <span style="color:var(--muted);font-weight:500">${RP_MOVEOUT_HOURLY_MIN_HOURS}hr minimum</span></div>
+          <div class="opts three">${Array.from({length:RP_MOVEOUT_HOURLY_MAX_HOURS-RP_MOVEOUT_HOURLY_MIN_HOURS+1},(_,i)=>i+RP_MOVEOUT_HOURLY_MIN_HOURS)
+            .map(n=>opt(`${n}hr`,`pick('moveoutHours',${n})`,rpState.moveoutHours===n)).join("")}</div></div>` : ""}` : "";
+    return `${moveoutHourlyToggle}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
         <small>Quote to give</small>
         <strong>${custom?"Custom Quote":"$"+rpFinalPrice().toFixed(2)}</strong>
         ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
-          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}</span>`}
+          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpIsMoveoutHourly()?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
       </div>
       ${custom?"":quoteCloseHelpersHtml()}
       ${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
@@ -948,6 +1044,23 @@ function toggle(f){ rpState[f]=!rpState[f];
 function pickService(k){ rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
+  /* BUG FIX: this reset never touched any addon field, or (once added)
+     the new move-out intent/questionnaire fields. Reproduced live: pick
+     Deep, toggle Additional Cleaner, switch to Carpet without a page
+     reload \u2014 the $300 leftover silently added onto Carpet's total
+     (confirmed $525 instead of $225 in testing). Every addon-ish field
+     and all move-out-specific state resets here now, matching /book's
+     rpResetServiceState() coverage. */
+  rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.windowsTier=null;
+  rpState.yardTier=null; rpState.garageWash=false; rpState.laundryLoads=0;
+  rpState.fridgeAddon=false; rpState.junkSize=null; rpState.cleanerCount=null;
+  rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
+  rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
+  rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
+  rpState.moveoutMode="flat"; rpState.moveoutHours=null;
+  rpState.moveoutWaterOn=null; rpState.moveoutPowerOn=null; rpState.moveoutAcOn=null;
+  rpState.moveoutMold=null; rpState.moveoutPests=null;
+  rpState.moveoutRentalOrSelling=null; rpState.moveoutPmOrRealtor="";
   render();
   // Fetch availability in the background now, not when she reaches the
   // calendar step — by the time she's at the price, real slot counts are
@@ -1007,13 +1120,31 @@ function jobDetails(){
     rpConditionMultiplier()>0?`Condition ${rpState.condition} \u2014 +${Math.round(rpConditionMultiplier()*100)}% applied, confirm on arrival`:"",
     rpIsSpecialtyCondition()?"Specialty/unsafe \u2014 office must confirm custom quote before the cleaning date":""
   ].filter(Boolean);
+  /* Move-out only. Same fields /book sends on a completed booking (fixed
+     last round after they were found missing there too) \u2014 this is a
+     SEPARATE code path from book's rpGetEstimatePayload(), so fixing one
+     never fixed the other. Without this, a phone-booked move-out would
+     lose the rental/PM lead and the pre-clean confirmation entirely,
+     same failure mode as the /book bug. */
+  const moveoutExtras = rpState.service==="moveout" ? [
+    `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
+    rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
+    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, Power ${rpState.moveoutPowerOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold ${rpState.moveoutMold?"YES":"No"}, Pests ${rpState.moveoutPests?"YES":"No"}`,
+    rpIsMoveoutHourly()?`Billing: Hourly (${rpState.moveoutHours||0} hrs @ $${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners, Satisfaction Guaranteed not Defend Your Deposit)`:""
+  ].filter(Boolean) : [];
+  const addonExtras=[
+    rpState.addonExtraHours?`Extra Time: +${rpState.addonExtraHours}hr`:"",
+    rpState.addonSecondCleaner?`Additional Cleaner: ${rpSecondCleanerHours()}hrs, $${rpSecondCleanerPrice()}`:"",
+    (rpState.service==="carpet"&&rpState.addonPetEnzyme)?`Pet Enzyme Treatment: $${rpPetEnzymePrice()}`:""
+  ].filter(Boolean).join(", ");
   return [
     `BOOKED BY PHONE${rpState.csrName?" (CSR: "+rpState.csrName+")":""}`,
     `Service: ${(rpServices[rpState.service]||{}).name||"N/A"}`,
     `Square footage: ${rpSqftTier()?rpSqftTier().label:"N/A"}`,
     `Bedrooms: ${rpState.bedrooms||"N/A"} | Bathrooms: ${rpState.bathrooms||"N/A"}`,
     `Condition: ${rpState.condition||"N/A"}`,
-    `Add-ons: ${rpAddonsTotal()>0?"$"+rpAddonsTotal().toFixed(2):"None"}`,
+    ...moveoutExtras,
+    `Add-ons: ${rpAddonsTotal()>0?"$"+rpAddonsTotal().toFixed(2):"None"}${addonExtras?` (${addonExtras})`:""}`,
     `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
     `Lead source: ${rpState.csrLeadSource||"N/A"}`,
