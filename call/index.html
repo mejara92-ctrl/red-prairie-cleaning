@@ -260,7 +260,7 @@ const rpState = {
      as complete. Declaring them explicitly as null/0/false closes that. */
   addonExtraHours:0, addonSecondCleaner:false, addonPetEnzyme:false,
   moveoutMode:"flat", moveoutHours:null,
-  moveoutWaterOn:null, moveoutPowerOn:null, moveoutAcOn:null, moveoutMold:null, moveoutPests:null,
+  moveoutWaterOn:null, moveoutAcOn:null, moveoutMoldPests:null,
   moveoutRentalOrSelling:null, moveoutPmOrRealtor:"",
   fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
   specialInstructions:"", addressReadBack:false,
@@ -291,7 +291,7 @@ const FLOWS = {
      "intent" (rental vs. selling + PM/realtor) and "questionnaire"
      (water/power/A/C/mold/pests hard-stop) added to moveout, matching
      /book exactly. */
-  moveout:     ["service","caller","intent","questionnaire","bedrooms","bathrooms","sqft","addons","quote","contact","calendar","done"],
+  moveout:     ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
   deep:        ["service","caller","addons","quote","contact","calendar","done"],
   maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
@@ -338,7 +338,7 @@ const SERVICE_ANGLES = {
       : "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
     addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
     objection: () => rpIsMoveoutHourly()
-      ? "Hourly gets you the same 2-cleaner crew at $80/hour \u2014 it's the flat-rate price that comes with the full inspection guarantee, since that one's priced for the whole job to get done, not just the time."
+      ? `Hourly gets you the same 2-cleaner crew at $${RP_MOVEOUT_HOURLY_RATE}/hour \u2014 it's the flat-rate price that comes with the full inspection guarantee, since that one's priced for the whole job to get done, not just the time.`
       : "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
     urgencyNoun: "move-out slots",
     seasonNote: "our busiest moving season"
@@ -708,7 +708,7 @@ const TITLES = {
   bathrooms:["How many bathrooms?",""],
   condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
   intent:["Rental or selling?","Ask before pricing \u2014 capture the PM/realtor if there is one."],
-  questionnaire:["A few quick facts","Water, power, A/C, mold, pests. If anything fails, do not quote a price."],
+  questionnaire:["A few quick facts","Water, A/C, mold, pests. If anything fails, do not quote a price."],
   frequency:["One-time or recurring?",""],
   rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
@@ -769,10 +769,8 @@ function screenHtml(){
           ${opt("No",`pick('${field}',false)`,rpState[field]===false)}
         </div></div>`;
     return yn("moveoutWaterOn","Is the water on?")
-      + yn("moveoutPowerOn","Is the electricity on?")
-      + yn("moveoutAcOn","Is the A/C working?")
-      + yn("moveoutMold","Any signs of mold?")
-      + yn("moveoutPests","Any signs of pests?");
+      + yn("moveoutAcOn","Is the air conditioning working?")
+      + yn("moveoutMoldPests","Any signs of mold or pests?");
   }
 
   if(s==="sqft") return `<div class="opts two">${rpSqftTiersForService(rpState.service)
@@ -1058,8 +1056,7 @@ function pickService(k){ rpState.service=k;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
   rpState.moveoutMode="flat"; rpState.moveoutHours=null;
-  rpState.moveoutWaterOn=null; rpState.moveoutPowerOn=null; rpState.moveoutAcOn=null;
-  rpState.moveoutMold=null; rpState.moveoutPests=null;
+  rpState.moveoutWaterOn=null; rpState.moveoutAcOn=null; rpState.moveoutMoldPests=null;
   rpState.moveoutRentalOrSelling=null; rpState.moveoutPmOrRealtor="";
   render();
   // Fetch availability in the background now, not when she reaches the
@@ -1129,7 +1126,7 @@ function jobDetails(){
   const moveoutExtras = rpState.service==="moveout" ? [
     `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
     rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
-    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, Power ${rpState.moveoutPowerOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold ${rpState.moveoutMold?"YES":"No"}, Pests ${rpState.moveoutPests?"YES":"No"}`,
+    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`,
     rpIsMoveoutHourly()?`Billing: Hourly (${rpState.moveoutHours||0} hrs @ $${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners, Satisfaction Guaranteed not Defend Your Deposit)`:""
   ].filter(Boolean) : [];
   const addonExtras=[

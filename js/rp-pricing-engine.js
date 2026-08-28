@@ -484,7 +484,7 @@ const RP_CONTACT_GATE = true;
    Defend Your Deposit guarantee (rpGuaranteeType() keys off the service,
    not the billing mode) — this is still a real move-out job, just billed
    differently, not a customer-directed scope like Hourly Cleaning. */
-const RP_MOVEOUT_HOURLY_RATE = 80;
+const RP_MOVEOUT_HOURLY_RATE = 75;
 const RP_MOVEOUT_HOURLY_MIN_HOURS = 4;
 const RP_MOVEOUT_HOURLY_MAX_HOURS = 12;
 const RP_MOVEOUT_HOURLY_CLEANERS = 2;
@@ -496,30 +496,31 @@ function rpIsMoveoutHourly() {
 function rpCurrentFlow() {
   let flow = rpFlows[rpState.service] || [];
   if (rpState.service === "moveout") {
-    /* Questionnaire always comes first, before any billing-mode choice —
-       water/power/A/C/mold/pests decide whether the job can happen at
-       all, regardless of how it's priced. A "no"/"yes" that blocks the
-       job ends the flow right there (see "moveoutblocked" screen, which
-       captures a callback lead instead of dead-ending with nothing).
+    /* Questionnaire moved to the END of the flow, right before the price
+       reveals \u2014 per direct instruction, not the first thing after
+       picking the service. "moveoutintent" (rental vs. selling +
+       PM/realtor) stays right after "included", asked the moment someone
+       picks Move-Out (a separate, still-valid decision from a prior
+       round; this change only concerns the water/A\/C/mold-pests
+       questions).
 
-       "moveoutintent" (rental vs. selling + PM/realtor name) now comes
-       right after "included" — asked the moment someone picks Move-Out,
-       not buried at the very end of the funnel where it used to live on
-       the lead step. Moved per direct feedback; no longer duplicated on
-       the lead screen (see rpLeadScreen).
+       Hourly mode is ONLY reachable via rpSwitchToHourlyMoveout(), called
+       from the FLAT estimate screen's link \u2014 confirmed the only setter
+       of moveoutMode in the whole file. That means anyone in hourly mode
+       already walked the flat path and already answered the
+       questionnaire truthfully to get there, so the hourly branch below
+       doesn't need its own copy of "moveoutquestionnaire" at all.
 
-       Past the questionnaire, flat-rate is the DEFAULT path straight
-       through to a real price — no upfront "how do you want this
-       priced?" choice anymore. Hourly is only reached by explicitly
-       choosing "Prefer an hourly clean?" from the estimate screen once
-       a flat price is already showing, not as a coin-flip before either
-       number exists. */
+       Blocking can therefore only ever happen on the FLAT path (hourly
+       is unreachable until after a flat pass), so the blocked branch is
+       just the flat prefix truncated at "moveoutblocked" instead of
+       "estimate". */
     if (rpMoveoutBlocked()) {
-      flow = ["included", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "moveoutblocked"];
     } else if (rpIsMoveoutHourly()) {
-      flow = ["included", "moveoutintent", "moveoutquestionnaire", "moveouthours", "addons", "estimate", "lead", "calendar"];
+      flow = ["included", "moveoutintent", "moveouthours", "addons", "estimate", "lead", "calendar"];
     } else {
-      flow = ["included", "moveoutintent", "moveoutquestionnaire", "bedrooms", "bathrooms", "sqft", "addons", "estimate", "lead", "calendar"];
+      flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"];
     }
   }
   if (!RP_CONTACT_GATE) return flow;
@@ -586,40 +587,41 @@ const RP_CONDITION_PRICED_SERVICES = [];
 
 /* ---------------------------------------------------------------------
    MOVE-OUT HARD-STOP QUESTIONNAIRE
-   Replaces the old self-reported condition scale entirely. Five plain
-   yes/no facts about whether the job can happen as booked, not how
-   dirty the home is. Any answer that fails routes straight to a phone
-   call instead of adjusting price, because this crew can't renegotiate
-   a number on-site, so there's no point pricing for dirtiness anymore,
-   only checking whether a normal crew can do a normal job here.
+   Reduced from 5 questions to 3 per direct instruction: Water, A/C, and
+   Mold/Pests combined into one. Power dropped as a separate question
+   entirely (no longer checked). Still plain facts about whether the job
+   can happen as booked, not how dirty the home is — any answer that
+   fails routes straight to a phone call instead of adjusting price,
+   because this crew can't renegotiate a number on-site.
 
-   NOTE: mold and pests used to route through rpIsSpecialtyCondition()
-   (the old "Specialty or Unsafe Conditions" custom-quote tier). That
+   Also moved to the END of the flow now, right before the price reveals
+   (see rpCurrentFlow()) rather than the very first question after
+   picking the service.
+
+   NOTE: mold/pests used to route through rpIsSpecialtyCondition() (the
+   old "Specialty or Unsafe Conditions" custom-quote tier). That
    mechanism is gone along with condition pricing; this is now the only
-   path for those two flags on Move-Out. */
+   path for that flag on Move-Out. Combining mold and pests into one
+   question means the office note can no longer distinguish which one
+   applies, just that one of them does. */
 function rpMoveoutQuestionnaireAnswered() {
-  return rpState.moveoutWaterOn !== null && rpState.moveoutPowerOn !== null &&
-         rpState.moveoutAcOn !== null && rpState.moveoutMold !== null &&
-         rpState.moveoutPests !== null;
+  return rpState.moveoutWaterOn !== null && rpState.moveoutAcOn !== null &&
+         rpState.moveoutMoldPests !== null;
 }
 function rpMoveoutBlocked() {
   if (rpState.service !== "moveout") return false;
   if (!rpMoveoutQuestionnaireAnswered()) return false;
   return rpState.moveoutWaterOn === false
-      || rpState.moveoutPowerOn === false
       || rpState.moveoutAcOn === false
-      || rpState.moveoutMold === true
-      || rpState.moveoutPests === true;
+      || rpState.moveoutMoldPests === true;
 }
 /* Which specific answer(s) triggered the block, used to write a useful
    note for the office instead of a generic "blocked" flag. */
 function rpMoveoutBlockReasons() {
   const reasons = [];
   if (rpState.moveoutWaterOn === false) reasons.push("Water is off");
-  if (rpState.moveoutPowerOn === false) reasons.push("Power is off");
   if (rpState.moveoutAcOn === false) reasons.push("A/C isn't working");
-  if (rpState.moveoutMold === true) reasons.push("Signs of mold");
-  if (rpState.moveoutPests === true) reasons.push("Signs of pests");
+  if (rpState.moveoutMoldPests === true) reasons.push("Signs of mold or pests");
   return reasons;
 }
 

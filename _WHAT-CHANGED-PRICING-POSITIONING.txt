@@ -1968,3 +1968,107 @@ VERIFIED THIS ROUND
   Full walkthrough of every step of every service (moveout, deep,
   maintenance, carpet, hourly, airbnb, custom) in /call: zero runtime
   errors, zero empty screens.
+
+
+========================================================
+ROUND 23 — QUESTIONS MOVED BEFORE PRICE, REDUCED TO 3, HOURLY RATE -> $75/hr
+========================================================
+A. HOURLY MOVE-OUT RATE LOWERED
+--------------------------------------------------------
+RP_MOVEOUT_HOURLY_RATE: 80 -> 75. Every reference already read the
+constant except two hardcoded literals, both fixed: call/index.html's
+price-pushback objection text (now reads the constant, not a hard string
+— can't drift again), and pricing/index.html's callout text.
+  hourly 8h: was $640, now $600. hourly 4h min: was $320, now $300.
+
+B. QUESTIONNAIRE REDUCED FROM 5 QUESTIONS TO 3
+--------------------------------------------------------
+Dropped "Is the electricity on?" as a standalone question entirely.
+Combined "Any signs of mold?" and "Any signs of pests?" into one:
+"Any signs of mold or pests?" (rpState.moveoutMoldPests, single
+boolean). Remaining: water, A/C, mold/pests.
+
+Consequence accepted: the office note can no longer distinguish mold
+from pests specifically, just that one of them is present. Not fixed
+without asking, since this is inherent to combining two questions into
+one, not something a code choice can work around.
+
+Renamed/removed fields everywhere they existed: rpState.moveoutPowerOn,
+moveoutMold, moveoutPests all gone (state init, reset function,
+persistence list, questionnaire UI, engine's answered/blocked/reasons
+functions, both books' GHL note builders) \u2014 replaced by a single
+moveoutMoldPests. Updated in ALL FOUR places this data model exists:
+js/rp-pricing-engine.js (shared logic), book/index.html (state/UI/
+notes), call/index.html (its own separate state/UI/notes — confirmed
+in round 22 these are independent, non-shared code paths), and
+pricing/index.html (public-facing description).
+
+C. QUESTIONS MOVED TO RIGHT BEFORE THE PRICE
+--------------------------------------------------------
+Was the first thing after "included" (right after picking the
+service). Per direct instruction, now the LAST thing before the price
+reveals, in both /book and /call \u2014 independently, since they're
+separate flow systems.
+
+/book (rpCurrentFlow(), shared engine):
+  Flat:    included -> moveoutintent -> bedrooms -> bathrooms -> sqft ->
+           contactgate -> addons -> moveoutquestionnaire -> estimate ->
+           lead -> calendar
+  Hourly:  included -> moveoutintent -> moveouthours -> contactgate ->
+           addons -> estimate -> lead -> calendar
+           (NO separate questionnaire copy needed \u2014 confirmed
+           rpSwitchToHourlyMoveout() is the ONLY setter of moveoutMode
+           anywhere in the file, and it's only callable from the FLAT
+           estimate screen's link. That means hourly mode is physically
+           unreachable until after the flat path's questionnaire has
+           already been answered and passed, so re-asking it in hourly
+           mode would be redundant by construction, not an oversight.)
+  Blocked: included -> moveoutintent -> bedrooms -> bathrooms -> sqft ->
+           addons -> moveoutquestionnaire -> moveoutblocked
+           (blocking can therefore ONLY happen on the flat path, since
+           hourly requires having already passed it)
+
+/call (FLOWS.moveout, its own independent static array):
+  ["service","caller","intent","bedrooms","bathrooms","sqft","addons",
+   "questionnaire","quote","contact","calendar","done"]
+  Guardrail logic unaffected by the reorder \u2014 it checks
+  rpMoveoutBlocked() regardless of which step Liz is currently on, and
+  `.includes()` on a step-name list doesn't care about order.
+
+"moveoutintent" (rental vs. selling + PM/realtor) was NOT moved \u2014 this
+instruction only concerned the water/A\/C/mold-pests questions. Intent
+stays right after "included" per the still-valid decision from two
+rounds ago.
+
+*** ONE THING WORTH KNOWING: the contact gate (name + phone capture)
+still fires BEFORE addons, which is now also before the questionnaire.
+This means a customer who gets BLOCKED will have already had their
+contact info captured once via the contact gate, then get asked for it
+AGAIN on the moveoutblocked screen. Not fixed this round since the
+blocked screen's fields already prefill from rpState.fullName/phone (so
+in practice they'd see their own info already there, not a blank form)
+\u2014 flagging in case that's still not the desired experience. ***
+
+VERIFIED THIS ROUND
+  Full syntax check: engine + book + call, all clean.
+  Full HTML structure validation: book + call + pricing, all CLEAN.
+  New rate confirmed: hourly 8h = $600, 4h min = $300.
+  3-question model verified: unanswered -> not blocked (still prices
+  normally), fully answered + all clear -> normal price, water=false ->
+  blocked with correct reason text, A/C=false -> correct reason,
+  moldPests=true -> correct combined reason text.
+  Flow order verified via direct rpCurrentFlow() calls: questionnaire
+  confirmed positioned immediately before "estimate" in both flat and
+  blocked branches; hourly branch confirmed to correctly omit it.
+  Live-render screenshot of /book's new 3-question screen: "STEP 9 OF
+  12" (correctly late in the flow), no em dashes, clean layout.
+  /call's reordered flow confirmed live through the real UI (auth-gate
+  bypassed properly): "STEP 8 OF 12," same 3 questions, guardrail still
+  fires correctly on a blocked answer, rpIsCustomQuoteOnly() still
+  correctly true.
+  /call's hourly quote script re-verified: price $600, objection text
+  correctly reads "$75/hour" from the constant, not a stale literal.
+  Full regression: moveout 1-2bed $299/3bed $399 unchanged, deep $300,
+  basic $150, hourly cleaning $150, carpet $250 \u2014 nothing else moved.
+  Live-render em-dash sweep on the full reordered /book flow: zero found.
+  Full walkthrough of every step of every service in /call: zero errors.

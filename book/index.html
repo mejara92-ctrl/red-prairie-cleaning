@@ -2595,10 +2595,8 @@ const rpState = {
   moveoutMode: "flat",
   moveoutHours: null,
   moveoutWaterOn: null,
-  moveoutPowerOn: null,
   moveoutAcOn: null,
-  moveoutMold: null,
-  moveoutPests: null,
+  moveoutMoldPests: null,
   moveoutRentalOrSelling: null,
   moveoutPmOrRealtor: "",
   addonPetEnzyme: false,
@@ -2826,7 +2824,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutMode", "moveoutHours", "moveoutWaterOn", "moveoutPowerOn", "moveoutAcOn", "moveoutMold", "moveoutPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "addonPetEnzyme", "windowsTier", "yardTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutMode", "moveoutHours", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "addonPetEnzyme", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -3071,14 +3069,12 @@ function rpScreenHtml() {
       </div>`;
     return { scroll: `<div class="rp-center">
       ${eyebrow}
-      <h2>A few quick facts first</h2>
+      <h2>A few quick facts</h2>
       <p class="rp-sub">Just checking the job can happen as booked. Doesn't affect your price.</p>
       <div class="rp-quest-list">
         ${q("moveoutWaterOn", "Is the water on?")}
-        ${q("moveoutPowerOn", "Is the electricity on?")}
-        ${q("moveoutAcOn", "Is the A/C working?")}
-        ${q("moveoutMold", "Any signs of mold?")}
-        ${q("moveoutPests", "Any signs of pests?")}
+        ${q("moveoutAcOn", "Is the air conditioning working?")}
+        ${q("moveoutMoldPests", "Any signs of mold or pests?")}
       </div>
     </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
@@ -3911,10 +3907,8 @@ function rpResetServiceState() {
   rpState.moveoutMode = "flat";
   rpState.moveoutHours = null;
   rpState.moveoutWaterOn = null;
-  rpState.moveoutPowerOn = null;
   rpState.moveoutAcOn = null;
-  rpState.moveoutMold = null;
-  rpState.moveoutPests = null;
+  rpState.moveoutMoldPests = null;
   rpState.moveoutRentalOrSelling = null;
   rpState.moveoutPmOrRealtor = "";
   rpState.addonPetEnzyme = false;
@@ -4143,7 +4137,7 @@ function rpGetEstimatePayload() {
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     rpState.service === "moveout" ? `Rental or selling: ${rpState.moveoutRentalOrSelling === "renting" ? "Renting" : rpState.moveoutRentalOrSelling === "selling" ? "Selling" : "N/A"}` : "",
     (rpState.service === "moveout" && rpState.moveoutPmOrRealtor) ? `Property manager/realtor: ${rpState.moveoutPmOrRealtor}` : "",
-    rpState.service === "moveout" ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, Power ${rpState.moveoutPowerOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold ${rpState.moveoutMold ? "YES" : "No"}, Pests ${rpState.moveoutPests ? "YES" : "No"}` : "",
+    rpState.service === "moveout" ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold/Pests ${rpState.moveoutMoldPests ? "YES" : "No"}` : "",
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,
