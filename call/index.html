@@ -247,7 +247,7 @@ const rpState = {
   step:"service", service:null,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
-  carpetRooms:0, addonCarpetRooms:0, windowsTier:null, yardTier:null,
+  carpetRooms:0, addonCarpetRooms:0, windowsTier:null,
   garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null,
   militaryDiscount:false, militaryVerified:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
@@ -394,7 +394,7 @@ function angle(){ return SERVICE_ANGLES[rpState.service] || {}; }
 
 function quoteSayLine(){
   const bits=[];
-  if(["moveout","deep","maintenance"].includes(rpState.service) && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
+  if(["moveout","moveoutrefresh","deep","maintenance"].includes(rpState.service) && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
   if(rpState.bedrooms) bits.push(`${rpState.bedrooms} bedroom${rpState.bedrooms>1?"s":""}`);
   if(rpState.bathrooms) bits.push(`${rpState.bathrooms} bathroom${rpState.bathrooms>1?"s":""}`);
   const desc = bits.length ? `for a ${bits.join(", ")}` : "for this job";
@@ -529,7 +529,6 @@ function removableAddonLabel(){
   if(rpState.garageWash) return "the garage floor wash";
   if(rpState.fridgeAddon) return "the refrigerator interior";
   if(Number(rpState.laundryLoads)>0) return "the laundry service";
-  if(rpState.yardTier) return "the yard refresh";
   return null;
 }
 function doBetterPriceAnswer(){
@@ -1058,7 +1057,7 @@ function pickService(k){ rpState.service=k;
      and all move-out-specific state resets here now, matching /book's
      rpResetServiceState() coverage. */
   rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.windowsTier=null;
-  rpState.yardTier=null; rpState.garageWash=false; rpState.laundryLoads=0;
+  rpState.garageWash=false; rpState.laundryLoads=0;
   rpState.fridgeAddon=false; rpState.junkSize=null; rpState.cleanerCount=null;
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;

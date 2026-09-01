@@ -362,7 +362,6 @@ const rpAddonCatalog = {
   garage:  { label: "Garage Floor Wash",   price: 150 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
-  yard:    { label: "Yard Refresh", normal: 100, overgrown: 150, xl: 200, xlOvergrown: 250 },
   extraHours: { label: "Extra Time", unit: "hour", pricePerHour: RP_EXTRA_HOUR_RATE },
   /* Deep Cleaning only. Priced per hour actually booked (anchor hours
      plus any Extra Time already purchased), not a flat number — a 2nd
@@ -373,14 +372,14 @@ const rpAddonCatalog = {
 };
 
 const rpServiceAddons = {
-  moveout:        ["carpet", "junk", "windows", "garage", "yard"],
+  moveout:        ["carpet", "junk", "windows", "garage"],
   /* Refresh doesn't include the fridge interior by default (Inspection
      Ready does) -- so unlike "moveout" above, Refresh gets "fridge" as a
      purchasable add-on. This is the concrete version of "tell the
      customer exactly what's excluded, and how to add it back": the
      included screen names the exclusion, and this is where they can
      actually buy it. */
-  moveoutrefresh: ["fridge", "carpet", "junk", "windows", "garage", "yard"],
+  moveoutrefresh: ["fridge", "carpet", "junk", "windows", "garage"],
   /* Fridge and laundry pulled from Deep/Basic — for a crew already on
      site for hours with an anchored-time model, these are small enough
      that "note it in special instructions" covers it without needing a
@@ -388,9 +387,12 @@ const rpServiceAddons = {
      because the crew isn't necessarily told anything beyond the standard
      scope, and Hourly because the whole service is instruction-driven
      anyway, so fridge/laundry fit the same pattern as any other request. */
-  deep:        ["extraHours", "secondCleaner", "carpet", "windows", "garage", "yard"],
-  maintenance: ["extraHours", "windows", "yard"],
-  hourly:      ["fridge", "laundry", "windows", "garage", "yard"]
+  deep:        ["extraHours", "secondCleaner", "carpet", "windows", "garage"],
+  maintenance: ["extraHours", "windows"],
+  hourly:      ["fridge", "laundry", "windows", "garage"]
+  /* Yard Refresh removed sitewide (direct instruction) -- it's gone from
+     the catalog above too. Every service that offered it now just offers
+     one less row on the add-ons screen; nothing else depended on it. */
 };
 
 /* Second cleaner costs the same $50/hr as the base rate, for however
@@ -507,13 +509,24 @@ const rpIncludes = {
    "What's included" on the estimate screen. */
 const rpFlows = {
   /* Both Move-Out services' actual flow is computed in rpCurrentFlow()
-     below, not read directly from this array — it branches on whether
-     the questionnaire answers block the job (rpMoveoutBlocked()). These
-     two entries are documentation of the normal path, kept as the
-     default/fallback; moveoutrefresh mirrors moveout exactly (same
-     steps, different pricing table underneath). */
-  moveout:        ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"],
-  moveoutrefresh: ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"],
+     below, not read directly from this array for step ORDER — it
+     branches on whether the questionnaire answers block the job
+     (rpMoveoutBlocked()). This array is still the allowlist /book's
+     session-resume check (rpLoadPersistedState) validates a saved step
+     name against, so every reachable move-out step name needs to be in
+     here even though the order isn't what drives navigation.
+
+     Round 19c (direct instruction): no more picking a tier up front.
+     One "Move-Out Cleaning" entry on the service list asks bedrooms and
+     bathrooms immediately, then a simplified sqft question, then the
+     rental/PM and hard-stop questions, THEN a side-by-side "moveouttiers"
+     screen shows both real prices for the home just described and the
+     customer picks there. "included" is gone from this list -- its old
+     job (describe the scope) is now the whole point of "moveouttiers",
+     shown per-tier instead of once, generically, before any numbers
+     exist to compare. */
+  moveout:        ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -544,31 +557,35 @@ const RP_CONTACT_GATE = true;
 function rpCurrentFlow() {
   let flow = rpFlows[rpState.service] || [];
   if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
-    /* Both Move-Out tiers share one flow shape. Questionnaire sits at the
-       END, right before the price reveals -- per direct instruction, not
-       the first thing after picking the service. "moveoutintent" (rental
-       vs. selling + PM/realtor) stays right after "included", asked the
-       moment someone picks either Move-Out tier.
-
-       Hourly mode (rpIsMoveoutHourly / moveoutMode / "moveouthours") is
-       REMOVED as of round 19 -- Move-Out no longer has a billing-mode
-       branch, only a tier branch (moveout vs moveoutrefresh), chosen up
-       front at the service list, not mid-flow. */
+    /* Round 19c (direct instruction): tier is no longer picked up front.
+       One "Move-Out Cleaning" entry on the service list asks bedrooms and
+       bathrooms immediately, then a simplified sqft question (no price
+       shown -- see rpSqftTiersForService's caller in /book), then the
+       rental/PM and hard-stop questions, THEN "moveouttiers" -- a
+       side-by-side Refresh vs. Inspection Ready price comparison for the
+       home just described, using rpMoveoutTierBasePrice() below. The
+       customer picks a real tier there; rpState.service switches to
+       whichever they pick (see rpChooseMoveoutTier in /book) and
+       everything downstream (addons, guarantee copy, estimate) reads
+       normally from that point on, same as picking the tier from the
+       service list did in round 19. */
     if (rpMoveoutBlocked()) {
-      flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
     } else {
-      flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"];
+      flow = ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
     }
   }
   if (!RP_CONTACT_GATE) return flow;
   if (flow.includes("contactgate") || flow.includes("moveoutblocked")) return flow;
-  /* Insert before "addons", NOT before "estimate". The add-ons screen
-     carries a live "Current estimate" chip, so gating only at the
-     estimate screen still let the customer read their full price a step
-     early and leave without giving a number. Blanking that chip instead
-     would mean choosing add-ons with no idea what they cost, which is
-     worse. Flows without an add-ons step fall back to the estimate. */
-  let at = flow.indexOf("addons");
+  /* Insert right before the FIRST screen that reveals a real price. For
+     Move-Out that's now "moveouttiers" (two real numbers, side by side)
+     -- gating at "addons" instead would let someone read both tier
+     prices for their exact home and leave without giving a number, the
+     exact leak this gate exists to close. Every other service still
+     gates at "addons" (or "estimate" if it has no add-ons step), same as
+     before. */
+  let at = flow.indexOf("moveouttiers");
+  if (at === -1) at = flow.indexOf("addons");
   if (at === -1) at = flow.indexOf("estimate");
   if (at === -1) return flow;
   return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
@@ -719,6 +736,26 @@ function rpServiceBasePrice() {
   return 0;
 }
 
+/* Computes a MOVE-OUT TIER'S base price for a specific bedrooms/
+   bathrooms/sqft combination without permanently switching
+   rpState.service — used by the "moveouttiers" comparison screen
+   (round 19c) to show both real numbers before the customer has
+   committed to either one. rpServiceBasePrice() only reads
+   rpState.service/.bedrooms/.bathrooms/.sqft, so a swap-compute-restore
+   is safe and synchronous; nothing else observes rpState in between.
+   Returns null (not 0) for a custom-quote home or a blocked
+   questionnaire answer — both apply identically to either tier, so the
+   comparison screen shows "Custom Quote" / routes to a callback instead
+   of a misleading $0 on either card. */
+function rpMoveoutTierBasePrice(service) {
+  if (rpMoveoutIsCustomSqft() || rpMoveoutBlocked()) return null;
+  const prevService = rpState.service;
+  rpState.service = service;
+  const price = rpServiceBasePrice();
+  rpState.service = prevService;
+  return price;
+}
+
 /* Single source of truth for what "Base Service" should display for any
    service, used by both /book's invoice and /call's CSR summary so the
    two never drift apart. */
@@ -824,7 +861,6 @@ function rpAddonsTotal() {
   if (rpState.garageWash) total += rpAddonCatalog.garage.price;
   if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
-  if (rpState.yardTier) total += rpAddonCatalog.yard[rpState.yardTier];
   if (rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
   if (rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
   /* Gated to carpet specifically — pet enzyme only makes sense for the

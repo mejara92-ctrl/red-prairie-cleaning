@@ -1,0 +1,87 @@
+RED PRAIRIE — ROUND 19b: POST-IMPLEMENTATION BUG REVIEW
+====================================================================
+You asked me to check Round 19 (two-tier move-out) for bugs and
+improvements. I re-read all 5 changed files plus the pricing engine
+line-by-line, re-ran the price harness with new cases (sqft + add-on
+combos, both tiers blocked, both guarantee types), and grepped the
+whole repo for any leftover single-tier or hourly references. This
+file covers what I found and what I fixed. 2 files changed as a result;
+both already re-verified with node --check and the price harness.
+
+
+FIXED (2 real bugs)
+--------------------------------------------------------
+1. index.html — stale Google-facing pricing.
+   The homepage's schema.org structured data (the JSON-LD block search
+   engines read, separate from anything a visitor sees) still had ONE
+   "Factory Reset™ Move-Out Clean (Starting At) — $199" offer. That
+   number predates even the old single-tier model's real prices
+   ($299–$599), and after Round 19 it didn't correspond to either real
+   tier at all. Left alone, this is what a search result or a rich
+   snippet could show someone before they ever reach your site — a
+   number nobody would actually be quoted.
+   FIXED: replaced it with two accurate offers —
+     "Move-Out Cleaning: Inspection Ready (Starting At)" — $299
+     "Move-Out Cleaning: Refresh (Starting At)" — $179
+   Validated the whole JSON-LD block still parses (python json.loads)
+   and every inline <script> on the page still passes node --check.
+
+2. call/index.html — CSR script silently skipped home size for Refresh.
+   quoteSayLine() (the line that assembles what the CSR says out loud,
+   e.g. "for a 3 bedroom, 2 bathroom home") only mentioned square
+   footage for moveout/deep/maintenance — moveoutrefresh was left out
+   of that array. Since Refresh has its own sqft surcharge (+$50/+$100/
+   +$150), a CSR quoting a large Refresh home would say a bedroom/
+   bathroom count but never the size, even on a job where size is
+   adding real dollars to the number she just quoted.
+   FIXED: added "moveoutrefresh" to that array. Re-checked with
+   node --check — clean.
+
+
+CHECKED AND CONFIRMED CORRECT (no action needed)
+--------------------------------------------------------
+- Every rpState.service === "moveout" check that should also cover
+  Refresh (guarantee type, flows, blocked-questionnaire, base price,
+  sqft tiers, custom-quote gating, addons, webhook fields, localStorage
+  persistence whitelist, CSR reset-on-service-switch) — all correctly
+  widened. Verified by grep across all 5 files plus a fresh set of
+  harness cases: sqft surcharge + fridge add-on stacking correctly on
+  Refresh ($229 + $100 + $50 = $379), military discount applying
+  correctly to that stacked total ($354, the same 10%-capped-at-$25
+  rule as everywhere else), and 5+BR/over-3,400-sqft Refresh correctly
+  falling into custom-quote instead of guessing a number.
+- No leftover references anywhere to moveoutMode, moveoutHours,
+  rpIsMoveoutHourly(), the old hourly rate constants, or the deleted
+  "moveouthours" step — only explanatory comments mentioning what was
+  removed and why.
+- The homepage's OTHER old "Factory Reset™ Move-Out Clean" mentions
+  (a dead <section style="display:none"> on-page estimator widget from
+  an earlier era of the site, never linked to from anywhere) are
+  confirmed genuinely unreachable — no link, button, or script ever
+  makes that section visible. Belongs on a future cleanup list, not a
+  bug someone can actually hit.
+- pricing/index.html's two-column table, both ledgers, and the worked
+  example all match the engine's real numbers exactly.
+
+
+WORTH KNOWING, NOT FIXED (pre-existing, outside Round 19's scope)
+--------------------------------------------------------
+- That same homepage schema.org block has "Deep Cleaning (Starting
+  At)" listed at $199 and "Maintenance Cleaning" at $149 — both
+  predate Deep/Basic's move to flat anchor pricing ($300 / $150) in an
+  earlier round and were already stale before this round started. Not
+  something this instruction touched or broke, but since I was already
+  in that block fixing the move-out entry, flagging it as a 5-minute
+  fix if you want it done: change "199" -> "300" and "149" -> "150" in
+  the two Offer blocks above the move-out one.
+- The schema.org "offers.highPrice" on /pricing ($930) — its original
+  basis (an old sqft-tier table, per an earlier changelog) no longer
+  exists in the current pricing model. The real ceiling today is
+  Inspection Ready 5+BR + largest surcharge = $899. Cosmetic only
+  (nobody is quoted $930), but worth tightening next time you're in
+  that file.
+- The word "isMoveout" as a variable name in book/index.html's
+  "included" screen only ever meant "is Inspection Ready" — Refresh
+  correctly falls through to the generic heading text either way, so
+  there's no visible bug, just a variable name that reads a little
+  misleading if you go looking for it later.
