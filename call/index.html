@@ -830,13 +830,14 @@ function screenHtml(){
       <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.carpet.bundlePrice}/room</span></div>
       <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
       ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room \u2014 $${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE} total)`,`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme)}</div>`:""}</div>`;
-    /* Round 21: the oversized load existed on /book but not here, so a
-       caller with a full house of junk had no option Liz could select
-       other than "full load" — which underquotes it as a firm $200. */
+    /* Round 24 (direct instruction, applied here for parity with /book):
+       junk haul is quoted-only now, no flat half/full pricing -- one
+       option instead of three, matching rpState.junkSize's new shape
+       (null or "yes"). Keeps this console consistent with what the
+       website itself now offers, so Liz never quotes a flat $100/$200
+       that a self-serve customer couldn't have gotten online. */
     if(list.includes("junk")) h+=`<div class="opts" style="margin-bottom:9px">
-      ${opt(`Junk haul \u2014 half load (+$${rpAddonCatalog.junk.half})`,`pick('junkSize', rpState.junkSize==='half'?null:'half')`,rpState.junkSize==="half")}
-      ${opt(`Junk haul \u2014 full load (+$${rpAddonCatalog.junk.full})`,`pick('junkSize', rpState.junkSize==='full'?null:'full')`,rpState.junkSize==="full")}
-      ${opt(`Junk haul \u2014 oversized (quoted separately, NOT in the total)`,`pick('junkSize', rpState.junkSize==='custom'?null:'custom')`,rpState.junkSize==="custom")}</div>`;
+      ${opt(`Junk/trash to haul away (quoted separately, NOT in the total)`,`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes")}</div>`;
     if(list.includes("windows")) h+=`<div class="opts" style="margin-bottom:9px">
       ${opt(`Exterior windows \u2014 basic (+$${rpAddonCatalog.windows.basic})`,`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
       ${opt(`Exterior windows \u2014 premium (+$${rpAddonCatalog.windows.premium})`,`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
@@ -1252,7 +1253,7 @@ function jobDetails(){
     `Condition: ${rpState.condition||"N/A"}`,
     ...moveoutExtras,
     `Add-ons: ${rpAddonSummaryText()}${rpAddonsTotal()>0?` | Add-ons total: $${rpAddonsTotal().toFixed(2)}`:""}`,
-    rpHasQuotedAddon()?`\u26a0 Oversized junk haul selected — office must quote the haul separately; it is NOT in the total above.`:"",
+    rpHasQuotedAddon()?`\u26a0 Junk haul selected — office must quote it separately; it is NOT in the total above.`:"",
     `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
     (()=>{const a=rpServiceAreaStatus();return a.status==="core"?`Service area: ${a.area}`:a.status==="unknown"?"":`\u26a0 SERVICE AREA: ${a.label}${a.area?` (${a.area})`:""}`;})(),

@@ -357,7 +357,13 @@ function rpMaintenancePrice(bedrooms, bathrooms) {
 
 const rpAddonCatalog = {
   carpet:  { label: "Carpet Cleaning",     unit: "room", bundlePrice: 50 },
-  junk:    { label: "Junk Haul",           half: 100, full: 200 },
+  /* Round 24 (direct instruction): junk haul is no longer flat-priced at
+     all -- half/full/oversized collapsed into one quoted-only item, same
+     treatment as "Need Small Handyman Repairs?" on the estimate screen.
+     No dollar fields left here on purpose; rpState.junkSize is now just
+     null (not selected) or "yes" (selected, quoted separately) instead
+     of "half"/"full"/"custom". */
+  junk:    { label: "Junk Haul" },
   windows: { label: "Exterior Windows",    basic: 100, premium: 200 },
   garage:  { label: "Garage Floor Wash",   price: 150 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
@@ -504,13 +510,13 @@ function rpAddonLineItems() {
       add("carpet", "Pet Enzyme Treatment", `${rooms} room${rooms === 1 ? "" : "s"}`, rooms * RP_PET_ENZYME_RATE);
     }
   }
-  if (rpState.junkSize === "half") add("junk", "Junk Haul", "Half truck bed", rpAddonCatalog.junk.half);
-  if (rpState.junkSize === "full") add("junk", "Junk Haul", "Full truck bed", rpAddonCatalog.junk.full);
-  /* The oversized load has no instant price. It used to render a row
-     reading "Custom Quote" next to a firm grand total, which read as
-     though the haul was included at $0. It's now explicitly a quoted
-     item worth $0 in the math, and every consumer says so. */
-  if (rpState.junkSize === "custom") add("junk", "Junk Haul", "Oversized load", 0, true);
+  /* Round 24: junk haul has no instant price at all anymore -- every
+     selection is a quoted item worth $0 in the math, same treatment the
+     oversized load already got. It used to render a row reading "Custom
+     Quote" next to a firm grand total, which read as though the haul
+     was included at $0; it's explicitly quoted instead, and every
+     consumer (summary text, webhook, crew sheet, /call) says so. */
+  if (rpState.junkSize === "yes") add("junk", "Junk Haul", "", 0, true);
   if (rpState.windowsTier === "basic") add("windows", "Exterior Windows", "Basic wash", rpAddonCatalog.windows.basic);
   if (rpState.windowsTier === "premium") add("windows", "Exterior Windows", "Premium wash, screens removed", rpAddonCatalog.windows.premium);
   if (rpState.garageWash) add("garage", "Garage Floor Wash", "Garage must be empty", rpAddonCatalog.garage.price);
@@ -674,27 +680,35 @@ const rpFlows = {
 
      Round 19c (direct instruction): no more picking a tier up front.
      One "Move-Out Cleaning" entry on the service list asks bedrooms and
-     bathrooms immediately, then a simplified sqft question, then the
-     rental/PM and hard-stop questions, THEN a side-by-side "moveouttiers"
-     screen shows both real prices for the home just described and the
-     customer picks there. "included" is gone from this list -- its old
-     job (describe the scope) is now the whole point of "moveouttiers",
-     shown per-tier instead of once, generically, before any numbers
-     exist to compare. */
-  /* Round 23 (sales-review fix): "bathrooms" removed as its own screen for
-     Move-Out. Since round 18, bathroom count has ZERO effect on price --
-     it's crew-planning data only -- so it was a full tap-to-continue
-     screen buying the customer nothing on your highest-friction flow
-     (12 screens on your best-selling product, vs 7-8 on Deep/Basic).
-     Bathrooms are now asked as a second question on the SAME "bedrooms"
-     screen (see the render block in book/index.html) -- one fewer step,
-     same data collected. Still listed here (as a comment, not a flow
-     entry) so nobody re-adds it as a standalone step without reading
-     this. Other services (Airbnb) keep the two-screen version --
-     bathrooms genuinely IS a separate tap there, and this change is
-     scoped to the flow that was actually flagged. */
-  moveout:        ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
-  moveoutrefresh: ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+     bathrooms immediately, THEN a side-by-side "moveouttiers" screen
+     shows both real prices for the home just described and the customer
+     picks there. "included" is gone from this list -- its old job
+     (describe the scope) is now the whole point of "moveouttiers", shown
+     per-tier instead of once, generically, before any numbers exist to
+     compare.
+
+     Round 24 (direct instruction) rewrote this flow again, reversing
+     part of round 23:
+       - "bathrooms" is back as its own screen (round 23 had merged it
+         into "bedrooms" to cut a step; direct instruction this round
+         was to split them back out).
+       - "sqft" is gone entirely, not just hidden -- Move-Out is flat
+         bedroom-tier pricing now, no large-home surcharge, no
+         sqft-triggered custom quote. rpServiceBasePrice() and
+         rpMoveoutIsCustomSqft() already degrade correctly when
+         rpState.sqft is never set (treated as "no surcharge"), so
+         nothing in the pricing math itself needed to change -- just
+         removing the step that used to set it.
+       - "moveoutintent" (renting vs. selling) is gone from /book. /call
+         keeps its own separate version of this question on its own
+         script step -- this only removes /book's copy, along with the
+         round-23 selling-specific nudge on "moveouttiers" that read it
+         (see that screen's render block).
+       - "contactgate" moved from right before "moveouttiers" to right
+         after "bathrooms" -- see the comment on rpCurrentFlow() below
+         for why. */
+  moveout:        ["bedrooms", "bathrooms", "contactgate", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["bedrooms", "bathrooms", "contactgate", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -727,33 +741,45 @@ function rpCurrentFlow() {
   if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
     /* Round 19c (direct instruction): tier is no longer picked up front.
        One "Move-Out Cleaning" entry on the service list asks bedrooms and
-       bathrooms immediately, then a simplified sqft question (no price
-       shown -- see rpSqftTiersForService's caller in /book), then the
-       rental/PM and hard-stop questions, THEN "moveouttiers" -- a
-       side-by-side Refresh vs. Inspection Ready price comparison for the
-       home just described, using rpMoveoutTierBasePrice() below. The
-       customer picks a real tier there; rpState.service switches to
-       whichever they pick (see rpChooseMoveoutTier in /book) and
-       everything downstream (addons, guarantee copy, estimate) reads
-       normally from that point on, same as picking the tier from the
-       service list did in round 19. */
+       bathrooms immediately, THEN "moveouttiers" -- a side-by-side
+       Refresh vs. Inspection Ready price comparison for the home just
+       described, using rpMoveoutTierBasePrice() below. The customer
+       picks a real tier there; rpState.service switches to whichever
+       they pick (see rpChooseMoveoutTier in /book) and everything
+       downstream (addons, guarantee copy, estimate) reads normally from
+       that point on, same as picking the tier from the service list did
+       in round 19.
+
+       Round 24 (direct instruction): "sqft" and "moveoutintent" removed
+       (see the comment on rpFlows above). "contactgate" is built in here
+       directly now, rather than left to the generic insertion logic
+       below -- it needs to land right after "bathrooms" and before
+       "moveoutquestionnaire" for BOTH branches, blocked included, so
+       that even a home that turns out to be blocked has already handed
+       over a name and number before it finds that out. That's earlier
+       than every other service's gate (which still sits right before its
+       first real price -- see the generic insertion below), and earlier
+       than Move-Out's OWN gate used to sit (round 19c-23 put it right
+       before "moveouttiers"). The moveoutblocked screen itself no longer
+       asks for name/phone a second time -- it reads what contactgate
+       already collected. */
     if (rpMoveoutBlocked()) {
-      flow = ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["bedrooms", "bathrooms", "moveoutquestionnaire", "moveoutblocked"];
     } else {
-      flow = ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
+      flow = ["bedrooms", "bathrooms", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
     }
+    if (!RP_CONTACT_GATE) return flow;
+    const at = flow.indexOf("moveoutquestionnaire");
+    if (at === -1) return flow;
+    return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
   }
   if (!RP_CONTACT_GATE) return flow;
-  if (flow.includes("contactgate") || flow.includes("moveoutblocked")) return flow;
-  /* Insert right before the FIRST screen that reveals a real price. For
-     Move-Out that's now "moveouttiers" (two real numbers, side by side)
-     -- gating at "addons" instead would let someone read both tier
-     prices for their exact home and leave without giving a number, the
-     exact leak this gate exists to close. Every other service still
-     gates at "addons" (or "estimate" if it has no add-ons step), same as
-     before. */
-  let at = flow.indexOf("moveouttiers");
-  if (at === -1) at = flow.indexOf("addons");
+  if (flow.includes("contactgate")) return flow;
+  /* Insert right before the FIRST screen that reveals a real price.
+     Every non-Move-Out service gates at "addons" (or "estimate" if it
+     has no add-ons step). Move-Out's own gate is built above instead,
+     at a different position in its flow. */
+  let at = flow.indexOf("addons");
   if (at === -1) at = flow.indexOf("estimate");
   if (at === -1) return flow;
   return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
@@ -1038,8 +1064,9 @@ function rpAddonsTotal() {
      room count. Gated on "carpet" being available, so it can never
      outlive the carpet selection it depends on. */
   if (rpAddonAvailable("carpet") && rpState.addonCarpetRooms > 0 && rpState.addonCarpetPetEnzyme) total += rpState.addonCarpetRooms * RP_PET_ENZYME_RATE;
-  if (rpAddonAvailable("junk") && rpState.junkSize === "half") total += rpAddonCatalog.junk.half;
-  if (rpAddonAvailable("junk") && rpState.junkSize === "full") total += rpAddonCatalog.junk.full;
+  /* Round 24: junk haul is quoted-only now (see rpAddonCatalog.junk) --
+     it never adds to the total regardless of selection, so there's no
+     line for it here anymore. */
   if (rpAddonAvailable("windows") && rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
   if (rpAddonAvailable("windows") && rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
   if (rpAddonAvailable("garage") && rpState.garageWash) total += rpAddonCatalog.garage.price;
@@ -1275,7 +1302,7 @@ function rpBuildSharedDetails() {
        dispatch that need one thing rather than the whole string --- */
     addon_carpet_rooms: rpAddonAvailable("carpet") ? String(rpState.addonCarpetRooms || 0) : "0",
     addon_carpet_pet_enzyme: (rpAddonAvailable("carpet") && rpState.addonCarpetPetEnzyme) ? "Yes" : "No",
-    addon_junk_size: rpAddonAvailable("junk") ? (rpState.junkSize || "None") : "None",
+    addon_junk_haul: (rpAddonAvailable("junk") && rpState.junkSize === "yes") ? "Yes" : "No",
     addon_windows_tier: rpAddonAvailable("windows") ? (rpState.windowsTier || "None") : "None",
     addon_garage_wash: (rpAddonAvailable("garage") && rpState.garageWash) ? "Yes" : "No",
     addon_laundry_loads: rpAddonAvailable("laundry") ? String(rpState.laundryLoads || 0) : "0",

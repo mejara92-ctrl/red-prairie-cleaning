@@ -2682,8 +2682,12 @@ const rpState = {
   moveoutWaterOn: null,
   moveoutAcOn: null,
   moveoutMoldPests: null,
-  moveoutRentalOrSelling: null,
-  moveoutPmOrRealtor: "",
+  /* moveoutRentalOrSelling / moveoutPmOrRealtor removed (round 24, direct
+     instruction) along with the "moveoutintent" screen that set them --
+     /call still asks this on its own separate CSR script step and keeps
+     its own identically-named state, so the shared webhook fields
+     (moveout_intent / moveout_pm_or_realtor in rpBuildSharedDetails) stay
+     put; a /book lead just reports "Not asked" now, which is accurate. */
   /* True only after a real pick on "moveouttiers" (round 19c). Needed
      because rpState.service holds the literal string "moveout" both as
      the neutral pre-tier-choice placeholder AND as the real Inspection
@@ -2703,6 +2707,9 @@ const rpState = {
      in the persisted-state whitelist — it describes one action, not a
      booking fact, and shouldn't reappear on a resumed session. */
   addonDropNotice: "",
+  /* Round 24: junk haul is quoted-only now, no flat price tiers -- this
+     is just null (not selected) or "yes" (selected), same shape as
+     handymanInterest below, not the old "half"/"full"/"custom". */
   junkSize: null,
   heavySoil: false,
   petOdor: false,
@@ -2933,7 +2940,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "moveoutTierChosen", "addonPetEnzyme", "windowsTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutTierChosen", "addonPetEnzyme", "windowsTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -3080,73 +3087,31 @@ function rpScreenHtml() {
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
 
-  if (rpState.step === "sqft") {
-    /* Brain-dead simple, per direct instruction: just the size ranges,
-       no "+$X" next to any of them. The comparison screen (moveouttiers)
-       is where real numbers show up for the first time -- showing a
-       partial price here, a step before the customer even knows which
-       tier they want, was one more number to parse for no benefit.
-       "Custom Quote" stays on the largest bracket since that's not a
-       price at all -- it's a heads-up that this size won't get an
-       instant number regardless of tier. */
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>About how big is the home?</h2>
-      <p class="rp-sub">Just a rough size — pick the closest one.</p>
-      <div class="rp-choice-grid">
-        ${rpSqftTiersForService(rpState.service).map(t => `<button type="button" class="rp-pill ${rpState.sqft === t.key ? "is-selected" : ""}" onclick="rpSelectSqft('${t.key}', this)">${t.label}${t.base === null ? "<br><small>Custom Quote</small>" : ""}</button>`).join("")}
-      </div>
-    </div>` };
-  }
+  /* Round 24 (direct instruction): the "sqft" screen is gone entirely,
+     not just hidden. Move-Out is flat bedroom-tier pricing now -- no
+     large-home surcharge, no sqft-triggered custom quote. See the
+     comment on rpFlows.moveout in the engine for why nothing in the
+     pricing math itself needed to change. */
 
   if (rpState.step === "bedrooms") {
-    /* Round 23 (sales-review fix): Move-Out folds the bathroom question
-       into this same screen instead of its own tap-to-continue step --
-       bathroom count has had zero price effect since round 18, so a
-       whole screen for it was pure friction on the highest-traffic,
-       highest-step-count flow. Bedrooms selects without advancing;
-       the bathroom row fades in once bedrooms is picked, and THAT tap
-       advances -- same one-tap-per-decision feel, one fewer screen.
-       Other services (Airbnb) still use the separate "bathrooms" step
-       below -- this is scoped to what was actually flagged. */
-    const isMoveoutFlow = ["moveout", "moveoutrefresh"].includes(rpState.service);
-    if (!isMoveoutFlow) {
-      return { scroll: `<div class="rp-center">
-        ${eyebrow}
-        <h2>How many bedrooms?</h2>
-        <div class="rp-q-gap"></div>
-        <div class="rp-rows">
-          ${[1,2,3,4,5].map(n => rpRowBtn({
-            onclick:`rpSelectBedrooms(${n}, this)`,
-            title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
-            selected: rpState.bedrooms === n
-          })).join("")}
-        </div>
-      </div>` };
-    }
-    const bedTier = rpState.bedrooms ? rpMoveoutBedroomTier(rpState.bedrooms) : null;
+    /* Round 24 (direct instruction): back to a plain, single-question
+       screen for every service, Move-Out included -- reversing round
+       23's merge of bedrooms+bathrooms into one screen. See "bathrooms"
+       below for the other half. rpSelectBedrooms still pre-fills the
+       Move-Out included-bathroom count as a starting guess (same idea
+       round 23 had), it just does it on tap-and-advance instead of
+       tap-and-reveal-a-second-question. */
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bedrooms?</h2>
       <div class="rp-q-gap"></div>
       <div class="rp-rows">
         ${[1,2,3,4,5].map(n => rpRowBtn({
-          onclick:`rpSelectMoveoutBedrooms(${n})`,
+          onclick:`rpSelectBedrooms(${n}, this)`,
           title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
           selected: rpState.bedrooms === n
         })).join("")}
       </div>
-      ${rpState.bedrooms ? `
-      <div class="rp-q-gap"></div>
-      <h2 style="font-size:19px">How many bathrooms?</h2>
-      ${bedTier ? `<p class="rp-sub" style="margin-bottom:12px">${bedTier.includedBathrooms} bathroom${bedTier.includedBathrooms > 1 ? "s" : ""} included at this size.</p>` : ""}
-      <div class="rp-rows" id="rpMoveoutBathroomRows">
-        ${[1,2,3,4].map(n => rpRowBtn({
-          onclick:`rpSelectMoveoutBathrooms(${n}, this)`,
-          title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
-          selected: rpState.bathrooms === n
-        })).join("")}
-      </div>` : ""}
     </div>` };
   }
 
@@ -3198,28 +3163,35 @@ function rpScreenHtml() {
     </div>` };
   }
 
-  if (rpState.step === "moveoutintent") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>One more quick question</h2>
-      <p class="rp-sub">Is this a rental, or are you selling the home?</p>
-      <div class="rp-choice-grid" style="margin-top:14px">
-        <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "renting" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('renting')">Renting</button>
-        <button type="button" class="rp-pill ${rpState.moveoutRentalOrSelling === "selling" ? "is-selected" : ""}" onclick="rpSetMoveoutRentalOrSelling('selling')">Selling</button>
-      </div>
-      <div class="rp-lead-field" style="margin-top:18px;text-align:left"><label for="rpMoveoutPmOrRealtor">Who is the property manager or realtor? (optional)</label><input id="rpMoveoutPmOrRealtor" type="text" value="${rpEscapeAttr(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="rpCaptureLeadField('moveoutPmOrRealtor',this.value)"></div>
-    </div>`, footer: `<button class="rp-primary" ${rpState.moveoutRentalOrSelling ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
-  }
+  /* "moveoutintent" (renting vs. selling) removed (round 24, direct
+     instruction). /call still asks its own version of this on its own
+     script step -- this only removes /book's copy. See the comment on
+     rpFlows.moveout in the engine, and the "moveouttiers" screen below
+     (its round-23 selling-specific nudge reverted to always-generic). */
 
   if (rpState.step === "moveoutquestionnaire") {
-    const q = (field, label) => `
+    /* Round 24 (direct instruction): all three questions now read the
+       same direction -- Yes always means "no problem," so a clean home
+       is Yes/Yes/Yes straight through instead of Yes/Yes/No. The mold
+       and pests question used to ask "Any signs of mold or pests?" where
+       Yes meant a problem, the one question that broke the pattern; it's
+       reworded to ask the inverse instead. invert=true swaps which
+       button writes true vs. false so rpState.moveoutMoldPests keeps its
+       original meaning (true = problem present) -- rpMoveoutBlocked() and
+       every webhook/crew-sheet field that reads it are untouched, this
+       is a label-and-wiring change only. */
+    const q = (field, label, invert = false) => {
+      const yesVal = invert ? false : true;
+      const noVal = invert ? true : false;
+      return `
       <div class="rp-quest-row">
         <span class="rp-quest-label">${label}</span>
         <div class="rp-choice-grid rp-quest-pills">
-          <button class="rp-pill ${rpState[field] === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', true)">Yes</button>
-          <button class="rp-pill ${rpState[field] === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', false)">No</button>
+          <button class="rp-pill ${rpState[field] === yesVal ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', ${yesVal})">Yes</button>
+          <button class="rp-pill ${rpState[field] === noVal ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('${field}', ${noVal})">No</button>
         </div>
       </div>`;
+    };
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>A few quick facts</h2>
@@ -3227,7 +3199,7 @@ function rpScreenHtml() {
       <div class="rp-quest-list">
         ${q("moveoutWaterOn", "Is the water on?")}
         ${q("moveoutAcOn", "Is the air conditioning working?")}
-        ${q("moveoutMoldPests", "Any signs of mold or pests?")}
+        ${q("moveoutMoldPests", "Is the home free of mold or pest issues?", true)}
       </div>
     </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
   }
@@ -3294,25 +3266,23 @@ function rpScreenHtml() {
         </div>
         <p class="rp-scope-foot">Both tiers: same 2-cleaner crew, same insurance, same standards. The difference is how far into the home we go.</p>`;
       })()}
-      ${(() => {
-        /* Round 23 (sales-review fix): the previous line was generic
-           regardless of answer -- but the PREVIOUS screen already asked
-           renting vs. selling, and that answer went unused after being
-           collected. A home going on the market gets buyer walkthroughs
-           and listing photos; arguably a stronger case for the full
-           checklist than a rental turnover. This nudges sellers
-           specifically, using data already in state, rather than adding
-           a new question. Renters and unanswered cases keep the
-           original generic line. */
-        if (rpState.moveoutRentalOrSelling === "selling") {
-          return `<p class="rp-fineprint"><strong>Listing it?</strong> Buyers notice what a rental tenant wouldn't \u2014 Inspection Ready is the one built to photograph and show well, backed by Defend Your Deposit.</p>`;
-        }
-        return `<p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave, Inspection Ready is the one backed by Defend Your Deposit.</p>`;
-      })()}
+      <p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave \u2014 or you're listing it for sale \u2014 Inspection Ready is the one backed by Defend Your Deposit.</p>
     </div>` };
   }
 
   if (rpState.step === "moveoutblocked") {
+    /* Round 24: contactgate now runs BEFORE this screen (see rpFlows.moveout
+       in the engine), so rpState.fullName/phone are already populated --
+       no need to ask a second time. If somehow reached without them
+       (shouldn't happen given the flow order, but session-resume edge
+       cases exist), fall back to asking, same form as before. */
+    if (rpState.fullName && rpState.phone) {
+      return { scroll: `<div class="rp-center">
+        ${eyebrow}
+        <h2>Let's talk it through first</h2>
+        <p class="rp-sub">${rpMoveoutBlockReasons().join(", ")}. We can't price this online until we've talked it through. We already have your number, ${rpState.fullName.split(" ")[0]} — we'll call you directly, usually within the hour.</p>
+      </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+    }
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>Let's talk it through first</h2>
@@ -3414,10 +3384,16 @@ function rpScreenHtml() {
 }
 
 function rpAddonsScreen(eyebrow) {
-  const keys = rpServiceAddons[rpState.service] || [];
+  /* Round 24 (direct instruction): junk haul is pulled out of this
+     pill-card grid entirely -- "junk" stays in rpServiceAddons so
+     rpAddonAvailable("junk")/rpAddonLineItems() etc. keep working
+     (summary text, webhook, crew sheet), it just doesn't get a card
+     here. It renders instead as a single checkbox next to "Need Small
+     Handyman Repairs?" below, same "quoted separately" treatment. */
+  const keys = (rpServiceAddons[rpState.service] || []).filter(k => k !== "junk");
+  const junkAvailable = (rpServiceAddons[rpState.service] || []).includes("junk");
   const isSelected = {
     carpet: rpState.addonCarpetRooms > 0,
-    junk: !!rpState.junkSize,
     windows: !!rpState.windowsTier,
     garage: rpState.garageWash,
     laundry: rpState.laundryLoads > 0,
@@ -3427,7 +3403,6 @@ function rpAddonsScreen(eyebrow) {
   };
   const cardMeta = {
     carpet:  { icon: "layers", label: "Carpet Cleaning", desc: "Hot-water extraction for a deeper carpet clean." },
-    junk:    { icon: "truck",  label: "Junk Haul", desc: "Bagged trash, furniture, and light debris removed." },
     windows: { icon: "window", label: "Exterior Windows", desc: "Exterior glass wash; screens available separately." },
     garage:  { icon: "car",    label: "Garage Floor Wash", desc: "A soft wash lifts embedded oils, then we scrub the concrete floor." },
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
@@ -3437,7 +3412,6 @@ function rpAddonsScreen(eyebrow) {
   };
   function summaryFor(key) {
     if (key === "carpet") { const enz = rpState.addonCarpetPetEnzyme ? rpState.addonCarpetRooms * RP_PET_ENZYME_RATE : 0; return `${rpState.addonCarpetRooms} room${rpState.addonCarpetRooms === 1 ? "" : "s"}${enz ? " + enzyme" : ""} · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice + enz}`; }
-    if (key === "junk") return rpState.junkSize === "half" ? `Half Truck · $${rpAddonCatalog.junk.half}` : rpState.junkSize === "full" ? `Full Truck · $${rpAddonCatalog.junk.full}` : "Oversized · quoted separately";
     if (key === "windows") return rpState.windowsTier === "basic" ? `Basic Wash · $${rpAddonCatalog.windows.basic}` : `Premium Wash · $${rpAddonCatalog.windows.premium}`;
     if (key === "garage") return `$${rpAddonCatalog.garage.price}`;
     if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
@@ -3464,15 +3438,6 @@ function rpAddonsScreen(eyebrow) {
           <button class="rp-pill ${rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(true)">Add Enzyme<br><small>$${rpState.addonCarpetRooms * RP_PET_ENZYME_RATE}</small></button>
           <button class="rp-pill ${!rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(false)">Not Needed</button>
         </div>` : ""}`;
-    }
-    if (key === "junk") {
-      return `
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.junkSize === "half" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('half')">Half Truck<br><small>$${rpAddonCatalog.junk.half}</small></button>
-          <button class="rp-pill ${rpState.junkSize === "full" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('full')">Full Truck<br><small>$${rpAddonCatalog.junk.full}</small></button>
-          <button class="rp-pill ${rpState.junkSize === "custom" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('custom')">Oversized<br><small>Quoted separately</small></button>
-        </div>
-        ${rpState.junkSize === "custom" ? `<p class="rp-tap-note" style="margin-top:10px;color:var(--red);font-weight:700">We'll call with a haul price before your cleaning date. It is not part of the total below.</p>` : ""}`;
     }
     if (key === "windows") {
       return `
@@ -3573,7 +3538,14 @@ function rpAddonsScreen(eyebrow) {
     <div class="rp-rows">${cards}</div>
     ${moreToggle}
     <p class="rp-addon-section-label">Need help beyond cleaning?</p>
+    ${junkAvailable ? `
     <label class="rp-make-ready-card">
+      <input class="rp-make-ready-input" type="checkbox" ${rpState.junkSize === "yes" ? "checked" : ""} onchange="rpToggleJunkHaul(this.checked)">
+      ${rpChip("truck")}
+      <span class="rp-make-ready-copy"><strong>Have Trash or Junk to Haul Away?</strong><span>Furniture, appliances, or bagged trash left behind. Quoted separately based on volume.</span></span>
+      <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
+    </label>` : ""}
+    <label class="rp-make-ready-card rp-mt">
       <input class="rp-make-ready-input" type="checkbox" ${rpState.handymanInterest ? "checked" : ""} onchange="rpToggleHandyman(this.checked)">
       ${rpChip("wrench")}
       <span class="rp-make-ready-copy"><strong>Need Small Handyman Repairs?</strong><span>Minor patches, caulking, and turnover repairs. Quoted separately.</span></span>
@@ -3763,11 +3735,16 @@ function rpSubmitContactGate() {
   rpTrack("contact_gate_submitted", { service: rpState.service });
 
   const serviceName = rpServices[rpState.service]?.name || "Not selected";
-  /* For Move-Out, the contact gate now fires BEFORE the tier comparison
-     screen (round 19c) -- rpState.service is still the neutral "moveout"
+  /* For Move-Out, the contact gate fires before the quick-facts
+     questionnaire AND the tier comparison screen (round 24 moved it
+     earlier still, from round 19c's position right before the
+     comparison) -- rpState.service is still the neutral "moveout"
      placeholder here, so rpPriceLabel() alone would only reflect
      Inspection Ready's number and imply a tier that hasn't been chosen
-     yet. Show both real prices in the partial-lead note instead. */
+     yet. Show both real prices in the partial-lead note instead; both
+     are already fully determined at this point since Move-Out pricing
+     only depends on bedrooms now, not on anything asked after this
+     screen. */
   const quoted = rpIsCustomQuoteOnly()
     ? "Custom quote required"
     : ["moveout", "moveoutrefresh"].includes(rpState.service)
@@ -3790,7 +3767,12 @@ function rpSubmitContactGate() {
       keepalive: true,
       body: JSON.stringify({
         lead_type: "website_partial",
-        call_outcome: "Saw price online - did not book",
+        /* Round 24: this used to always mean "saw the price and left" --
+           accurate when the gate sat right before the price on every
+           service. For Move-Out the gate now fires earlier (before quick
+           facts too), so a partial lead here might not have seen a price
+           at all yet. Kept generic so it stays true either way. */
+        call_outcome: "Entered contact info online - did not book",
         csr_lead_source: "Website Estimator",
         full_name: fullName,
         phone: phone,
@@ -4147,8 +4129,7 @@ function rpRender(direction) {
     price_inspection_ready: rpMoveoutTierBasePrice("moveout") ?? "custom",
     price_refresh: rpMoveoutTierBasePrice("moveoutrefresh") ?? "custom",
     price_gap: (rpMoveoutTierBasePrice("moveout") ?? 0) - (rpMoveoutTierBasePrice("moveoutrefresh") ?? 0),
-    bedrooms: rpState.bedrooms || "none",
-    sqft_tier: rpSqftTier() ? rpSqftTier().label : "none"
+    bedrooms: rpState.bedrooms || "none"
   });
   if (rpState.step === "estimate") rpTrack("estimate_reached", { estimate: rpPriceLabel() });
   if (rpState.step === "calendar") rpTrack("calendar_reached", { estimate: rpPriceLabel() });
@@ -4201,8 +4182,6 @@ function rpResetServiceState() {
   rpState.moveoutWaterOn = null;
   rpState.moveoutAcOn = null;
   rpState.moveoutMoldPests = null;
-  rpState.moveoutRentalOrSelling = null;
-  rpState.moveoutPmOrRealtor = "";
   rpState.moveoutTierChosen = false;
   rpState.addonPetEnzyme = false;
   rpState.junkSize = null;
@@ -4248,28 +4227,30 @@ function rpSelectService(service, element) {
     rpRender("forward");
   });
 }
-function rpSelectSqft(key, element) { rpCommitChoice(element, () => { rpState.sqft = key; rpAdvance(); }); }
-function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.bedrooms = n; rpAdvance(); }); }
-function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
-/* Round 23: Move-Out's merged bedrooms+bathrooms screen. Bedrooms does
-   NOT advance -- it just sets state and re-renders so the bathroom row
-   fades in below, no element to animate via rpCommitChoice since the
-   bedroom tap doesn't leave the screen. Bathrooms is the one that
-   advances, same rpCommitChoice pattern as everywhere else. */
-function rpSelectMoveoutBedrooms(n) {
-  rpState.bedrooms = n;
-  if (rpMoveoutBedroomTier(n)?.includedBathrooms && !rpState.bathrooms) {
-    rpState.bathrooms = rpMoveoutBedroomTier(n).includedBathrooms;
-  }
-  rpRefresh();
+/* rpSelectSqft removed (round 24) along with the "sqft" screen. */
+/* Round 24 (direct instruction): reverses round 23's merge -- bedrooms
+   and bathrooms are separate tap-and-advance screens again for every
+   service, Move-Out included. rpSelectBedrooms still pre-fills the
+   Move-Out included-bathroom count as a starting guess for the very next
+   screen (same idea round 23 had, just landing on "bathrooms" as its own
+   step instead of a second question on this one). */
+function rpSelectBedrooms(n, element) {
+  rpCommitChoice(element, () => {
+    rpState.bedrooms = n;
+    if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
+      const tier = rpMoveoutBedroomTier(n);
+      if (tier?.includedBathrooms && !rpState.bathrooms) rpState.bathrooms = tier.includedBathrooms;
+    }
+    rpAdvance();
+  });
 }
-function rpSelectMoveoutBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
+function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
 function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
 function rpSelectHourCount(n, element) { rpCommitChoice(element, () => { rpState.hourCount = n; rpAdvance(); }); }
 /* Toggles one questionnaire answer and re-renders in place (not
-   rpAdvance) — all 5 questions live on one screen, so answering one
+   rpAdvance) — all 3 questions live on one screen, so answering one
    doesn't move anywhere; the Continue button only becomes clickable
-   once all 5 have an answer (see rpMoveoutQuestionnaireAnswered()). */
+   once all 3 have an answer (see rpMoveoutQuestionnaireAnswered()). */
 function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh(); }
 
 /* Switching TIER from the ESTIMATE screen, after the customer already
@@ -4310,7 +4291,6 @@ function rpChooseMoveoutTier(service) {
     tier_price: rpMoveoutTierBasePrice(service) ?? "custom",
     other_tier_price: rpMoveoutTierBasePrice(service === "moveout" ? "moveoutrefresh" : "moveout") ?? "custom",
     bedrooms: rpState.bedrooms || "none",
-    sqft_tier: rpSqftTier() ? rpSqftTier().label : "none",
     switched_from: rpState.moveoutTierChosen ? "changed_mind" : "first_choice"
   });
   rpState.service = service;
@@ -4322,27 +4302,36 @@ function rpChooseMoveoutTier(service) {
 }
 
 function rpSubmitMoveoutBlockedLead() {
+  /* Round 24: contactgate now runs before this screen, so most of the
+     time rpState.fullName/phone are already set and there's no form on
+     screen to read (see the moveoutblocked render block) -- this only
+     falls back to reading/validating a form when one is actually present
+     (the same edge-case fallback the render block has). */
   const nameEl = document.getElementById("rpBlockedName");
   const phoneEl = document.getElementById("rpBlockedPhone");
-  const errorBox = document.getElementById("rpBlockedError");
-  const fullName = nameEl.value.trim();
-  const phone = phoneEl.value.trim();
-  const phoneDigits = phone.replace(/\D/g, "");
+  if (nameEl && phoneEl) {
+    const errorBox = document.getElementById("rpBlockedError");
+    const fullName = nameEl.value.trim();
+    const phone = phoneEl.value.trim();
+    const phoneDigits = phone.replace(/\D/g, "");
 
-  [nameEl, phoneEl].forEach(el => el.classList.remove("is-invalid"));
-  let bad = null;
-  if (fullName.length < 2) bad = { el: nameEl, msg: "Please enter your full name." };
-  else if (phoneDigits.length < 10) bad = { el: phoneEl, msg: "Please enter a valid 10-digit phone number." };
-  if (bad) {
-    bad.el.classList.add("is-invalid");
-    errorBox.textContent = bad.msg;
-    errorBox.style.display = "block";
-    bad.el.focus({ preventScroll: true });
-    return;
+    [nameEl, phoneEl].forEach(el => el.classList.remove("is-invalid"));
+    let bad = null;
+    if (fullName.length < 2) bad = { el: nameEl, msg: "Please enter your full name." };
+    else if (phoneDigits.length < 10) bad = { el: phoneEl, msg: "Please enter a valid 10-digit phone number." };
+    if (bad) {
+      bad.el.classList.add("is-invalid");
+      errorBox.textContent = bad.msg;
+      errorBox.style.display = "block";
+      bad.el.focus({ preventScroll: true });
+      return;
+    }
+    errorBox.style.display = "none";
+    rpState.fullName = fullName;
+    rpState.phone = phone;
   }
-  errorBox.style.display = "none";
-  rpState.fullName = fullName;
-  rpState.phone = phone;
+  const fullName = rpState.fullName;
+  const phone = rpState.phone;
   rpTrack("moveout_blocked_lead_submitted", { reasons: rpMoveoutBlockReasons() });
 
   try {
@@ -4392,7 +4381,6 @@ function rpTogglePetEnzyme(checked) { rpState.addonPetEnzyme = checked; rpRefres
    card before arriving on-site. See rpGetEstimatePayload for how these
    surface in the booking notes sent to GoHighLevel. */
 function rpToggleNoAC(checked) { rpState.noAC = checked; rpRefresh(); }
-function rpSetMoveoutRentalOrSelling(value) { rpState.moveoutRentalOrSelling = value; rpRefresh(); }
 function rpToggleMoldConcern(checked) { rpState.moldConcern = checked; rpRefresh(); }
 function rpTogglePetWasteConcern(checked) { rpState.petWasteConcern = checked; rpRefresh(); }
 function rpToggleHazardConcern(checked) { rpState.hazardConcern = checked; rpRefresh(); }
@@ -4420,7 +4408,11 @@ function rpClearAddon(key) {
 }
 function rpSelectAddonCarpetRooms(n) { rpTrackAddon("carpet", n > 0, { rooms: n }); rpState.addonCarpetRooms = n; if (!n) rpState.addonCarpetPetEnzyme = false; rpRefresh(); }
 function rpSelectAddonCarpetPetEnzyme(yes) { rpTrackAddon("carpetPetEnzyme", yes, { rooms: rpState.addonCarpetRooms }); rpState.addonCarpetPetEnzyme = yes; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectAddonJunk(size) { rpTrackAddon("junk", !!size, { size }); rpState.junkSize = size; rpState.expandedAddon = null; rpRefresh(); }
+/* Round 24: junk haul is a single checkbox now (see "Have Trash or Junk
+   to Haul Away?" on the addons screen), not an expandable pill card, so
+   this no longer touches rpState.expandedAddon. Still tracked the same
+   way every other add-on toggle is, so attach-rate data keeps flowing. */
+function rpToggleJunkHaul(checked) { rpTrackAddon("junk", checked); rpState.junkSize = checked ? "yes" : null; rpRefresh(); }
 function rpSelectAddonWindows(tier) { rpTrackAddon("windows", !!tier, { tier }); rpState.windowsTier = tier; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectGarageWash(yes) { rpTrackAddon("garage", yes); rpState.garageWash = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundryLoads(n) { rpTrackAddon("laundry", n > 0, { loads: n }); rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
@@ -4485,11 +4477,17 @@ function rpGetEstimatePayload() {
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal().toFixed(2)}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit().toFixed(2)} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
     ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Tier: ${rpState.service === "moveout" ? "Inspection Ready (Defend Your Deposit)" : "Move-Out Refresh (Satisfaction Guaranteed, no deposit guarantee)"}` : "",
-    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Rental or selling: ${rpState.moveoutRentalOrSelling === "renting" ? "Renting" : rpState.moveoutRentalOrSelling === "selling" ? "Selling" : "N/A"}` : "",
-    (["moveout", "moveoutrefresh"].includes(rpState.service) && rpState.moveoutPmOrRealtor) ? `Property manager/realtor: ${rpState.moveoutPmOrRealtor}` : "",
+    /* "Rental or selling" / "Property manager/realtor" removed (round 24)
+       -- /book no longer asks this (see "moveoutintent" removal, engine
+       rpFlows.moveout comment). rpState.moveoutRentalOrSelling never gets
+       set through /book anymore, so these would only ever print "N/A". */
     ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold/Pests ${rpState.moveoutMoldPests ? "YES" : "No"}` : "",
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
-    `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
+    `Add-ons: ${addonsList}`,
+    `Additional service request: ${[
+      rpState.junkSize === "yes" ? "Junk/trash haul-away requested" : "",
+      rpState.handymanInterest ? "Make-ready repairs requested" : ""
+    ].filter(Boolean).join("; ") || "None"}${(rpState.junkSize === "yes" || rpState.handymanInterest) ? " (quoted separately; not included in cleaning estimate)" : ""}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,
     `Address: ${fullAddress || "N/A"}`,
     /* Round 22: the crew sheet is where a coverage problem has to be

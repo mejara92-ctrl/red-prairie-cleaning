@@ -1,0 +1,193 @@
+RED PRAIRIE — ROUND 24: MOVE-OUT FLOW REWORK + JUNK HAUL GOES QUOTE-ONLY
+====================================================================
+This zip contains ONLY the files that changed. Unzip it over your repo
+root and let it overwrite matching paths.
+
+Your instructions, verbatim (two messages):
+  1. "remove square footage, remove are you selling or renting... Make
+     bedroom/bathroom separate screens. So the flow is How many
+     Bedrooms? How Many Bathrooms? Your name/phone number // Price (two
+     options with scopes) // If they want to book make it one of the
+     last things? No water, no air conditioning, presence of mold /
+     waste."
+  2. "Make trash haul like the handyman thing. custom quote. I'm good
+     with carpet pricing, garage floor pricing, and exterior window
+     pricing."
+
+We talked through the open questions before I built anything (big-home
+handling, where quick-facts lands) — you picked "drop sqft entirely,
+flat bedroom pricing" and flagged that the mold/pests question read
+backwards from the other two. Both are addressed below.
+
+
+FILES CHANGED (4)
+  js/rp-pricing-engine.js   modified
+  book/index.html           modified
+  call/index.html           modified (junk haul only, for parity)
+  pricing/index.html        modified (junk haul only)
+
+
+--------------------------------------------------------
+1. THE NEW /book MOVE-OUT FLOW
+--------------------------------------------------------
+Old (round 23):  bedrooms+bathrooms (merged) -> sqft -> rental/selling
+                 -> quick facts -> contact gate -> tier comparison ->
+                 add-ons -> estimate -> lead -> calendar   (10 steps)
+
+New (round 24):  bedrooms -> bathrooms -> contact gate -> quick facts
+                 -> tier comparison -> add-ons -> estimate -> lead ->
+                 calendar   (9 steps)
+
+Blocked path:    bedrooms -> bathrooms -> contact gate -> quick facts
+                 -> "let's talk it through" callback screen   (4 steps,
+                 same count as before -- just reordered)
+
+What moved and why:
+  - Square footage is GONE, not hidden. Move-Out is flat bedroom-tier
+    pricing now at every size -- no large-home surcharge, no
+    sqft-triggered custom quote. You picked this over keeping a
+    lightweight big-home toggle. If a genuinely oversized home slips
+    through underpriced, that's now something to catch by eye (an
+    unusual bed/bath ratio) rather than something the funnel screens
+    for -- worth watching for a few weeks.
+  - Bedrooms and bathrooms are separate screens again, reversing round
+    23's merge. Bathrooms still pre-fills to the included count for
+    that bedroom tier as a starting guess, it just does that when you
+    land on the bathrooms screen instead of revealing a second question
+    in place.
+  - "Is this a rental, or are you selling?" is gone from /book entirely.
+    /call keeps asking its own copy of this on its own script step
+    (unaffected) -- so a phone booking still gets Liz's selling/renting
+    nudge and that field in the crew notes, but a self-serve /book lead
+    now reports "Not asked" for it, which is accurate. The comparison
+    screen's fineprint was tweaked to mention sellers generically
+    ("...or you're listing it for sale") so that advice doesn't
+    disappear along with the question.
+  - Contact gate (name + phone) moved from right before the tier
+    comparison to right after bathrooms -- now the very first thing
+    after size, before quick facts and before pricing. Practical effect:
+    a home that turns out to be blocked (no water, no A/C, mold/pests)
+    now hands over a phone number BEFORE finding that out, instead of
+    only on the callback screen itself. The callback screen no longer
+    re-asks for name/phone when it already has them (which is always,
+    now, barring a session-resume edge case) -- it just confirms by
+    first name and asks for the callback.
+
+
+--------------------------------------------------------
+2. MOLD/PESTS QUESTION — FIXED THE BACKWARDS POLARITY
+--------------------------------------------------------
+You flagged it exactly right: "Is the water on?" and "Is the air
+conditioning working?" both had Yes = no problem, but "Any signs of
+mold or pests?" flipped that -- Yes meant a problem. Someone tapping
+through on autopilot could hit Yes/Yes/Yes meaning "everything's fine,
+also there's mold," which reads backwards.
+
+FIXED: reworded to "Is the home free of mold or pest issues?" -- Yes now
+means no problem on all three questions, so a clean home is Yes/Yes/Yes
+straight through and any No is the one that flags it. This is a label
+and button-wiring change only; the underlying data your office sees
+(water/A/C/mold status on the crew sheet, the webhook, what blocks a
+job) is stored exactly the same as before.
+
+
+--------------------------------------------------------
+3. JUNK HAUL — NOW QUOTED SEPARATELY, LIKE HANDYMAN REPAIRS
+--------------------------------------------------------
+Old: half load $100 / full load $200 / oversized (quoted separately).
+New: one question -- "Have Trash or Junk to Haul Away?" -- with no
+price shown, same "Quoted separately based on volume" treatment as
+"Need Small Handyman Repairs?" right below it on the add-ons screen.
+
+Per your note, carpet, garage floor wash, and exterior window pricing
+are untouched -- this round only touches junk hauling.
+
+Applied consistently across all three surfaces so nobody gets a
+different answer depending on how they book:
+  - /book: the half/full/oversized picker is replaced by the one
+    checkbox described above.
+  - /call: Liz's picker collapsed from three priced options to one
+    ("Junk/trash to haul away (quoted separately, NOT in the total)"),
+    so she never quotes a flat $100/$200 that a self-serve customer
+    couldn't have gotten online.
+  - /pricing: the "$100 / $200" row is gone; the add-ons table just
+    says "Junk hauling — Quoted separately," and the fine print at the
+    bottom of that section was reworded since junk hauling is now the
+    thing on that page that can't be priced online (used to be just the
+    oversized case).
+
+Technically this rides on infrastructure that was already there: round
+21 built a single "quoted item, $0 in the math, flagged everywhere" path
+for the oversized-load case specifically. This round just makes that the
+ONLY path for junk, instead of one of three. That means the summary
+text, the webhook field, the crew sheet, and /call's job details all
+already knew how to show a quoted-but-unpriced line item -- nothing new
+had to be built for those, which is also why this change touched
+noticeably less code than the flow rework above.
+
+
+--------------------------------------------------------
+VERIFIED THIS ROUND
+--------------------------------------------------------
+node --check clean on the engine and every inline <script> in all 4
+  changed files (pricing/index.html's JSON-LD block is not JS and was
+  excluded from that check, same as always).
+Flow arrays traced by hand:
+  Unblocked: bedrooms -> bathrooms -> contactgate -> moveoutquestionnaire
+    -> moveouttiers -> addons -> estimate -> lead -> calendar  (9 steps)
+  Blocked:   bedrooms -> bathrooms -> contactgate -> moveoutquestionnaire
+    -> moveoutblocked  (4 steps)
+  RP_CONTACT_GATE kill switch still cleanly removes contactgate from
+    both branches when set to false.
+Grep-audited for dangling references to everything removed this round
+  (sqft screen/handler, moveoutintent screen/handler, the old
+  half/full/custom junk states) across all four files -- none found.
+Confirmed /book's navigation (rpAdvance, rpBack, the URL preselect, the
+  session-resume history rebuild) all read rpCurrentFlow() dynamically
+  rather than hardcoding step names or counts, so none of it needed
+  touching for the reordered flow to work.
+Confirmed /call's own "sqft" and "intent" (rental/selling) steps are a
+  fully separate script/state system from /book's and were correctly
+  left alone -- /call still asks both, on purpose, same as every round
+  since 19c kept the CSR console structurally independent.
+
+
+--------------------------------------------------------
+NOT price-verified in a live browser
+--------------------------------------------------------
+The actual click-through funnel end to end on a real phone, especially:
+  - the bedrooms -> bathrooms tap-and-advance feel now that they're two
+    screens again
+  - the reworded mold/pests question reading naturally
+  - the junk checkbox's placement above the handyman checkbox
+  - the blocked path's shortened callback screen (confirms by first
+    name instead of showing a form)
+Please walk /book once end to end -- including one pass where you
+deliberately answer "No" to one of the quick-facts questions so you see
+the callback screen -- before this goes live.
+
+
+--------------------------------------------------------
+NOT DONE (by scope, not by accident)
+--------------------------------------------------------
+- /call's own "sqft" step and "intent" (rental/selling) step are
+  untouched -- see above. Say the word if you want /call restructured
+  to match /book's new shape someday; round 19c and every round since
+  has kept them deliberately separate.
+- Carpet, garage floor wash, and exterior window pricing untouched, per
+  direct instruction.
+- The big-home safety net: no sqft question, no toggle, nothing replaced
+  it. If you start seeing underpriced oversized homes, the lightweight
+  toggle option (one yes/no question, no price impact, just routes to
+  custom quote) is still on the table -- that was the other option on
+  the table when we talked this through, and it's an easy follow-up if
+  "drop it entirely" doesn't hold up in practice.
+- index.html (homepage) has its own separate, older embedded booking
+  widget that still references "yard" and the old junk half/full/custom
+  pricing -- this is pre-existing (every round back through 19c has left
+  index.html alone) and out of scope for this round, but flagging it
+  since it's now further out of sync with /book than before.
+
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
