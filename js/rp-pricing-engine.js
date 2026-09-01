@@ -395,6 +395,154 @@ const rpServiceAddons = {
      one less row on the add-ons screen; nothing else depended on it. */
 };
 
+/* =========================================================================
+   ADD-ON AVAILABILITY (round 20)
+   =========================================================================
+   Every priced add-on lives in exactly one place: rpServiceAddons above.
+   Before round 20, rpAddonsTotal() summed add-on state fields WITHOUT
+   checking whether the current service actually offers that add-on, so a
+   selection made under one service could survive a switch and keep
+   charging under another.
+
+   Reproduced live: pick Move-Out Refresh, add Refrigerator Interior
+   ($50), then use the estimate screen's "See Inspection Ready pricing"
+   link. Result was $449 on a 3BR instead of $399 -- a $50 charge for a
+   fridge interior that Inspection Ready already includes in its base
+   scope, rendered as a line item the customer could not remove
+   (rpClearAddon is only reachable from an add-on card, and Inspection
+   Ready has no fridge card). The same $50 then flowed to GHL and onto
+   the crew sheet as a work item.
+
+   This is the same bug class already fixed once in /call's pickService()
+   -- see the "$525 instead of $225" note there. It came back through the
+   new tier-switch path, so the fix here is structural rather than a
+   patch on the two switch functions:
+
+     1. rpClearUnavailableAddons() zeroes any add-on the incoming service
+        doesn't offer. Called by every path that changes rpState.service
+        WITHOUT a full rpResetServiceState() -- i.e. the move-out tier
+        switches in /book and /call.
+     2. rpAddonsTotal() below now filters by availability as a safety
+        net, so a future code path that changes service and forgets to
+        call (1) produces a correct PRICE even if state goes stale.
+
+   Services with no entry in rpServiceAddons (carpet, airbnb) have no
+   add-ons step in their flow at all, so filtering them to zero is
+   correct. Carpet's own room count (rpState.carpetRooms) and pet enzyme
+   are core service fields, not add-ons, and are priced elsewhere. */
+function rpAddonAvailable(key, service = rpState.service) {
+  return (rpServiceAddons[service] || []).includes(key);
+}
+/* Add-on key -> the rpState field(s) that hold its selection, and the
+   value that means "not selected". Both /book and /call define all of
+   these fields on their own rpState. */
+const RP_ADDON_STATE_DEFAULTS = {
+  carpet:        { addonCarpetRooms: 0, addonCarpetPetEnzyme: false },
+  junk:          { junkSize: null },
+  windows:       { windowsTier: null },
+  garage:        { garageWash: false },
+  laundry:       { laundryLoads: 0 },
+  fridge:        { fridgeAddon: false },
+  extraHours:    { addonExtraHours: 0 },
+  secondCleaner: { addonSecondCleaner: false }
+};
+/* Returns the list of add-on keys it actually cleared, so a caller can
+   tell the customer what was dropped instead of silently changing their
+   cart. */
+function rpClearUnavailableAddons(service = rpState.service) {
+  const cleared = [];
+  Object.keys(RP_ADDON_STATE_DEFAULTS).forEach(key => {
+    if (rpAddonAvailable(key, service)) return;
+    const fields = RP_ADDON_STATE_DEFAULTS[key];
+    Object.keys(fields).forEach(field => {
+      const empty = fields[field];
+      if (rpState[field] !== empty && rpState[field]) {
+        rpState[field] = empty;
+        if (!cleared.includes(key)) cleared.push(key);
+      }
+    });
+  });
+  return cleared;
+}
+
+/* =========================================================================
+   ADD-ON LINE ITEMS (round 21) — ONE list, three consumers
+   =========================================================================
+   Before this, the same add-on selection was re-derived by hand in four
+   places: /book's estimate rows, /book's office/crew summary string,
+   /book's webhook payload, and /call's jobDetails(). Each had its own
+   copy of "is it selected" and its own idea of how to describe it, which
+   is how /call ended up shipping a $0 total for a Junk Haul the customer
+   had actually selected, and how the webhook ended up with add-on names
+   but no add-on prices.
+
+   rpAddonLineItems() is now the single source. It returns one row per
+   SELECTED and AVAILABLE add-on:
+
+     { key, label, detail, price, quoted }
+
+   price  — dollars actually added to the total (0 for quoted-separately)
+   quoted — true when the item is real work with no instant price (the
+            oversized junk load), so a consumer can render "quoted
+            separately" instead of implying it's free.
+
+   Every consumer formats these rows; nobody re-checks selection state. */
+function rpAddonLineItems() {
+  const rows = [];
+  const add = (key, label, detail, price, quoted = false) => {
+    if (!rpAddonAvailable(key)) return;
+    rows.push({ key, label, detail, price, quoted });
+  };
+  if (rpState.addonCarpetRooms > 0) {
+    const rooms = Number(rpState.addonCarpetRooms);
+    add("carpet", "Carpet Cleaning", `${rooms} room${rooms === 1 ? "" : "s"}`, rooms * rpAddonCatalog.carpet.bundlePrice);
+    /* Pet enzyme is now purchasable on the carpet ADD-ON too, not just
+       the standalone Carpet Cleaning service. Same $25/room rate. A
+       move-out with pet damage is the single most common place this is
+       needed, and it was unreachable from that flow. */
+    if (rpState.addonCarpetPetEnzyme) {
+      add("carpet", "Pet Enzyme Treatment", `${rooms} room${rooms === 1 ? "" : "s"}`, rooms * RP_PET_ENZYME_RATE);
+    }
+  }
+  if (rpState.junkSize === "half") add("junk", "Junk Haul", "Half truck bed", rpAddonCatalog.junk.half);
+  if (rpState.junkSize === "full") add("junk", "Junk Haul", "Full truck bed", rpAddonCatalog.junk.full);
+  /* The oversized load has no instant price. It used to render a row
+     reading "Custom Quote" next to a firm grand total, which read as
+     though the haul was included at $0. It's now explicitly a quoted
+     item worth $0 in the math, and every consumer says so. */
+  if (rpState.junkSize === "custom") add("junk", "Junk Haul", "Oversized load", 0, true);
+  if (rpState.windowsTier === "basic") add("windows", "Exterior Windows", "Basic wash", rpAddonCatalog.windows.basic);
+  if (rpState.windowsTier === "premium") add("windows", "Exterior Windows", "Premium wash, screens removed", rpAddonCatalog.windows.premium);
+  if (rpState.garageWash) add("garage", "Garage Floor Wash", "Garage must be empty", rpAddonCatalog.garage.price);
+  if (rpState.laundryLoads > 0) {
+    const loads = Number(rpState.laundryLoads);
+    add("laundry", "Laundry Service", `${loads} load${loads === 1 ? "" : "s"}`, loads * rpAddonCatalog.laundry.pricePerLoad);
+  }
+  if (rpState.fridgeAddon) add("fridge", "Refrigerator Interior", "", rpAddonCatalog.fridge.price);
+  if (rpState.addonExtraHours > 0) {
+    const hrs = Number(rpState.addonExtraHours);
+    add("extraHours", "Extra Time", `+${hrs} hour${hrs === 1 ? "" : "s"}`, hrs * rpAddonCatalog.extraHours.pricePerHour);
+  }
+  if (rpState.addonSecondCleaner) add("secondCleaner", "Additional Cleaner", `${rpSecondCleanerHours()} hours`, rpSecondCleanerPrice());
+  /* Carpet-as-a-SERVICE keeps its own enzyme field (rpState.addonPetEnzyme)
+     — different flow, different screen, priced identically. */
+  if (rpState.service === "carpet" && rpState.addonPetEnzyme) {
+    rows.push({ key: "petEnzyme", label: "Pet Enzyme Treatment", detail: `${Math.max(1, Number(rpState.carpetRooms || 0))} room(s)`, price: rpPetEnzymePrice(), quoted: false });
+  }
+  return rows;
+}
+/* "Carpet Cleaning: 2 rooms — $100, Junk Haul: Oversized load — quoted
+   separately". Used by the crew sheet, the webhook, and /call. */
+function rpAddonSummaryText() {
+  const rows = rpAddonLineItems();
+  if (!rows.length) return "None";
+  return rows.map(r => {
+    const detail = r.detail ? `: ${r.detail}` : "";
+    return `${r.label}${detail} — ${r.quoted ? "quoted separately" : `$${r.price.toFixed(2)}`}`;
+  }).join(", ");
+}
+function rpHasQuotedAddon() { return rpAddonLineItems().some(r => r.quoted); }
+
 /* Second cleaner costs the same $50/hr as the base rate, for however
    many hours are actually booked (the 6-hour anchor plus any Extra Time
    already added) — a 2nd person working 8 hours costs the same as the
@@ -452,7 +600,15 @@ const rpIncludes = {
       [null, "No inspection guarantee"]
     ],
     outcome: "Built for tenants and owners who just need it clean — not for a landlord walkthrough.",
-    fineprint: "Oven and fridge interiors, inside cabinets and closets, baseboards, interior windows, and wall spot-cleaning aren't part of this tier. Add any of them individually on the next step, or switch to Inspection Ready for the full checklist and Defend Your Deposit™.",
+    /* Round 20 copy fix: the old version said "add any of them
+       individually on the next step," but the refrigerator interior is
+       the ONLY one of those exclusions that exists as a purchasable
+       add-on (rpServiceAddons.moveoutrefresh). A customer picking
+       Refresh on the strength of that sentence reached the add-ons step
+       and found four of the five missing. Naming the one that's real and
+       routing the rest to Inspection Ready keeps the promise accurate
+       without needing new SKUs. */
+    fineprint: "Oven interiors, inside cabinets and closets, baseboards, interior windows, and wall spot-cleaning aren't part of this tier. You can add the refrigerator interior on the next step; for the rest, Inspection Ready covers all of it plus Defend Your Deposit™.",
     itemsLead: "What's included:",
     items: ["Kitchen counters, sink, stovetop & appliance exteriors", "Cabinet & closet exteriors wiped", "Bathrooms: toilet, tub/shower, sink, mirror", "All floors vacuumed & mopped", "Trash out, light fixtures dusted, glass & mirrors"]
   },
@@ -525,8 +681,20 @@ const rpFlows = {
      job (describe the scope) is now the whole point of "moveouttiers",
      shown per-tier instead of once, generically, before any numbers
      exist to compare. */
-  moveout:        ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
-  moveoutrefresh: ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  /* Round 23 (sales-review fix): "bathrooms" removed as its own screen for
+     Move-Out. Since round 18, bathroom count has ZERO effect on price --
+     it's crew-planning data only -- so it was a full tap-to-continue
+     screen buying the customer nothing on your highest-friction flow
+     (12 screens on your best-selling product, vs 7-8 on Deep/Basic).
+     Bathrooms are now asked as a second question on the SAME "bedrooms"
+     screen (see the render block in book/index.html) -- one fewer step,
+     same data collected. Still listed here (as a comment, not a flow
+     entry) so nobody re-adds it as a standalone step without reading
+     this. Other services (Airbnb) keep the two-screen version --
+     bathrooms genuinely IS a separate tap there, and this change is
+     scoped to the flow that was actually flagged. */
+  moveout:        ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -570,9 +738,9 @@ function rpCurrentFlow() {
        normally from that point on, same as picking the tier from the
        service list did in round 19. */
     if (rpMoveoutBlocked()) {
-      flow = ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveoutblocked"];
     } else {
-      flow = ["bedrooms", "bathrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
+      flow = ["bedrooms", "sqft", "moveoutintent", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
     }
   }
   if (!RP_CONTACT_GATE) return flow;
@@ -592,9 +760,17 @@ function rpCurrentFlow() {
 }
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
+/* Round 20: pulled out of rpTimeEstimate() so the tier comparison screen
+   can show BOTH tiers' hours side by side without touching rpState —
+   same reason rpMoveoutTierBasePrice() exists for the prices. The hours
+   are the clearest justification for the gap between the two numbers,
+   and they weren't stated anywhere on that screen. */
+const RP_MOVEOUT_TIER_HOURS = { moveout: "6–10 hours", moveoutrefresh: "3–5 hours" };
+function rpMoveoutTierHours(service) { return RP_MOVEOUT_TIER_HOURS[service] || ""; }
+
 function rpTimeEstimate() {
-  if (rpState.service === "moveout") return "6–10 hours";
-  if (rpState.service === "moveoutrefresh") return "3–5 hours";
+  if (rpState.service === "moveout") return RP_MOVEOUT_TIER_HOURS.moveout;
+  if (rpState.service === "moveoutrefresh") return RP_MOVEOUT_TIER_HOURS.moveoutrefresh;
   if (rpState.service === "deep") {
     const extra = Number(rpState.addonExtraHours || 0);
     return extra > 0 ? `${RP_DEEP_ANCHOR_HOURS + extra} hours (${RP_DEEP_ANCHOR_HOURS} + ${extra} extra)` : `${RP_DEEP_ANCHOR_HOURS} hours`;
@@ -851,18 +1027,26 @@ function rpPetEnzymePrice() {
   return Math.max(1, Number(rpState.carpetRooms || 0)) * RP_PET_ENZYME_RATE;
 }
 
+/* Round 20: every line below is gated on rpAddonAvailable() — see the
+   ADD-ON AVAILABILITY block above rpSecondCleanerPrice() for why. A
+   selection the current service doesn't offer must never reach a total. */
 function rpAddonsTotal() {
   let total = 0;
-  if (rpState.addonCarpetRooms > 0) total += rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice;
-  if (rpState.junkSize === "half") total += rpAddonCatalog.junk.half;
-  if (rpState.junkSize === "full") total += rpAddonCatalog.junk.full;
-  if (rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
-  if (rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
-  if (rpState.garageWash) total += rpAddonCatalog.garage.price;
-  if (rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
-  if (rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
-  if (rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
-  if (rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
+  if (rpAddonAvailable("carpet") && rpState.addonCarpetRooms > 0) total += rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice;
+  /* Pet enzyme on the carpet ADD-ON (round 21) — same $25/room rate as
+     the standalone Carpet Cleaning service, priced off the add-on's own
+     room count. Gated on "carpet" being available, so it can never
+     outlive the carpet selection it depends on. */
+  if (rpAddonAvailable("carpet") && rpState.addonCarpetRooms > 0 && rpState.addonCarpetPetEnzyme) total += rpState.addonCarpetRooms * RP_PET_ENZYME_RATE;
+  if (rpAddonAvailable("junk") && rpState.junkSize === "half") total += rpAddonCatalog.junk.half;
+  if (rpAddonAvailable("junk") && rpState.junkSize === "full") total += rpAddonCatalog.junk.full;
+  if (rpAddonAvailable("windows") && rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
+  if (rpAddonAvailable("windows") && rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
+  if (rpAddonAvailable("garage") && rpState.garageWash) total += rpAddonCatalog.garage.price;
+  if (rpAddonAvailable("laundry") && rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
+  if (rpAddonAvailable("fridge") && rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
+  if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
+  if (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
   /* Gated to carpet specifically — pet enzyme only makes sense for the
      standalone Carpet Cleaning service, and stacking it here (rather than
      inside rpPreDiscountSubtotalCents' carpet branch) keeps it OUTSIDE
@@ -1023,3 +1207,157 @@ function rpFrequencySummary() {
   const pct = Math.round(plan.discount * 100);
   return `${rpState.frequency} · ${pct}% off recurring rate`;
 }
+
+/* =========================================================================
+   SHARED WEBHOOK / CRM DETAIL FIELDS (round 21)
+   =========================================================================
+   /book and /call were building their GHL payloads independently. /book's
+   was thorough (~60 fields); /call's `details` object had NINE, with
+   everything else flattened into one job_details text blob. The practical
+   effect: a phone booking arrived in GHL missing the guarantee type, the
+   move-out tier, the add-on prices, the questionnaire answers, and the
+   pricing breakdown — so any GHL automation that branches on those fields
+   (a Refresh confirmation SMS must NOT promise Defend Your Deposit) fired
+   wrong or not at all on every phone-booked job.
+
+   Same fix as the pricing engine itself: put the shared fields in ONE
+   function both pages spread into their own payload, and let each page
+   add only what's genuinely page-specific (/book: ad attribution, Airbnb
+   extras, handyman interest; /call: CSR name, lead source, call notes).
+
+   Everything here is a STRING or NUMBER, flat, no nesting — GHL custom
+   fields can't read nested objects.
+
+   Field-name note: existing field names are preserved exactly. GHL
+   dropdowns and workflows are keyed to them, so renaming would silently
+   break automations. New fields are additive only. */
+function rpBuildSharedDetails() {
+  const custom = rpIsCustomQuoteOnly();
+  const lineItems = rpAddonLineItems();
+  const addonsTotal = rpAddonsTotal();
+  const isMoveout = ["moveout", "moveoutrefresh"].includes(rpState.service);
+  const tierLabel = !isMoveout ? "N/A"
+    : rpState.service === "moveout" ? "Inspection Ready" : "Refresh";
+  const guarantee = rpGuaranteeType();
+  return {
+    /* --- service identity --- */
+    service: (rpServices[rpState.service] || {}).name || "N/A",
+    service_key: rpState.service || "N/A",
+    /* Discrete tier + guarantee fields so GHL can branch without parsing
+       a text blob. THIS is what a Refresh confirmation message must read
+       to avoid promising a deposit guarantee that doesn't apply. */
+    moveout_tier: tierLabel,
+    guarantee_type: guarantee,
+    guarantee_label: guarantee === "deposit" ? "Defend Your Deposit"
+      : guarantee === "satisfaction" ? "Satisfaction Guaranteed" : "No guarantee (customer-directed scope)",
+    estimated_time_on_site: rpTimeEstimate() || "N/A",
+
+    /* --- home --- */
+    square_footage: rpSqftTier() ? rpSqftTier().label : "N/A",
+    bedrooms: rpState.bedrooms || "N/A",
+    bathrooms: rpState.bathrooms || "N/A",
+
+    /* --- money --- */
+    pricing_status: custom ? "Custom Quote" : "Confirmed",
+    base_service_price: custom ? "N/A" : rpDisplayBasePrice().toFixed(2),
+    addons_total: addonsTotal.toFixed(2),
+    addons_count: String(lineItems.length),
+    /* Names AND prices. The old payload sent names only, so the office
+       could see "Junk Haul" but not what it was worth. */
+    addons: rpAddonSummaryText(),
+    addons_quoted_separately: rpHasQuotedAddon() ? "Yes" : "No",
+    military_discount: rpState.militaryDiscount ? "Yes" : "No",
+    discount_amount: rpMilitaryDiscountAmount().toFixed(2),
+    estimated_price_number: custom ? "N/A" : rpFirstVisitTotal(),
+    estimated_price: custom ? "Custom Quote" : `$${rpFirstVisitTotal().toFixed(2)}`,
+
+    /* --- per-add-on discrete fields, for GHL automations and crew
+       dispatch that need one thing rather than the whole string --- */
+    addon_carpet_rooms: rpAddonAvailable("carpet") ? String(rpState.addonCarpetRooms || 0) : "0",
+    addon_carpet_pet_enzyme: (rpAddonAvailable("carpet") && rpState.addonCarpetPetEnzyme) ? "Yes" : "No",
+    addon_junk_size: rpAddonAvailable("junk") ? (rpState.junkSize || "None") : "None",
+    addon_windows_tier: rpAddonAvailable("windows") ? (rpState.windowsTier || "None") : "None",
+    addon_garage_wash: (rpAddonAvailable("garage") && rpState.garageWash) ? "Yes" : "No",
+    addon_laundry_loads: rpAddonAvailable("laundry") ? String(rpState.laundryLoads || 0) : "0",
+    addon_fridge_interior: (rpAddonAvailable("fridge") && rpState.fridgeAddon) ? "Yes" : "No",
+    addon_extra_hours: rpAddonAvailable("extraHours") ? String(rpState.addonExtraHours || 0) : "0",
+    addon_second_cleaner: (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) ? "Yes" : "No",
+
+    /* --- move-out questionnaire, discrete. Operationally the most
+       important fields in the whole payload: they decide whether a crew
+       can work the job at all. Previously text-blob only on both
+       surfaces. "Not asked" is distinct from "No" on purpose. --- */
+    moveout_intent: isMoveout ? (rpState.moveoutRentalOrSelling || "Not asked") : "N/A",
+    moveout_pm_or_realtor: isMoveout ? (rpState.moveoutPmOrRealtor || "None") : "N/A",
+    moveout_water_on: isMoveout ? (rpState.moveoutWaterOn === true ? "Yes" : rpState.moveoutWaterOn === false ? "NO" : "Not asked") : "N/A",
+    moveout_ac_on: isMoveout ? (rpState.moveoutAcOn === true ? "Yes" : rpState.moveoutAcOn === false ? "NO" : "Not asked") : "N/A",
+    moveout_mold_pests: isMoveout ? (rpState.moveoutMoldPests === true ? "YES" : rpState.moveoutMoldPests === false ? "No" : "Not asked") : "N/A",
+    moveout_blocked: (isMoveout && rpMoveoutBlocked()) ? "Yes" : "No",
+    moveout_block_reasons: (isMoveout && rpMoveoutBlocked()) ? rpMoveoutBlockReasons().join(", ") : "None",
+
+    /* --- where the job is (round 22) --- */
+    service_area_status: rpServiceAreaStatus().status,
+    service_area_label: rpServiceAreaStatus().label,
+    service_area_town: rpServiceAreaStatus().area || "N/A",
+    outside_service_area: rpIsOutsideServiceArea() ? "Yes" : "No",
+
+    /* --- recurring --- */
+    frequency: rpState.frequency || "N/A",
+    monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal().toFixed(2) : "N/A"
+  };
+}
+
+/* =========================================================================
+   SERVICE AREA (round 22)
+   =========================================================================
+   Nothing anywhere in the funnel checked WHERE the job is. /book validated
+   that the ZIP was five digits and that was the whole test, so a booking
+   from Oklahoma City could land a 2-cleaner crew on a $399 flat rate with
+   roughly three hours of unpaid round-trip drive attached to it. /call had
+   no prompt at all.
+
+   DESIGN DECISION — FLAG, NEVER BLOCK.
+   A ZIP list maintained by hand will eventually be wrong, and the cost of
+   the two errors is wildly asymmetric: wrongly flagging a real customer
+   costs one confirmation call, while wrongly BLOCKING one throws away a
+   paid click and a real job. So an out-of-area ZIP never stops a booking.
+   It sets a flag that reaches the office, the crew sheet, the CRM, and
+   (softly) the customer. The office decides.
+
+   EDITING THIS: RP_SERVICE_AREA_ZIPS is the core list — jobs here are
+   normal, no flag, no note. RP_SERVICE_AREA_EDGE_ZIPS is the nearby ring
+   worth taking but worth KNOWING about, because drive time starts to eat
+   a flat rate out there. Anything in neither list is "outside". Moving a
+   ZIP between the two lists is a one-word edit. */
+const RP_SERVICE_AREA_ZIPS = {
+  "73501": "Lawton", "73502": "Lawton", "73505": "Lawton",
+  "73506": "Lawton", "73507": "Lawton",
+  "73503": "Fort Sill",
+  "73527": "Cache",
+  "73538": "Elgin",
+  "73557": "Medicine Park",
+  "73533": "Duncan", "73534": "Duncan", "73536": "Duncan"
+};
+/* Nearby Comanche/Stephens County towns not on the published service-area
+   list but close enough to be worth taking deliberately rather than by
+   accident. Verify these against what you actually want to drive before
+   trusting them — they're a starting list, not a survey. */
+const RP_SERVICE_AREA_EDGE_ZIPS = {
+  "73541": "Fletcher", "73543": "Geronimo", "73567": "Sterling",
+  "73540": "Faxon", "73528": "Chattanooga", "73572": "Walters",
+  "73529": "Comanche", "73055": "Marlow", "73006": "Apache"
+};
+/* Returns { status, label, area } where status is:
+     "core"    normal job, no flag anywhere
+     "edge"    take it, but the office should see the drive
+     "outside" office confirms coverage and travel before dispatch
+     "unknown" ZIP not entered yet or not 5 digits — never treated as a
+               problem, since the lead screen validates format separately */
+function rpServiceAreaStatus(zip = rpState.postalCode) {
+  const z = String(zip || "").trim().slice(0, 5);
+  if (!/^\d{5}$/.test(z)) return { status: "unknown", label: "Not provided", area: "" };
+  if (RP_SERVICE_AREA_ZIPS[z]) return { status: "core", label: "In service area", area: RP_SERVICE_AREA_ZIPS[z] };
+  if (RP_SERVICE_AREA_EDGE_ZIPS[z]) return { status: "edge", label: "Edge of service area — extra drive time", area: RP_SERVICE_AREA_EDGE_ZIPS[z] };
+  return { status: "outside", label: "OUTSIDE service area — confirm coverage and travel before dispatch", area: "" };
+}
+function rpIsOutsideServiceArea(zip) { return rpServiceAreaStatus(zip).status === "outside"; }

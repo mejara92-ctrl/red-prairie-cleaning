@@ -139,6 +139,12 @@ input,select,textarea{font-family:inherit;font-size:15px}
 .rail-included-title{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .rail-included ul{margin:0;padding:0 0 0 16px;list-style:disc}
 .rail-included li{font-size:12.5px;line-height:1.5;color:var(--ink);margin-bottom:2px}
+.rail-excluded{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line)}
+.rail-excluded p{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink)}
+.rail-area{padding:11px 15px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.rail-area b{font-size:12px;font-weight:800}
+.rail-area span{font-size:12px;line-height:1.45;color:var(--muted)}
+.rail-area.is-out b{color:var(--red)}
 
 .guard{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.45;border:1.5px solid}
 .guard b{display:block;margin-bottom:2px;font-size:12px;letter-spacing:.03em;text-transform:uppercase}
@@ -247,8 +253,8 @@ const rpState = {
   step:"service", service:null,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
-  carpetRooms:0, addonCarpetRooms:0, windowsTier:null,
-  garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null,
+  carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
+  garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null, addonDropNotice:"",
   militaryDiscount:false, militaryVerified:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
   heavySoil:false, petOdor:false,
@@ -290,8 +296,14 @@ const FLOWS = {
      "intent" (rental vs. selling + PM/realtor) and "questionnaire"
      (water/power/A/C/mold/pests hard-stop) added to moveout, matching
      /book exactly. */
-  moveout:        ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
-  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
+  /* Round 22: "questionnaire" moved AHEAD of "addons". It used to sit
+     after, so Liz worked carpet, junk and windows onto a job and only
+     then discovered the water was off and the job couldn't happen as
+     booked — the productive part of the call spent selling extras on a
+     clean that routes to a callback. /book has always asked the
+     hard-stops before anything priced; this brings the phone in line. */
+  moveout:        ["service","caller","intent","bedrooms","bathrooms","sqft","questionnaire","addons","quote","contact","calendar","done"],
+  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","sqft","questionnaire","addons","quote","contact","calendar","done"],
   deep:        ["service","caller","addons","quote","contact","calendar","done"],
   maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
@@ -522,13 +534,16 @@ function objectionPriceAnswer(){
 /* Only names an add-on that's actually on THIS order — checked against
    the same state fields the addons screen writes to. Returns null if
    nothing was added, so there's nothing false to offer to remove. */
+/* Round 20: gated on rpAddonAvailable() — the price-objection script
+   must never offer to remove an add-on the customer isn't being charged
+   for. */
 function removableAddonLabel(){
-  if(Number(rpState.addonCarpetRooms)>0) return "the carpet cleaning";
-  if(rpState.junkSize) return "the junk haul";
-  if(rpState.windowsTier) return "the exterior windows";
-  if(rpState.garageWash) return "the garage floor wash";
-  if(rpState.fridgeAddon) return "the refrigerator interior";
-  if(Number(rpState.laundryLoads)>0) return "the laundry service";
+  if(rpAddonAvailable("carpet") && Number(rpState.addonCarpetRooms)>0) return "the carpet cleaning";
+  if(rpAddonAvailable("junk") && rpState.junkSize) return "the junk haul";
+  if(rpAddonAvailable("windows") && rpState.windowsTier) return "the exterior windows";
+  if(rpAddonAvailable("garage") && rpState.garageWash) return "the garage floor wash";
+  if(rpAddonAvailable("fridge") && rpState.fridgeAddon) return "the refrigerator interior";
+  if(rpAddonAvailable("laundry") && Number(rpState.laundryLoads)>0) return "the laundry service";
   return null;
 }
 function doBetterPriceAnswer(){
@@ -813,10 +828,15 @@ function screenHtml(){
     let h="";
     if(list.includes("carpet")) h+=`<div style="margin-bottom:9px">
       <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.carpet.bundlePrice}/room</span></div>
-      <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div></div>`;
+      <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
+      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room \u2014 $${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE} total)`,`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme)}</div>`:""}</div>`;
+    /* Round 21: the oversized load existed on /book but not here, so a
+       caller with a full house of junk had no option Liz could select
+       other than "full load" — which underquotes it as a firm $200. */
     if(list.includes("junk")) h+=`<div class="opts" style="margin-bottom:9px">
       ${opt(`Junk haul \u2014 half load (+$${rpAddonCatalog.junk.half})`,`pick('junkSize', rpState.junkSize==='half'?null:'half')`,rpState.junkSize==="half")}
-      ${opt(`Junk haul \u2014 full load (+$${rpAddonCatalog.junk.full})`,`pick('junkSize', rpState.junkSize==='full'?null:'full')`,rpState.junkSize==="full")}</div>`;
+      ${opt(`Junk haul \u2014 full load (+$${rpAddonCatalog.junk.full})`,`pick('junkSize', rpState.junkSize==='full'?null:'full')`,rpState.junkSize==="full")}
+      ${opt(`Junk haul \u2014 oversized (quoted separately, NOT in the total)`,`pick('junkSize', rpState.junkSize==='custom'?null:'custom')`,rpState.junkSize==="custom")}</div>`;
     if(list.includes("windows")) h+=`<div class="opts" style="margin-bottom:9px">
       ${opt(`Exterior windows \u2014 basic (+$${rpAddonCatalog.windows.basic})`,`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
       ${opt(`Exterior windows \u2014 premium (+$${rpAddonCatalog.windows.premium})`,`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
@@ -824,6 +844,12 @@ function screenHtml(){
     if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
     if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
     h+=`</div>`;
+    /* Round 21: laundry is in rpServiceAddons.hourly but was never
+       rendered on this console, so an Hourly job booked by phone simply
+       could not include it. */
+    if(list.includes("laundry")) h+=`<div style="margin:9px 0">
+      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Laundry <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.laundry.pricePerLoad}/load</span></div>
+      <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
     /* Extra Time / Additional Cleaner — previously missing entirely from
        this console, so a Deep/Basic phone booking had no way to add
        either even though both exist in the shared engine and on /book.
@@ -857,7 +883,13 @@ function screenHtml(){
         `switchMoveoutTier('${rpState.service==="moveout" ? "moveoutrefresh" : "moveout"}')`,
         false
       )}</div>` : "";
-    return `${moveoutTierToggle}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
+    /* Round 20: if the tier switch dropped an add-on the new tier already
+       includes, say so on screen so Liz can explain the price change
+       instead of the number moving on its own mid-call. */
+    const dropNotice = rpState.addonDropNotice
+      ? `<div class="opts" style="margin-bottom:11px"><span class="note">Removed (already included in this tier): <strong>${esc(rpState.addonDropNotice)}</strong></span></div>`
+      : "";
+    return `${moveoutScopeRefHtml()}${moveoutTierToggle}${dropNotice}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
         <small>Quote to give</small>
         <strong>${custom?"Custom Quote":"$"+rpFinalPrice().toFixed(2)}</strong>
         ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
@@ -1031,7 +1063,26 @@ function renderRail(){
     ${rpState.service && rpIncludes[rpState.service] ? `<div class="rail-included">
       <div class="rail-included-title">What's Included \u2014 read this if asked</div>
       <ul>${rpIncludes[rpState.service].items.map(i=>`<li>${i}</li>`).join("")}</ul>
+      ${/* Round 22: the rail only ever showed what IS included. The most
+            likely question on a Refresh call is "does that do the oven?"
+            and the answer lived in fineprint, which was never rendered
+            here. Liz has the harder job than the website -- she's saying
+            it out loud without the caller seeing a comparison table. */
+        rpIncludes[rpState.service].fineprint ? `<div class="rail-excluded">
+        <div class="rail-included-title" style="color:var(--red)">NOT included \u2014 say this before they ask</div>
+        <p>${rpIncludes[rpState.service].fineprint}</p>
+      </div>` : ""}
     </div>` : ""}
+    ${(() => {
+      const a = rpServiceAreaStatus();
+      if (a.status === "core" || a.status === "unknown") return "";
+      return `<div class="rail-area ${a.status==="outside"?"is-out":""}">
+        <b>${a.status==="outside"?"\u26a0 Outside service area":"Edge of service area"}</b>
+        <span>${a.status==="outside"
+          ? "Book it, but tell them the office will confirm coverage and any travel before the date. Flag it in your notes."
+          : `${esc(a.area)} \u2014 extra drive time. Fine to book; the office will see the flag.`}</span>
+      </div>`;
+    })()}
   </div>`;
 }
 
@@ -1045,7 +1096,61 @@ function toggle(f){ rpState[f]=!rpState[f];
 /* Swap Move-Out tier without resetting size/addon state -- unlike
    pickService(), which is a genuine service change. See the comment on
    moveoutTierToggle above. */
-function switchMoveoutTier(k){ rpState.service=k; render(); }
+/* Round 20: a tier switch changes rpState.service WITHOUT pickService()'s
+   full reset, so any add-on the incoming tier doesn't offer must be
+   dropped explicitly — same bug class as the "$525 instead of $225"
+   note on pickService() below. Concretely: Refresh offers Refrigerator
+   Interior ($50) because Refresh excludes it; Inspection Ready includes
+   it in the base, so carrying the selection across quoted $50 for work
+   already in scope. Liz gets a one-line heads-up so she can say it out
+   loud instead of the number quietly changing mid-call. */
+/* Round 22: the website now shows the customer a nine-row scope grid on
+   the tier screen. Liz had nothing equivalent — she was asked to route
+   between two products with one hint line. Same nine rows, formatted for
+   reading aloud, shown on the quote screen for either move-out tier. */
+function moveoutScopeRefHtml(){
+  if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
+  const rows=[
+    ["Kitchen, bathrooms, floors",1,1],
+    ["Appliance exteriors, counters, sinks",1,1],
+    ["Trash out, mirrors & glass",1,1],
+    ["Inside the oven",1,0],
+    ["Inside the refrigerator",1,"add"],
+    ["Inside cabinets & closets",1,0],
+    ["Baseboards, doors & trim",1,0],
+    ["Interior windows, sills & tracks",1,0],
+    ["Wall spot-cleaning",1,0]
+  ];
+  const m=v=>v===1?`<span style="color:var(--green);font-weight:800">yes</span>`
+    :v==="add"?`<span style="color:var(--red);font-weight:800">+$${rpAddonCatalog.fridge.price}</span>`
+    :`<span style="color:var(--muted);font-weight:800">no</span>`;
+  return `<details class="scope-ref" style="margin-bottom:11px">
+    <summary style="cursor:pointer;font-weight:800;font-size:13px">Scope cheat sheet \u2014 Inspection Ready vs Refresh</summary>
+    <div style="margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:7px 10px;background:rgba(17,17,17,.05);font-size:10.5px;font-weight:800;text-align:center">
+        <span style="text-align:left">&nbsp;</span><span>Insp.<br>Ready</span><span>Refresh</span></div>
+      ${rows.map(r=>`<div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:6px 10px;border-top:1px solid var(--line);font-size:12px;align-items:center"><span>${r[0]}</span><span style="text-align:center">${m(r[1])}</span><span style="text-align:center">${m(r[2])}</span></div>`).join("")}
+    </div>
+    <p style="margin:7px 0 0;font-size:12px;color:var(--muted);line-height:1.45">${
+      /* Round 23 (sales-review fix): /book now nudges sellers toward
+         Inspection Ready using the rental/selling answer it already
+         collected. Liz collects the same answer on the "intent" step and
+         it went unused after that -- same nudge, said out loud. */
+      rpState.moveoutRentalOrSelling === "selling"
+        ? "They're listing it \u2014 lead with Inspection Ready: buyers notice what a rental tenant wouldn't."
+        : "Say it as: same crew, same standards, the difference is how far into the home we go. If a landlord or PM is inspecting, it's Inspection Ready."
+    }</p>
+  </details>`;
+}
+
+function switchMoveoutTier(k){
+  rpState.service=k;
+  const dropped=rpClearUnavailableAddons(k);
+  rpState.addonDropNotice = dropped.length
+    ? dropped.map(x => rpAddonCatalog[x] ? rpAddonCatalog[x].label : x).join(", ")
+    : "";
+  render();
+}
 function pickService(k){ rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
@@ -1056,9 +1161,9 @@ function pickService(k){ rpState.service=k;
      (confirmed $525 instead of $225 in testing). Every addon-ish field
      and all move-out-specific state resets here now, matching /book's
      rpResetServiceState() coverage. */
-  rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.windowsTier=null;
+  rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.addonCarpetPetEnzyme=false; rpState.windowsTier=null;
   rpState.garageWash=false; rpState.laundryLoads=0;
-  rpState.fridgeAddon=false; rpState.junkSize=null; rpState.cleanerCount=null;
+  rpState.fridgeAddon=false; rpState.junkSize=null; rpState.cleanerCount=null; rpState.addonDropNotice="";
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
@@ -1135,11 +1240,10 @@ function jobDetails(){
     rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
     `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`
   ].filter(Boolean) : [];
-  const addonExtras=[
-    rpState.addonExtraHours?`Extra Time: +${rpState.addonExtraHours}hr`:"",
-    rpState.addonSecondCleaner?`Additional Cleaner: ${rpSecondCleanerHours()}hrs, $${rpSecondCleanerPrice()}`:"",
-    (rpState.service==="carpet"&&rpState.addonPetEnzyme)?`Pet Enzyme Treatment: $${rpPetEnzymePrice()}`:""
-  ].filter(Boolean).join(", ");
+  /* Round 21: one shared list (rpAddonSummaryText) with prices, replacing
+     a partial hand-maintained copy that only ever mentioned three of the
+     nine add-ons — so a phone-booked carpet or junk haul reached the crew
+     sheet as a dollar figure with no description of what was sold. */
   return [
     `BOOKED BY PHONE${rpState.csrName?" (CSR: "+rpState.csrName+")":""}`,
     `Service: ${(rpServices[rpState.service]||{}).name||"N/A"}`,
@@ -1147,9 +1251,11 @@ function jobDetails(){
     `Bedrooms: ${rpState.bedrooms||"N/A"} | Bathrooms: ${rpState.bathrooms||"N/A"}`,
     `Condition: ${rpState.condition||"N/A"}`,
     ...moveoutExtras,
-    `Add-ons: ${rpAddonsTotal()>0?"$"+rpAddonsTotal().toFixed(2):"None"}${addonExtras?` (${addonExtras})`:""}`,
+    `Add-ons: ${rpAddonSummaryText()}${rpAddonsTotal()>0?` | Add-ons total: $${rpAddonsTotal().toFixed(2)}`:""}`,
+    rpHasQuotedAddon()?`\u26a0 Oversized junk haul selected — office must quote the haul separately; it is NOT in the total above.`:"",
     `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
+    (()=>{const a=rpServiceAreaStatus();return a.status==="core"?`Service area: ${a.area}`:a.status==="unknown"?"":`\u26a0 SERVICE AREA: ${a.label}${a.area?` (${a.area})`:""}`;})(),
     `Lead source: ${rpState.csrLeadSource||"N/A"}`,
     rpState.csrCallNotes?`Call notes: ${rpState.csrCallNotes}`:"",
     rpState.specialInstructions?`Access/instructions: ${rpState.specialInstructions}`:"",
@@ -1349,14 +1455,28 @@ async function submitBooking(){
         bedrooms:rpState.bedrooms, bathrooms:rpState.bathrooms,
         specialInstructions:rpState.specialInstructions,
         notes:jobDetails(),
+        /* Round 21: this object used to carry NINE fields while /book sent
+           roughly sixty, so a phone booking arrived in GHL with no
+           guarantee type, no move-out tier, no add-on prices and no
+           questionnaire answers — any workflow branching on those fired
+           wrong on every phone-booked job. rpBuildSharedDetails() is the
+           same builder /book uses; the CSR-specific fields below are the
+           only things that legitimately differ. */
         details:{
+          ...rpBuildSharedDetails(),
+          source:"RPC Call Console", business:"Red Prairie Cleaning",
           booking_channel:"phone_csr", csr_name:rpState.csrName,
           csr_lead_source:rpState.csrLeadSource||"N/A", csr_call_notes:rpState.csrCallNotes||"",
-          square_footage:rpSqftTier()?rpSqftTier().label:"N/A",
           condition:rpState.condition||"N/A",
           condition_adjustment_percent:Math.round(rpConditionMultiplier()*100),
           custom_quote_required:rpIsCustomQuoteOnly()?"Yes":"No",
+          /* Overrides the shared "Yes"/"No" with the CSR-verified state —
+             Liz ticking "I asked and they confirmed" is a different fact
+             from the website's self-serve checkbox. */
           military_discount:rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (unconfirmed)"):"No",
+          military_discount_verified:rpState.militaryVerified?"Yes":"No",
+          special_instructions:rpState.specialInstructions||"",
+          submitted_at:new Date().toISOString(),
           job_details:jobDetails()
         },
         companyWebsite:"", dryRun:false
@@ -1419,6 +1539,15 @@ async function logOutcome(outcome){
         full_name:rpState.fullName, phone:normalizePhone(rpState.phone), email:rpState.email,
         service:rpState.service?(rpServices[rpState.service]||{}).name:"Not selected",
         quoted_price:(rpState.service&&!rpIsCustomQuoteOnly()&&rpFinalPrice()>0)?"$"+rpFinalPrice().toFixed(2):"No quote given",
+        /* Round 21: a lost call is the lead most worth re-working, and it
+           was going to GHL as a text blob only. The structured fields
+           (tier, guarantee, add-ons with prices, questionnaire answers,
+           the exact number Liz quoted) are what make a follow-up
+           campaign targetable rather than a manual read-through. Only
+           spread when a service was actually picked — rpBuildSharedDetails
+           reads rpState.service and would report "N/A" across the board
+           on a hangup at step one. */
+        ...(rpState.service ? rpBuildSharedDetails() : {}),
         details:jobDetails(), submitted_at:new Date().toISOString()
       })
     });

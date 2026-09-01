@@ -197,6 +197,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   transition: background .18s, transform .18s;
   /* font-weight, color, border, background match later rule at line ~1098 */
 }
+.rp-head-call {
+  font-size: 12px; letter-spacing: .02em;
+  padding: 9px 11px;
+  border-radius: 12px;
+  transition: background .18s, transform .18s;
+  /* font-weight, color, border, background match later rule at line ~1098 */
+}
 .rp-head-text:active { background: var(--surface); transform: scale(.96); }
 
 /* Progress */
@@ -588,6 +595,26 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
    per direct instruction. Stacks to one column only below 400px, the
    narrowest phones in the site's own breakpoint list, so the price and
    its three bullets never get crushed. */
+.rp-slots-low { margin: -4px 3px 10px; font-size: 12.5px; font-weight: 800; color: var(--red-dark); text-align: center; }
+.rp-area-note { margin: 2px 2px 0; font-size: 12.5px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.rp-addon-quoted-note { margin: 0 3px 8px; font-size: 11.5px; line-height: 1.45; font-weight: 700; color: var(--red); text-align: center; }
+.rp-scope-table { margin: 14px 0 4px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: rgba(255,255,255,.9); }
+.rp-scope-head, .rp-scope-row { display: grid; grid-template-columns: 1fr 74px 74px; align-items: center; gap: 4px; padding: 9px 12px; }
+.rp-scope-head { background: rgba(17,17,17,.045); font-size: 10.5px; font-weight: 800; line-height: 1.2; text-align: center; letter-spacing: -.01em; }
+.rp-scope-head span:first-child { text-align: left; }
+.rp-scope-row { border-top: 1px solid var(--line); font-size: 12.5px; font-weight: 600; text-align: left; }
+.rp-scope-row > span:not(:first-child), .rp-scope-row .rp-scope-yes, .rp-scope-row .rp-scope-no, .rp-scope-row .rp-scope-addon { text-align: center; justify-self: center; }
+.rp-scope-yes { color: var(--sage); display: inline-flex; }
+.rp-scope-no { color: rgba(17,17,17,.26); font-weight: 800; }
+.rp-scope-addon { color: var(--red); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.rp-scope-foot { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); text-align: center; }
+@media (max-width: 380px) {
+  .rp-scope-head, .rp-scope-row { grid-template-columns: 1fr 58px 58px; padding-left: 10px; padding-right: 10px; }
+  .rp-scope-row { font-size: 11.5px; }
+}
+.rp-tier-card .rp-tier-hours { font-size: 12px; font-weight: 800; color: var(--ink); margin: -2px 0 4px; letter-spacing: -.01em; }
+.rp-addon-drop-notice { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); text-align: center; }
+.rp-addon-drop-notice strong { color: var(--ink); }
 .rp-tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; margin-top: 6px; }
 .rp-tier-card {
   display: flex; flex-direction: column; align-items: center;
@@ -624,7 +651,12 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   background: linear-gradient(135deg, var(--red-bright) 0%, var(--red) 48%, var(--red-dark) 100%);
   color: #fffaf5; box-shadow: 0 10px 20px rgba(127,25,31,.24);
 }
-@media (max-width: 400px) {
+/* Round 20: raised from 400px. At 400–480px (Pixel 7 is 412, iPhone Pro
+   Max is 430) each card was a ~195px column holding a price, an hours
+   line, a guarantee, four bullets, an exclusions sentence and a button.
+   Stacking through 480px keeps both readable; they still sit side by
+   side on anything wider. */
+@media (max-width: 480px) {
   .rp-tier-grid { grid-template-columns: 1fr; }
 }
 
@@ -1079,7 +1111,7 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-wordmark-copy strong { font-size: 12.5px; }
   .rp-wordmark-copy small { font-size: 12.5px; }
   .rp-head-actions { gap: 4px; }
-  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
+  .rp-head-faq, .rp-head-text, .rp-head-call { padding: 6px 6px; font-size: 10px; }
   .rp-screen-scroll { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer { padding-left: 20px; padding-right: 20px; }
   .rp-screen-footer::before { left: 20px; right: 20px; }
@@ -1097,7 +1129,7 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-wordmark-copy strong { font-size: 9.5px; }
   .rp-wordmark-copy small { font-size: 9.5px; }
   .rp-head-actions { gap: 2px; }
-  .rp-head-faq, .rp-head-text { padding: 5px 5px; font-size: 8.5px; }
+  .rp-head-faq, .rp-head-text, .rp-head-call { padding: 5px 5px; font-size: 8.5px; }
   .rp-hero-cta { padding: 18px 20px; gap: 9px; font-size: 19px; border-radius: 17px; }
   .rp-hero-cta .rp-ic-sm { width: 19px; height: 19px; }
 }
@@ -1499,7 +1531,7 @@ details.rp-includes ul { display: none; }
 @media (max-width: 390px) {
   .rp-head { gap: 5px; }
   .rp-head-actions { gap: 4px; }
-  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
+  .rp-head-faq, .rp-head-text, .rp-head-call { padding: 6px 6px; font-size: 10px; }
   .step-addons .rp-screen-scroll { padding-inline: 14px; }
 }
 
@@ -1514,7 +1546,7 @@ details.rp-includes ul { display: none; }
   .rp-wordmark-copy strong { font-size: 11px; }
   .rp-wordmark-copy small { font-size: 11px; }
   .rp-head-actions { gap: 4px; }
-  .rp-head-faq, .rp-head-text { padding: 6px 6px; font-size: 10px; }
+  .rp-head-faq, .rp-head-text, .rp-head-call { padding: 6px 6px; font-size: 10px; }
 }
 
 @media (max-height: 760px) {
@@ -2588,6 +2620,15 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
     </a>
     <div class="rp-head-actions">
       <button class="rp-head-faq" type="button" onclick="rpOpenFaq('header')" aria-label="Open frequently asked questions">FAQ</button>
+      <!-- Round 23 (sales-review fix): "Call" added next to "Text us".
+           Previously the only tel: link anywhere in this file was on the
+           calendar screen, meaning a property manager or realtor comparing
+           vendors -- exactly the highest-leverage channel -- had to get
+           through bedrooms, bathrooms, sqft, rental/selling, the
+           questionnaire, contact info and a tier pick before a phone
+           option ever appeared. Costs nothing to add; it's not competing
+           with anything else in the header. -->
+      <a class="rp-head-call" href="tel:5802150915" onclick="rpTrack('call_tap',{placement:'header'}); return gtag_report_conversion('tel:5802150915');">Call</a>
       <a class="rp-head-text" href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'header'})">Text us</a>
     </div>
   </header>
@@ -2635,6 +2676,7 @@ const rpState = {
   hourCount: null,
   carpetRooms: 0,
   addonCarpetRooms: 0,
+  addonCarpetPetEnzyme: false,
   addonExtraHours: 0,
   addonSecondCleaner: false,
   moveoutWaterOn: null,
@@ -2656,6 +2698,11 @@ const rpState = {
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
+  /* Round 20: set by rpSwitchMoveoutTier() when a tier switch drops an
+     add-on the new tier already includes. Display-only, deliberately NOT
+     in the persisted-state whitelist — it describes one action, not a
+     booking fact, and shouldn't reappear on a resumed session. */
+  addonDropNotice: "",
   junkSize: null,
   heavySoil: false,
   petOdor: false,
@@ -2733,6 +2780,19 @@ function rpChip(name) { return `<span class="rp-ic-chip">${rpIcon(name)}</span>`
    FUNNEL ANALYTICS — every screen is measurable.
    ========================================================================= */
 let rpScreenEnteredAt = Date.now();
+/* Round 22: addon_removed was tracked but nothing recorded an add-on
+   being ADDED, so attach rate — the actual evidence for whether an
+   add-on is priced right — could not be calculated at all. Fires the
+   price alongside the selection so the rate and the take-up can be read
+   together when a price later changes. */
+function rpTrackAddon(key, added, extra = {}) {
+  if (!added) return;
+  rpTrack("addon_added", Object.assign({
+    addon: key,
+    addon_price: rpAddonsTotal(),
+    service_at_selection: rpState.service || "none"
+  }, extra));
+}
 function rpTrack(event, extra = {}) {
   const payload = Object.assign({
     screen: rpState.step,
@@ -2873,7 +2933,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "moveoutTierChosen", "addonPetEnzyme", "windowsTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "moveoutTierChosen", "addonPetEnzyme", "windowsTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -3040,17 +3100,53 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "bedrooms") {
+    /* Round 23 (sales-review fix): Move-Out folds the bathroom question
+       into this same screen instead of its own tap-to-continue step --
+       bathroom count has had zero price effect since round 18, so a
+       whole screen for it was pure friction on the highest-traffic,
+       highest-step-count flow. Bedrooms selects without advancing;
+       the bathroom row fades in once bedrooms is picked, and THAT tap
+       advances -- same one-tap-per-decision feel, one fewer screen.
+       Other services (Airbnb) still use the separate "bathrooms" step
+       below -- this is scoped to what was actually flagged. */
+    const isMoveoutFlow = ["moveout", "moveoutrefresh"].includes(rpState.service);
+    if (!isMoveoutFlow) {
+      return { scroll: `<div class="rp-center">
+        ${eyebrow}
+        <h2>How many bedrooms?</h2>
+        <div class="rp-q-gap"></div>
+        <div class="rp-rows">
+          ${[1,2,3,4,5].map(n => rpRowBtn({
+            onclick:`rpSelectBedrooms(${n}, this)`,
+            title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
+            selected: rpState.bedrooms === n
+          })).join("")}
+        </div>
+      </div>` };
+    }
+    const bedTier = rpState.bedrooms ? rpMoveoutBedroomTier(rpState.bedrooms) : null;
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bedrooms?</h2>
       <div class="rp-q-gap"></div>
       <div class="rp-rows">
         ${[1,2,3,4,5].map(n => rpRowBtn({
-          onclick:`rpSelectBedrooms(${n}, this)`,
+          onclick:`rpSelectMoveoutBedrooms(${n})`,
           title:`${n}${n===5?"+":""} bedroom${n>1?"s":""}`,
           selected: rpState.bedrooms === n
         })).join("")}
       </div>
+      ${rpState.bedrooms ? `
+      <div class="rp-q-gap"></div>
+      <h2 style="font-size:19px">How many bathrooms?</h2>
+      ${bedTier ? `<p class="rp-sub" style="margin-bottom:12px">${bedTier.includedBathrooms} bathroom${bedTier.includedBathrooms > 1 ? "s" : ""} included at this size.</p>` : ""}
+      <div class="rp-rows" id="rpMoveoutBathroomRows">
+        ${[1,2,3,4].map(n => rpRowBtn({
+          onclick:`rpSelectMoveoutBathrooms(${n}, this)`,
+          title:`${n}${n===4?"+":""} bathroom${n>1?"s":""}`,
+          selected: rpState.bathrooms === n
+        })).join("")}
+      </div>` : ""}
     </div>` };
   }
 
@@ -3154,6 +3250,7 @@ function rpScreenHtml() {
           ${featured ? `<span class="rp-tier-badge">Most Popular</span>` : ""}
           <h3>${svc.name}</h3>
           <div class="rp-tier-price">${price === null ? "Custom" : `$${price.toFixed(0)}`}${price === null ? "" : "<small>starting price</small>"}</div>
+          <div class="rp-tier-hours">${rpMoveoutTierHours(service)} on site</div>
           <div class="rp-tier-guarantee">${featured ? "Defend Your Deposit™" : "Satisfaction Guaranteed"}</div>
           <ul>${(inc.highlights || []).slice(0, 4).map(([, text]) => `<li>${text}</li>`).join("")}</ul>
           ${!featured ? `<p class="rp-tier-exclusions">Not included: oven &amp; fridge interiors, inside cabinets, baseboards, interior windows.</p>` : ""}
@@ -3168,7 +3265,50 @@ function rpScreenHtml() {
         ${tierCard("moveout")}
         ${tierCard("moveoutrefresh")}
       </div>
-      <p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave, Inspection Ready is the one backed by Defend Your Deposit.</p>
+      ${(() => {
+        /* Round 21: the four highlight bullets on each card both read as
+           "a competent clean." This table is the actual answer to "what
+           am I getting" — the same nine scope lines, ticked per tier, so
+           the difference is a column of marks instead of prose the
+           customer has to compare in their head. Same source of truth as
+           the /pricing ledgers. */
+        const scope = [
+          ["Kitchen, bathrooms, floors", true, true],
+          ["Appliance exteriors, counters, sinks", true, true],
+          ["Trash out, mirrors & glass", true, true],
+          ["Inside the oven", true, false],
+          ["Inside the refrigerator", true, "addon"],
+          ["Inside cabinets & closets", true, false],
+          ["Baseboards, doors & trim", true, false],
+          ["Interior windows, sills & tracks", true, false],
+          ["Wall spot-cleaning", true, false]
+        ];
+        const mark = (v) => v === true ? `<span class="rp-scope-yes" aria-label="included">${rpIcon("check","rp-ic rp-ic-sm")}</span>`
+          : v === "addon" ? `<span class="rp-scope-addon">+$${rpAddonCatalog.fridge.price}</span>`
+          : `<span class="rp-scope-no" aria-label="not included">&minus;</span>`;
+        return `<div class="rp-scope-table">
+          <div class="rp-scope-head">
+            <span></span><span>Inspection<br>Ready</span><span>Refresh</span>
+          </div>
+          ${scope.map(([label, ir, rf]) => `<div class="rp-scope-row"><span>${label}</span>${mark(ir)}${mark(rf)}</div>`).join("")}
+        </div>
+        <p class="rp-scope-foot">Both tiers: same 2-cleaner crew, same insurance, same standards. The difference is how far into the home we go.</p>`;
+      })()}
+      ${(() => {
+        /* Round 23 (sales-review fix): the previous line was generic
+           regardless of answer -- but the PREVIOUS screen already asked
+           renting vs. selling, and that answer went unused after being
+           collected. A home going on the market gets buyer walkthroughs
+           and listing photos; arguably a stronger case for the full
+           checklist than a rental turnover. This nudges sellers
+           specifically, using data already in state, rather than adding
+           a new question. Renters and unanswered cases keep the
+           original generic line. */
+        if (rpState.moveoutRentalOrSelling === "selling") {
+          return `<p class="rp-fineprint"><strong>Listing it?</strong> Buyers notice what a rental tenant wouldn't \u2014 Inspection Ready is the one built to photograph and show well, backed by Defend Your Deposit.</p>`;
+        }
+        return `<p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave, Inspection Ready is the one backed by Defend Your Deposit.</p>`;
+      })()}
     </div>` };
   }
 
@@ -3296,10 +3436,10 @@ function rpAddonsScreen(eyebrow) {
     secondCleaner: { icon: "repeat", label: "Additional Cleaner", desc: "A 2nd cleaner for the full time booked, so more gets done in the same visit." }
   };
   function summaryFor(key) {
-    if (key === "carpet") return `${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}`;
-    if (key === "junk") return rpState.junkSize === "half" ? "Half Truck · $100" : rpState.junkSize === "full" ? "Full Truck · $200" : "Custom Quote";
-    if (key === "windows") return rpState.windowsTier === "basic" ? "Basic Wash · $100" : "Premium Wash · $200";
-    if (key === "garage") return "$150";
+    if (key === "carpet") { const enz = rpState.addonCarpetPetEnzyme ? rpState.addonCarpetRooms * RP_PET_ENZYME_RATE : 0; return `${rpState.addonCarpetRooms} room${rpState.addonCarpetRooms === 1 ? "" : "s"}${enz ? " + enzyme" : ""} · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice + enz}`; }
+    if (key === "junk") return rpState.junkSize === "half" ? `Half Truck · $${rpAddonCatalog.junk.half}` : rpState.junkSize === "full" ? `Full Truck · $${rpAddonCatalog.junk.full}` : "Oversized · quoted separately";
+    if (key === "windows") return rpState.windowsTier === "basic" ? `Basic Wash · $${rpAddonCatalog.windows.basic}` : `Premium Wash · $${rpAddonCatalog.windows.premium}`;
+    if (key === "garage") return `$${rpAddonCatalog.garage.price}`;
     if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
     if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}`;
@@ -3308,39 +3448,51 @@ function rpAddonsScreen(eyebrow) {
   }
   function bodyFor(key) {
     if (key === "carpet") {
+      /* Round 21: pet enzyme was only reachable from the standalone
+         Carpet Cleaning service, so a move-out with pet damage — the
+         most common place it's actually needed — had no way to buy it.
+         Same $25/room rate, shown only once rooms are picked so the
+         price it quotes is a real number. */
       return `
-        <p class="rp-tap-note">How many rooms? <span style="color:var(--muted)">· $50 per room</span></p>
+        <p class="rp-tap-note">How many rooms? <span style="color:var(--muted)">· $${rpAddonCatalog.carpet.bundlePrice} per room</span></p>
         <div class="rp-pill-grid">
           ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.addonCarpetRooms === n ? "is-selected" : ""}" onclick="rpSelectAddonCarpetRooms(${n})">${n}${n===6?"+":""}</button>`).join("")}
-        </div>`;
+        </div>
+        ${rpState.addonCarpetRooms ? `
+        <p class="rp-tap-note" style="margin-top:12px">Pet odor or stains? <span style="color:var(--muted)">· $${RP_PET_ENZYME_RATE} per room</span></p>
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(true)">Add Enzyme<br><small>$${rpState.addonCarpetRooms * RP_PET_ENZYME_RATE}</small></button>
+          <button class="rp-pill ${!rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(false)">Not Needed</button>
+        </div>` : ""}`;
     }
     if (key === "junk") {
       return `
         <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.junkSize === "half" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('half')">Half Truck<br><small>$100</small></button>
-          <button class="rp-pill ${rpState.junkSize === "full" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('full')">Full Truck<br><small>$200</small></button>
-          <button class="rp-pill ${rpState.junkSize === "custom" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('custom')">Large<br><small>Custom Quote</small></button>
-        </div>`;
+          <button class="rp-pill ${rpState.junkSize === "half" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('half')">Half Truck<br><small>$${rpAddonCatalog.junk.half}</small></button>
+          <button class="rp-pill ${rpState.junkSize === "full" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('full')">Full Truck<br><small>$${rpAddonCatalog.junk.full}</small></button>
+          <button class="rp-pill ${rpState.junkSize === "custom" ? "is-selected" : ""}" onclick="rpSelectAddonJunk('custom')">Oversized<br><small>Quoted separately</small></button>
+        </div>
+        ${rpState.junkSize === "custom" ? `<p class="rp-tap-note" style="margin-top:10px;color:var(--red);font-weight:700">We'll call with a haul price before your cleaning date. It is not part of the total below.</p>` : ""}`;
     }
     if (key === "windows") {
       return `
         <p class="rp-tap-note">Premium adds screen removal for a fuller clean.</p>
         <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $100</small></button>
-          <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $200</small></button>
+          <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $${rpAddonCatalog.windows.basic}</small></button>
+          <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $${rpAddonCatalog.windows.premium}</small></button>
         </div>`;
     }
     if (key === "garage") {
       return `
         <p class="rp-tap-note"><strong>Garage must be completely empty before service.</strong></p>
         <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Add Floor Wash<br><small>$150</small></button>
+          <button class="rp-pill ${rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(true)">Add Floor Wash<br><small>$${rpAddonCatalog.garage.price}</small></button>
           <button class="rp-pill ${!rpState.garageWash ? "is-selected" : ""}" onclick="rpSelectGarageWash(false)">Not Needed</button>
         </div>`;
     }
     if (key === "laundry") {
       return `
-        <p class="rp-tap-note">How many loads? <span style="color:var(--muted)">· $35 per load</span></p>
+        <p class="rp-tap-note">How many loads? <span style="color:var(--muted)">· $${rpAddonCatalog.laundry.pricePerLoad} per load</span></p>
         <div class="rp-pill-grid">
           ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.laundryLoads === n ? "is-selected" : ""}" onclick="rpSelectLaundryLoads(${n})">${n}<br><small>load${n===1?"":"s"}</small></button>`).join("")}
         </div>`;
@@ -3428,26 +3580,24 @@ function rpAddonsScreen(eyebrow) {
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>
   </div>${optionSheet}`, footer: `
-    <div class="rp-live-chip"><span>Current estimate</span><strong>${rpPriceLabel()}</strong></div>
+    <div class="rp-live-chip"><span>${rpAddonsTotal() > 0 ? `Add-ons +$${rpAddonsTotal().toFixed(0)} \u00b7 total` : "Current estimate"}</span><strong>${rpPriceLabel()}</strong></div>
+    ${rpHasQuotedAddon() ? `<p class="rp-addon-quoted-note">Oversized junk haul is quoted separately and isn't in this total.</p>` : ""}
     <button class="rp-primary" onclick="rpAdvance()">Review My Estimate</button>
   ` };
 }
 
+/* Round 21: renders rpAddonLineItems() instead of re-deriving selection
+   state here. Every hardcoded price string ($100/$200/$150) is gone —
+   those were a second copy of the catalog waiting to drift. The
+   oversized junk load now reads "quoted separately" rather than a bare
+   "Custom Quote" sitting next to a firm grand total, which looked like
+   the haul was free. */
 function rpAddonSummaryRows() {
-  const rows = [];
-  if (rpState.addonCarpetRooms) rows.push(`<div class="rp-mini-row"><span>Carpet Cleaning</span><strong>${rpState.addonCarpetRooms} room(s) · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice}</strong></div>`);
-  if (rpState.junkSize === "half") rows.push(`<div class="rp-mini-row"><span>Junk Haul</span><strong>Half Truck Bed · $100</strong></div>`);
-  if (rpState.junkSize === "full") rows.push(`<div class="rp-mini-row"><span>Junk Haul</span><strong>Full Truck Bed · $200</strong></div>`);
-  if (rpState.junkSize === "custom") rows.push(`<div class="rp-mini-row"><span>Junk Haul</span><strong>Larger load · Custom Quote</strong></div>`);
-  if (rpState.windowsTier === "basic") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Basic Wash · $100</strong></div>`);
-  if (rpState.windowsTier === "premium") rows.push(`<div class="rp-mini-row"><span>Exterior Windows</span><strong>Premium Wash · $200</strong></div>`);
-  if (rpState.garageWash) rows.push(`<div class="rp-mini-row"><span>Garage Floor Wash</span><strong>$150</strong></div>`);
-  if (rpState.laundryLoads) rows.push(`<div class="rp-mini-row"><span>Laundry Service (${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"})</span><strong>$${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}</strong></div>`);
-  if (rpState.fridgeAddon) rows.push(`<div class="rp-mini-row"><span>Refrigerator Interior</span><strong>$${rpAddonCatalog.fridge.price}</strong></div>`);
-  if (rpState.addonExtraHours) rows.push(`<div class="rp-mini-row"><span>Extra Time (+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"})</span><strong>$${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}</strong></div>`);
-  if (rpState.addonSecondCleaner) rows.push(`<div class="rp-mini-row"><span>Additional Cleaner (${rpSecondCleanerHours()} hrs)</span><strong>$${rpSecondCleanerPrice()}</strong></div>`);
-  if (rpState.service === "carpet" && rpState.addonPetEnzyme) rows.push(`<div class="rp-mini-row"><span>Pet Enzyme Treatment</span><strong>$${rpPetEnzymePrice()}</strong></div>`);
-  return rows.join("");
+  return rpAddonLineItems().map(r => {
+    const detail = r.detail ? `${r.detail} · ` : "";
+    const amount = r.quoted ? "Quoted separately" : `$${r.price.toFixed(0)}`;
+    return `<div class="rp-mini-row"><span>${r.label}</span><strong>${detail}${amount}</strong></div>`;
+  }).join("");
 }
 
 function rpEstimateScreen(eyebrow) {
@@ -3488,6 +3638,7 @@ function rpEstimateScreen(eyebrow) {
           : rpState.service === "moveoutrefresh"
             ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveout')">Need it guaranteed for an inspection? See Inspection Ready pricing \u2192</button>`
             : ""}
+        ${rpState.addonDropNotice ? `<p class="rp-addon-drop-notice">Removed from your estimate: <strong>${rpState.addonDropNotice}</strong> — already included in this tier.</p>` : ""}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 61+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
@@ -3552,10 +3703,18 @@ function rpLeadFieldFocus(element) {
    rather than "give us your number", because the price genuinely does
    get texted and people abandon a form that reads like a paywall. */
 function rpContactGateScreen(eyebrow) {
+  /* Round 23 (sales-review fix): this screen asks for name and phone
+     BEFORE showing any price, and Clarity already flagged it as the
+     biggest drop point in the funnel -- yet it was the one screen in
+     the whole flow with no trust signal on it at all (the intro screen
+     and the estimate screen both have one). Reinforcing trust is worth
+     the most exactly where the ask feels biggest, not on the screens
+     where there's nothing to be nervous about. */
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Almost there</h2>
     <p class="rp-sub">Just a name and number, then your price is right here.</p>
+    <div class="rp-trust-signal" style="margin-bottom:14px"><strong>\u2605 5.0</strong> \u00b7 61+ reviews \u00b7 Veteran-owned & insured</div>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
@@ -3637,6 +3796,19 @@ function rpSubmitContactGate() {
         phone: phone,
         service: serviceName,
         quoted_price: quoted,
+        /* Round 21: the partial lead is the one most likely to need a
+           call back, and it was going over with a text blob only. The
+           structured fields let GHL route it (a blocked move-out is a
+           different callback than a price balk) and let the ad platforms
+           tie it to the click that produced it. rpState.service is still
+           the neutral "moveout" placeholder at this point, so
+           moveout_tier correctly reads Inspection Ready as the default
+           view — the note text above already says no tier was chosen. */
+        ...rpBuildSharedDetails(),
+        booking_channel: "website",
+        gclid: rpAttribution.gclid || "", gbraid: rpAttribution.gbraid || "", wbraid: rpAttribution.wbraid || "",
+        utm_source: rpAttribution.utm_source || "", utm_medium: rpAttribution.utm_medium || "", utm_campaign: rpAttribution.utm_campaign || "",
+        ad_attribution: rpAttributionSummary(),
         details: [
           "WEBSITE PARTIAL LEAD",
           "Customer entered name and phone, then was shown their price.",
@@ -3670,6 +3842,16 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
+      ${(() => {
+        /* Round 22: deliberately soft, and deliberately NOT a blocker.
+           An out-of-area ZIP still books; this only sets expectations so
+           the office's coverage call isn't a surprise. If the ZIP list is
+           wrong, the worst outcome is one unnecessary sentence — never a
+           lost booking. See SERVICE AREA in the pricing engine. */
+        const area = rpServiceAreaStatus();
+        if (area.status !== "outside") return "";
+        return `<p class="rp-area-note">That ZIP is outside our usual Lawton, Fort Sill, Cache, Elgin, Medicine Park and Duncan area. You can still book, and we'll call to confirm coverage before your appointment.</p>`;
+      })()}
       ${["moveout", "moveoutrefresh"].includes(rpState.service) ? "" : `
       <div class="rp-prep-check">
         <label class="rp-prep-check-label">A few quick property details</label>
@@ -3799,6 +3981,24 @@ function rpAvailableDateKeys() {
     .filter((key) => rpSlotsForDate(key).length > 0)
     .sort();
 }
+/* Round 23 (sales-review fix): real slot-scarcity messaging, built from
+   the SAME live availability data the calendar already renders -- never
+   a manufactured "hurry" line. Counts total open slots across the next
+   7 calendar days (today included). Only shown when that count is
+   genuinely low; when there's plenty of availability the line simply
+   doesn't render, because a false "filling up fast" next to a wide-open
+   calendar reads as a lie and undercuts the "we publish everything
+   honestly" positioning the rest of the site is built on. Threshold is
+   a starting guess -- tune RP_LOW_AVAILABILITY_THRESHOLD once you know
+   what a normal week's slot count looks like. */
+const RP_LOW_AVAILABILITY_THRESHOLD = 6;
+function rpUpcomingWeekOpenSlotsCount() {
+  const today = rpCentralDateKey();
+  const end = rpAddDaysKey(today, 7);
+  return Object.keys(rpState.availableSlots || {})
+    .filter((key) => key >= today && key <= end)
+    .reduce((sum, key) => sum + rpSlotsForDate(key).length, 0);
+}
 function rpSlotsForSelectedDate() {
   return rpState.selectedDate ? rpSlotsForDate(rpState.selectedDate) : [];
 }
@@ -3884,6 +4084,19 @@ function rpCalendarScreen(eyebrow) {
     <h2>${heading}</h2>
     <p class="rp-sub">${sub}</p>
     <div class="rp-calendar-assurance"><span>No deposit</span><span>Instant confirmation</span></div>
+    ${(() => {
+      /* Round 23 (sales-review fix): genuine scarcity built from the same
+         live slot data the calendar already renders -- never invented.
+         Only shows when the count is actually low; a wide-open calendar
+         renders nothing rather than a manufactured "hurry" line, since a
+         false one next to visibly-open dates would undercut the
+         "we publish everything honestly" positioning the rest of the site
+         is built on. */
+      if (rpState.slotsLoading || rpState.slotsError) return "";
+      const openCount = rpUpcomingWeekOpenSlotsCount();
+      if (openCount <= 0 || openCount > RP_LOW_AVAILABILITY_THRESHOLD) return "";
+      return `<p class="rp-slots-low">Only ${openCount} opening${openCount === 1 ? "" : "s"} left in the next 7 days.</p>`;
+    })()}
     ${body}
   </div>`, footer: onTimeStage && !rpState.slotsLoading && !rpState.slotsError ? `
     <div class="rp-calendar-footer-meta"><span>${rpState.selectedStartTime ? `${rpFormatLongDate(rpState.selectedDate)} · ${rpFormatTime(rpState.selectedStartTime)}` : "Choose an arrival time"}</span><strong>${rpPriceLabel()}</strong></div>
@@ -3924,6 +4137,19 @@ function rpRender(direction) {
 
   rpScreenEnteredAt = Date.now();
   rpTrack("screen_view");
+  /* Round 22: the tier decision is the single most important thing this
+     funnel now does and it was invisible to analytics. screen_view fires
+     with service = "moveout" here (the neutral placeholder), so without
+     these two events there is no way to answer "what share of customers
+     pick Refresh, at what home size, at what price gap" — which is
+     exactly the data the Refresh pricing question needs. */
+  if (rpState.step === "moveouttiers") rpTrack("moveout_tiers_viewed", {
+    price_inspection_ready: rpMoveoutTierBasePrice("moveout") ?? "custom",
+    price_refresh: rpMoveoutTierBasePrice("moveoutrefresh") ?? "custom",
+    price_gap: (rpMoveoutTierBasePrice("moveout") ?? 0) - (rpMoveoutTierBasePrice("moveoutrefresh") ?? 0),
+    bedrooms: rpState.bedrooms || "none",
+    sqft_tier: rpSqftTier() ? rpSqftTier().label : "none"
+  });
   if (rpState.step === "estimate") rpTrack("estimate_reached", { estimate: rpPriceLabel() });
   if (rpState.step === "calendar") rpTrack("calendar_reached", { estimate: rpPriceLabel() });
 
@@ -3963,11 +4189,13 @@ function rpResetServiceState() {
   rpState.hourCount = null;
   rpState.carpetRooms = 0;
   rpState.addonCarpetRooms = 0;
+  rpState.addonCarpetPetEnzyme = false;
   rpState.expandedAddon = null;
   rpState.windowsTier = null;
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
+  rpState.addonDropNotice = "";
   rpState.addonExtraHours = 0;
   rpState.addonSecondCleaner = false;
   rpState.moveoutWaterOn = null;
@@ -4023,6 +4251,19 @@ function rpSelectService(service, element) {
 function rpSelectSqft(key, element) { rpCommitChoice(element, () => { rpState.sqft = key; rpAdvance(); }); }
 function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.bedrooms = n; rpAdvance(); }); }
 function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
+/* Round 23: Move-Out's merged bedrooms+bathrooms screen. Bedrooms does
+   NOT advance -- it just sets state and re-renders so the bathroom row
+   fades in below, no element to animate via rpCommitChoice since the
+   bedroom tap doesn't leave the screen. Bathrooms is the one that
+   advances, same rpCommitChoice pattern as everywhere else. */
+function rpSelectMoveoutBedrooms(n) {
+  rpState.bedrooms = n;
+  if (rpMoveoutBedroomTier(n)?.includedBathrooms && !rpState.bathrooms) {
+    rpState.bathrooms = rpMoveoutBedroomTier(n).includedBathrooms;
+  }
+  rpRefresh();
+}
+function rpSelectMoveoutBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
 function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
 function rpSelectHourCount(n, element) { rpCommitChoice(element, () => { rpState.hourCount = n; rpAdvance(); }); }
 /* Toggles one questionnaire answer and re-renders in place (not
@@ -4038,13 +4279,47 @@ function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh();
    rpServiceBasePrice() reads and jumps straight back to the estimate,
    no re-asking anything. Replaces the old flat/hourly billing-mode
    toggle (round 19 -- hourly removed). */
-function rpSwitchMoveoutTier(service) { rpState.service = service; rpGoToStep("estimate", "back"); }
+/* Round 20: a tier switch changes rpState.service WITHOUT the full
+   rpResetServiceState() a real service change gets, so any add-on the
+   incoming tier doesn't offer has to be dropped explicitly. Concretely:
+   Refresh offers Refrigerator Interior ($50) because Refresh excludes it
+   — Inspection Ready includes it in the base, so carrying that selection
+   across billed $50 for work already in scope, on a line the customer
+   couldn't remove. rpClearUnavailableAddons() returns what it dropped so
+   the change is announced rather than silent. */
+function rpSwitchMoveoutTier(service) {
+  rpTrack("moveout_tier_switched", {
+    from: rpState.service === "moveout" ? "inspection_ready" : "refresh",
+    to: service === "moveout" ? "inspection_ready" : "refresh",
+    at_step: "estimate"
+  });
+  rpState.service = service;
+  const dropped = rpClearUnavailableAddons(service);
+  if (dropped.length) rpState.addonDropNotice = dropped.map(k => rpAddonCatalog[k] ? rpAddonCatalog[k].label : k).join(", ");
+  else rpState.addonDropNotice = "";
+  rpGoToStep("estimate", "back");
+}
 
 /* The FIRST tier pick, from the "moveouttiers" comparison screen
    (round 19c) -- as opposed to rpSwitchMoveoutTier() above, which
    flips an already-chosen tier later from the estimate screen. Sets
    the real service, then advances normally into add-ons. */
-function rpChooseMoveoutTier(service) { rpState.service = service; rpState.moveoutTierChosen = true; rpAdvance(); }
+function rpChooseMoveoutTier(service) {
+  rpTrack("moveout_tier_selected", {
+    tier: service === "moveout" ? "inspection_ready" : "refresh",
+    tier_price: rpMoveoutTierBasePrice(service) ?? "custom",
+    other_tier_price: rpMoveoutTierBasePrice(service === "moveout" ? "moveoutrefresh" : "moveout") ?? "custom",
+    bedrooms: rpState.bedrooms || "none",
+    sqft_tier: rpSqftTier() ? rpSqftTier().label : "none",
+    switched_from: rpState.moveoutTierChosen ? "changed_mind" : "first_choice"
+  });
+  rpState.service = service;
+  rpState.moveoutTierChosen = true;
+  /* Normally a no-op (add-ons come AFTER this screen), but reachable:
+     choose a tier, continue to add-ons, press back, choose the other. */
+  rpClearUnavailableAddons(service);
+  rpAdvance();
+}
 
 function rpSubmitMoveoutBlockedLead() {
   const nameEl = document.getElementById("rpBlockedName");
@@ -4083,6 +4358,15 @@ function rpSubmitMoveoutBlockedLead() {
         phone: phone,
         service: (rpServices[rpState.service] && rpServices[rpState.service].name) || "Move-Out Cleaning",
         quoted_price: "No quote - blocked",
+        /* Round 21: same structured fields as every other lead. The
+           questionnaire answers are the whole reason this lead exists,
+           and moveout_block_reasons arrives as its own field so the
+           office can triage water-off from mold before dialling. */
+        ...rpBuildSharedDetails(),
+        booking_channel: "website",
+        gclid: rpAttribution.gclid || "", gbraid: rpAttribution.gbraid || "", wbraid: rpAttribution.wbraid || "",
+        utm_source: rpAttribution.utm_source || "", utm_medium: rpAttribution.utm_medium || "", utm_campaign: rpAttribution.utm_campaign || "",
+        ad_attribution: rpAttributionSummary(),
         details: [
           "MOVE-OUT BLOCKED AT QUESTIONNAIRE",
           "Customer could not get a price online because:",
@@ -4122,7 +4406,7 @@ function rpExpandAddon(key) { rpState.expandedAddon = key; rpRefresh(); }
 function rpCollapseAddon() { rpState.expandedAddon = null; rpRefresh(); }
 function rpToggleMoreAddons() { rpState.showMoreAddons = !rpState.showMoreAddons; rpRefresh(); }
 function rpClearAddon(key) {
-  if (key === "carpet") rpState.addonCarpetRooms = 0;
+  if (key === "carpet") { rpState.addonCarpetRooms = 0; rpState.addonCarpetPetEnzyme = false; }
   else if (key === "junk") rpState.junkSize = null;
   else if (key === "windows") rpState.windowsTier = null;
   else if (key === "garage") rpState.garageWash = false;
@@ -4134,15 +4418,16 @@ function rpClearAddon(key) {
   rpTrack("addon_removed", { addon: key });
   rpRefresh();
 }
-function rpSelectAddonCarpetRooms(n) { rpState.addonCarpetRooms = n; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectAddonJunk(size) { rpState.junkSize = size; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectAddonWindows(tier) { rpState.windowsTier = tier; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectGarageWash(yes) { rpState.garageWash = yes; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectLaundryLoads(n) { rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectAddonCarpetRooms(n) { rpTrackAddon("carpet", n > 0, { rooms: n }); rpState.addonCarpetRooms = n; if (!n) rpState.addonCarpetPetEnzyme = false; rpRefresh(); }
+function rpSelectAddonCarpetPetEnzyme(yes) { rpTrackAddon("carpetPetEnzyme", yes, { rooms: rpState.addonCarpetRooms }); rpState.addonCarpetPetEnzyme = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectAddonJunk(size) { rpTrackAddon("junk", !!size, { size }); rpState.junkSize = size; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectAddonWindows(tier) { rpTrackAddon("windows", !!tier, { tier }); rpState.windowsTier = tier; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectGarageWash(yes) { rpTrackAddon("garage", yes); rpState.garageWash = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectLaundryLoads(n) { rpTrackAddon("laundry", n > 0, { loads: n }); rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
-function rpSelectFridge(yes) { rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectSecondCleaner(yes) { rpState.addonSecondCleaner = yes; rpState.expandedAddon = null; rpRefresh(); }
-function rpSelectExtraHours(n) { rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectFridge(yes) { rpTrackAddon("fridge", yes); rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectSecondCleaner(yes) { rpTrackAddon("secondCleaner", yes); rpState.addonSecondCleaner = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectExtraHours(n) { rpTrackAddon("extraHours", n > 0, { hours: n }); rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
 
 /* =========================================================================
    PAYLOAD + CALENDAR HANDOFF — verbatim from the homepage estimator.
@@ -4171,17 +4456,9 @@ function rpGetEstimatePayload() {
   const propertyConditionsSummary = propertyConditionFlags.length
     ? `⚠ CREW PREP: ${propertyConditionFlags.join(", ")}`
     : "None flagged";
-  const addonsList = [
-    rpState.addonCarpetRooms ? `Carpet Cleaning: ${rpState.addonCarpetRooms} room(s)` : "",
-    rpState.junkSize ? `Junk Haul: ${rpState.junkSize}` : "",
-    rpState.windowsTier ? `Exterior Windows: ${rpState.windowsTier}` : "",
-    rpState.garageWash ? "Garage Floor Wash" : "",
-    rpState.laundryLoads ? `Laundry Service: ${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"}` : "",
-    rpState.fridgeAddon ? "Refrigerator Interior" : "",
-    rpState.addonExtraHours ? `Extra Time: +${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"}` : "",
-    rpState.addonSecondCleaner ? `Additional Cleaner: ${rpSecondCleanerHours()} hrs, $${rpSecondCleanerPrice()}` : "",
-    (rpState.service === "carpet" && rpState.addonPetEnzyme) ? `Pet Enzyme Treatment: $${rpPetEnzymePrice()}` : ""
-  ].filter(Boolean).join(", ") || "None";
+  /* Round 21: one shared list (rpAddonSummaryText) instead of a
+     hand-maintained copy that carried names without prices. */
+  const addonsList = rpAddonSummaryText();
   const isConditionPriced = ["moveout", "moveoutrefresh", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
   const baseServicePrice = rpDisplayBasePrice();
   const militaryDiscountAmount = rpMilitaryDiscountAmount();
@@ -4214,10 +4491,24 @@ function rpGetEstimatePayload() {
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,
-    `Address: ${fullAddress || "N/A"}`, `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
+    `Address: ${fullAddress || "N/A"}`,
+    /* Round 22: the crew sheet is where a coverage problem has to be
+       visible, because it's the thing dispatch actually reads. */
+    (() => { const a = rpServiceAreaStatus(); return a.status === "core" ? `Service area: ${a.area}` : `\u26a0 SERVICE AREA: ${a.label}${a.area ? ` (${a.area})` : ""}`; })(),
+    `Special instructions: ${notes}`, `Ad Attribution: ${rpAttributionSummary()}`
   ].join(" | ");
+  /* Round 21: rpBuildSharedDetails() supplies every field that /call must
+     also send — service identity, tier, guarantee, sizes, the add-on
+     breakdown WITH prices, the move-out questionnaire as discrete
+     fields, and the pricing math. Spread FIRST so the page-specific
+     fields below still win on any key they both define (e.g. /book's
+     estimated_price already handled the Airbnb custom-quote wording).
+     Anything added to the shared builder now reaches both surfaces
+     automatically instead of one of them silently lagging. */
   return {
+    ...rpBuildSharedDetails(),
     source: "Red Prairie Website Instant Estimator", business: "Red Prairie Cleaning",
+    booking_channel: "website",
     full_name: rpState.fullName, phone: rpState.phone, email: rpState.email,
     address1, street_address: address1, address: address1, city, state, postal_code: postalCode, zip: postalCode, full_address: fullAddress,
     service, service_type: service, service_key: rpState.service, guarantee_type: rpGuaranteeType(),
