@@ -292,5 +292,155 @@ NOT DONE (by scope, not by accident)
   now including the new pricing.
 
 
+--------------------------------------------------------
+6. FOLLOW-UP (same round): NEW ADD-ONS WERE BURYING CARPET & WINDOWS
+--------------------------------------------------------
+Your note: "I don't like the move-out addons from the refresh toppling
+over the high quality addons like carpet and windows. Can there be a
+little box to check to add them in the comparison screen?"
+
+Real bug, caused by section 2 above. The add-ons screen only shows the
+first 3 cards by default (everything past that collapses behind a "Show
+more" toggle) — before this round that top-3 slot was fridge, carpet,
+windows for Refresh. Prepending oven, cabinets, and Detail Pass ahead of
+carpet in the add-on list bumped BOTH carpet and windows out of that
+visible slot and behind "Show more," which is backwards: those are the
+bigger, more-considered purchases and shouldn't be the ones hidden.
+
+Fixed exactly as you suggested: Refrigerator Interior, Oven Interior,
+Inside Cabinets & Closets, and Detail Pass are no longer cards on
+Refresh's add-ons screen at all. They're checkboxes on the moveouttiers
+comparison screen instead, right below the scope table that already
+prices each of them out — labeled "Going with Refresh? Add any of
+these:". Same state fields, same toggle functions as before, so nothing
+about pricing, the estimate, the webhook, or the crew sheet changed —
+only where you check the box. Checking one and then choosing Inspection
+Ready instead is harmless; the total only counts them on Refresh, since
+Inspection Ready already includes all of it for free.
+
+Net effect on Refresh's add-ons screen: only Carpet Cleaning, Exterior
+Windows, and Garage Floor Wash remain, all three visible up front with
+no "Show more" needed. This is /book only — /call's addon picker for
+Liz never had this problem (it lists every available add-on as static
+checkboxes with no top-3 collapse), so it was left as-is.
+
+Verified with a scripted browser pass: the comparison screen renders
+the four checkboxes correctly under the scope table, checking two of
+them (fridge + oven) correctly adds $100 and follows through to the
+add-ons screen's running total, and the add-ons screen itself now shows
+carpet/windows/garage up front with nothing collapsed. node --check
+clean on book/index.html afterward.
+
+
+--------------------------------------------------------
+7. AUDIT PASS: "did you check /book, /call and the FAQ" + prep Liz
+--------------------------------------------------------
+You asked me to scan the round for micro-optimizations, check whether
+/book, /call, and the FAQ actually got the round's changes and any
+recommended additions, and specifically prepare Liz to talk through the
+tier difference on the phone. Here's what that turned up and what I
+fixed.
+
+CALL BUTTON, STILL BROKEN-LOOKING (separate bug from section 5 above)
+You flagged "call button still goofy looking" with a screenshot: FAQ and
+Text Us render as proper pill buttons, Call renders as bare text between
+them. Cause: the shared button styling rule (background, border, color,
+font-weight) only ever listed ".rp-head-faq, .rp-head-text" -- ".rp-head-
+call" had its own separate rule for spacing/sizing but was never added
+to the rule that actually makes it look like a button. Pre-existing
+since round 23 (when Call was first added next to Text Us), unrelated to
+this round's work otherwise. Fixed by adding .rp-head-call into that
+shared rule and its :active state. /book only -- the location landing
+pages use a different button system (.book-btn) that was never affected.
+
+FAQ HAD NOTHING ABOUT THE TWO MOVE-OUT TIERS
+The FAQ (reachable from every service, not just Move-Out) never
+mentioned Inspection Ready vs. Refresh at all -- a real gap given it's
+the site's core differentiated pricing decision. Added a new question,
+"What's the difference between Inspection Ready and Move-Out Refresh?",
+right after the first question, explaining both tiers, both guarantees,
+and that individual items can be added to Refresh or bundled by
+choosing Inspection Ready outright.
+
+LIZ HAD A ONE-LINE HINT, NOT A CONVERSATION
+Per your ask -- "prepare Liz to have conversations about the difference
+... sells to both the customer who needs it perfect and the budget
+people" -- the only guidance on /call was a single hint line per option
+on the service picker, plus a short "say it as" line on the scope cheat
+sheet. Neither gave her an actual two-sided script. Added:
+  - A full "Watch" script on the service-picker step (the very first
+    screen, before either tier is even picked): ask whether anyone's
+    inspecting the home, then a real pitch for EACH answer -- Inspection
+    Ready framed as what most people book to protect a deposit, Refresh
+    framed as a genuine recommendation for a real situation, not a
+    downsell. Ends by telling her the quote screen will flag it if the
+    numbers say Inspection Ready is now the better deal (see next item).
+  - Expanded the scope cheat sheet's closing line the same way.
+
+INSPECTION READY CAN BECOME THE BETTER DEAL AND NOBODY SAID SO
+This is the one I'd flag as the most consequential fix. The whole
+add-on pricing in section 2 was deliberately built so stacking every
+excluded-scope add-on on Refresh always costs MORE than switching to
+Inspection Ready outright -- but nothing on either /call or /book ever
+said this to anyone. A caller or self-serve customer could genuinely end
+up paying more for Refresh-plus-everything than Inspection Ready would
+have cost, for less scope and no deposit guarantee -- worse for them,
+and it leaves money and a happier customer on the table for you. Fixed
+on both sides, computed live off the real bedroom-tier prices so it
+can't drift out of sync:
+  - /call: a new guardrail on the addons and quote screens. Once the
+    add-ons total reaches the tier-price gap, an info box appears with
+    the exact numbers and a line to say out loud, next to the existing
+    "Switch to Inspection Ready" button.
+  - /book: the "Need it guaranteed for an inspection?" link on the
+    estimate screen now checks the same math. Below the threshold it's
+    unchanged; at or above it, it swaps to "With these add-ons you're at
+    $X — Inspection Ready is $Y and fully guaranteed" with real numbers.
+Tested at $150 in add-ons (below the $230 gap for a 3-bed home -- stays
+quiet) and $275 (above it -- fires with the correct live numbers) on
+both /call and /book.
+
+ONE MORE STALE PRICE, ON A LANDING PAGE
+Swept every location/resource page for old move-out price figures.
+pcs-cleaning-fort-sill-ok/index.html had a "PCS Package" price list
+still quoting the old $199-$599 range (last touched before round 25's
+repricing) linked to a "?service=moveout" button -- i.e. it was quoting
+old Inspection Ready numbers for the current Inspection Ready link.
+Updated to $379 / $479-$589 / $699 by home size. Nothing else on any
+other page referenced an old price.
+
+SMALLER FIXES WHILE AUDITING
+  - /pricing's <meta description> claimed "oven, fridge, cabinets and
+    closets included -- not add-ons" as a blanket site-wide claim; it's
+    only true on Inspection Ready now that Refresh sells them
+    individually. Reworded to describe both tiers instead. (The visible
+    on-page promise list already correctly said "on Inspection Ready" --
+    only the meta tag was the blanket version.)
+
+WAS THIS A GOOD IDEA / IS IT CLEAR -- my honest read
+The underlying logic is sound: Inspection Ready needed the increase to
+actually fund its own guarantee, Refresh stays the honest budget option,
+and the a-la-carte-always-costs-more design protects both tiers from
+cannibalizing each other. Two things worth watching, not fixing --
+they're judgment calls, not bugs:
+  - Inspection Ready moved up 21-27% in one shot. That's a real jump for
+    anyone who saw the old number recently (a repeat customer, a referral
+    who heard a friend's price). Worth watching booking volume on that
+    tier for a few weeks -- if it drops noticeably, that's the market
+    telling you something the cost math alone won't show.
+  - The "Most Popular" badge sits on Inspection Ready unconditionally.
+    That's presumably intentional (it's the better-margin tier), but it
+    does mean the comparison isn't perfectly neutral between "sells to
+    both" audiences -- flagging it so it's a choice you're making on
+    purpose, not a default you inherited.
+Not touched, flagged again as in every round since 19c: the homepage's
+own separate, older embedded booking widget is now further out of sync
+than ever -- it predates the tier split entirely and still shows old
+junk pricing and a "yard" option that doesn't exist anymore. Given how
+much has now diverged (two tiers, new add-ons, new prices), this is
+probably worth a real look soon rather than another round of "still
+flagging it."
+
+
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub

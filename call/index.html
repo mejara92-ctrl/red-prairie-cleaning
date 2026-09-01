@@ -453,7 +453,15 @@ const SCRIPT = {
      in the first five seconds of the call. */
   service:{say:()=>`\u201cThanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} \u2014 what can we help you with today?\u201d`,
     listen:"Let them describe it in their own words first. Callers move for all kinds of reasons \u2014 military transfer, new job, new place \u2014 don't assume they know military terms and don't assume they don't.",
-    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number."},
+    /* Round 25 (direct instruction): "Prepare Liz... to have conversations
+       about the difference between Move-Out Refresh and Inspection Ready.
+       I think this sells to both the customer who needs it perfect and
+       the budget people." This is the moment to say it -- right when a
+       move-out caller first states their need, before either tier gets
+       picked and before a price gets said. The scope cheat sheet on the
+       quote screen (further down the call) still has the size-specific
+       numbers; this is the up-front "how do I even frame this" version. */
+    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number.  \u2022  MOVING OUT? Ask before quoting either tier: \u201cIs a landlord, property manager, or a buyer's inspector going to walk through and check the place against a list?\u201d Yes or not sure \u2192 lead with Inspection Ready: \u201cThat's the one most people book for a move-out \u2014 full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.\u201d Flat no, they're just handing over keys \u2192 Refresh is a genuine, honest recommendation, not a downsell: \u201cYou don't need to pay for a guarantee nobody's going to test \u2014 Refresh gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d Both tiers are worth being proud to sell \u2014 the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn on price once add-ons start stacking up on Refresh, the quote screen will flag it if Inspection Ready has become the better deal."},
   caller:{say:"\u201cHappy to help with that \u2014 let me just grab your name and a good number for you in case we get cut off.\u201d",
     listen:"Get the name and number BEFORE anything else past this point.",
     watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
@@ -678,6 +686,23 @@ function guardrails(){
   if(s==="addons" && ["moveout","moveoutrefresh"].includes(rpState.service) && rpAddonsTotal()===0)
     g.push({level:"info",title:"Ask all three by name",
       body:"Carpet, exterior windows, garage. Most customers won't raise them on their own, and they're the easiest revenue on the call."});
+  /* Round 25 (direct instruction: "I need to make money and the
+     expectations need to be clear" -- and the pricing itself was built so
+     buying every excluded-scope add-on on Refresh always costs MORE than
+     switching tiers outright, by design; see rpDetailPassPrice()'s
+     comment in the engine). Nothing used to say this out loud, so a
+     caller could stack fridge + oven + cabinets + Detail Pass on Refresh
+     and end up paying more than Inspection Ready for LESS scope and no
+     guarantee -- worse for them, and it undersells the tier that's
+     actually the better fit. Computed live off the same base-price
+     function /book and /pricing use, so it can't drift out of sync with
+     the real numbers. */
+  if(["addons","quote"].includes(s) && rpState.service==="moveoutrefresh" && !rpIsCustomQuoteOnly()){
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh"), addonsTotal=rpAddonsTotal();
+    if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && addonsTotal>=(irPrice-rfPrice))
+      g.push({level:"info",title:"Inspection Ready is now the better deal",
+        body:`With these add-ons, Refresh comes to $${(rfPrice+addonsTotal).toFixed(2)} — Inspection Ready is $${irPrice.toFixed(2)} for the same home, fully guaranteed, nothing left out. Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
+  }
   return g;
 }
 function hasBlockingGuard(){ return guardrails().some(x=>x.level==="stop"); }
@@ -1153,7 +1178,7 @@ function moveoutScopeRefHtml(){
          it went unused after that -- same nudge, said out loud. */
       rpState.moveoutRentalOrSelling === "selling"
         ? "They're listing it \u2014 lead with Inspection Ready: buyers notice what a rental tenant wouldn't."
-        : "Say it as: same crew, same standards, the difference is how far into the home we go. If a landlord or PM is inspecting, it's Inspection Ready."
+        : "Same crew, same standards \u2014 the difference is how far into the home we go. No inspection at all? Refresh is the honest recommendation, not a downsell: less scope for less money, and anything specific is still addable by the row above."
     }</p>
   </details>`;
 }
