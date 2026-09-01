@@ -254,7 +254,7 @@ const rpState = {
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
-  garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null, addonDropNotice:"",
+  garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, addonDropNotice:"",
   militaryDiscount:false, militaryVerified:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
   heavySoil:false, petOdor:false,
@@ -543,6 +543,9 @@ function removableAddonLabel(){
   if(rpAddonAvailable("windows") && rpState.windowsTier) return "the exterior windows";
   if(rpAddonAvailable("garage") && rpState.garageWash) return "the garage floor wash";
   if(rpAddonAvailable("fridge") && rpState.fridgeAddon) return "the refrigerator interior";
+  if(rpAddonAvailable("oven") && rpState.ovenAddon) return "the oven interior";
+  if(rpAddonAvailable("cabinets") && rpState.cabinetsAddon) return "the cabinets & closets";
+  if(rpAddonAvailable("detailPass") && rpState.detailPassAddon) return "the detail pass";
   if(rpAddonAvailable("laundry") && Number(rpState.laundryLoads)>0) return "the laundry service";
   return null;
 }
@@ -844,6 +847,14 @@ function screenHtml(){
     h+=`<div class="opts">`;
     if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
     if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
+    /* Round 25 (direct instruction, for phone-booking parity with /book's
+       three new Refresh add-ons): oven and cabinets are flat $50 same as
+       fridge; Detail Pass is bedroom-tier priced like the tier bases
+       themselves, so it reads rpDetailPassPrice() rather than a catalog
+       constant. */
+    if(list.includes("oven")) h+=opt(`Oven interior (+$${rpAddonCatalog.oven.price})`,`toggle('ovenAddon')`,rpState.ovenAddon);
+    if(list.includes("cabinets")) h+=opt(`Inside cabinets & closets (+$${rpAddonCatalog.cabinets.price})`,`toggle('cabinetsAddon')`,rpState.cabinetsAddon);
+    if(list.includes("detailPass")) h+=opt(`Detail Pass — baseboards, windows, walls, fans/vents/lights (+$${rpDetailPassPrice()})`,`toggle('detailPassAddon')`,rpState.detailPassAddon);
     h+=`</div>`;
     /* Round 21: laundry is in rpServiceAddons.hourly but was never
        rendered on this console, so an Hourly job booked by phone simply
@@ -1111,19 +1122,22 @@ function toggle(f){ rpState[f]=!rpState[f];
    reading aloud, shown on the quote screen for either move-out tier. */
 function moveoutScopeRefHtml(){
   if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
+  /* Round 25 (parity with /book's scope table, same direct instruction --
+     "each addon should have a price" + cover ceiling fans/vents/lights):
+     every excluded-on-Refresh row now shows the real dollar figure Liz can
+     say out loud, and baseboards/windows/walls/fans-vents-lights are one
+     combined row matching the single Detail Pass SKU she actually books. */
   const rows=[
     ["Kitchen, bathrooms, floors",1,1],
     ["Appliance exteriors, counters, sinks",1,1],
     ["Trash out, mirrors & glass",1,1],
-    ["Inside the oven",1,0],
-    ["Inside the refrigerator",1,"add"],
-    ["Inside cabinets & closets",1,0],
-    ["Baseboards, doors & trim",1,0],
-    ["Interior windows, sills & tracks",1,0],
-    ["Wall spot-cleaning",1,0]
+    ["Inside the oven",1,rpAddonCatalog.oven.price],
+    ["Inside the refrigerator",1,rpAddonCatalog.fridge.price],
+    ["Inside cabinets & closets",1,rpAddonCatalog.cabinets.price],
+    ["Baseboards, windows, walls, fans/vents/lights",1,rpDetailPassPrice()]
   ];
   const m=v=>v===1?`<span style="color:var(--green);font-weight:800">yes</span>`
-    :v==="add"?`<span style="color:var(--red);font-weight:800">+$${rpAddonCatalog.fridge.price}</span>`
+    :typeof v==="number"?`<span style="color:var(--red);font-weight:800">+$${v}</span>`
     :`<span style="color:var(--muted);font-weight:800">no</span>`;
   return `<details class="scope-ref" style="margin-bottom:11px">
     <summary style="cursor:pointer;font-weight:800;font-size:13px">Scope cheat sheet \u2014 Inspection Ready vs Refresh</summary>
@@ -1164,7 +1178,7 @@ function pickService(k){ rpState.service=k;
      rpResetServiceState() coverage. */
   rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.addonCarpetPetEnzyme=false; rpState.windowsTier=null;
   rpState.garageWash=false; rpState.laundryLoads=0;
-  rpState.fridgeAddon=false; rpState.junkSize=null; rpState.cleanerCount=null; rpState.addonDropNotice="";
+  rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.cleanerCount=null; rpState.addonDropNotice="";
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;

@@ -1893,17 +1893,26 @@ line-height:1.5;
     });
 
     function gtag_report_conversion(url) {
-      var callback = function () {
-        if (typeof(url) != 'undefined') {
-          window.location = url;
-        }
+      /* Round 25 fix: previously navigation ONLY happened inside GA's
+         event_callback, so an ad blocker or slow/blocked network (which
+         keeps googletagmanager.com from ever loading) silently ate every
+         tap on Call -- gtag() is a local no-op stub until the real script
+         loads, so the callback that fires window.location was never called.
+         A 500ms fallback timer guarantees the call goes through either way;
+         the 'navigated' guard stops a double-fire if both paths land. */
+      var navigated = false;
+      var go = function () {
+        if (navigated) return;
+        navigated = true;
+        if (typeof(url) != 'undefined') { window.location = url; }
       };
       gtag('event', 'conversion', {
-        'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
-        'value': 1.0,
-        'currency': 'USD',
-        'event_callback': callback
+          'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
+          'value': 1.0,
+          'currency': 'USD',
+          'event_callback': go
       });
+      setTimeout(go, 500);
       return false;
     }
   </script>

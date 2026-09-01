@@ -15,15 +15,26 @@
     'phone_conversion_number': '(580) 215-0915'
   });
   function gtag_report_conversion(url) {
-    var callback = function () {
+    /* Round 25 fix: previously navigation ONLY happened inside GA's
+       event_callback, so an ad blocker or slow/blocked network (which
+       keeps googletagmanager.com from ever loading) silently ate every
+       tap on Call -- gtag() is a local no-op stub until the real script
+       loads, so the callback that fires window.location was never called.
+       A 500ms fallback timer guarantees the call goes through either way;
+       the 'navigated' guard stops a double-fire if both paths land. */
+    var navigated = false;
+    var go = function () {
+      if (navigated) return;
+      navigated = true;
       if (typeof(url) != 'undefined') { window.location = url; }
     };
     gtag('event', 'conversion', {
         'send_to': 'AW-17734105967/DhCYCKjxxb4cEO_2o4hC',
         'value': 1.0,
         'currency': 'USD',
-        'event_callback': callback
+        'event_callback': go
     });
+    setTimeout(go, 500);
     return false;
   }
 </script>
@@ -2702,6 +2713,12 @@ const rpState = {
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
+  /* Round 25 (direct instruction): real priced add-ons for Refresh's
+     remaining excluded scope -- see rpAddonCatalog.oven/cabinets/
+     detailPass in the engine. */
+  ovenAddon: false,
+  cabinetsAddon: false,
+  detailPassAddon: false,
   /* Round 20: set by rpSwitchMoveoutTier() when a tier switch drops an
      add-on the new tier already includes. Display-only, deliberately NOT
      in the persisted-state whitelist — it describes one action, not a
@@ -2941,7 +2958,7 @@ const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
   "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutTierChosen", "addonPetEnzyme", "windowsTier", "garageWash",
-  "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
+  "laundryLoads", "fridgeAddon", "ovenAddon", "cabinetsAddon", "detailPassAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
   "fullName", "phone", "email", "address1", "city",
@@ -3225,7 +3242,7 @@ function rpScreenHtml() {
           <div class="rp-tier-hours">${rpMoveoutTierHours(service)} on site</div>
           <div class="rp-tier-guarantee">${featured ? "Defend Your Deposit™" : "Satisfaction Guaranteed"}</div>
           <ul>${(inc.highlights || []).slice(0, 4).map(([, text]) => `<li>${text}</li>`).join("")}</ul>
-          ${!featured ? `<p class="rp-tier-exclusions">Not included: oven &amp; fridge interiors, inside cabinets, baseboards, interior windows.</p>` : ""}
+          ${!featured ? `<p class="rp-tier-exclusions">Not in the base price: oven &amp; fridge interiors, inside cabinets, Detail Pass (baseboards, windows, fans/vents/lights) — all addable next.</p>` : ""}
           <button type="button" class="rp-tier-choose ${featured ? "is-featured" : ""}" onclick="rpChooseMoveoutTier('${service}')">${alreadyChosen ? "Selected ✓" : `Choose ${featured ? "Inspection Ready" : "Refresh"}`}</button>
         </div>`;
     };
@@ -3244,19 +3261,25 @@ function rpScreenHtml() {
            the difference is a column of marks instead of prose the
            customer has to compare in their head. Same source of truth as
            the /pricing ledgers. */
+        /* Round 25 (direct instruction: "each addon should have a price" +
+           "doesn't mention ceiling fans, vents, light fixtures, make the
+           list cover all the big stuff"): every excluded-on-Refresh row
+           now shows the real dollar figure instead of a bare dash, and
+           baseboards/interior windows/walls/fans/vents/lights are folded
+           into one "Detail Pass" row (matching the single bundled SKU
+           customers actually buy on the add-ons step) instead of three
+           separate rows that all pointed at the same purchase. */
         const scope = [
           ["Kitchen, bathrooms, floors", true, true],
           ["Appliance exteriors, counters, sinks", true, true],
           ["Trash out, mirrors & glass", true, true],
-          ["Inside the oven", true, false],
-          ["Inside the refrigerator", true, "addon"],
-          ["Inside cabinets & closets", true, false],
-          ["Baseboards, doors & trim", true, false],
-          ["Interior windows, sills & tracks", true, false],
-          ["Wall spot-cleaning", true, false]
+          ["Inside the oven", true, rpAddonCatalog.oven.price],
+          ["Inside the refrigerator", true, rpAddonCatalog.fridge.price],
+          ["Inside cabinets & closets", true, rpAddonCatalog.cabinets.price],
+          ["Baseboards, interior windows, walls, ceiling fans, vents & light fixtures", true, rpDetailPassPrice()]
         ];
         const mark = (v) => v === true ? `<span class="rp-scope-yes" aria-label="included">${rpIcon("check","rp-ic rp-ic-sm")}</span>`
-          : v === "addon" ? `<span class="rp-scope-addon">+$${rpAddonCatalog.fridge.price}</span>`
+          : typeof v === "number" ? `<span class="rp-scope-addon">+$${v}</span>`
           : `<span class="rp-scope-no" aria-label="not included">&minus;</span>`;
         return `<div class="rp-scope-table">
           <div class="rp-scope-head">
@@ -3398,6 +3421,9 @@ function rpAddonsScreen(eyebrow) {
     garage: rpState.garageWash,
     laundry: rpState.laundryLoads > 0,
     fridge: rpState.fridgeAddon,
+    oven: rpState.ovenAddon,
+    cabinets: rpState.cabinetsAddon,
+    detailPass: rpState.detailPassAddon,
     extraHours: rpState.addonExtraHours > 0,
     secondCleaner: rpState.addonSecondCleaner
   };
@@ -3407,6 +3433,9 @@ function rpAddonsScreen(eyebrow) {
     garage:  { icon: "car",    label: "Garage Floor Wash", desc: "A soft wash lifts embedded oils, then we scrub the concrete floor." },
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
     fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
+    oven:    { icon: "zap", label: "Oven Interior", desc: "Interior racks, walls, and door glass, degreased." },
+    cabinets: { icon: "droplet", label: "Inside Cabinets & Closets", desc: "Empty cabinet and closet interiors wiped down." },
+    detailPass: { icon: "star", label: "Detail Pass", desc: "Baseboards & trim, interior windows/sills/tracks, wall spot-cleaning, and ceiling fans/vents/light fixtures." },
     extraHours: { icon: "clock", label: "Extra Time", desc: "Bigger or messier than typical? Add time so nothing gets rushed." },
     secondCleaner: { icon: "repeat", label: "Additional Cleaner", desc: "A 2nd cleaner for the full time booked, so more gets done in the same visit." }
   };
@@ -3416,6 +3445,9 @@ function rpAddonsScreen(eyebrow) {
     if (key === "garage") return `$${rpAddonCatalog.garage.price}`;
     if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
+    if (key === "oven") return `$${rpAddonCatalog.oven.price}`;
+    if (key === "cabinets") return `$${rpAddonCatalog.cabinets.price}`;
+    if (key === "detailPass") return `$${rpDetailPassPrice()}`;
     if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}`;
     if (key === "secondCleaner") return `${rpSecondCleanerHours()} hour${rpSecondCleanerHours() === 1 ? "" : "s"} · $${rpSecondCleanerPrice()}`;
     return "";
@@ -3467,6 +3499,28 @@ function rpAddonsScreen(eyebrow) {
         <div class="rp-choice-grid">
           <button class="rp-pill ${rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(true)">Yes<br><small>$${rpAddonCatalog.fridge.price}</small></button>
           <button class="rp-pill ${!rpState.fridgeAddon ? "is-selected" : ""}" onclick="rpSelectFridge(false)">No</button>
+        </div>`;
+    }
+    if (key === "oven") {
+      return `
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.ovenAddon ? "is-selected" : ""}" onclick="rpSelectOven(true)">Yes<br><small>$${rpAddonCatalog.oven.price}</small></button>
+          <button class="rp-pill ${!rpState.ovenAddon ? "is-selected" : ""}" onclick="rpSelectOven(false)">No</button>
+        </div>`;
+    }
+    if (key === "cabinets") {
+      return `
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.cabinetsAddon ? "is-selected" : ""}" onclick="rpSelectCabinets(true)">Yes<br><small>$${rpAddonCatalog.cabinets.price}</small></button>
+          <button class="rp-pill ${!rpState.cabinetsAddon ? "is-selected" : ""}" onclick="rpSelectCabinets(false)">No</button>
+        </div>`;
+    }
+    if (key === "detailPass") {
+      return `
+        <p class="rp-tap-note">Baseboards &amp; trim, interior windows &amp; tracks, wall spot-cleaning, and ceiling fans, vents &amp; light fixtures — bundled as one pass.</p>
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.detailPassAddon ? "is-selected" : ""}" onclick="rpSelectDetailPass(true)">Yes<br><small>$${rpDetailPassPrice()}</small></button>
+          <button class="rp-pill ${!rpState.detailPassAddon ? "is-selected" : ""}" onclick="rpSelectDetailPass(false)">No</button>
         </div>`;
     }
     if (key === "secondCleaner") {
@@ -4176,6 +4230,9 @@ function rpResetServiceState() {
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
+  rpState.ovenAddon = false;
+  rpState.cabinetsAddon = false;
+  rpState.detailPassAddon = false;
   rpState.addonDropNotice = "";
   rpState.addonExtraHours = 0;
   rpState.addonSecondCleaner = false;
@@ -4400,6 +4457,9 @@ function rpClearAddon(key) {
   else if (key === "garage") rpState.garageWash = false;
   else if (key === "laundry") rpState.laundryLoads = 0;
   else if (key === "fridge") rpState.fridgeAddon = false;
+  else if (key === "oven") rpState.ovenAddon = false;
+  else if (key === "cabinets") rpState.cabinetsAddon = false;
+  else if (key === "detailPass") rpState.detailPassAddon = false;
   else if (key === "secondCleaner") rpState.addonSecondCleaner = false;
   else if (key === "extraHours") rpState.addonExtraHours = 0;
   rpState.expandedAddon = null;
@@ -4418,6 +4478,9 @@ function rpSelectGarageWash(yes) { rpTrackAddon("garage", yes); rpState.garageWa
 function rpSelectLaundryLoads(n) { rpTrackAddon("laundry", n > 0, { loads: n }); rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
 function rpSelectFridge(yes) { rpTrackAddon("fridge", yes); rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectOven(yes) { rpTrackAddon("oven", yes); rpState.ovenAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectCabinets(yes) { rpTrackAddon("cabinets", yes); rpState.cabinetsAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
+function rpSelectDetailPass(yes) { rpTrackAddon("detailPass", yes); rpState.detailPassAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectSecondCleaner(yes) { rpTrackAddon("secondCleaner", yes); rpState.addonSecondCleaner = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectExtraHours(n) { rpTrackAddon("extraHours", n > 0, { hours: n }); rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
 

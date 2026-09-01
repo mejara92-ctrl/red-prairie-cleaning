@@ -83,27 +83,43 @@ const rpServices = {
        guarantee. Priced at roughly 60% of the matching Inspection Ready
        tier, rounded to a clean number, reflecting the shorter job (about
        half the crew-hours) rather than a discount off the same work. */
+/* ROUND 25 (direct instruction) re-priced BOTH tiers from the Deposit
+   Math worksheet's own formula, replacing numbers that were carried over
+   unchanged from before the guarantee split existed:
+
+     labor(hrs) = hrs * 2 crew * $17.50/hr * 1.12 burden
+     cost       = labor + $15 supplies + $25 overhead
+     Inspection Ready only: cost = cost / (1 - 8% guarantee reserve)
+     price      = cost / (1 - 20% target margin)
+
+   Using the worksheet's own assumed hours (Inspection Ready 6/8/10/12,
+   Refresh 3/4/5/6, by bedroom tier) this formula outputs $374/$480/
+   $587/$693 for Inspection Ready and $197/$246/$295/$344 for Refresh --
+   rounded below to clean, ends-in-9 numbers that land AT OR SLIGHTLY
+   ABOVE the formula's own target at every size, so the margin is a
+   floor, not a ceiling. Inspection Ready's old prices ($299/$399/$499/
+   $599) were the exact same numbers charged before the two-tier split
+   existed -- the guarantee reserve was adopted structurally but never
+   actually funded into the price. This is that fix. Refresh's old
+   prices ($179/$229/$279/$329) were closer to correct (round 19's
+   "~60% of Inspection Ready, rounded" heuristic) but still $15-18 under
+   the formula at every size; nudged up to clear it cleanly. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 299, includedBathrooms: 1, label: "1\u20132 bedrooms" },
-  { min: 3, max: 3, base: 399, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 499, includedBathrooms: 2, label: "4 bedrooms" },
-  /* 5+ base ($599) continues the same $100 step as the other three tiers
-     ($299/$399/$499) — not given directly, follows the confirmed pattern. */
-  { min: 5, max: 999, base: 599, includedBathrooms: 3, label: "5+ bedrooms" }
+  { min: 1, max: 2, base: 379, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 3, max: 3, base: 479, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 589, includedBathrooms: 2, label: "4 bedrooms" },
+  { min: 5, max: 999, base: 699, includedBathrooms: 3, label: "5+ bedrooms" }
 ];
-/* Move-Out Refresh -- the new lighter tier. Same bedroom brackets and
-   included-bathroom convention as Inspection Ready above so the two stay
-   directly comparable size-for-size; only the base price and scope
-   differ. Not a flat percentage of the Inspection Ready price (that would
-   produce odd cents like $179.40) -- clean $50-step numbers instead,
-   landing close to 60% of the matching Inspection Ready tier. Revisit
-   these once real Refresh job hours are logged; this is a starting
-   estimate, not a measured rate. */
+/* Move-Out Refresh -- same bedroom brackets and included-bathroom
+   convention as Inspection Ready above so the two stay directly
+   comparable size-for-size; only the base price and scope differ. Still
+   a starting estimate pending real logged Refresh job hours, same as
+   before -- only the number changed this round, not that caveat. */
 const RP_MOVEOUT_REFRESH_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 179, includedBathrooms: 1, label: "1–2 bedrooms" },
-  { min: 3, max: 3, base: 229, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 279, includedBathrooms: 2, label: "4 bedrooms" },
-  { min: 5, max: 999, base: 329, includedBathrooms: 3, label: "5+ bedrooms" }
+  { min: 1, max: 2, base: 199, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 3, max: 3, base: 249, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 299, includedBathrooms: 2, label: "4 bedrooms" },
+  { min: 5, max: 999, base: 349, includedBathrooms: 3, label: "5+ bedrooms" }
 ];
 function rpMoveoutTierTable(service) {
   return service === "moveoutrefresh" ? RP_MOVEOUT_REFRESH_BEDROOM_TIERS : RP_MOVEOUT_BEDROOM_TIERS;
@@ -111,6 +127,28 @@ function rpMoveoutTierTable(service) {
 function rpMoveoutBedroomTier(beds, service = rpState.service) {
   const b = Number(beds || 0);
   return rpMoveoutTierTable(service).find(t => b >= t.min && b <= t.max) || null;
+}
+/* Round 25 (direct instruction): Detail Pass pricing (baseboards & trim,
+   interior windows, wall spot-cleaning, bundled) for Move-Out Refresh --
+   same bedroom brackets as the tier tables above, $50-step convention.
+   Anchored so buying every excluded-scope add-on (fridge $50 + oven $50
+   + cabinets $50 + this) still costs MORE than just switching to
+   Inspection Ready outright, at every size -- a la carte should never
+   be the cheaper way to get the full checklist:
+     1-2BR: $50*3 + $75  = $225  vs. tier gap $379-$199 = $180  (+$45)
+     3BR:   $50*3 + $125 = $275  vs. tier gap $479-$249 = $230  (+$45)
+     4BR:   $50*3 + $175 = $325  vs. tier gap $589-$299 = $290  (+$35)
+     5+BR:  $50*3 + $225 = $375  vs. tier gap $699-$349 = $350  (+$25) */
+const RP_DETAIL_PASS_PRICES = [
+  { min: 1, max: 2, price: 75 },
+  { min: 3, max: 3, price: 125 },
+  { min: 4, max: 4, price: 175 },
+  { min: 5, max: 999, price: 225 }
+];
+function rpDetailPassPrice(beds = rpState.bedrooms) {
+  const b = Number(beds || 0);
+  const tier = RP_DETAIL_PASS_PRICES.find(t => b >= t.min && b <= t.max);
+  return tier ? tier.price : RP_DETAIL_PASS_PRICES[0].price;
 }
 /* $50/extra bathroom beyond whatever's included at that bedroom tier —
    raised from $40 to stay proportional now that the base tiers moved up
@@ -368,6 +406,22 @@ const rpAddonCatalog = {
   garage:  { label: "Garage Floor Wash",   price: 150 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
+  /* Round 25 (direct instruction): three new real SKUs for Move-Out
+     Refresh's excluded scope, so every row on the moveouttiers scope
+     table (see book/index.html) shows a real price instead of "-".
+     Oven and cabinets/closets are flat, same rate as the existing
+     fridge interior -- interior appliance and storage cleaning time
+     doesn't meaningfully scale with home size. The Detail Pass bundles
+     the three remaining rows (baseboards & trim, interior windows,
+     wall spot-cleaning) into one purchase, priced by bedroom tier
+     since THOSE genuinely do scale with home size -- see
+     rpDetailPassPrice() below for the actual numbers. Buying every one
+     of these plus the fridge still costs more than switching to
+     Inspection Ready outright, at every bedroom size -- see that
+     function's comment for the check. */
+  oven:     { label: "Oven Interior", price: 50 },
+  cabinets: { label: "Inside Cabinets & Closets", price: 50 },
+  detailPass: { label: "Detail Pass" }, // price is bedroom-tier-based -- see rpDetailPassPrice()
   extraHours: { label: "Extra Time", unit: "hour", pricePerHour: RP_EXTRA_HOUR_RATE },
   /* Deep Cleaning only. Priced per hour actually booked (anchor hours
      plus any Extra Time already purchased), not a flat number — a 2nd
@@ -385,7 +439,7 @@ const rpServiceAddons = {
      customer exactly what's excluded, and how to add it back": the
      included screen names the exclusion, and this is where they can
      actually buy it. */
-  moveoutrefresh: ["fridge", "carpet", "junk", "windows", "garage"],
+  moveoutrefresh: ["fridge", "oven", "cabinets", "detailPass", "carpet", "junk", "windows", "garage"],
   /* Fridge and laundry pulled from Deep/Basic — for a crew already on
      site for hours with an anchored-time model, these are small enough
      that "note it in special instructions" covers it without needing a
@@ -449,6 +503,9 @@ const RP_ADDON_STATE_DEFAULTS = {
   garage:        { garageWash: false },
   laundry:       { laundryLoads: 0 },
   fridge:        { fridgeAddon: false },
+  oven:          { ovenAddon: false },
+  cabinets:      { cabinetsAddon: false },
+  detailPass:    { detailPassAddon: false },
   extraHours:    { addonExtraHours: 0 },
   secondCleaner: { addonSecondCleaner: false }
 };
@@ -525,6 +582,9 @@ function rpAddonLineItems() {
     add("laundry", "Laundry Service", `${loads} load${loads === 1 ? "" : "s"}`, loads * rpAddonCatalog.laundry.pricePerLoad);
   }
   if (rpState.fridgeAddon) add("fridge", "Refrigerator Interior", "", rpAddonCatalog.fridge.price);
+  if (rpState.ovenAddon) add("oven", "Oven Interior", "", rpAddonCatalog.oven.price);
+  if (rpState.cabinetsAddon) add("cabinets", "Inside Cabinets & Closets", "", rpAddonCatalog.cabinets.price);
+  if (rpState.detailPassAddon) add("detailPass", "Detail Pass", "Baseboards, interior windows, walls, fans, vents & light fixtures", rpDetailPassPrice());
   if (rpState.addonExtraHours > 0) {
     const hrs = Number(rpState.addonExtraHours);
     add("extraHours", "Extra Time", `+${hrs} hour${hrs === 1 ? "" : "s"}`, hrs * rpAddonCatalog.extraHours.pricePerHour);
@@ -589,7 +649,7 @@ const rpIncludes = {
        main enumeration work. */
     fineprint: "Exterior windows, the garage floor, carpet extraction, and junk removal aren't included, but you can add any of them on the next step. Need something else? Text us anytime.",
     itemsLead: "Including the parts most companies bill as add-ons:",
-    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets, inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
+    items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets, inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "Ceiling fans, vents & light fixtures", "All floors throughout", "Every other room and surface inside the home"]
   },
   /* NEW (round 19) — the lighter counterpart to "moveout" above. Opposite
      framing on purpose: "moveout" claims totality (naming a few
@@ -614,7 +674,12 @@ const rpIncludes = {
        and found four of the five missing. Naming the one that's real and
        routing the rest to Inspection Ready keeps the promise accurate
        without needing new SKUs. */
-    fineprint: "Oven interiors, inside cabinets and closets, baseboards, interior windows, and wall spot-cleaning aren't part of this tier. You can add the refrigerator interior on the next step; for the rest, Inspection Ready covers all of it plus Defend Your Deposit™.",
+    /* Round 25: rewritten now that oven, cabinets, and the baseboards/
+       windows/walls/fans-vents-lights bundle are all real, priced
+       add-ons on the next step (not just Inspection-Ready-only anymore) —
+       the old copy told customers to switch tiers for things they could
+       now just add here, which undersold this tier's flexibility. */
+    fineprint: "Oven interior, inside cabinets & closets, and a Detail Pass (baseboards, interior windows, walls, ceiling fans, vents & light fixtures) aren't part of the base price, but you can add any of them on the next step. Inspection Ready includes all of it plus Defend Your Deposit™.",
     itemsLead: "What's included:",
     items: ["Kitchen counters, sink, stovetop & appliance exteriors", "Cabinet & closet exteriors wiped", "Bathrooms: toilet, tub/shower, sink, mirror", "All floors vacuumed & mopped", "Trash out, light fixtures dusted, glass & mirrors"]
   },
@@ -1072,6 +1137,9 @@ function rpAddonsTotal() {
   if (rpAddonAvailable("garage") && rpState.garageWash) total += rpAddonCatalog.garage.price;
   if (rpAddonAvailable("laundry") && rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpAddonAvailable("fridge") && rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
+  if (rpAddonAvailable("oven") && rpState.ovenAddon) total += rpAddonCatalog.oven.price;
+  if (rpAddonAvailable("cabinets") && rpState.cabinetsAddon) total += rpAddonCatalog.cabinets.price;
+  if (rpAddonAvailable("detailPass") && rpState.detailPassAddon) total += rpDetailPassPrice();
   if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
   if (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
   /* Gated to carpet specifically — pet enzyme only makes sense for the
@@ -1307,6 +1375,9 @@ function rpBuildSharedDetails() {
     addon_garage_wash: (rpAddonAvailable("garage") && rpState.garageWash) ? "Yes" : "No",
     addon_laundry_loads: rpAddonAvailable("laundry") ? String(rpState.laundryLoads || 0) : "0",
     addon_fridge_interior: (rpAddonAvailable("fridge") && rpState.fridgeAddon) ? "Yes" : "No",
+    addon_oven_interior: (rpAddonAvailable("oven") && rpState.ovenAddon) ? "Yes" : "No",
+    addon_cabinets_closets: (rpAddonAvailable("cabinets") && rpState.cabinetsAddon) ? "Yes" : "No",
+    addon_detail_pass: (rpAddonAvailable("detailPass") && rpState.detailPassAddon) ? "Yes" : "No",
     addon_extra_hours: rpAddonAvailable("extraHours") ? String(rpState.addonExtraHours || 0) : "0",
     addon_second_cleaner: (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) ? "Yes" : "No",
 

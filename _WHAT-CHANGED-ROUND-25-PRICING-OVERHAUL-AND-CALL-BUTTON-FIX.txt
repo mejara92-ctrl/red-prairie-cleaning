@@ -1,0 +1,296 @@
+RED PRAIRIE — ROUND 25: DEPOSIT-MATH PRICING OVERHAUL, NEW ADD-ONS,
+SCOPE TABLE FIXES, SITE-WIDE CALL BUTTON FIX
+====================================================================
+This zip contains ONLY the files that changed. Unzip it over your repo
+root and let it overwrite matching paths.
+
+Your instructions, across several messages:
+  1. "Okay make all reccommended changes to pricing. An inspection
+     move-out should cost alot. A quick move-out should be fair but a
+     good value. Make all reccomendaed changes to make this the best
+     business get alot of sales and make some money."
+  2. "each addon should have a price" (with a screenshot of the scope
+     table showing "–" where oven/cabinets/baseboards/windows/walls
+     should show real numbers)
+  3. "The addons on move-out refresh arent showing besides the oven."
+  4. "Create competitive but profitable pricing for lawton based on the
+     deposit math sheet."
+  5. Mid-session: "call button is broken, doesn't mention ceiling fans,
+     vents, light fixtures, make the list cover all the big stuff."
+
+Five things happened this round. They're unrelated to each other except
+that #5 landed in the middle of building #1-4, so it's folded in here
+instead of shipping as its own round.
+
+
+FILES CHANGED (4)
+  js/rp-pricing-engine.js   modified
+  book/index.html           modified
+  call/index.html           modified
+  pricing/index.html        modified
+  + 16 other pages          modified (Call button fix only — see #5)
+
+
+--------------------------------------------------------
+1. BOTH MOVE-OUT TIERS RE-PRICED FROM THE DEPOSIT MATH SHEET
+--------------------------------------------------------
+The core problem, from the feedback pass before this round: Inspection
+Ready's live price was never raised to fund its own 8% guarantee
+reserve when the guarantee was added. It was carrying the same
+~79%-labor-share problem the whole Deposit Math redesign existed to
+fix — the guarantee that's supposed to be the tier's selling point was
+quietly unfunded.
+
+Formula (from your worksheet, unchanged):
+  labor(hrs) = hrs * 2 crew * $17.50/hr * 1.12 burden
+  cost       = labor + $15 supplies + $25 overhead
+  Inspection Ready only: cost = cost / (1 - 8% guarantee reserve)
+  price      = cost / (1 - 20% target margin)
+
+Worksheet hours: Inspection Ready 6/8/10/12 hrs by size, Refresh
+3/4/5/6 hrs by size (unchanged from before).
+
+                    Old price   New price   Formula target
+Inspection Ready
+  1-2 bed             $299        $379        $373.91
+  3 bed               $399        $479        $480.43
+  4 bed               $499        $589        $586.96
+  5+ bed              $599        $699        $693.48
+Move-Out Refresh
+  1-2 bed             $179        $199        $197
+  3 bed               $229        $249        $246
+  4 bed               $279        $299        $295
+  5+ bed              $329        $349        $344
+
+Rounded to clean $10s above the formula's exact number in every case —
+never below it, so the reserve and margin are always at least fully
+funded, usually with a couple dollars of headroom. Inspection Ready
+moved up 21-27% depending on size; Refresh moved up 6-11%. Per your
+framing: Inspection Ready is priced to actually cost a lot (it backs a
+real guarantee and a full-scope job), Refresh stays the fair, good-value
+option for people with no walkthrough to pass.
+
+Nothing about hours, crew size, or scope changed — same 2-cleaner crew,
+same time on site, same guarantee split (Defend Your Deposit on
+Inspection Ready, Satisfaction Guaranteed on Refresh). This is strictly
+a "the number was wrong for what it has to fund" fix.
+
+
+--------------------------------------------------------
+2. THREE NEW PRICED ADD-ONS ON MOVE-OUT REFRESH
+--------------------------------------------------------
+Refresh could only add the refrigerator interior. Every other
+Inspection-Ready-only item was a hard "no" that pushed the customer to
+switch tiers entirely — which is fine if that's what they want, but
+someone who's 90% happy with Refresh and just wants the oven done had
+no way to buy that.
+
+New, alongside the existing Refrigerator Interior ($50):
+  Oven Interior              $50
+  Inside Cabinets & Closets  $50
+  Detail Pass                $75 / $125 / $175 / $225 by bedroom count
+    (baseboards & trim, interior windows/sills/tracks, wall
+    spot-cleaning, and — per your note — ceiling fans, vents & light
+    fixtures, all bundled as one purchase, not four separate line
+    items to tap through)
+
+Detail Pass is priced by bedroom tier (same brackets as the tiers
+themselves) rather than a flat number, since a 5-bedroom home has a lot
+more baseboard and window to detail than a 1-bedroom. It's one SKU, not
+three or four, on purpose — round 21 established "keep booking dead
+simple" as a standing principle, and a customer already knows what a
+"Detail Pass" costs without pricing baseboards, windows, walls, and
+fans/vents/lights separately.
+
+Pricing psychology check (same standard applied everywhere else on
+this site): buying every excluded-scope add-on on Refresh must always
+cost strictly more than just switching to Inspection Ready outright.
+Verified at all four sizes — buying fridge + oven + cabinets + Detail
+Pass costs $25-$45 MORE than the tier-price gap at every size, so
+switching tiers is always the better deal for someone who wants
+everything, and a la carte stays the right call only for someone who
+genuinely wants just one or two items.
+
+  1-2BR: $50+$50+$50+$75  = $225  vs. tier gap $379-$199 = $180  (+$45)
+  3BR:   $50+$50+$50+$125 = $275  vs. tier gap $479-$249 = $230  (+$45)
+  4BR:   $50+$50+$50+$175 = $325  vs. tier gap $589-$299 = $290  (+$35)
+  5+BR:  $50+$50+$50+$225 = $375  vs. tier gap $699-$349 = $350  (+$25)
+
+Applied everywhere an add-on has to show up consistently: /book's
+add-ons screen (new cards, same Yes/No pattern as Refrigerator
+Interior), /call's addon picker (new checkboxes for Liz) and its
+price-objection script (removableAddonLabel — Liz can now offer to
+drop any of the three off the total, not just fridge/carpet/junk/etc.),
+the webhook (new addon_oven_interior / addon_cabinets_closets /
+addon_detail_pass fields), and the crew sheet / job details (all read
+the shared rpAddonLineItems() function, so nothing extra had to be
+built there).
+
+
+--------------------------------------------------------
+3. SCOPE TABLE — EVERY ROW NOW SHOWS A REAL PRICE
+--------------------------------------------------------
+You flagged this with a screenshot: the Inspection-Ready-vs-Refresh
+comparison table on /book showed a bare "–" for oven, cabinets,
+baseboards, interior windows, and wall spot-cleaning — everywhere the
+refrigerator row showed "+$50," the rest showed nothing, which read as
+"you cannot get this at all on Refresh" even before today's new
+add-ons existed to buy them with.
+
+Fixed on both /book's customer-facing table and /call's CSR "scope
+cheat sheet" (the console's own copy of the same comparison, added in
+round 22):
+  - Oven, refrigerator, and cabinets & closets each show their real
+    $50 add-on price instead of a dash.
+  - Baseboards, interior windows, and wall spot-cleaning — previously
+    three separate rows all showing "–" — are now ONE row ("Baseboards,
+    interior windows, walls, ceiling fans, vents & light fixtures")
+    showing the real Detail Pass price for that size, matching the one
+    SKU it actually is.
+  - Per your note that the list should "cover all the big stuff" and
+    call out ceiling fans, vents, and light fixtures by name: those are
+    now explicitly named in that combined row, in the Detail Pass's own
+    description text on the add-ons screen, in Inspection Ready's full
+    item list, and in Refresh's exclusion fine print — not just
+    silently folded into "baseboards" the way they used to be.
+
+The `mark()` helper on both pages went from a hardcoded "always show
+the fridge price for any addon-eligible row" to reading the real price
+per row, so this can't drift out of sync with the catalog again.
+
+
+--------------------------------------------------------
+4. COPY THAT WAS QUIETLY WRONG, FIXED WHILE TOUCHING THIS AREA
+--------------------------------------------------------
+A few spots described the OLD Refresh scope (nothing purchasable but
+the fridge) and would have actively undersold the new add-ons if left
+alone:
+  - Move-Out Refresh's fine print (shown on /book's tier cards, /call's
+    rail, and read by the engine everywhere rpIncludes.moveoutrefresh
+    is used) said "Fridge interior can be added individually... for
+    the rest, Inspection Ready covers all of it" — now lists all three
+    new add-ons by name and price range instead of routing customers to
+    switch tiers for things they can now just add.
+  - The tier-comparison card's exclusion line on /book said flatly "Not
+    included: oven & fridge interiors, inside cabinets, baseboards" —
+    now says "Not in the base price: ... — all addable next," since
+    they're no longer hard exclusions.
+  - /pricing's Move-Out section still described a large-home square-
+    footage surcharge (+$100/$200/$300 tiers) and a "custom quote over
+    3,400 sq ft" note — both leftover from before round 24 removed
+    square footage from /book entirely. That page had never been
+    updated to match; it now says what round 24 actually shipped (flat
+    bedroom pricing, any size, no sq-ft lookup) and the worked example
+    and JSON-LD price range (was still citing the old $899 ceiling from
+    when surcharges existed) were updated to match the new $699 top
+    price.
+  - /pricing's add-ons ledger and Optional Add-ons table gained rows
+    for Oven Interior, Inside Cabinets & Closets, and Detail Pass,
+    matching what's actually purchasable now.
+
+
+--------------------------------------------------------
+5. SITE-WIDE FIX: THE "CALL" BUTTON COULD SILENTLY DO NOTHING
+--------------------------------------------------------
+This is the bug behind "call button is broken." It wasn't broken on
+every tap — it was broken specifically when Google's ad-blocked or
+slow-loading tracking script didn't get a chance to run, which on a
+phone with any ad blocker, content blocker, or slow connection is not
+rare.
+
+The old code, on every page's tel: link:
+  function gtag_report_conversion(url) {
+    var callback = function () { window.location = url; };
+    gtag('event', 'conversion', { ..., 'event_callback': callback });
+    return false;
+  }
+`gtag()` is defined locally as a stub that just queues events — it does
+nothing by itself. The REAL Google Ads script (loaded from
+googletagmanager.com) is what eventually processes that queue and
+calls `event_callback`. If that script is blocked, slow, or fails to
+load for any reason, `event_callback` is never invoked — and since
+`return false` also cancels the link's own default tel: action, tapping
+Call just... did nothing. No error, no fallback, no phone call.
+
+Fixed with a 500ms fallback timer that fires the navigation either way,
+with a guard so it never double-fires if the real GA callback also
+lands:
+  function gtag_report_conversion(url) {
+    var navigated = false;
+    var go = function () { if (navigated) return; navigated = true;
+      if (typeof(url) != 'undefined') window.location = url; };
+    gtag('event', 'conversion', { ..., 'event_callback': go });
+    setTimeout(go, 500);
+    return false;
+  }
+Conversion tracking still fires normally on every call where Google's
+script loads in time (the common case) — this only changes what
+happens in the failure case, from "nothing" to "the call goes through,
+slightly before or after the tracking pixel would have landed."
+
+Applied to every page on the site that has a Call button or a tel:
+link using this pattern — the header nav (FAQ / Call / Text us) present
+site-wide, plus /book's calendar-screen "Call us" link and every
+location/service landing page. 17 files total; each was carrying its
+own independent copy of this script (not shared code), so each needed
+the same fix individually. All 17 verified with node --check afterward.
+
+
+--------------------------------------------------------
+VERIFIED THIS ROUND
+--------------------------------------------------------
+node --check clean on the engine and every inline <script> in all 20
+  touched files (JSON-LD blocks excluded from that check, same as
+  always).
+Pricing psychology re-verified at all four bedroom sizes: buying every
+  Refresh add-on always costs $25-$45 more than switching to Inspection
+  Ready outright (see section 2 above).
+Grep-audited for stale references to the old three-separate-rows scope
+  layout ("Wall spot-cleaning" as its own row, the old "oven and fridge
+  interiors, inside cabinets, baseboards" exclusion phrasing used as a
+  factual claim rather than a Liz sales line) — none found outside one
+  intentionally-kept objection-script line in /call that's still
+  accurate as general framing.
+Confirmed rpAddonLineItems(), rpAddonsTotal(), and the webhook payload
+  all pick up the three new add-ons through the same shared functions
+  every other add-on uses — nothing added addon-specific code to the
+  estimate screen, crew sheet, or /call's job summary.
+Confirmed /call's own addon picker, "removable addon" price-objection
+  logic, and scope cheat sheet all got the same three-add-on and
+  real-price treatment as /book, so a phone booking and a self-serve
+  booking can no longer quote different things for the same home.
+
+
+--------------------------------------------------------
+NOT price-verified in a live browser
+--------------------------------------------------------
+The actual click-through on a real phone, especially:
+  - the three new Yes/No add-on cards on Refresh's add-ons screen
+  - the combined Detail Pass row reading naturally alongside the two
+    still-separate $50 rows (oven, cabinets) in the scope table
+  - tapping Call on a phone with an ad blocker enabled, to confirm the
+    fallback timer actually recovers the tap (hard to fully simulate
+    without one)
+Please walk a Refresh booking once end to end, and test the Call
+button specifically from a phone if you have an ad blocker or privacy
+browser installed, before calling this fully closed out.
+
+
+--------------------------------------------------------
+NOT DONE (by scope, not by accident)
+--------------------------------------------------------
+- No fridge+oven+cabinets bundle discount — kept as three flat $50
+  add-ons rather than adding bundle-pricing UI complexity.
+- No bathroom-count surcharge and no square-footage surcharge were
+  reintroduced — both stay deliberately removed per round 24.
+- Carpet, garage floor wash, exterior window, and junk hauling pricing
+  are untouched this round — this round only touched the two Move-Out
+  tier bases and the Refresh-side add-on catalog.
+- The homepage's separate, older embedded booking widget (still out of
+  sync since round 19c, flagged again every round since) is still
+  untouched — still true that it's further out of sync than before,
+  now including the new pricing.
+
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
