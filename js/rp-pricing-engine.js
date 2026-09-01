@@ -26,7 +26,17 @@
    ========================================================================= */
 
 const rpServices = {
-  moveout:     { name: "Move-In / Move-Out Cleaning",     emoji: "🏠" },
+  /* Round 19 — Move-Out split into two real products instead of one
+     product with an optional hourly billing mode. "moveout" keeps its
+     original key (no GHL/webhook/analytics migration needed) and becomes
+     the guaranteed, full-checklist tier. "moveoutrefresh" is new: a
+     lighter, faster, cheaper clean for anyone NOT facing a landlord/PM
+     inspection, with no Defend Your Deposit promise attached. See the
+     comment above RP_MOVEOUT_REFRESH_BEDROOM_TIERS below for the pricing
+     rationale and RP_GUARANTEE note in rpGuaranteeType() for the
+     guarantee split. */
+  moveout:        { name: "Inspection Ready Move-Out",     emoji: "🏠" },
+  moveoutrefresh: { name: "Move-Out Refresh",               emoji: "🧹" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
@@ -54,15 +64,25 @@ const rpServices = {
    which is now a SURCHARGE table (only 5 steps, only matters above
    2,200 sq ft) instead of the entire pricing engine.
 
-   NOTE — open question, not resolved by this change: the Hourly Move-Out
-   option (RP_MOVEOUT_HOURLY_RATE, $80/hr) was calibrated in round 17 so
-   an 8-hour standard 3bed/2bath job priced at $640 on both the flat and
-   hourly paths. The new 3-bed flat price is $449, so that agreement no
-   longer holds — a customer could get a meaningfully different number
-   depending which path they pick for what might be the same actual job.
-   Left as-is since it wasn't part of this request, but flagging clearly:
-   worth deciding whether to adjust the hourly rate, or accept the two
-   paths pricing differently now. */
+   ROUND 19 — per direct instruction: "remove move-out hourly and replace
+   move-out with" a two-tier structure so the customer knows exactly what
+   scope they're buying. The old Hourly Move-Out option (pay-by-the-hour,
+   RP_MOVEOUT_HOURLY_RATE) is GONE — it was a second way to price the same
+   guaranteed job and had drifted from the flat-rate table's real hours.
+   Removing it outright is simpler than re-syncing it: one product, one
+   number, easy to explain at a glance, matching how Deep/Basic work.
+
+   In its place, Move-Out is now two real products:
+     - "moveout" (THIS table, UNCHANGED)         Inspection Ready.
+       Full checklist, Defend Your Deposit guarantee. Same prices as
+       before this round -- nothing here was re-priced.
+     - "moveoutrefresh" (RP_MOVEOUT_REFRESH_BEDROOM_TIERS, below)
+       A lighter, faster clean for anyone NOT facing a landlord/PM
+       inspection -- no oven/fridge/cabinet interiors, no inside closets,
+       no baseboards/interior windows/wall spot-cleaning, no deposit
+       guarantee. Priced at roughly 60% of the matching Inspection Ready
+       tier, rounded to a clean number, reflecting the shorter job (about
+       half the crew-hours) rather than a discount off the same work. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
   { min: 1, max: 2, base: 299, includedBathrooms: 1, label: "1\u20132 bedrooms" },
   { min: 3, max: 3, base: 399, includedBathrooms: 2, label: "3 bedrooms" },
@@ -71,9 +91,26 @@ const RP_MOVEOUT_BEDROOM_TIERS = [
      ($299/$399/$499) — not given directly, follows the confirmed pattern. */
   { min: 5, max: 999, base: 599, includedBathrooms: 3, label: "5+ bedrooms" }
 ];
-function rpMoveoutBedroomTier(beds) {
+/* Move-Out Refresh -- the new lighter tier. Same bedroom brackets and
+   included-bathroom convention as Inspection Ready above so the two stay
+   directly comparable size-for-size; only the base price and scope
+   differ. Not a flat percentage of the Inspection Ready price (that would
+   produce odd cents like $179.40) -- clean $50-step numbers instead,
+   landing close to 60% of the matching Inspection Ready tier. Revisit
+   these once real Refresh job hours are logged; this is a starting
+   estimate, not a measured rate. */
+const RP_MOVEOUT_REFRESH_BEDROOM_TIERS = [
+  { min: 1, max: 2, base: 179, includedBathrooms: 1, label: "1–2 bedrooms" },
+  { min: 3, max: 3, base: 229, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 279, includedBathrooms: 2, label: "4 bedrooms" },
+  { min: 5, max: 999, base: 329, includedBathrooms: 3, label: "5+ bedrooms" }
+];
+function rpMoveoutTierTable(service) {
+  return service === "moveoutrefresh" ? RP_MOVEOUT_REFRESH_BEDROOM_TIERS : RP_MOVEOUT_BEDROOM_TIERS;
+}
+function rpMoveoutBedroomTier(beds, service = rpState.service) {
   const b = Number(beds || 0);
-  return RP_MOVEOUT_BEDROOM_TIERS.find(t => b >= t.min && b <= t.max) || null;
+  return rpMoveoutTierTable(service).find(t => b >= t.min && b <= t.max) || null;
 }
 /* $50/extra bathroom beyond whatever's included at that bedroom tier —
    raised from $40 to stay proportional now that the base tiers moved up
@@ -97,6 +134,16 @@ const rpSqftTiers = [
   { key: "t2", label: "2,200\u20132,600 sq ft",     base: 100 },
   { key: "t3", label: "2,600\u20133,000 sq ft",     base: 200 },
   { key: "t4", label: "3,000\u20133,400 sq ft",     base: 300 },
+  { key: "t5", label: "Over 3,400 sq ft",      base: null }
+];
+/* Move-Out Refresh's own large-home surcharge -- same steps as Inspection
+   Ready above, halved, since Refresh's whole point is a smaller number.
+   Same t5 = custom-quote convention. */
+const rpRefreshSqftTiers = [
+  { key: "t1", label: "Under 2,200 sq ft",     base: 0 },
+  { key: "t2", label: "2,200\u20132,600 sq ft",     base: 50 },
+  { key: "t3", label: "2,600\u20133,000 sq ft",     base: 100 },
+  { key: "t4", label: "3,000\u20133,400 sq ft",     base: 150 },
   { key: "t5", label: "Over 3,400 sq ft",      base: null }
 ];
 /* Deep Cleaning sq-ft tiers — same bracket structure and included
@@ -144,6 +191,7 @@ const RP_MAINTENANCE_BATHROOM_RATE = 15;
 function rpSqftTiersForService(service) {
   if (service === "deep") return rpDeepSqftTiers;
   if (service === "maintenance") return rpMaintenanceSqftTiers;
+  if (service === "moveoutrefresh") return rpRefreshSqftTiers;
   return rpSqftTiers; // moveout, and safe default
 }
 function rpSqftTier() { return rpSqftTiersForService(rpState.service).find(t => t.key === rpState.sqft) || null; }
@@ -154,7 +202,7 @@ function rpSqftTier() { return rpSqftTiersForService(rpState.service).find(t => 
    to avoid touching every call site for a rename, same reasoning as
    before. */
 function rpMoveoutIsCustomSqft() {
-  return (rpState.service === "moveout" && rpState.sqft === "t5")
+  return (["moveout", "moveoutrefresh"].includes(rpState.service) && rpState.sqft === "t5")
     || (["deep", "maintenance"].includes(rpState.service) && rpState.sqft === "t8");
 }
 
@@ -213,20 +261,21 @@ function rpServiceIsPublic(key) {
 
 /* Guarantee tiers, not a single on/off switch:
 
-   - "deposit"      Move-Out only. This is the one service with an
-                     inspection/deposit outcome to stand behind, so it
-                     keeps the specific, provable Defend Your Deposit
-                     promise: come back free if a landlord flags something.
+   - "deposit"      Inspection Ready Move-Out only. This is the one
+                     product with an inspection/deposit outcome to stand
+                     behind, so it keeps the specific, provable Defend
+                     Your Deposit promise: come back free if a landlord
+                     flags something.
 
-   - "satisfaction" Deep and Basic. These no longer promise a completed
-                     whole-home reset regardless of size — the customer
-                     buys an anchored block of time and can add hours.
-                     A deposit-style completion guarantee wouldn't be
-                     honest against a job that's intentionally scoped by
-                     time rather than by square footage. A satisfaction
-                     guarantee is: we stand behind the QUALITY of what we
-                     did clean, not a promise that everything in a large
-                     or heavily-soiled home got reached in the time booked.
+   - "satisfaction" Move-Out Refresh, Deep, and Basic. None of these
+                     promise a completed, inspection-proof reset — Refresh
+                     is intentionally a lighter/faster scope (no landlord
+                     walkthrough to answer to), Deep/Basic sell an
+                     anchored block of time. A deposit-style completion
+                     guarantee wouldn't be honest against any of the
+                     three. A satisfaction guarantee is: we stand behind
+                     the QUALITY of what we did clean, not a promise that
+                     the FULL inspection checklist got covered.
 
    - "none"         Hourly only. Scope is entirely customer-directed (their
                      priority list, in their order), so neither guarantee
@@ -239,14 +288,8 @@ function rpServiceIsPublic(key) {
    in the round log as unresolved, not silently changed here since it
    wasn't part of what was asked. */
 function rpGuaranteeType() {
-  /* Split by billing mode, not just service. Flat-rate Move-Out is paid
-     for an OUTCOME (an inspection-ready home) — the deposit guarantee
-     protects that outcome. Hourly Move-Out is paid for TIME — if the
-     crew stops when the clock runs out, promising the same outcome
-     guarantee wouldn't hold together, so it gets the same time-based
-     Satisfaction Guarantee Deep/Basic already use instead. */
-  if (rpIsMoveoutHourly()) return "satisfaction";
   if (rpState.service === "moveout") return "deposit";
+  if (rpState.service === "moveoutrefresh") return "satisfaction";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "satisfaction";
   if (rpState.service === "hourly") return "none";
   return "deposit";
@@ -330,7 +373,14 @@ const rpAddonCatalog = {
 };
 
 const rpServiceAddons = {
-  moveout:     ["carpet", "junk", "windows", "garage", "yard"],
+  moveout:        ["carpet", "junk", "windows", "garage", "yard"],
+  /* Refresh doesn't include the fridge interior by default (Inspection
+     Ready does) -- so unlike "moveout" above, Refresh gets "fridge" as a
+     purchasable add-on. This is the concrete version of "tell the
+     customer exactly what's excluded, and how to add it back": the
+     included screen names the exclusion, and this is where they can
+     actually buy it. */
+  moveoutrefresh: ["fridge", "carpet", "junk", "windows", "garage", "yard"],
   /* Fridge and laundry pulled from Deep/Basic — for a crew already on
      site for hours with an anchored-time model, these are small enough
      that "note it in special instructions" covers it without needing a
@@ -385,6 +435,25 @@ const rpIncludes = {
     itemsLead: "Including the parts most companies bill as add-ons:",
     items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets, inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "All floors throughout", "Every other room and surface inside the home"]
   },
+  /* NEW (round 19) — the lighter counterpart to "moveout" above. Opposite
+     framing on purpose: "moveout" claims totality (naming a few
+     exclusions to make "everything" credible); Refresh is the opposite
+     kind of promise, so it leads with what's bounded and names its
+     exclusions as the MAIN point, not a footnote, per direct instruction
+     that the customer should know exactly the scope they're getting. */
+  moveoutrefresh: {
+    intro: "A fast, affordable clean for when there's no landlord or PM inspection to pass — just a place that needs to be clean and ready to hand over.",
+    highlights: [
+      ["home", "Kitchen, bathrooms & floors"],
+      ["check", "Surfaces & appliance exteriors wiped"],
+      ["repeat", "2-cleaner crew"],
+      [null, "No inspection guarantee"]
+    ],
+    outcome: "Built for tenants and owners who just need it clean — not for a landlord walkthrough.",
+    fineprint: "Oven and fridge interiors, inside cabinets and closets, baseboards, interior windows, and wall spot-cleaning aren't part of this tier. Add any of them individually on the next step, or switch to Inspection Ready for the full checklist and Defend Your Deposit™.",
+    itemsLead: "What's included:",
+    items: ["Kitchen counters, sink, stovetop & appliance exteriors", "Cabinet & closet exteriors wiped", "Bathrooms: toilet, tub/shower, sink, mirror", "All floors vacuumed & mopped", "Trash out, light fixtures dusted, glass & mirrors"]
+  },
   deep: {
     intro: "A detailed, top-to-bottom clean of every room.",
     highlights: [
@@ -437,11 +506,14 @@ const rpIncludes = {
    read-only "includes" screen — that content lives as an expandable
    "What's included" on the estimate screen. */
 const rpFlows = {
-  /* Move-Out's actual flow is computed in rpCurrentFlow() below, not
-     read directly from this array — it branches on rpState.moveoutMode
-     ("flat" vs "hourly"). This entry is the flat-rate path, kept as the
-     default/fallback. */
-  moveout:     ["included", "moveoutmode", "bedrooms", "bathrooms", "sqft", "condition", "addons", "estimate", "lead", "calendar"],
+  /* Both Move-Out services' actual flow is computed in rpCurrentFlow()
+     below, not read directly from this array — it branches on whether
+     the questionnaire answers block the job (rpMoveoutBlocked()). These
+     two entries are documentation of the normal path, kept as the
+     default/fallback; moveoutrefresh mirrors moveout exactly (same
+     steps, different pricing table underneath). */
+  moveout:        ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -469,56 +541,21 @@ const rpFlows = {
    completion rate — completion will look worse by design. */
 const RP_CONTACT_GATE = true;
 
-/* ---------------------------------------------------------------------
-   MOVE-OUT HOURLY OPTION
-   New alternative to the flat sqft-bracket price: pay by the hour at a
-   rate that already bundles the standard 2-cleaner crew, no separate
-   cleaner-count picker needed. Priced to match the same labor economics
-   as the flat-rate table above — see rpSqftTiers comment for the shared
-   $80/hr benchmark both paths are built from.
-
-   Minimum is 4 hours (a full move-out reset rarely finishes faster than
-   that even for a small home) — adjustable if that's wrong in practice.
-   No condition step: like Deep/Basic, variance is absorbed by choosing
-   more hours rather than a size/condition multiplier. Still gets the
-   Defend Your Deposit guarantee (rpGuaranteeType() keys off the service,
-   not the billing mode) — this is still a real move-out job, just billed
-   differently, not a customer-directed scope like Hourly Cleaning. */
-const RP_MOVEOUT_HOURLY_RATE = 75;
-const RP_MOVEOUT_HOURLY_MIN_HOURS = 4;
-const RP_MOVEOUT_HOURLY_MAX_HOURS = 12;
-const RP_MOVEOUT_HOURLY_CLEANERS = 2;
-
-function rpIsMoveoutHourly() {
-  return rpState.service === "moveout" && rpState.moveoutMode === "hourly";
-}
-
 function rpCurrentFlow() {
   let flow = rpFlows[rpState.service] || [];
-  if (rpState.service === "moveout") {
-    /* Questionnaire moved to the END of the flow, right before the price
-       reveals \u2014 per direct instruction, not the first thing after
-       picking the service. "moveoutintent" (rental vs. selling +
-       PM/realtor) stays right after "included", asked the moment someone
-       picks Move-Out (a separate, still-valid decision from a prior
-       round; this change only concerns the water/A\/C/mold-pests
-       questions).
+  if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
+    /* Both Move-Out tiers share one flow shape. Questionnaire sits at the
+       END, right before the price reveals -- per direct instruction, not
+       the first thing after picking the service. "moveoutintent" (rental
+       vs. selling + PM/realtor) stays right after "included", asked the
+       moment someone picks either Move-Out tier.
 
-       Hourly mode is ONLY reachable via rpSwitchToHourlyMoveout(), called
-       from the FLAT estimate screen's link \u2014 confirmed the only setter
-       of moveoutMode in the whole file. That means anyone in hourly mode
-       already walked the flat path and already answered the
-       questionnaire truthfully to get there, so the hourly branch below
-       doesn't need its own copy of "moveoutquestionnaire" at all.
-
-       Blocking can therefore only ever happen on the FLAT path (hourly
-       is unreachable until after a flat pass), so the blocked branch is
-       just the flat prefix truncated at "moveoutblocked" instead of
-       "estimate". */
+       Hourly mode (rpIsMoveoutHourly / moveoutMode / "moveouthours") is
+       REMOVED as of round 19 -- Move-Out no longer has a billing-mode
+       branch, only a tier branch (moveout vs moveoutrefresh), chosen up
+       front at the service list, not mid-flow. */
     if (rpMoveoutBlocked()) {
       flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "moveoutblocked"];
-    } else if (rpIsMoveoutHourly()) {
-      flow = ["included", "moveoutintent", "moveouthours", "addons", "estimate", "lead", "calendar"];
     } else {
       flow = ["included", "moveoutintent", "bedrooms", "bathrooms", "sqft", "addons", "moveoutquestionnaire", "estimate", "lead", "calendar"];
     }
@@ -539,8 +576,8 @@ function rpCurrentFlow() {
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
 function rpTimeEstimate() {
-  if (rpIsMoveoutHourly()) return rpState.moveoutHours ? `${rpState.moveoutHours} hour${rpState.moveoutHours === 1 ? "" : "s"}` : `${RP_MOVEOUT_HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "moveout") return "6–10 hours";
+  if (rpState.service === "moveoutrefresh") return "3–5 hours";
   if (rpState.service === "deep") {
     const extra = Number(rpState.addonExtraHours || 0);
     return extra > 0 ? `${RP_DEEP_ANCHOR_HOURS + extra} hours (${RP_DEEP_ANCHOR_HOURS} + ${extra} extra)` : `${RP_DEEP_ANCHOR_HOURS} hours`;
@@ -555,7 +592,7 @@ function rpTimeEstimate() {
   return "";
 }
 function rpTeamSize() {
-  if (rpState.service === "moveout") return "2 cleaners";
+  if (rpState.service === "moveout" || rpState.service === "moveoutrefresh") return "2 cleaners";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
   if (rpState.service === "hourly") return rpState.cleanerCount ? `${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}` : "You choose";
   if (rpState.service === "airbnb") return "1–2 cleaners";
@@ -609,7 +646,7 @@ function rpMoveoutQuestionnaireAnswered() {
          rpState.moveoutMoldPests !== null;
 }
 function rpMoveoutBlocked() {
-  if (rpState.service !== "moveout") return false;
+  if (!["moveout", "moveoutrefresh"].includes(rpState.service)) return false;
   if (!rpMoveoutQuestionnaireAnswered()) return false;
   return rpState.moveoutWaterOn === false
       || rpState.moveoutAcOn === false
@@ -651,7 +688,7 @@ function rpIsCustomQuoteOnly() {
    credits for either service; Standard is always the lowest advertised
    price. */
 function rpServiceBasePrice() {
-  if (rpState.service === "moveout") {
+  if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
     /* Condition-based pricing (Standard/Heavy/Extreme multiplier) REMOVED
        for Move-Out. Replaced by a hard-stop questionnaire (water, power,
        A/C, mold, pests) — see rpMoveoutBlocked(). The reasoning: this
@@ -659,7 +696,9 @@ function rpServiceBasePrice() {
        "how dirty is it" multiplier was never enforceable anyway. The new
        model doesn't try to price dirtiness at all — it only checks
        whether the job can happen as booked. If it can't, the flow stops
-       and routes to a phone call instead of adjusting the price. */
+       and routes to a phone call instead of adjusting the price. Applies
+       identically to both Move-Out tiers; only the tier table differs
+       (see rpMoveoutBedroomTier / rpMoveoutTierTable). */
     if (!rpState.bedrooms || rpMoveoutIsCustomSqft() || rpMoveoutBlocked()) return 0;
     const tier = rpMoveoutBedroomTier(rpState.bedrooms);
     if (!tier) return 0;
@@ -684,11 +723,7 @@ function rpServiceBasePrice() {
    service, used by both /book's invoice and /call's CSR summary so the
    two never drift apart. */
 function rpDisplayBasePrice() {
-  if (rpIsMoveoutHourly()) {
-    const hours = Number(rpState.moveoutHours || 0);
-    return hours >= RP_MOVEOUT_HOURLY_MIN_HOURS ? hours * RP_MOVEOUT_HOURLY_RATE : 0;
-  }
-  if (rpState.service === "moveout") return rpServiceBasePrice();
+  if (rpState.service === "moveout" || rpState.service === "moveoutrefresh") return rpServiceBasePrice();
   if (rpState.service === "deep") return RP_DEEP_ANCHOR_PRICE;
   if (rpState.service === "maintenance") return RP_BASIC_ANCHOR_PRICE;
   return 0;
@@ -707,15 +742,6 @@ function rpFormatMoney(cents) { return `$${(Math.abs(cents) / 100).toFixed(2)}`;
    they're fixed price and never touched by condition or military discount. */
 function rpPreDiscountSubtotalCents() {
   if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
-  if (rpIsMoveoutHourly()) {
-    /* Flat $80/hr, 2 cleaners already bundled into that rate — no
-       separate cleaner-count picker needed, and no condition multiplier
-       (same reasoning as Deep/Basic: more hours absorbs a bigger or
-       messier home, not a size/condition bump on top of the rate). */
-    const hours = Number(rpState.moveoutHours || 0);
-    if (hours < RP_MOVEOUT_HOURLY_MIN_HOURS) return 0;
-    return rpToCents(hours * RP_MOVEOUT_HOURLY_RATE);
-  }
   if (rpState.service === "carpet") {
     const rooms = Math.max(2, Number(rpState.carpetRooms || 0)); // 2-room minimum
     /* $50/room whether carpet is booked standalone or bundled onto another
@@ -744,7 +770,7 @@ function rpPreDiscountSubtotalCents() {
     const discountedBase = plan ? Math.round(conditioned * (1 - plan.discount)) : conditioned;
     return rpToCents(discountedBase);
   }
-  if (rpState.service === "moveout") {
+  if (rpState.service === "moveout" || rpState.service === "moveoutrefresh") {
     if (!rpState.bedrooms) return 0;
     return rpToCents(rpServiceBasePrice());
   }

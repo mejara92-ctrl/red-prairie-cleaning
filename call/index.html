@@ -259,7 +259,6 @@ const rpState = {
      check, which would have silently treated an unanswered questionnaire
      as complete. Declaring them explicitly as null/0/false closes that. */
   addonExtraHours:0, addonSecondCleaner:false, addonPetEnzyme:false,
-  moveoutMode:"flat", moveoutHours:null,
   moveoutWaterOn:null, moveoutAcOn:null, moveoutMoldPests:null,
   moveoutRentalOrSelling:null, moveoutPmOrRealtor:"",
   fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
@@ -291,7 +290,8 @@ const FLOWS = {
      "intent" (rental vs. selling + PM/realtor) and "questionnaire"
      (water/power/A/C/mold/pests hard-stop) added to moveout, matching
      /book exactly. */
-  moveout:     ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
+  moveout:        ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
+  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","sqft","addons","questionnaire","quote","contact","calendar","done"],
   deep:        ["service","caller","addons","quote","contact","calendar","done"],
   maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
@@ -324,22 +324,26 @@ function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i
    everyone; "PCS" only lands with people who already know the acronym.
    ========================================================================= */
 const SERVICE_ANGLES = {
+  /* Round 19 -- Move-Out is now two services, not one service with a
+     billing-mode branch. "moveout" is the guaranteed tier (Inspection
+     Ready); "moveoutrefresh" is the new lighter tier. Both are plain
+     strings now -- the old rpIsMoveoutHourly() function-wrapper trick
+     is gone along with hourly move-out billing. */
   moveout: {
-    /* Functions, not plain strings \u2014 the inspection/deposit promise
-       only holds for flat-rate (an outcome guarantee). Saying "nothing
-       gets flagged at the walkthrough" on an HOURLY quote would directly
-       contradict the guarantee split (hourly gets Satisfaction Guaranteed,
-       not Defend Your Deposit, because a clock-based price can't honestly
-       promise a completed outcome). angle() callers already just read
-       these as values, so a function needs (val/obj) computed at the
-       call site \u2014 see the two `typeof x === "function"` checks below. */
-    value: () => rpIsMoveoutHourly()
-      ? "that's a 2-cleaner crew for the hours you book, working the whole interior in that time"
-      : "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
+    value: "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
     addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
-    objection: () => rpIsMoveoutHourly()
-      ? `Hourly gets you the same 2-cleaner crew at $${RP_MOVEOUT_HOURLY_RATE}/hour \u2014 it's the flat-rate price that comes with the full inspection guarantee, since that one's priced for the whole job to get done, not just the time.`
-      : "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
+    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
+    urgencyNoun: "move-out slots",
+    seasonNote: "our busiest moving season"
+  },
+  moveoutrefresh: {
+    /* Ask the qualifying question FIRST on this one -- if it turns out
+       there IS a landlord/PM inspection, steer them to moveout instead
+       before quoting, the same way the old hourly carve-out steered
+       people toward the guaranteed tier. */
+    value: "that's the fast, affordable option when there's no landlord walkthrough to answer to \u2014 kitchen, bathrooms, floors, surfaces wiped down",
+    addon: "If they mention a landlord or property manager checking the place afterward, stop and ask before quoting \u2014 that's Inspection Ready, not Refresh.",
+    objection: "This one's priced lighter because it skips the deep-clean items a landlord inspection checks for \u2014 oven and fridge interiors, inside cabinets, baseboards. If there's any inspection at all, Inspection Ready is the one backed by Defend Your Deposit.",
     urgencyNoun: "move-out slots",
     seasonNote: "our busiest moving season"
   },
@@ -421,7 +425,7 @@ function calendarSayLine(){
    good advice for a move-out, but doesn't apply to a maintenance signup or
    a carpet job with no deadline. */
 function calendarWatchLine(){
-  if(rpState.service==="moveout") return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
+  if(["moveout","moveoutrefresh"].includes(rpState.service)) return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
   if(rpState.service==="deep" || rpState.service==="maintenance") return "Ask if there's an event or date they're working around \u2014 otherwise just offer your two soonest openings.";
   return "Offer your two soonest real openings \u2014 no deadline to work around here, so don't invent one.";
 }
@@ -654,7 +658,7 @@ function guardrails(){
   if(s==="quote" && !rpIsCustomQuoteOnly() && rpFinalPrice()>0)
     g.push({level:"info",title:"Say it, then stop",
       body:"Give the number once, plainly, then be quiet. Silence is them thinking, not them saying no."});
-  if(s==="addons" && rpState.service==="moveout" && rpAddonsTotal()===0)
+  if(s==="addons" && ["moveout","moveoutrefresh"].includes(rpState.service) && rpAddonsTotal()===0)
     g.push({level:"info",title:"Ask all three by name",
       body:"Carpet, exterior windows, garage. Most customers won't raise them on their own, and they're the easiest revenue on the call."});
   return g;
@@ -743,7 +747,9 @@ function screenHtml(){
   if(s==="service"){
     const items = Object.entries(rpServices).map(([k,v])=>
       opt(v.name, `pickService('${k}')`, rpState.service===k,
-        k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
+        k==="moveout" ? "ASK FIRST: will a landlord or property manager inspect this? If yes, this is the tier."
+        : k==="moveoutrefresh" ? "No landlord inspection expected. Lighter/faster, no deposit guarantee."
+        : k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
     ).join("");
     const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
       "Commercial, specialty, or one-of-a-kind \u2014 we'll follow up with a real quote.");
@@ -839,26 +845,24 @@ function screenHtml(){
 
   if(s==="quote"){
     const custom=rpIsCustomQuoteOnly();
-    /* Move-out only: offer hourly AFTER giving the flat number, same
-       order as /book (flat is the default quote; hourly is something
-       you offer once they've heard the real price, not a coin-flip
-       asked up front). Toggling switches rpState.moveoutMode and the
-       quote box recomputes live through the same shared engine. */
-    const moveoutHourlyToggle = (rpState.service==="moveout" && !custom) ? `
+    /* Move-out tier switch: let the CSR flip between Inspection Ready and
+       Refresh from the quote screen after giving the first number, same
+       spirit as /book's cross-sell link. Bedrooms/bathrooms/sqft/addons
+       stay in state either way -- both tiers ask the same size questions
+       -- so this just swaps which price table the shared engine reads.
+       Replaces the old flat/hourly billing-mode toggle (round 19 --
+       hourly move-out removed). */
+    const moveoutTierToggle = (["moveout","moveoutrefresh"].includes(rpState.service) && !custom) ? `
       <div class="opts" style="margin-bottom:11px">${opt(
-        rpIsMoveoutHourly() ? "Switch back to flat-rate price" : `Prefer hourly instead? ($${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners)`,
-        `pick('moveoutMode', rpState.moveoutMode==='hourly' ? 'flat' : 'hourly')`,
-        rpIsMoveoutHourly()
-      )}</div>
-      ${rpIsMoveoutHourly() ? `<div style="margin-bottom:13px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:5px">How many hours? <span style="color:var(--muted);font-weight:500">${RP_MOVEOUT_HOURLY_MIN_HOURS}hr minimum</span></div>
-          <div class="opts three">${Array.from({length:RP_MOVEOUT_HOURLY_MAX_HOURS-RP_MOVEOUT_HOURLY_MIN_HOURS+1},(_,i)=>i+RP_MOVEOUT_HOURLY_MIN_HOURS)
-            .map(n=>opt(`${n}hr`,`pick('moveoutHours',${n})`,rpState.moveoutHours===n)).join("")}</div></div>` : ""}` : "";
-    return `${moveoutHourlyToggle}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
+        rpState.service==="moveout" ? "Switch to Move-Out Refresh (no inspection guarantee)" : "Switch to Inspection Ready (adds Defend Your Deposit)",
+        `switchMoveoutTier('${rpState.service==="moveout" ? "moveoutrefresh" : "moveout"}')`,
+        false
+      )}</div>` : "";
+    return `${moveoutTierToggle}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
         <small>Quote to give</small>
         <strong>${custom?"Custom Quote":"$"+rpFinalPrice().toFixed(2)}</strong>
         ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
-          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpIsMoveoutHourly()?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
+          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpState.service==="moveoutrefresh"?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
       </div>
       ${custom?"":quoteCloseHelpersHtml()}
       ${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
@@ -1039,6 +1043,10 @@ function set(f,v){ rpState[f]=v; save(); try{renderRail();}catch(e){}
 function pick(f,v){ rpState[f]=v; render(); }
 function toggle(f){ rpState[f]=!rpState[f];
   if(f==="militaryDiscount"&&!rpState.militaryDiscount) rpState.militaryVerified=false; render(); }
+/* Swap Move-Out tier without resetting size/addon state -- unlike
+   pickService(), which is a genuine service change. See the comment on
+   moveoutTierToggle above. */
+function switchMoveoutTier(k){ rpState.service=k; render(); }
 function pickService(k){ rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
@@ -1055,7 +1063,6 @@ function pickService(k){ rpState.service=k;
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
-  rpState.moveoutMode="flat"; rpState.moveoutHours=null;
   rpState.moveoutWaterOn=null; rpState.moveoutAcOn=null; rpState.moveoutMoldPests=null;
   rpState.moveoutRentalOrSelling=null; rpState.moveoutPmOrRealtor="";
   render();
@@ -1123,11 +1130,11 @@ function jobDetails(){
      never fixed the other. Without this, a phone-booked move-out would
      lose the rental/PM lead and the pre-clean confirmation entirely,
      same failure mode as the /book bug. */
-  const moveoutExtras = rpState.service==="moveout" ? [
+  const moveoutExtras = ["moveout","moveoutrefresh"].includes(rpState.service) ? [
+    `Tier: ${rpState.service==="moveout"?"Inspection Ready (Defend Your Deposit)":"Move-Out Refresh (Satisfaction Guaranteed, no deposit guarantee)"}`,
     `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
     rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
-    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`,
-    rpIsMoveoutHourly()?`Billing: Hourly (${rpState.moveoutHours||0} hrs @ $${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners, Satisfaction Guaranteed not Defend Your Deposit)`:""
+    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`
   ].filter(Boolean) : [];
   const addonExtras=[
     rpState.addonExtraHours?`Extra Time: +${rpState.addonExtraHours}hr`:"",

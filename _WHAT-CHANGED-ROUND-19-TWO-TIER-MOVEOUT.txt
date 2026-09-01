@@ -1,0 +1,229 @@
+RED PRAIRIE — ROUND 19: TWO-TIER MOVE-OUT (per direct instruction)
+====================================================================
+This zip contains ONLY the files that changed. Unzip it over your repo
+root and let it overwrite matching paths. Nothing needs to be moved by
+hand.
+
+Requested: "make it so that the customer knows EXACTLY the scope" +
+"remove move-out hourly and replace move-out with this" + keep the
+booking process super simple.
+
+
+FILES CHANGED (5)
+  js/rp-pricing-engine.js   modified
+  book/index.html           modified
+  call/index.html           modified
+  pricing/index.html        modified
+  index.html                modified
+
+
+--------------------------------------------------------
+1. js/rp-pricing-engine.js — THE ACTUAL CHANGE
+--------------------------------------------------------
+Move-Out is no longer one service with a flat/hourly billing toggle.
+It's two services, chosen up front on the service list, same as picking
+Deep vs. Basic:
+
+  moveout          "Inspection Ready Move-Out"   (same key as before —
+                    no GHL/webhook/analytics migration needed)
+  moveoutrefresh    "Move-Out Refresh"             (NEW)
+
+INSPECTION READY — UNCHANGED PRICES. Nothing here was re-priced:
+  1-2BR  $299   |  3BR  $399   |  4BR  $499   |  5+BR  $599
+  + large-home surcharge: +$100 / +$200 / +$300 (2,200-3,400 sq ft)
+  Full checklist (oven, fridge, cabinets, closets, baseboards, interior
+  windows, walls, bathrooms, floors). Defend Your Deposit™ guarantee.
+
+MOVE-OUT REFRESH — NEW, roughly 60% of the matching Inspection Ready
+tier, rounded to a clean number (a starting estimate, not a measured
+rate — see "WORTH DOING NEXT" below):
+  1-2BR  $179   |  3BR  $229   |  4BR  $279   |  5+BR  $329
+  + large-home surcharge: +$50 / +$100 / +$150 (half of Inspection Ready)
+  Lighter scope: kitchen/bath surfaces, appliance exteriors, cabinet/
+  closet exteriors, floors, trash out. Does NOT include oven/fridge
+  interiors, inside cabinets/closets, baseboards, interior windows, or
+  wall spot-cleaning. Satisfaction Guaranteed (quality of what we
+  cleaned) instead of Defend Your Deposit — it isn't priced or
+  checklisted to survive a landlord inspection, so it doesn't promise to.
+  Fridge interior is a $50 add-on for this tier (rpAddonCatalog.fridge —
+  already existed, just wasn't offered on Move-Out before).
+
+REMOVED ENTIRELY: Hourly Move-Out ($75/hr, 4hr minimum, RP_MOVEOUT_HOURLY_*).
+That was a second way to price the SAME guaranteed job and had drifted
+from the flat-rate table's real hours — a customer could get a different
+number for the same job depending which path they picked. Simpler to
+delete it than keep re-syncing it, especially now that "which product am
+I buying" is answered by a real tier choice instead of a mid-flow toggle.
+Deleted: rpIsMoveoutHourly(), RP_MOVEOUT_HOURLY_RATE/MIN_HOURS/
+MAX_HOURS/CLEANERS, the moveoutMode state field, the "moveouthours" step.
+
+BOTH TIERS SHARE: the same bedrooms/bathrooms/sqft questions, the same
+"moveoutintent" (rental vs. selling) question, the same water/A-C/mold-
+pests hard-stop questionnaire (rpMoveoutBlocked() now checks both
+services — if the job can't happen as booked, that's true regardless of
+which tier someone picked), the same 2-cleaner crew, the same military
+discount, and the same $150 one-visit floor (both tiers price above it
+at every size, so it never actually bites).
+
+Guarantee model (rpGuaranteeType()) now has Inspection Ready on
+"deposit", Move-Out Refresh on "satisfaction" (the same honest bucket
+Deep/Basic already use — quality guaranteed, completeness is not).
+
+
+--------------------------------------------------------
+2. book/index.html
+--------------------------------------------------------
+- Service list: one "Move-In / Move-Out Cleaning" row replaced with two
+  rows — Inspection Ready (still "Most Popular") and Move-Out Refresh.
+- "What's included" screen: Refresh gets its own honest copy (opposite
+  framing from Inspection Ready on purpose — Inspection Ready claims
+  totality, Refresh leads with its boundary) via rpIncludes.moveoutrefresh
+  in the engine. No template changes needed; the screen was already
+  data-driven per service.
+- Estimate screen: guarantee line is service-aware (deposit vs.
+  satisfaction, unchanged mechanism) — Refresh's satisfaction line now
+  adds one sentence pointing at Inspection Ready for anyone who mentions
+  an inspection at the last second.
+- NEW cross-sell link on the estimate screen: "Don't need the inspection
+  guarantee? See Refresh pricing" (Inspection Ready) / "Need it
+  guaranteed for an inspection? See Inspection Ready pricing" (Refresh).
+  Switches rpState.service and jumps back to the estimate WITHOUT
+  resetting bedrooms/bathrooms/sqft/add-ons, so someone can compare both
+  real numbers for their actual home without restarting the flow. This
+  replaces the old flat/hourly toggle's UX slot with something that
+  compares two honest products instead of two prices for a fuzzy scope.
+- Removed: the "moveouthours" step, the hourly mini-rows (Billing/Hours/
+  Rate), rpSelectMoveoutHours(), rpSwitchToHourlyMoveout()/
+  rpSwitchToFlatMoveout() (replaced by rpSwitchMoveoutTier()).
+- Lead-screen prep-check (No A/C, etc.) still correctly suppressed for
+  both Move-Out tiers, since both already ask it via the questionnaire.
+- GHL webhook payload: added guarantee_type field; the "Base service
+  price" and rental/PM/pre-clean-check fields now fire for Refresh too
+  (previously would have silently shown "N/A" for a Refresh booking).
+- Fixed one hardcoded string: the blocked-questionnaire lead used to
+  always say "Move-In / Move-Out Cleaning" no matter which tier was
+  picked. Now reads the real service name.
+
+
+--------------------------------------------------------
+3. call/index.html (CSR phone console)
+--------------------------------------------------------
+Kept in lockstep with /book per this file's own stated purpose (a phone
+quote and a web quote must never disagree):
+- Service picker already renders from Object.entries(rpServices), so
+  Move-Out Refresh appeared there automatically once added to the engine.
+  Added CSR-only hint text on both Move-Out rows: "ASK FIRST: will a
+  landlord or property manager inspect this?" — this is the routing
+  question Mike's Deposit Math notes already called for.
+- SERVICE_ANGLES.moveout de-function-ified (no more hourly ternary) and
+  a new SERVICE_ANGLES.moveoutrefresh added with its own script guidance
+  — the objection line explicitly tells the CSR to switch tiers if an
+  inspection comes up mid-call.
+- Quote screen: hourly toggle replaced with a tier-switch toggle
+  (switchMoveoutTier()), same non-resetting behavior as /book's version.
+- jobDetails() (the office/crew summary text): now includes a "Tier:"
+  line for either Move-Out service, and the rental/PM/pre-clean-check
+  lines fire for Refresh bookings too (previously moveout-only).
+
+
+--------------------------------------------------------
+4. pricing/index.html
+--------------------------------------------------------
+- Move-out section rebuilt as a two-column comparison table (Refresh /
+  Inspection Ready) instead of one price column.
+- Two separate "what's included" ledgers — Inspection Ready's is
+  unchanged; Refresh's is new and states its exclusions plainly, with a
+  pointer to the $50 fridge add-on and to upgrading tiers.
+- Old "prefer to pay by the hour" callout replaced with "Which one do I
+  need?" — the same landlord/PM qualifying question used in /book and
+  /call, now public-facing.
+- Defend Your Deposit callout narrowed to say it's the Inspection Ready
+  promise specifically, not a blanket move-out promise.
+- Schema.org offerCount bumped 5 -> 6 (Refresh is a real 6th product now).
+
+
+--------------------------------------------------------
+5. index.html (homepage)
+--------------------------------------------------------
+Minimal, targeted edits only — did NOT touch the "Factory Reset™"
+umbrella brand name (title tags, meta, schema) since that's a separate,
+larger rebrand question and wasn't part of this ask:
+- Hero trust bullet: "Defend Your Deposit™" -> "Defend Your Deposit™ on
+  Inspection Ready" (was an unqualified claim next to a service that no
+  longer universally carries it).
+- FAQ answer for "What does Defend Your Deposit mean?" now names the
+  tier and mentions Refresh as the no-guarantee alternative.
+- Footer service list: "Factory Reset™ Move-Out Clean" split into
+  "Move-Out Cleaning: Inspection Ready" and "Move-Out Cleaning: Refresh".
+
+
+--------------------------------------------------------
+VERIFIED THIS ROUND (node --check + a standalone price harness)
+--------------------------------------------------------
+  Inspection Ready 1-2BR / 3BR / 4BR / 5+BR   $299 / $399 / $499 / $599  (unchanged)
+  Inspection Ready 3BR + military discount     $374.00
+  Inspection Ready 3BR, 2,600-3,000 sq ft       $599.00 (+$200 surcharge)
+  Move-Out Refresh 1-2BR / 3BR / 4BR / 5+BR    $179 / $229 / $279 / $329
+  Move-Out Refresh 3BR + military discount      $206.10
+  Move-Out Refresh 3BR, 2,600-3,000 sq ft        $329.00 (+$100 surcharge)
+  Blocked flow (water off / mold flagged)        $0.00, routes to callback screen, both tiers
+  Deep / Basic / Carpet pricing                  unchanged (regression-checked)
+  book/index.html + call/index.html inline JS    parses clean (node --check)
+
+NOT price-verified in a live browser: the actual click-through funnel,
+the calendar step, and the GHL webhook round-trip. I don't have a way to
+run this in a real browser or hit your live Worker from here — please
+walk /book once per tier (service -> bedrooms -> bathrooms -> sqft ->
+questionnaire -> estimate -> the new tier-switch link -> lead) on a
+phone before this goes live, the same way you'd verify any of the
+earlier rounds.
+
+
+--------------------------------------------------------
+!! BEFORE YOU DEPLOY !!
+--------------------------------------------------------
+GHL: add "Move-Out Refresh" as a Service Needed dropdown option (same
+pattern as when Targeted/Hourly Clean was renamed in earlier rounds).
+Without it, a Refresh booking sends a service value the dropdown doesn't
+have — the Worker degrades gracefully (retries without custom fields)
+but you'd lose service_needed on that booking.
+
+Sona prompt (if you ever reactivate it): already documented as stale
+against round 18's prices — it now also knows nothing about the two-tier
+split. Leave it off until it's rewritten, same guidance as last time.
+
+
+--------------------------------------------------------
+NOT DONE (by scope, not by accident)
+--------------------------------------------------------
+- The 14 city/service SEO landing pages (move-out-cleaning-lawton-ok,
+  pcs-cleaning-fort-sill-ok, etc.) were NOT rewritten. I checked all of
+  them for stale hardcoded references to the old single move-out product
+  or the $75/hr hourly rate — found none. One page
+  (pcs-cleaning-fort-sill-ok) has soft, rounded pricing language ("start
+  at $199-$299", "around $399", "around $499-$599") that still reads
+  fine with two tiers in play but doesn't mention the split. Left as-is;
+  worth a copy pass later if you want those pages to sell Refresh too.
+- The "Factory Reset™" brand name sitewide (titles, meta descriptions,
+  schema, the homepage's dormant/unused on-page estimator widget from an
+  earlier round) is untouched. That's the trademarked umbrella name for
+  the whole move-out category and changing it is a bigger call than this
+  request — Inspection Ready can live comfortably under that umbrella as
+  its guaranteed variant.
+- No new priced add-on SKUs were created for oven-interior or
+  cabinet-interior on Refresh — only fridge interior (which already
+  existed in the catalog) was wired in as a Refresh add-on. Adding the
+  others would need new catalog entries, UI cards, and pricing-page rows;
+  flagging as a real option if Refresh customers ask for it often.
+
+
+--------------------------------------------------------
+WORTH DOING NEXT
+--------------------------------------------------------
+The Refresh prices ($179/$229/$279/$329) are a starting estimate built
+off "roughly 60% of Inspection Ready, rounded clean" — not a measured
+rate. Time a handful of real Refresh-scope jobs across the four bedroom
+sizes and adjust RP_MOVEOUT_REFRESH_BEDROOM_TIERS in
+js/rp-pricing-engine.js if the real hours say otherwise. That table is a
+single, clearly-commented block — a one-person, five-minute edit once
+you have real numbers.

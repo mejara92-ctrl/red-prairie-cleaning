@@ -2592,8 +2592,6 @@ const rpState = {
   addonCarpetRooms: 0,
   addonExtraHours: 0,
   addonSecondCleaner: false,
-  moveoutMode: "flat",
-  moveoutHours: null,
   moveoutWaterOn: null,
   moveoutAcOn: null,
   moveoutMoldPests: null,
@@ -2824,7 +2822,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutMode", "moveoutHours", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "addonPetEnzyme", "windowsTier", "yardTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutRentalOrSelling", "moveoutPmOrRealtor", "addonPetEnzyme", "windowsTier", "yardTier", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "militaryDiscount", "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -2940,7 +2938,8 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-In / Move-Out Cleaning", desc:"A complete top-to-bottom cleaning of the home, with no add-ons needed.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_BEDROOM_TIERS[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:rpServices.moveout.name, desc:"Full interior reset, backed by Defend Your Deposit™. Built to pass a landlord walkthrough.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_BEDROOM_TIERS[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveoutrefresh', this)", icon:"zap", title:rpServices.moveoutrefresh.name, desc:"A faster, more affordable clean when there's no landlord inspection to pass.", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
@@ -2998,7 +2997,7 @@ function rpScreenHtml() {
   }
 
   if (rpState.step === "bathrooms") {
-    const moveoutTier = rpState.service === "moveout" ? rpMoveoutBedroomTier(rpState.bedrooms) : null;
+    const moveoutTier = ["moveout", "moveoutrefresh"].includes(rpState.service) ? rpMoveoutBedroomTier(rpState.bedrooms) : null;
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>How many bathrooms?</h2>
@@ -3097,22 +3096,6 @@ function rpScreenHtml() {
       ${eyebrow}
       <h2>Got it, thanks</h2>
       <p class="rp-sub">We'll call you shortly to sort out next steps. In the meantime, feel free to text or call us directly at (580) 215-0915.</p>
-    </div>` };
-  }
-
-  if (rpState.step === "moveouthours") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How many hours?</h2>
-      <p class="rp-sub">${RP_MOVEOUT_HOURLY_MIN_HOURS}-hour minimum. A standard home usually runs about 8 hours with a 2-cleaner crew.</p>
-      <div class="rp-rows">
-        ${Array.from({ length: RP_MOVEOUT_HOURLY_MAX_HOURS - RP_MOVEOUT_HOURLY_MIN_HOURS + 1 }, (_, i) => i + RP_MOVEOUT_HOURLY_MIN_HOURS).map(n => rpRowBtn({
-          onclick:`rpSelectMoveoutHours(${n}, this)`,
-          title:`${n} hour${n > 1 ? "s" : ""}`,
-          val:`$${(n * RP_MOVEOUT_HOURLY_RATE).toFixed(2)}`,
-          selected: rpState.moveoutHours === n
-        })).join("")}
-      </div>
     </div>` };
   }
 
@@ -3411,7 +3394,7 @@ function rpEstimateScreen(eyebrow) {
     </div>` : ""}
     <div class="rp-invoice">
       <div class="rp-price-section">
-        ${rpState.service === "moveout" && !rpIsMoveoutHourly() ? `<p class="rp-moveout-tagline">Save the stress. Feel confident in your move-out team.</p>` : ""}
+        ${["moveout", "moveoutrefresh"].includes(rpState.service) ? `<p class="rp-moveout-tagline">Save the stress. Feel confident in your move-out team.</p>` : ""}
         <div class="rp-price-block ${noGuaranteedPrice ? "is-quote" : ""}">
           <strong>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? rpFormatMoney(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong>
           <span>${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? "Due on your first visit" : service.name}</span>
@@ -3419,28 +3402,28 @@ function rpEstimateScreen(eyebrow) {
         ${(() => {
           const gtype = rpGuaranteeType();
           if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>We guarantee this clean.</strong> This is a full reset of the home, done by a real crew, however long it takes to get there. If your landlord flags something we missed, tell us within 48 hours and we'll come back and make it right, free. That's Defend Your Deposit\u2122.</span></div>`;
-          if (gtype === "satisfaction") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</span></div>`;
+          if (gtype === "satisfaction") {
+            const refreshNote = rpState.service === "moveoutrefresh" ? " Need it guaranteed to pass a landlord or PM inspection? Switch to Inspection Ready before you book." : "";
+            return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.${refreshNote}</span></div>`;
+          }
           return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")}<span>You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</span></div>`;
         })()}
-        ${rpState.service === "moveout" ? (
-          rpIsMoveoutHourly()
-            ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToFlatMoveout()">Back to flat-rate pricing \u2192</button>`
-            : `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchToHourlyMoveout()">Prefer an hourly clean instead? $${RP_MOVEOUT_HOURLY_RATE}/hr \u2192</button>`
-        ) : ""}
+        ${rpState.service === "moveout"
+          ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveoutrefresh')">Don't need the inspection guarantee? See Refresh pricing \u2192</button>`
+          : rpState.service === "moveoutrefresh"
+            ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveout')">Need it guaranteed for an inspection? See Inspection Ready pricing \u2192</button>`
+            : ""}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 61+ reviews · Veteran-owned & insured</div>
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
-      ${rpState.service === "moveout" && rpSqftTier() && !rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
-      ${rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Billing</span><strong>Hourly</strong></div>` : ""}
-      ${rpIsMoveoutHourly() && rpState.moveoutHours ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.moveoutHours}</strong></div>` : ""}
-      ${rpIsMoveoutHourly() ? `<div class="rp-mini-row"><span>Rate</span><strong>$${RP_MOVEOUT_HOURLY_RATE}/hr (${RP_MOVEOUT_HOURLY_CLEANERS} cleaners included)</strong></div>` : ""}
+      ${["moveout", "moveoutrefresh"].includes(rpState.service) && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
       ${["deep","maintenance"].includes(rpState.service) ? `<div class="rp-mini-row"><span>Included Time</span><strong>${rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS} hours</strong></div>` : ""}
       ${rpState.bedrooms ? `<div class="rp-mini-row"><span>Bedrooms</span><strong>${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""}</strong></div>` : ""}
       ${rpState.bathrooms ? `<div class="rp-mini-row"><span>Bathrooms</span><strong>${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.hourCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hourCount}</strong></div>` : ""}
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
-      ${["moveout","deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpDisplayBasePrice().toFixed(2)}</strong></div>` : ""}
+      ${["moveout","moveoutrefresh","deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpDisplayBasePrice().toFixed(2)}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
@@ -3603,7 +3586,7 @@ function rpLeadScreen(eyebrow) {
         <div class="rp-lead-field"><label for="rpCity">City *</label><input id="rpCity" type="text" autocomplete="address-level2" value="${rpEscapeAttr(rpState.city)}" placeholder="Lawton" oninput="rpCaptureLeadField('city',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
         <div class="rp-lead-field"><label for="rpPostalCode">ZIP *</label><input id="rpPostalCode" type="text" autocomplete="postal-code" value="${rpEscapeAttr(rpState.postalCode)}" placeholder="73505" inputmode="numeric" oninput="rpCaptureLeadField('postalCode',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       </div>
-      ${rpState.service === "moveout" ? "" : `
+      ${["moveout", "moveoutrefresh"].includes(rpState.service) ? "" : `
       <div class="rp-prep-check">
         <label class="rp-prep-check-label">A few quick property details</label>
         <p class="rp-prep-check-note">This helps us bring the right equipment, schedule enough time, and confirm the final scope.</p>
@@ -3904,8 +3887,6 @@ function rpResetServiceState() {
   rpState.fridgeAddon = false;
   rpState.addonExtraHours = 0;
   rpState.addonSecondCleaner = false;
-  rpState.moveoutMode = "flat";
-  rpState.moveoutHours = null;
   rpState.moveoutWaterOn = null;
   rpState.moveoutAcOn = null;
   rpState.moveoutMoldPests = null;
@@ -3954,21 +3935,20 @@ function rpSelectBedrooms(n, element) { rpCommitChoice(element, () => { rpState.
 function rpSelectBathrooms(n, element) { rpCommitChoice(element, () => { rpState.bathrooms = n; rpAdvance(); }); }
 function rpSelectCleanerCount(n, element) { rpCommitChoice(element, () => { rpState.cleanerCount = n; rpAdvance(); }); }
 function rpSelectHourCount(n, element) { rpCommitChoice(element, () => { rpState.hourCount = n; rpAdvance(); }); }
-function rpSelectMoveoutHours(n, element) { rpCommitChoice(element, () => { rpState.moveoutHours = n; rpAdvance(); }); }
 /* Toggles one questionnaire answer and re-renders in place (not
    rpAdvance) — all 5 questions live on one screen, so answering one
    doesn't move anywhere; the Continue button only becomes clickable
    once all 5 have an answer (see rpMoveoutQuestionnaireAnswered()). */
 function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh(); }
 
-/* Switching billing mode from the ESTIMATE screen, not a dedicated
-   upfront choice screen. Hourly: nothing about the home size is known
-   yet, so go collect hours. Flat: bedrooms/bathrooms/sqft are already
-   in state (that's the only way to have reached hourly in the first
-   place), so jump straight back to the estimate instead of re-asking
-   size questions that were already answered. */
-function rpSwitchToHourlyMoveout() { rpState.moveoutMode = "hourly"; rpGoToStep("moveouthours", "forward"); }
-function rpSwitchToFlatMoveout() { rpState.moveoutMode = "flat"; rpGoToStep("estimate", "back"); }
+/* Switching TIER from the ESTIMATE screen, not a dedicated upfront
+   choice screen (that's still the service-list row). Bedrooms/bathrooms/
+   sqft/add-ons are already in state either way -- both tiers use the
+   exact same size questions -- so this just swaps which price table
+   rpServiceBasePrice() reads and jumps straight back to the estimate,
+   no re-asking anything. Replaces the old flat/hourly billing-mode
+   toggle (round 19 -- hourly removed). */
+function rpSwitchMoveoutTier(service) { rpState.service = service; rpGoToStep("estimate", "back"); }
 
 function rpSubmitMoveoutBlockedLead() {
   const nameEl = document.getElementById("rpBlockedName");
@@ -4005,7 +3985,7 @@ function rpSubmitMoveoutBlockedLead() {
         csr_lead_source: "Website Estimator",
         full_name: fullName,
         phone: phone,
-        service: "Move-In / Move-Out Cleaning",
+        service: (rpServices[rpState.service] && rpServices[rpState.service].name) || "Move-Out Cleaning",
         quoted_price: "No quote - blocked",
         details: [
           "MOVE-OUT BLOCKED AT QUESTIONNAIRE",
@@ -4107,10 +4087,9 @@ function rpGetEstimatePayload() {
     rpState.yardTier ? `Yard Refresh: ${rpState.yardTier}` : "",
     rpState.addonExtraHours ? `Extra Time: +${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"}` : "",
     rpState.addonSecondCleaner ? `Additional Cleaner: ${rpSecondCleanerHours()} hrs, $${rpSecondCleanerPrice()}` : "",
-    (rpState.service === "carpet" && rpState.addonPetEnzyme) ? `Pet Enzyme Treatment: $${rpPetEnzymePrice()}` : "",
-    rpIsMoveoutHourly() ? `Billing: Hourly (${rpState.moveoutHours || 0} hrs @ $${RP_MOVEOUT_HOURLY_RATE}/hr, 2 cleaners)` : ""
+    (rpState.service === "carpet" && rpState.addonPetEnzyme) ? `Pet Enzyme Treatment: $${rpPetEnzymePrice()}` : ""
   ].filter(Boolean).join(", ") || "None";
-  const isConditionPriced = ["moveout", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
+  const isConditionPriced = ["moveout", "moveoutrefresh", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
   const baseServicePrice = rpDisplayBasePrice();
   const militaryDiscountAmount = rpMilitaryDiscountAmount();
   /* Pricing status shown to the office: "Confirmed" for a normal instant
@@ -4135,9 +4114,10 @@ function rpGetEstimatePayload() {
     `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal().toFixed(2)}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit().toFixed(2)} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
-    rpState.service === "moveout" ? `Rental or selling: ${rpState.moveoutRentalOrSelling === "renting" ? "Renting" : rpState.moveoutRentalOrSelling === "selling" ? "Selling" : "N/A"}` : "",
-    (rpState.service === "moveout" && rpState.moveoutPmOrRealtor) ? `Property manager/realtor: ${rpState.moveoutPmOrRealtor}` : "",
-    rpState.service === "moveout" ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold/Pests ${rpState.moveoutMoldPests ? "YES" : "No"}` : "",
+    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Tier: ${rpState.service === "moveout" ? "Inspection Ready (Defend Your Deposit)" : "Move-Out Refresh (Satisfaction Guaranteed, no deposit guarantee)"}` : "",
+    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Rental or selling: ${rpState.moveoutRentalOrSelling === "renting" ? "Renting" : rpState.moveoutRentalOrSelling === "selling" ? "Selling" : "N/A"}` : "",
+    (["moveout", "moveoutrefresh"].includes(rpState.service) && rpState.moveoutPmOrRealtor) ? `Property manager/realtor: ${rpState.moveoutPmOrRealtor}` : "",
+    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Pre-clean check: Water ${rpState.moveoutWaterOn ? "On" : "N/A"}, A/C ${rpState.moveoutAcOn ? "Working" : "N/A"}, Mold/Pests ${rpState.moveoutMoldPests ? "YES" : "No"}` : "",
     `Airbnb laundry: ${rpState.airbnbLaundry ? "Yes" : "No"}`, `Airbnb restocking: ${rpState.airbnbRestocking ? "Yes" : "No"}`, `Airbnb same-day: ${rpState.airbnbSameDay ? "Yes" : "No"}`,
     `Add-ons: ${addonsList}`, `Additional service request: ${rpState.handymanInterest ? "Make-ready repairs requested (quoted separately; not included in cleaning estimate)" : "None"}`,
     `Military/First Responder Discount: ${discountApplied ? `Yes (-$${militaryDiscountAmount.toFixed(2)}, capped at $${MILITARY_DISCOUNT_CAP}, not combinable with promo codes)` : "No"}`,
@@ -4147,7 +4127,7 @@ function rpGetEstimatePayload() {
     source: "Red Prairie Website Instant Estimator", business: "Red Prairie Cleaning",
     full_name: rpState.fullName, phone: rpState.phone, email: rpState.email,
     address1, street_address: address1, address: address1, city, state, postal_code: postalCode, zip: postalCode, full_address: fullAddress,
-    service, service_type: service, service_key: rpState.service,
+    service, service_type: service, service_key: rpState.service, guarantee_type: rpGuaranteeType(),
     estimated_price: estimateDisplay, estimated_price_number: rpIsCustomQuoteOnly() ? "N/A" : total, price_estimate: estimateDisplay,
     pricing_status: pricingStatus,
     square_footage: rpSqftTier() ? rpSqftTier().label : "N/A",
