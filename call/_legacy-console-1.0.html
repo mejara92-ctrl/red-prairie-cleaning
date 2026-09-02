@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+<!-- ===================================================================
+     RED PRAIRIE CLEANING — INTERNAL CSR CALL CONSOLE
+     ===================================================================
+     This is NOT a customer-facing page. It is a staff tool used while on
+     the phone with a caller.
+
+     DELIBERATELY ABSENT (do not "restore" these):
+       - Google Analytics / Google Ads tags. Bookings taken here are not
+         ad conversions; firing the /book pixels would inflate Google Ads
+         conversion counts and corrupt bid-strategy data.
+       - Microsoft Clarity. It records session replay including form
+         input — here that means customer names, addresses, phones and
+         emails typed by staff. No product benefit, real PII exposure.
+       - Marketing copy, hero imagery, trust badges, SEO/schema markup.
+         Nothing here persuades the reader; the reader works here.
+
+     Indexing is blocked via robots + googlebot meta and referrer
+     suppression. That stops honest crawlers, NOT people. Put a
+     Cloudflare Access policy in front of /call for real protection.
+     =================================================================== -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet"/>
+<meta name="referrer" content="no-referrer"/>
+<title>Call Console — Internal</title>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+
+<style>
+:root{
+  --ink:#231a14; --muted:#6d6259; --line:#ded3c6; --bg:#f4efe8; --panel:#fffdfa;
+  --red:#9f2027; --green:#3f7d40; --amber:#a8761c; --blue:#2c5d86; --radius:12px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px}
+
+.hd{position:sticky;top:0;z-index:40;background:var(--ink);color:#fff;display:flex;
+  align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;
+  padding-top:calc(9px + env(safe-area-inset-top))}
+.hd-brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.hd-brand h1{margin:0;font-size:13px;font-weight:inherit;line-height:inherit}
+.hd-brand strong{font-size:13px}
+.hd-brand small{font-size:10px;letter-spacing:.04em;opacity:.65;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.hd-acts{display:flex;gap:6px;flex:0 0 auto}
+.hd-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
+  border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap;
+  /* 44px touch floor: these get tapped one-handed, mid-call. */
+  min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.hd-btn:active{transform:scale(.96)}
+.hd-btn.danger{background:var(--red);border-color:var(--red)}
+
+.prog{height:3px;background:var(--line)}
+.jump-rail{display:flex;gap:5px;overflow-x:auto;padding:8px 12px;background:var(--panel);
+  border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.jump-rail::-webkit-scrollbar{display:none}
+.jump-chip{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.jump-chip.done{color:var(--ink);border-color:rgba(63,125,64,.4);background:rgba(63,125,64,.06)}
+.jump-chip.now{background:var(--red);border-color:var(--red);color:#fff}
+.jump-chip:active{transform:scale(.95)}
+.prog i{display:block;height:100%;background:var(--red);transition:width .25s}
+
+.wrap{max-width:1060px;margin:0 auto;padding:14px 12px 60px}
+.cols{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:900px){.cols{grid-template-columns:1fr 292px;align-items:start}
+  .rail{position:sticky;top:66px}}
+
+.script{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);
+  border-radius:var(--radius);padding:13px 15px;margin-bottom:14px}
+.script-row{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
+.script-row+.script-row{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+.tag{flex:0 0 52px;font-size:9px;font-weight:800;letter-spacing:.06em;padding-top:3px;text-transform:uppercase}
+.t-say{color:var(--red)}.t-listen{color:var(--green)}.t-watch{color:var(--amber)}
+.t-close{color:var(--blue)}.t-pushback{color:var(--amber)}
+.say-text{font-weight:700;font-size:15.5px}
+.script-row.muted{color:var(--muted);font-size:13.5px}
+
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
+.q h2{margin:0 0 3px;font-size:19px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 13px}
+.stepno{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);
+  text-transform:uppercase;margin:0 0 5px}
+
+.opts{display:grid;gap:7px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;
+  background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;
+  font-size:14.5px;font-weight:700;color:var(--ink);width:100%}
+.opt small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.opt:active{transform:scale(.99)}
+.opt.on{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1px var(--red)}
+.opt:disabled{opacity:.4;background:#eee7db;cursor:not-allowed;color:var(--muted)}
+.opt:disabled:active{transform:none}
+.opt .chk{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--red);opacity:0}
+.opt.on .chk{opacity:1}
+.opts.two .opt,.opts.three .opt{justify-content:center;text-align:center}
+
+.f{margin-bottom:11px}
+.f label{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%;background:#fff;border:1.5px solid var(--line);
+  border-radius:9px;padding:10px 11px;color:var(--ink)}
+.f textarea{min-height:70px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--red)}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.check{display:flex;gap:9px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);
+  border-radius:10px;padding:11px 12px;margin-bottom:8px;font-size:14px;font-weight:600}
+.check input{margin:2px 0 0;flex:0 0 auto;width:17px;height:17px;accent-color:var(--red)}
+
+.nav{display:flex;gap:9px;margin-top:14px}
+.btn{border-radius:10px;padding:13px 16px;font-size:15px;font-weight:800;
+  border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff;flex:1}
+.btn.pri:disabled{opacity:.42}
+.btn:active{transform:scale(.99)}
+
+.rail-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.rail-price{background:var(--ink);color:#fff;padding:13px 15px}
+.rail-price small{display:block;font-size:10.5px;letter-spacing:.08em;opacity:.65;text-transform:uppercase}
+.rail-price strong{font-size:27px;letter-spacing:-.02em;display:block;margin-top:1px}
+.rail-price .note{font-size:11.5px;opacity:.75;margin-top:3px;display:block;line-height:1.4}
+.rail-list{padding:9px 15px}
+.rail-list div{display:flex;justify-content:space-between;gap:10px;font-size:13px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.rail-list div:last-child{border-bottom:none}
+.rail-list span{color:var(--muted)}
+.rail-list b{font-weight:700;text-align:right}
+.rail-included{padding:11px 15px;border-top:1px solid var(--line)}
+.rail-included-title{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.rail-included ul{margin:0;padding:0 0 0 16px;list-style:disc}
+.rail-included li{font-size:12.5px;line-height:1.5;color:var(--ink);margin-bottom:2px}
+.rail-excluded{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line)}
+.rail-excluded p{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink)}
+.rail-area{padding:11px 15px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.rail-area b{font-size:12px;font-weight:800}
+.rail-area span{font-size:12px;line-height:1.45;color:var(--muted)}
+.rail-area.is-out b{color:var(--red)}
+
+.guard{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.45;border:1.5px solid}
+.guard b{display:block;margin-bottom:2px;font-size:12px;letter-spacing:.03em;text-transform:uppercase}
+.guard.stop{background:#fdf0f0;border-color:var(--red);color:#7d181e}
+.guard.warn{background:#fdf7ec;border-color:var(--amber);color:#7a560f}
+.guard.info{background:#eef4f9;border-color:var(--blue);color:#204a6b}
+
+.drawer{position:fixed;inset:0;background:rgba(35,26,20,.6);z-index:60;
+  display:flex;align-items:flex-end;justify-content:center}
+.drawer[hidden]{display:none}
+.drawer-in{background:var(--bg);width:100%;max-width:620px;max-height:88vh;overflow-y:auto;
+  border-radius:16px 16px 0 0;padding:18px 16px calc(26px + env(safe-area-inset-bottom))}
+.drawer-in h3{margin:0 0 3px;font-size:19px}
+.obj{border-top:1px solid var(--line);padding:12px 0}
+.obj b{display:block;font-size:14.5px;margin-bottom:4px}
+.obj span{display:block;font-size:13.5px;color:var(--muted);line-height:1.5}
+.obj em{display:block;font-style:normal;font-size:12.5px;color:var(--red);font-weight:700;margin-top:5px}
+.out-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);
+  border-radius:10px;padding:12px 13px;margin-bottom:7px;font-size:14.5px;font-weight:700;color:var(--ink)}
+.out-btn small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px}
+.status{font-size:13.5px;margin:8px 0;min-height:18px;line-height:1.45}
+
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:7px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav strong{font-size:16px}
+.cal-nav button{background:#fff;border:1.5px solid var(--line);border-radius:9px;width:36px;height:36px;font-size:18px;font-weight:800;color:var(--ink)}
+.cal-nav button:disabled{opacity:.3;cursor:not-allowed}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px}
+.cal-weekdays span{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-blank{visibility:hidden}
+.cal-day{
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:#fff;border:1.5px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:700;color:var(--ink);
+  position:relative;
+}
+.cal-day.avail{border-color:rgba(159,32,39,.35)}
+.cal-day.avail:active{transform:scale(.94)}
+.cal-day.full{color:rgba(60,50,42,.32);background:#f0ebe1;cursor:not-allowed}
+.cal-day.today{box-shadow:0 0 0 2px rgba(198,161,100,.55)}
+.cal-day.sel{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1.5px var(--red)}
+.cal-day small{font-size:8.5px;font-weight:800;color:var(--red)}
+.cal-day.full small{color:var(--muted)}
+.cal-day.sel small{color:var(--red)}
+.cal-key{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px}
+.cal-key span{display:flex;align-items:center;gap:5px}
+.cal-key i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.cal-key i.avail{background:#fff;border:1.5px solid rgba(159,32,39,.5)}
+.cal-key i.today{background:#fff;box-shadow:0 0 0 2px rgba(198,161,100,.7)}
+.days{margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="hd-brand"><h1><strong>RPC Call Console</strong></h1><small id="hdWho">Internal tool</small></div>
+  <div class="hd-acts">
+    <button class="hd-btn" type="button" onclick="openDrawer('drObj')">Objections</button>
+    <button class="hd-btn danger" type="button" onclick="openDrawer('drOut')">End Call</button>
+  </div>
+</header>
+<div class="prog"><i id="progFill" style="width:0%"></i></div>
+<div class="jump-rail" id="jumpRail"></div>
+
+<div class="wrap">
+  <div class="cols">
+    <main id="main" aria-live="polite"></main>
+    <aside class="rail"><div id="rail"></div></aside>
+  </div>
+</div>
+
+<div class="drawer" id="drObj" hidden onclick="if(event.target===this)closeDrawer('drObj')">
+  <div class="drawer-in">
+    <h3>Objection handling</h3>
+    <p class="sub">Answer it, then go straight back to booking. The longer you talk after an objection, the more it sounds like you're negotiating.</p>
+    <div id="objList"></div>
+    <button class="btn pri" style="width:100%;margin-top:14px" onclick="closeDrawer('drObj')">Back to call</button>
+  </div>
+</div>
+
+<div class="drawer" id="drOut" hidden onclick="if(event.target===this)closeDrawer('drOut')">
+  <div class="drawer-in">
+    <h3>End call</h3>
+    <p class="sub">If they booked, just close this — it's already saved. Use these only when the call ends <b>without</b> a booking, so the lead still gets followed up.</p>
+    <div id="outList"></div>
+    <div class="f"><label for="outNotes">Follow-up notes</label>
+      <textarea id="outNotes" placeholder="What did they say? What would change their mind?"></textarea></div>
+    <div class="status" id="outStatus"></div>
+    <button class="btn" style="width:100%" onclick="closeDrawer('drOut')">Back to call</button>
+  </div>
+</div>
+
+<script src="../js/rp-pricing-engine.js"></script>
+<script>
+/* =========================================================================
+   CSR CALL CONSOLE
+   All pricing math comes from /js/rp-pricing-engine.js — the same file
+   /book uses. Never hardcode a price here; change it in the engine so a
+   phone quote and a web quote can never disagree.
+   ========================================================================= */
+const RP_BOOKING_API = "https://rpc-booking-api.aged-breeze-c9a5.workers.dev";
+const LS_KEY = "rpCallConsole.v1";
+
+/* The engine reads this global. Field names match /book's rpState. */
+const rpState = {
+  step:"service", service:null, moveoutTierChosen:false,
+  sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
+  cleanerCount:null, hourCount:null,
+  carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
+  garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, handymanInterest:false, addonDropNotice:"",
+  militaryDiscount:false, militaryVerified:false,
+  noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
+  heavySoil:false, petOdor:false,
+  /* Below: fields the shared engine (rp-pricing-engine.js) reads that
+     this console's own rpState never declared. Missing entirely (not
+     just unset) matters here — rpMoveoutQuestionnaireAnswered() checks
+     `!== null`, and a genuinely undefined property still passes that
+     check, which would have silently treated an unanswered questionnaire
+     as complete. Declaring them explicitly as null/0/false closes that. */
+  addonExtraHours:0, addonSecondCleaner:false, addonPetEnzyme:false,
+  moveoutWaterOn:null, moveoutAcOn:null, moveoutMoldPests:null,
+  moveoutRentalOrSelling:null, moveoutPmOrRealtor:"",
+  fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
+  specialInstructions:"", addressReadBack:false,
+  customNotes:"",
+  csrName:"", csrLeadSource:null, csrCallNotes:"", csrDisposition:null,
+  quotedAloud:false,
+  selectedDay:null, selectedStartTime:null, bookedAt:null, calendarMonth:null,
+  availableSlots:{}, slotsLoading:false, slotsError:"",
+  bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:""
+};
+
+/* "custom" is a console-only pseudo-service — not part of the shared
+   pricing engine's rpServices. It's the fallback for anything that
+   doesn't fit a real service (commercial, specialty/one-off jobs). No
+   price is ever given; it captures contact info + what they need, then
+   logs it as a lead via /lead for the office to follow up with an
+   in-person visit or photo request. */
+const FLOWS = {
+  /* "condition" removed for both moveout and deep — Standard/Heavy/
+     Extreme pricing was dropped entirely for moveout (see
+     rp-pricing-engine.js), and deep has been flat-anchor priced with no
+     sqft/bedroom/condition dependency since an earlier round — this
+     console just never caught up until now. That was a previously-
+     flagged gap (Liz was being asked size/condition questions that had
+     zero effect on Deep's price); fixed here alongside the moveout work.
+     Same for maintenance's sqft/bedrooms/bathrooms.
+
+     "intent" (rental vs. selling + PM/realtor) and "questionnaire"
+     (water/power/A/C/mold/pests hard-stop) added to moveout, matching
+     /book exactly. */
+  /* Round 22: "questionnaire" moved AHEAD of "addons". It used to sit
+     after, so Liz worked carpet, junk and windows onto a job and only
+     then discovered the water was off and the job couldn't happen as
+     booked — the productive part of the call spent selling extras on a
+     clean that routes to a callback. /book has always asked the
+     hard-stops before anything priced; this brings the phone in line. */
+  /* Round 25 (found while auditing /book vs /call for consistency): "sqft"
+     was still in these two flows from before round 24 dropped square
+     footage from Move-Out pricing on /book entirely -- flat bedroom-tier
+     price, no large-home surcharge, by direct instruction. Nobody
+     revisited /call's flow when that shipped, so Liz was still asking
+     home size and rpServiceBasePrice() was still adding the (still-live,
+     never-deleted) $100/$200/$300 surcharge -- or routing a >3,400 sq ft
+     home to a custom quote via rpMoveoutIsCustomSqft() -- for a phone
+     caller, while the identical home online got the flat, lower, always-
+     priceable number. A caller could be quoted MORE than the website
+     would ever quote for the same house, or get "we'll call you back"
+     for a home /book prices instantly. Removed here so both channels
+     read the same rpState.sqft === null and compute the same price. If
+     the large-home surcharge is ever wanted back, it has to come back on
+     /book first -- /call should never diverge from what the site quotes. */
+  /* Round 26 (direct instruction: "think differently, how's the sales
+     flow, what's counter-intuitive" -- a fresh pass, not a consistency
+     audit): "tiers" is new here. It ports /book's round-19c decision
+     forward onto the phone -- before that round, /book also made a
+     customer commit to Inspection Ready vs. Express at the very first
+     question, before it could show a single real dollar figure. /book
+     fixed that for itself (one "Move-Out Cleaning" entry, ask size
+     first, THEN show two real prices side-by-side to choose from) but
+     /call was never brought forward: the "service" list below still had
+     Inspection Ready and Express as two separate first-question buttons,
+     so Liz picked a tier for the caller from a landlord/inspector guess
+     alone, before a single number existed -- the exact blind-commitment
+     problem /book was rebuilt to avoid. Now "service" offers one merged
+     "Move-Out Cleaning" entry (see the service-step render below), and
+     this new "tiers" step -- inserted after "questionnaire", before
+     "addons", same position as /book's "moveouttiers" -- shows both real
+     prices for the home just described and she picks (or confirms) the
+     tier there, out loud, with the caller. See chooseMoveoutTier(). */
+  moveout:        ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
+  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
+  deep:        ["service","caller","addons","quote","contact","calendar","done"],
+  maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
+  carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
+  hourly:      ["service","caller","cleaners","hours","addons","quote","contact","calendar","done"],
+  airbnb:      ["service","caller","bedrooms","bathrooms","quote","contact","calendar","done"],
+  custom:      ["service","caller","customDetails","contact","done"]
+};
+function flow(){ return rpState.service ? FLOWS[rpState.service] : ["service"]; }
+function isCustomService(){ return rpState.service==="custom"; }
+function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i; }
+
+/* =========================================================================
+   CALL SCRIPT
+   say    — words to use, spoken naturally. Not read verbatim.
+   listen — what to capture from their answer.
+   watch  — the trap at this step. These protect margin and stop the crew
+            being sent to a mispriced job.
+   ========================================================================= */
+/* =========================================================================
+   SERVICE PSYCHOLOGY
+   =========================================================================
+   What actually motivates the purchase is different per service — a
+   move-out customer is protecting a deposit, a recurring customer is
+   buying back their time, an Airbnb host is protecting their rating.
+   Using the generic "move-out" pitch on a recurring-cleaning caller (or
+   vice versa) undersells the thing they actually care about.
+
+   Language note: avoid assuming every caller is military/PCS-related.
+   Plenty of Lawton-area movers are civilian. "Moving season" lands with
+   everyone; "PCS" only lands with people who already know the acronym.
+   ========================================================================= */
+const SERVICE_ANGLES = {
+  /* Round 19 -- Move-Out is now two services, not one service with a
+     billing-mode branch. "moveout" is the guaranteed tier (Inspection
+     Ready); "moveoutrefresh" is the new lighter tier. Both are plain
+     strings now -- the old rpIsMoveoutHourly() function-wrapper trick
+     is gone along with hourly move-out billing. */
+  moveout: {
+    value: "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
+    addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
+    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
+    urgencyNoun: "move-out slots",
+    seasonNote: "our busiest moving season"
+  },
+  moveoutrefresh: {
+    /* Ask the qualifying question FIRST on this one -- if it turns out
+       there IS a landlord/PM inspection, steer them to moveout instead
+       before quoting, the same way the old hourly carve-out steered
+       people toward the guaranteed tier. */
+    value: "that's the fast, affordable option when there's no landlord walkthrough to answer to \u2014 kitchen, bathrooms, floors, surfaces wiped down",
+    addon: "If they mention a landlord or property manager checking the place afterward, stop and ask before quoting \u2014 that's Inspection Ready, not Express.",
+    objection: "This one's priced lighter because it skips the deep-clean items a landlord inspection checks for \u2014 oven and fridge interiors, inside cabinets, baseboards. If there's any inspection at all, Inspection Ready is the one that protects the deposit \u2014 if something's flagged, we come back and fix it free.",
+    urgencyNoun: "move-out slots",
+    seasonNote: "our busiest moving season"
+  },
+  deep: {
+    value: "that's a full top-to-bottom reset \u2014 inside the oven, baseboards, everything \u2014 not just a surface clean",
+    addon: "Since everything's already getting a deep clean, a lot of people knock out carpets or windows in the same visit rather than scheduling it separately.",
+    objection: "A deep clean is meant to reset the whole house at once \u2014 that's the difference between this and a regular cleaning.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy stretch for deep cleans"
+  },
+  maintenance: {
+    value: "that keeps the whole house consistently handled \u2014 kitchens, bathrooms, floors \u2014 on whatever schedule works for you",
+    addon: "A lot of recurring customers add windows or laundry once they see how much time the regular visits actually free up.",
+    objection: "Once this is on a schedule it's genuinely one less thing on your plate every week \u2014 that's really what you're paying for, not just the cleaning itself.",
+    urgencyNoun: "recurring slots",
+    seasonNote: "filling up our regular schedule"
+  },
+  carpet: {
+    value: "that's real hot-water extraction with pre-treatment, not a rental machine or a quick surface pass",
+    addon: "",
+    objection: "A proper hot-water extraction gets out what a rental machine or a regular vacuum physically can't \u2014 that's the difference the price reflects.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy week for carpet jobs"
+  },
+  hourly: {
+    value: "that's our time on your priority list, in the order you set it \u2014 whatever we reach in those hours gets done right",
+    addon: "",
+    objection: "You're not paying for rooms you don't want touched \u2014 the whole booking goes to what you actually care about.",
+    urgencyNoun: "openings this week",
+    seasonNote: "a busy week",
+    /* ASK THIS FIRST. Living-in-it \u2192 book Hourly Cleaning, easy. Moving out
+       \u2192 be straight about the guarantee before booking. Some upgrade on the
+       spot; the ones who don't were never paying $459+ anyway, and a booked
+       slot beats a lost call. */
+    qualifier: "Is this a move-out, or a house you're living in?",
+    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and only the full reset is backed by our deposit-protection guarantee. If you want it inspection-backed, that's Inspection Ready Move-Out.\"",
+    scopeWarning: "GET THE PRIORITY LIST BEFORE YOU QUOTE. Most important first. Type it into notes verbatim \u2014 the crew works it in that order. Never promise the list gets finished."
+  },
+  airbnb: {
+    value: "that's a full guest-ready turnover \u2014 kitchens, bathrooms, floors \u2014 ready before your next check-in",
+    addon: "A lot of hosts add laundry or restocking once they see how tight same-day turnovers can get.",
+    objection: "One bad review from a rushed turnover costs a lot more than this \u2014 that's really what you're protecting.",
+    urgencyNoun: "turnover slots",
+    seasonNote: "a busy stretch of back-to-back bookings"
+  }
+};
+function angle(){ return SERVICE_ANGLES[rpState.service] || {}; }
+
+function quoteSayLine(){
+  /* Round 28 cleanup: the sqft-tier bit this used to prepend for
+     moveout/moveoutrefresh/deep/maintenance was already fully dead --
+     all four dropped square footage from their pricing entirely
+     (moveout/moveoutrefresh in round 24, deep/maintenance back in round
+     12), so rpState.sqft is never set for any of them and rpSqftTier()
+     always returned null here. Removed rather than left as a silent
+     no-op, since a future reader would otherwise assume it still did
+     something. */
+  /* This string is read OUT LOUD, verbatim, to a paying customer, so it
+     has to be grammatical. It used to build "for a 3 bedrooms, 2
+     bathrooms" -- pluralised nouns behind the article "a". Rendered as
+     an attributive phrase instead: "for a 3-bedroom, 2-bath home". */
+  const bits=[];
+  if(rpState.bedrooms) bits.push(`${rpState.bedrooms}-bedroom`);
+  if(rpState.bathrooms) bits.push(`${rpState.bathrooms}-bath`);
+  const desc = bits.length ? `for a ${bits.join(", ")} home` : "for this job";
+  const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : rpFormatMoneyDisplay(rpFinalPriceCents());
+  const rawVal = angle().value;
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that's the full price, nothing added at the door";
+  return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
+}
+function addonsSayLine(){
+  const base = "\u201cCouple things people often add \u2014 any carpet that needs professional cleaning? Junk or old furniture to haul off? Exterior windows washed? Garage floor?\u201d";
+  const a = angle().addon;
+  return a ? `${base} ${a}` : base;
+}
+function calendarSayLine(){
+  const days=availableDateKeys();
+  const total=days.reduce((n,d)=>n+slotsForDate(d).length,0);
+  const noun=angle().urgencyNoun || "openings";
+  let dayPhrase;
+  if(days.length>=2) dayPhrase=`${fmtDay(days[0])} or ${fmtDay(days[1])}`;
+  else if(days.length===1) dayPhrase=fmtDay(days[0]);
+  else dayPhrase="a couple options coming up";
+  if(total>0 && total<=6){
+    return `\u201cI've got ${dayPhrase} open \u2014 and we're honestly down to just a few ${noun} this week, so if either works for you I'd grab it now.\u201d`;
+  }
+  return `\u201cI've got ${dayPhrase} open \u2014 which works better for you?\u201d`;
+}
+/* Service-aware calendar WATCH \u2014 "ask when they have to be out" is real,
+   good advice for a move-out, but doesn't apply to a maintenance signup or
+   a carpet job with no deadline. */
+function calendarWatchLine(){
+  if(["moveout","moveoutrefresh"].includes(rpState.service)) return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
+  if(rpState.service==="deep" || rpState.service==="maintenance") return "Ask if there's an event or date they're working around \u2014 otherwise just offer your two soonest openings.";
+  return "Offer your two soonest real openings \u2014 no deadline to work around here, so don't invent one.";
+}
+function csrGreetingName(){ return rpState.csrName || "the team"; }
+function doneSayLine(){
+  if(isCustomService()) return `\u201cThanks for the details \u2014 we'll follow up shortly to schedule a look or request some photos, and get you a firm quote.\u201d`;
+  return `\u201cYou're all set for ${rpState.bookedAt||"the time we picked"}. You'll get a text confirmation in just a second \u2014 and if anything comes up before then, have them call back and ask for ${csrGreetingName()}.\u201d`;
+}
+
+const SCRIPT = {
+  /* "service" now runs FIRST \u2014 ask what they need before asking who
+     they are. Old order (identity before purpose) read as interrogative
+     in the first five seconds of the call. */
+  service:{say:()=>`\u201cThanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} \u2014 what can we help you with today?\u201d`,
+    listen:"Let them describe it in their own words first. Callers move for all kinds of reasons \u2014 military transfer, new job, new place \u2014 don't assume they know military terms and don't assume they don't.",
+    /* Round 25 (direct instruction): "Prepare Liz... to have conversations
+       about the difference between Move-Out Express and Inspection Ready.
+       I think this sells to both the customer who needs it perfect and
+       the budget people." This is the moment to say it -- right when a
+       move-out caller first states their need, before either tier gets
+       picked and before a price gets said. The scope cheat sheet on the
+       quote screen (further down the call) still has the size-specific
+       numbers; this is the up-front "how do I even frame this" version.
+
+       Round 26 (fresh-look pass, "apply all recommended settings"):
+       trimmed -- the actual dollar-figure pitch for each tier moved to
+       the new "tiers" screen's watch text below, since that's now where
+       real numbers exist to say out loud. This step's job is only to
+       plant the qualitative question early, before bedrooms/bathrooms
+       are even asked, same spirit as before. */
+    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number.  \u2022  MOVING OUT? Ask now, before you've gathered bedrooms and bathrooms: \u201cIs a landlord, property manager, or a buyer's inspector going to walk through and check the place against a list?\u201d You're not locking in a tier yet \u2014 just noting the lean, so you already know which real price to lead with once you reach the two-price screen a few questions from now."},
+  caller:{say:"\u201cHappy to help with that \u2014 let me just grab your name and a good number for you in case we get cut off.\u201d",
+    listen:"Get the name and number BEFORE anything else past this point.",
+    watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
+  sqft:{say:"\u201cRoughly how big is the home? A ballpark is fine.\u201d",
+    listen:"Lawton-area rough sizes by bedroom count \u2014 1-bed: 600\u2013900 \u00b7 2-bed: 900\u20131,300 \u00b7 3-bed: 1,400\u20131,800 \u00b7 4-bed: 1,800\u20132,200 \u00b7 5-bed: 2,400+. This is just a starting estimate \u2014 if it's off, we adjust on-site, not a big deal.",
+    watch:"If the size sounds way off for the bedroom count, don't push back on it \u2014 just say \u2018no problem, we'll confirm when we arrive\u2019 and move on. It's not worth making them defend a guess."},
+  bedrooms:{say:"\u201cHow many bedrooms?\u201d",
+    listen:"Bedrooms only. An office or bonus room counts only if they'd call it a bedroom.",
+    watch:"Don't count a converted garage or sunroom \u2014 put it in the notes instead."},
+  bathrooms:{say:"\u201cHow many bathrooms?\u201d",
+    listen:"Count full bathrooms only \u2014 if they say \u201ctwo and a half,\u201d that's 2.",
+    watch:"Half-baths aren't priced separately, so don't make a thing of it if they're not sure whether it counts."},
+  condition:{say:"\u201cLast one on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
+    listen:"Standard sounds like: \u2018pretty normal,\u2019 \u2018lived-in,\u2019 \u2018nothing crazy.\u2019 Heavy sounds like: trash, grease, pet hair, \u2018hasn't been cleaned in a while.\u2019 Extreme sounds like: \u2018honestly it's bad,\u2019 mold, strong pet odor, \u2018hasn't really been touched in months.\u2019 Stuck between two? Pick the higher one \u2014 the crew finding it lighter than expected costs nothing; being sent in short costs their whole day.",
+    watch:"Don't default to Standard because you're unsure or don't want to sound judgmental about someone's house \u2014 that's the same costly mistake as underpricing on purpose, just a nicer-feeling reason for it. If they push back after you read the tier back, hold your read \u2014 describe what they told you, let the crew confirm on arrival."},
+  /* Round 26: new step, new script. This is the payoff of asking the
+     landlord/inspector question back on "service" -- real dollar numbers
+     for THIS home, said out loud, instead of a tier picked on a guess. */
+  tiers:{say:()=>{
+      const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
+      const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
+      return `“For a home like that, I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
+    },
+    listen:"Which one they actually pick once real numbers are on the table — not just the qualitative lean from the service question. Someone who sounded like “no inspection” earlier can still choose Inspection Ready once they hear it's only a small gap for full deposit protection.",
+    watch:"Lead with whichever tier matches what they told you back on the service question. Landlord, PM, or inspector expected (or not sure) → “That's the one most people book for a move-out — full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.” Flat no, just handing over keys → Express is a genuine, honest recommendation, not a downsell: “You don't need to pay for a guarantee nobody's going to test — Express gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.” Both tiers are worth being proud to sell — the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn once add-ons start stacking up on Express, the quote screen will flag it if Inspection Ready has become the better deal."},
+  addons:{say:addonsSayLine,
+    listen:"Ask these by name. Customers almost never volunteer them.",
+    watch:()=>`Pet stains or odor is a crew-prep flag, not automatically a condition bump.  \u2022  ASK THE MILITARY QUESTION HERE, before you say the price, not after they push back on it: \u201cAnd are you or your spouse military or a first responder? I can take ${Math.round(MILITARY_DISCOUNT_RATE*100)}% off if so.\u201d This is Lawton \u2014 a large share of callers qualify, it caps at $${MILITARY_DISCOUNT_CAP}, and offered UP FRONT it's a reason to book with us. Held back until they complain, the same $${MILITARY_DISCOUNT_CAP} only buys you a save on a price objection you'd already lost ground to. Tick the box below so the quote screen shows the discounted number.  \u2022  Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price.`},
+  frequency:{say:"\u201cWould you want this one-time, or set up on a regular schedule?\u201d",
+    listen:"Recurring is worth more long-term.",
+    watch:"If they hesitate, book One-Time. They can switch later; a lost booking can't."},
+  rooms:{say:"\u201cHow many carpeted rooms are we cleaning?\u201d",
+    listen:"Count rooms, not square footage.",
+    watch:"There's a 2-room minimum \u2014 say that up front, not after they've said one room."},
+  cleaners:{say:"\u201cHow many cleaners would you like?\u201d",
+    listen:"Two is the normal default for most homes.",
+    watch:"More cleaners is faster, not cheaper. Make sure they hear it's per cleaner, per hour."},
+  hours:{say:"\u201cAnd about how many hours do you think you'll need?\u201d",
+    listen:()=>`${HOURLY_MIN_HOURS}-hour minimum ($${HOURLY_RATE_PER_CLEANER*HOURLY_MIN_HOURS} for one cleaner). Reads from the pricing engine, so it can't drift from what the site quotes.`,
+    watch:"If they don't know, ask what they want done and estimate for them \u2014 don't make them guess."},
+  quote:{say:quoteSayLine,
+    listen:"Say the number plainly, then STOP TALKING. Let them respond first.",
+    watch:"Pause 2\u20133 seconds after the price. If they don't jump in with a question or objection, that's your cue \u2014 move straight into \u2018Perfect, let me grab your address\u2019 on the next screen. Don't sit in dead silence waiting for them to bring up booking; you lead into it."},
+  contact:{say:"\u201cPerfect \u2014 let me grab the address and get you on the schedule.\u201d",
+    listen:"Read the address back out loud, digit by digit on the house number.",
+    watch:"Wrong address = wasted crew trip and a lost day. Confirm it verbally before moving on."},
+  customDetails:{say:"\u201cThat's a bit outside our standard services, so let me get some details and we'll follow up with a firm quote.\u201d",
+    listen:"Get a clear description of the job \u2014 what, where, how big, anything unusual.",
+    watch:"Set the expectation now: this will likely need an in-person visit or some photos before we can give a real number. Don't guess a price out loud, even a rough one."},
+  calendar:{say:calendarSayLine,
+    listen:"Offer two specific days. Don't ask an open \u201cwhat day works?\u201d",
+    watch:calendarWatchLine},
+  done:{say:doneSayLine,
+    listen:"Confirm they got the text before hanging up.",
+    watch:"Don't hang up without repeating the date and time one more time."}
+};
+function resolveScript(step){
+  const e=SCRIPT[step]; if(!e) return null;
+  const out = {
+    say: typeof e.say==="function"?e.say():e.say,
+    listen: typeof e.listen==="function"?e.listen():e.listen,
+    watch: typeof e.watch==="function"?e.watch():e.watch
+  };
+  /* Hourly Cleaning is the one service where the CSR can create real
+     downstream risk: a partial clean sold to a move-out caller who then
+     fails inspection. Force the qualifier and the guarantee carve-out
+     into the rail at the steps where they actually matter. */
+  const a = angle();
+  if(rpState.service === "hourly"){
+    if(step === "cleaners" || step === "hours"){
+      if(a.qualifier) out.say = `\u201c${a.qualifier}\u201d  \u2014 then: ` + out.say;
+      out.watch = [a.guaranteeWarning, out.watch].filter(Boolean).join("  \u2022  ");
+    }
+    if(step === "contact" || step === "quote"){
+      out.watch = [a.scopeWarning, out.watch].filter(Boolean).join("  \u2022  ");
+    }
+  }
+  return out;
+}
+
+function objectionPriceAnswer(){
+  const rawVal = angle().value;
+  const rawObj = angle().objection;
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that covers everything, nothing added at the door";
+  const obj = (typeof rawObj === "function" ? rawObj() : rawObj) || "";
+  return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
+}
+/* Only names an add-on that's actually on THIS order — checked against
+   the same state fields the addons screen writes to. Returns null if
+   nothing was added, so there's nothing false to offer to remove. */
+/* Round 20: gated on rpAddonAvailable() — the price-objection script
+   must never offer to remove an add-on the customer isn't being charged
+   for. */
+function removableAddonLabel(){
+  if(rpAddonAvailable("carpet") && Number(rpState.addonCarpetRooms)>0) return "the carpet cleaning";
+  if(rpAddonAvailable("junk") && rpState.junkSize) return "the junk haul";
+  if(rpAddonAvailable("windows") && rpState.windowsTier) return "the exterior windows";
+  if(rpAddonAvailable("garage") && rpState.garageWash) return "the garage floor wash";
+  if(rpAddonAvailable("fridge") && rpState.fridgeAddon) return "the refrigerator interior";
+  if(rpAddonAvailable("oven") && rpState.ovenAddon) return "the oven interior";
+  if(rpAddonAvailable("cabinets") && rpState.cabinetsAddon) return "the cabinets & closets";
+  if(rpAddonAvailable("detailPass") && rpState.detailPassAddon) return "the detail pass";
+  if(rpAddonAvailable("laundry") && Number(rpState.laundryLoads)>0) return "the laundry service";
+  return null;
+}
+function doBetterPriceAnswer(){
+  const removable = removableAddonLabel();
+  const removeLine = removable ? ` Or if you'd rather handle ${removable} yourself, I can take that off the total.` : "";
+  return `\u201cI can't move the base price, but if you're military or first responder that's 10% off.${removeLine}\u201d`;
+}
+/* Round 28 (direct instruction: "make /call an absolute weapon... handle
+   rejections"). Tier-aware deposit answer -- the old line was the same
+   regardless of which tier they were on, which meant an Express caller
+   asking about their deposit got a vague non-answer instead of the
+   honest, genuinely useful redirect: Express was never built to survive
+   an inspection, and if there's a real chance of one, that's exactly
+   the moment to offer the switch, not dodge the question. */
+function depositAnswer(){
+  if(rpState.service === "moveoutrefresh"){
+    return "\u201cI can't promise that on this one \u2014 Express is priced for when nobody's checking, so it skips some of what a landlord walkthrough looks for. If there's any real chance of an inspection, Inspection Ready is the tier built to protect it \u2014 want me to switch it over?\u201d";
+  }
+  return "\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it free \u2014 that's exactly what Inspection Ready is built for.\u201d";
+}
+/* Move-out-specific competitor answer -- the generic version just
+   defends the price. This one gives Liz an honest way to actually WIN
+   the call instead of just holding ground: if what the caller describes
+   really is a no-inspection situation, Express undercuts most
+   competitors' "everything included" quotes on price AND is a truthful
+   fit, not a downsell. Turns a price objection into a second at-bat
+   instead of a wall. */
+function competitorAnswer(){
+  if(["moveout","moveoutrefresh"].includes(rpState.service)){
+    return "\u201cThey might be quoting a lighter scope \u2014 worth asking if inside the oven, the fridge, and the cabinets are included, since a lot of move-out quotes leave those out and add them later. But if it's genuinely just a light clean with nobody inspecting afterward, that might actually be our Express option, which runs lower too \u2014 want me to price that one out for you instead?\u201d";
+  }
+  return "\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d";
+}
+const OBJECTIONS = [
+  /* FIRST, because on a paid LSA call this fires within about 20 seconds
+     and it's where most of them are lost. Quoting a bare number here
+     just hands the caller what the website already gives away free —
+     the whole value of a paid phone lead is the human in the middle.
+     Bridge, get the two facts, THEN quote bundled with what's included. */
+  {q:"\u201cHow much for a move-out clean?\u201d (asked before you've got any details)",
+   a:"\u201cHappy to \u2014 it comes down to bedroom count and which of two options fits, so let me get you the real number instead of guessing high. How many bedrooms and full baths, and is a landlord or property manager going to inspect the place after you leave?\u201d",
+   n:()=>"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Move-Out pricing is flat by bedroom count now (no square footage, no condition tiers), so don't ask about size or condition \u2014 bedrooms and the inspection question are the only two things that change the price. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's [the price], and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause. (Inspection Ready currently starts at $"+RP_MOVEOUT_BEDROOM_TIERS[0].base+" for a 1\u20132 bedroom; the tiers screen a few questions from now gives you the real number for THIS home \u2014 read it from there, not from memory.)"},
+  {q:"\u201cHave you done this before? / Are you legit?\u201d",
+   a:"\u201cWe're a veteran-owned local company, fully insured, with over 60 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
+   n:"Real, verifiable numbers only \u2014 don't round up or guess. If the review count changes, this line needs updating too."},
+  {q:"\u201cThat's more than I expected.\u201d",
+   a:objectionPriceAnswer,
+   n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
+  {q:"\u201cAnother company quoted me less.\u201d",
+   a:competitorAnswer,
+   n:"Never bad-mouth a competitor by name. For a move-out caller, this is a real second at-bat, not just a defense \u2014 if what they describe genuinely has no inspection coming, pivoting to Express can win the call on a truthful, lower number instead of just holding the line on Inspection Ready."},
+  {q:"\u201cCan you do better on price?\u201d",
+   a:doBetterPriceAnswer,
+   n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, it just offers the military/first responder discount instead of naming something that was never there."},
+  {q:"\u201cI need to think about it / talk to my spouse.\u201d",
+   a:"\u201cTotally fair \u2014 we can at least get you on the calendar. No deposit required, and you can let us know if anything changes.\u201d",
+   n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
+  {q:"\u201cWill I get my deposit back?\u201d",
+   a:depositAnswer,
+   n:"NEVER promise a deposit back \u2014 the landlord decides, not us. But this is also a real moment to sell: if they're on Express and clearly worried about an inspection, that's the caller Inspection Ready was built for \u2014 offer the switch, don't just reassure and move on."},
+  {q:"\u201cWhy does it take three people / two people?\u201d",
+   a:"\u201cMore hands means we're in and done in one visit instead of stretching it out \u2014 Inspection Ready runs three cleaners so the full interior reset gets finished same-day, Express runs two since it's a lighter scope. Either way it's the same crew, same insurance, just sized to the job.\u201d",
+   n:"Comes up right after they hear the crew size on the tiers screen. Frame it as speed and thoroughness, not extra cost tacked on \u2014 it isn't; the price already reflects it."},
+  {q:"\u201cWhat's actually different between the two options?\u201d",
+   a:"\u201cInspection Ready is the full interior reset \u2014 inside the oven, fridge, cabinets, baseboards, windows, everything \u2014 and it's the one that protects your deposit if a landlord flags something. Express covers the kitchen, bathrooms, floors and surfaces, which is plenty if nobody's inspecting the place, and you can still add the oven, fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d",
+   n:"Same pitch as the tiers screen, for whenever the question resurfaces later \u2014 on addons, or even at the price. Keep leading with whichever tier matches what they've told you about an inspection, not the bigger number."},
+  {q:"\u201cCan't I just add the oven and fridge to Express instead of paying for Inspection Ready?\u201d",
+   a:"\u201cYou can, but once you add a couple of those on it usually comes out to about the same as just switching over \u2014 and Inspection Ready throws in the full guarantee on top, so at that point it's the better deal, not just the safer one.\u201d",
+   n:"This is true by design, not a sales trick \u2014 Express plus enough add-ons always lands at or above Inspection Ready's price, and the quote screen's own guardrail will flag it the moment it happens. Don't fight this objection, just point it out plainly; the math sells itself."},
+  {q:"\u201cCan you come today or tomorrow?\u201d",
+   a:"Check the calendar and offer the soonest real opening.",
+   n:"Never promise a slot you haven't confirmed on the calendar."},
+  {q:"\u201cDo I need to be there?\u201d",
+   a:"\u201cNope \u2014 most move-outs are empty. Just get us a key, a lockbox code, or the property manager's contact.\u201d",
+   n:"Capture the access method in the notes right then."},
+  {q:"\u201cWhat if I'm not happy with it?\u201d",
+   a:"\u201cIf we miss something in the scope you booked, call us and we come back and fix it.\u201d",
+   n:"Don't invent a refund policy. Re-clean, not money back."},
+  /* Round 29 (review addition): three questions that come up on real calls
+     and had no scripted answer, so they were being improvised at exactly
+     the moments a booking is won or lost. */
+  {q:"\u201cHow do I pay? / Do you need a deposit?\u201d",
+   a:"\u201cNo deposit, nothing due today \u2014 we take payment after the clean is done and you've seen it. Getting you on the calendar doesn't cost you anything.\u201d",
+   n:"\u201cNothing due today\u201d is the single easiest close on this list and it's true \u2014 lead with it any time someone hesitates about committing, not just when they ask about payment. If they ask which methods specifically, and you're not certain, say you'll confirm in the text confirmation rather than guessing."},
+  {q:"\u201cWhat if my move date changes?\u201d",
+   a:"\u201cJust call or text us and we'll move it \u2014 move dates slip all the time, especially on a PCS. There's no deposit riding on it either way.\u201d",
+   n:"A slipping move date is the #1 reason a move-out caller says \u2018let me call you back\u2019 instead of booking. Book the date they think they need; a reschedule is trivial and a lost call is not."},
+  {q:"\u201cI need it this week / my walkthrough is in two days.\u201d",
+   a:"Check the calendar and offer the soonest real opening, by name: \u201cI can get you [day] \u2014 want me to hold it?\u201d",
+   n:"Highest-intent caller on the board: a hard deadline they can't move. Do not lose them to a callback. If nothing on the calendar fits their deadline, take the booking request anyway and flag it for the office rather than saying no on the phone."}
+];
+
+/* Closing lines for the quote screen — proactive, not reactive. Used
+   right after the price-and-pause, whether or not an objection came up.
+   Objection handling only fires when the customer pushes back; a close
+   has to happen even on a clean call with zero pushback, or interest
+   never turns into a booking. */
+const QUOTE_CLOSERS = [
+  "\u201cGreat \u2014 let's get you on the schedule. What day works best?\u201d",
+  "\u201cWant me to go ahead and get that booked for you?\u201d",
+  "\u201cWe can at least get you on the calendar \u2014 no deposit required, and you can always let us know if anything changes.\u201d"
+];
+/* The 4 objections most likely to fire in the first few seconds right
+   after a price is said. Referenced by exact question text (not array
+   index) so this stays correct even if OBJECTIONS gets reordered or
+   added to later. */
+const QUOTE_SCREEN_OBJECTION_KEYS = [
+  "\u201cThat's more than I expected.\u201d",
+  "\u201cAnother company quoted me less.\u201d",
+  "\u201cCan you do better on price?\u201d",
+  "\u201cI need to think about it / talk to my spouse.\u201d"
+];
+function quoteCloseHelpersHtml(){
+  const objs = OBJECTIONS.filter(o => QUOTE_SCREEN_OBJECTION_KEYS.includes(o.q));
+  const urgency = quoteUrgencyLine();
+  return `<div class="script" style="margin-bottom:13px">
+    ${urgency?`<div class="script-row"><span class="tag" style="color:var(--red)">Urgency</span><span class="say-text" style="font-size:14.5px">${urgency}</span></div>`:""}
+    <div class="script-row"><span class="tag t-close">Close</span><span class="say-text" style="font-size:14.5px">
+      ${QUOTE_CLOSERS.map(c=>`<div style="margin-bottom:5px">${c}</div>`).join("")}
+    </span></div>
+    <div class="script-row muted"><span class="tag t-pushback">Pushback</span><span>
+      ${objs.map(o=>`<div style="margin-bottom:8px"><b style="color:var(--ink);font-weight:700">${o.q}</b><br>${typeof o.a==="function"?o.a():o.a}</div>`).join("")}
+      <div style="font-size:12px">Anything else \u2014 tap Objections above.</div>
+    </span></div>
+  </div>`;
+}
+/* Only fires when the loaded calendar actually shows 6 or fewer open
+   slots across the next two months (same threshold as calendarSayLine).
+   Silent otherwise — no fallback "we're pretty busy" guess if the real
+   data doesn't support it. If slots haven't finished loading yet
+   (pickService's background fetch is still in flight), also silent
+   rather than showing a stale or premature number. */
+function quoteUrgencyLine(){
+  if(rpState.slotsLoading || !Object.keys(rpState.availableSlots||{}).length) return "";
+  const days=availableDateKeys();
+  const total=days.reduce((n,d)=>n+slotsForDate(d).length,0);
+  if(total<=0 || total>6) return "";
+  const noun=angle().urgencyNoun || "openings";
+  return `\u201cHonestly, we're down to just ${total} ${noun} across the next couple weeks \u2014 if you want one of those, I'd grab it now while I've got you.\u201d`;
+}
+
+const OUTCOMES = [
+  ["Price objection","Quoted, but price was the blocker"],
+  ["Thinking it over","Interested, needs to decide"],
+  ["Date not available","Wanted a date we couldn't cover"],
+  ["Out of service area","Outside our coverage"],
+  ["Wanted info only","Not ready to book yet"],
+  ["Wrong number / not a lead","No follow-up needed"],
+  ["Call dropped","Disconnected before finishing"]
+];
+
+/* =========================================================================
+   GUARDRAILS — the dummy-proofing layer. "stop" blocks the Next button.
+   ========================================================================= */
+function guardrails(){
+  const g=[], s=rpState.step;
+  if(rpIsCustomQuoteOnly() && ["quote","contact","calendar"].includes(s))
+    g.push({level:"stop",title:"Do not quote a price",
+      body:"This job is custom-quote only. Book the visit, tell them the office confirms pricing before the cleaning date, and do NOT say a dollar amount out loud \u2014 even a rough one. A number said on the phone is the number they expect."});
+  if(s==="condition" && rpState.condition==="Standard Condition" &&
+     (rpState.petWasteConcern||rpState.hazardConcern||rpState.moldConcern))
+    g.push({level:"warn",title:"Condition looks under-tagged",
+      body:"You flagged pets, trash, or mold but tagged the home Standard. If any of it is significant this should be Heavy or Extreme \u2014 otherwise the crew eats the extra hours."});
+  if(["questionnaire","bedrooms","bathrooms","sqft","tiers","addons"].includes(s) && rpMoveoutBlocked())
+    g.push({level:"stop",title:"Do not give a price on this call",
+      body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
+  if(rpState.militaryDiscount && !rpState.militaryVerified)
+    g.push({level:"warn",title:"Military discount not confirmed",
+      body:"Ask: \u201cAre you active duty, retired, or a first responder?\u201d then tick the confirm box. Don't apply it just because they're calling from Lawton."});
+  if(s==="contact" && rpState.address1 && !rpState.addressReadBack)
+    g.push({level:"warn",title:"Read the address back",
+      body:"Say the full address out loud and have them confirm before continuing. Wrong address is the #1 cause of a wasted crew trip."});
+  if(s==="quote" && !rpIsCustomQuoteOnly() && rpFinalPrice()>0)
+    g.push({level:"info",title:"Say it, then stop",
+      body:"Give the number once, plainly, then be quiet. Silence is them thinking, not them saying no."});
+  if(s==="addons" && ["moveout","moveoutrefresh"].includes(rpState.service) && rpAddonsTotal()===0)
+    g.push({level:"info",title:"Ask all three by name",
+      body:"Carpet, exterior windows, garage. Most customers won't raise them on their own, and they're the easiest revenue on the call."});
+  /* Round 25 (direct instruction: "I need to make money and the
+     expectations need to be clear" -- and the pricing itself was built so
+     buying every excluded-scope add-on on Express always costs MORE than
+     switching tiers outright, by design; see rpDetailPassPrice()'s
+     comment in the engine). Nothing used to say this out loud, so a
+     caller could stack fridge + oven + cabinets + Detail Pass on Express
+     and end up paying more than Inspection Ready for LESS scope and no
+     guarantee -- worse for them, and it undersells the tier that's
+     actually the better fit. Computed live off the same base-price
+     function /book and /pricing use, so it can't drift out of sync with
+     the real numbers. */
+  if(["addons","quote"].includes(s) && rpState.service==="moveoutrefresh" && !rpIsCustomQuoteOnly()){
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh"), addonsTotal=rpAddonsTotal();
+    if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && addonsTotal>=(irPrice-rfPrice))
+      g.push({level:"info",title:"Inspection Ready is now the better deal",
+        body:`With these add-ons, Express comes to $${(rfPrice+addonsTotal).toFixed(0)} — Inspection Ready is $${irPrice.toFixed(0)} for the same home, fully guaranteed, nothing left out. Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
+  }
+  return g;
+}
+function hasBlockingGuard(){ return guardrails().some(x=>x.level==="stop"); }
+
+/* ---------- Validation ---------- */
+function normalizePhone(v){ return String(v||"").replace(/\D/g,"").slice(0,10); }
+function phoneOk(v){ return normalizePhone(v).length===10; }
+function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim()); }
+function stepValid(){
+  switch(rpState.step){
+    case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone);
+    case "service":   return !!rpState.service;
+    case "sqft":      return !!rpState.sqft;
+    case "bedrooms":  return !!rpState.bedrooms;
+    case "bathrooms": return !!rpState.bathrooms;
+    case "condition": return !!rpState.condition;
+    case "intent":    return !!rpState.moveoutRentalOrSelling;
+    case "questionnaire": return rpMoveoutQuestionnaireAnswered();
+    case "tiers":     return !!rpState.moveoutTierChosen;
+    case "frequency": return !!rpState.frequency;
+    case "rooms":     return Number(rpState.carpetRooms)>0;
+    case "cleaners":  return !!rpState.cleanerCount;
+    case "hours":     return !!rpState.hourCount;
+    case "addons":    return true;
+    case "quote":     return rpState.quotedAloud;
+    case "contact":   return rpState.address1.trim().length>2 && rpState.city.trim().length>1
+                        && /^\d{5}$/.test(rpState.postalCode.trim())
+                        && (rpState.email==="" || emailOk(rpState.email))
+                        && rpState.addressReadBack;
+    case "calendar":  return !!rpState.selectedStartTime;
+    default:          return true;
+  }
+}
+
+/* ---------- Render ---------- */
+const el = id => document.getElementById(id);
+const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function opt(label,onclick,selected,sub){
+  return `<button type="button" class="opt${selected?" on":""}" onclick="${onclick}"><span>${label}${sub?`<small>${sub}</small>`:""}</span><span class="chk">\u2714</span></button>`;
+}
+function chk(field,label){
+  return `<label class="check"><input type="checkbox" ${rpState[field]?"checked":""} onchange="toggle('${field}')"><span>${label}</span></label>`;
+}
+
+const TITLES = {
+  service:["What can we help you with?",""],
+  caller:["Who's calling?","Name and number \u2014 you'll need it either way."],
+  sqft:["About how big is the home?",""],
+  bedrooms:["How many bedrooms?",""],
+  bathrooms:["How many bathrooms?",""],
+  condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
+  intent:["Rental or selling?","Ask before pricing \u2014 capture the PM/realtor if there is one."],
+  questionnaire:["A few quick facts","Water, A/C, mold, pests. If anything fails, do not quote a price."],
+  tiers:["Here's what fits — two real prices","Present both, out loud, and let them pick."],
+  frequency:["One-time or recurring?",""],
+  rooms:["How many carpeted rooms?","2-room minimum."],
+  cleaners:["How many cleaners?",""],
+  hours:["How many hours?","3-hour minimum."],
+  addons:["Anything to add on?","Ask carpet, junk, windows, and garage by name."],
+  quote:["Give the quote","Say it once, plainly, then stop talking."],
+  contact:["Service address","Read it back out loud before continuing."],
+  customDetails:["What do they need?","Get enough detail for the office to follow up."],
+  calendar:["Pick a date and time","Offer two specific options."],
+  done:["All set",""]
+};
+const SHORT_LABELS = {
+  service:"Service", caller:"Contact", sqft:"Size", bedrooms:"Beds", bathrooms:"Baths",
+  condition:"Condition", tiers:"Tier", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
+  hours:"Hours", addons:"Add-ons", quote:"Quote", contact:"Address",
+  customDetails:"Details", calendar:"Calendar", done:"Done",
+  intent:"Reason", questionnaire:"Checks"
+};
+
+function screenHtml(){
+  const s=rpState.step;
+
+  if(s==="caller") return `
+    <div class="f"><label for="nm">Caller name *</label>
+      <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" oninput="set('fullName',this.value)"></div>
+    <div class="f"><label for="ph">Best callback number *</label>
+      <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" oninput="set('phone',this.value)"></div>
+    <div class="f"><label for="src">How did they hear about us? (Optional)</label>
+      <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014</option>
+      ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
+        .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
+
+  if(s==="service"){
+    /* Round 26: was two separate rows here -- "Inspection Ready Move-Out"
+       and "Move-Out Express" -- forcing Liz to lock in a tier for the
+       caller before a single real number existed, off a landlord/
+       inspector guess alone. Merged to one "Move-Out Cleaning" entry
+       (filtering "moveoutrefresh" out of this list; rpServices itself is
+       untouched since /call's other screens and the shared engine still
+       need both real keys). The actual tier choice now happens on the
+       new "tiers" screen once bedrooms/bathrooms are known -- same order
+       /book has used since round 19c. */
+    const items = Object.entries(rpServices).filter(([k])=>k!=="moveoutrefresh").map(([k,v])=>
+      opt(k==="moveout" ? "Move-Out Cleaning" : v.name, `pickService('${k}')`,
+        rpState.service==="moveout"||rpState.service==="moveoutrefresh" ? k==="moveout" : rpState.service===k,
+        k==="moveout" ? "One entry covers both tiers. Ask the landlord/inspector question now (see Watch below) -- you'll show real numbers for both a few questions from now."
+        : k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
+    ).join("");
+    const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
+      "Commercial, specialty, or one-of-a-kind \u2014 we'll follow up with a real quote.");
+    return `<div class="opts">${items}${customBtn}</div>`;
+  }
+
+  if(s==="customDetails") return `
+    <div class="f"><label for="cd">What do they need?</label>
+      <textarea id="cd" placeholder="Describe the job \u2014 commercial space, specialty request, rough size, anything unusual\u2026" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
+
+  if(s==="intent") return `<div class="opts two">
+      ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
+      ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
+    </div>
+    <div class="f" style="margin-top:13px"><label for="pmName">Property manager or realtor (optional)</label>
+      <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="set('moveoutPmOrRealtor',this.value)"></div>`;
+
+  if(s==="questionnaire"){
+    const yn=(field,label)=>`<div style="margin-bottom:11px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:5px">${label}</div>
+        <div class="opts two">
+          ${opt("Yes",`pick('${field}',true)`,rpState[field]===true)}
+          ${opt("No",`pick('${field}',false)`,rpState[field]===false)}
+        </div></div>`;
+    return yn("moveoutWaterOn","Is the water on?")
+      + yn("moveoutAcOn","Is the air conditioning working?")
+      + yn("moveoutMoldPests","Any signs of mold or pests?");
+  }
+
+  if(s==="sqft") return `<div class="opts two">${rpSqftTiersForService(rpState.service)
+    .map(t=>opt(t.label,`pick('sqft','${t.key}')`,rpState.sqft===t.key)).join("")}</div>`;
+
+  if(s==="bedrooms") return `<div class="opts three">${[1,2,3,4,5]
+    .map(n=>opt(`${n}${n===5?"+":""} bed`,`pick('bedrooms',${n})`,rpState.bedrooms===n)).join("")}</div>`;
+
+  if(s==="bathrooms") return `<div class="opts three">${[1,2,3,4]
+    .map(n=>opt(`${n}${n===4?"+":""} bath`,`pick('bathrooms',${n})`,rpState.bathrooms===n)).join("")}</div>`;
+
+  if(s==="condition") return `<div class="opts">${rpConditionOrder
+      .map(c=>opt(c,`pick('condition','${c.replace(/'/g,"\\'")}')`,rpState.condition===c,rpConditionCopy[c])).join("")}</div>
+    <div style="margin-top:13px"><p class="sub" style="margin-bottom:6px">Flag anything the crew needs to prep for:</p>
+      ${chk("petWasteConcern","Pets / pet odor / animal waste")}
+      ${chk("hazardConcern","Excessive trash, hoarding, pests, or smoke")}
+      ${chk("moldConcern","Mold or musty smell reported")}
+      ${chk("noAC","No working A/C")}</div>`;
+
+  if(s==="frequency") return `<div class="opts two">${["One-Time","Weekly","Bi-Weekly","Monthly"]
+    .map(f=>opt(f,`pick('frequency','${f}')`,rpState.frequency===f)).join("")}</div>`;
+
+  if(s==="rooms") return `<div class="opts three">${[2,3,4,5,6,7]
+    .map(n=>opt(`${n} rooms`,`pick('carpetRooms',${n})`,Number(rpState.carpetRooms)===n)).join("")}</div>
+    <div class="opts" style="margin-top:13px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room${rpState.carpetRooms?` \u2014 $${rpPetEnzymePrice()} total`:""})`,`toggle('addonPetEnzyme')`,rpState.addonPetEnzyme)}</div>`;
+
+  if(s==="cleaners") return `<div class="opts three">${[1,2,3,4]
+    .map(n=>opt(`${n}`,`pick('cleanerCount',${n})`,rpState.cleanerCount===n)).join("")}</div>`;
+
+  if(s==="hours") return `<div class="opts three">${[4,5,6,7,8]
+    .map(n=>opt(`${n} hrs`,`pick('hourCount',${n})`,rpState.hourCount===n)).join("")}</div>`;
+
+  if(s==="tiers"){
+    /* Round 26: the moment Liz shows two real prices instead of asking
+       the caller to commit to a tier blind. Mirrors /book's "moveouttiers"
+       screen -- same rpMoveoutTierBasePrice() call, same two options,
+       just rendered in this console's plainer button style. Picking
+       either one calls chooseMoveoutTier(), which sets the real service
+       and moves on; nothing forces a pick (this console never hard-blocks
+       Next), so leaving it on the default still prices as Inspection
+       Ready -- the safer default if she skips ahead. */
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
+    const fmt=p=>p===null?"Custom quote":`$${p.toFixed(0)}`;
+    const chosen = rpState.moveoutTierChosen ? rpState.service : null;
+    return `<div class="opts">
+      ${opt(`Inspection Ready — ${fmt(irPrice)}`,`chooseMoveoutTier('moveout')`,chosen==="moveout",
+        "Protects your security deposit (Defend Your Deposit™) — oven, fridge, cabinets & closets, and the full Detail Pass all included in this price.")}
+      ${opt(`Move-Out Express — ${fmt(rfPrice)}`,`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
+        "Satisfaction Guaranteed, no deposit guarantee — oven, fridge, cabinets, and Detail Pass are addable next screen.")}
+    </div>
+    <p class="sub" style="margin-top:13px">${
+      /* Round 26: this is the actual decision screen now, so the
+         selling/renting signal from "intent" belongs here -- it's the
+         moment it can change which tier Liz leads with, not just a
+         closing-argument aside on the scope cheat sheet three screens
+         later, after a tier's likely already been picked. */
+      rpState.moveoutRentalOrSelling === "selling"
+        ? "They're listing it for sale, not handing it to a new tenant -- lead with Inspection Ready. Buyers notice what a renter wouldn't, and it's the one that protects the security deposit if anything's flagged."
+        : "Not sure which fits? Landlord, property manager, or inspector checking the place after move-out -- Inspection Ready is the one that protects the security deposit. Flat no on any of that, Express is the honest, lower-cost pick."
+    }</p>`;
+  }
+
+  if(s==="addons"){
+    const list=rpServiceAddons[rpState.service]||[];
+    let h="";
+    if(list.includes("carpet")) h+=`<div style="margin-bottom:9px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.carpet.bundlePrice}/room</span></div>
+      <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
+      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room \u2014 $${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE} total)`,`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme)}</div>`:""}</div>`;
+    /* Round 24 (direct instruction, applied here for parity with /book):
+       junk haul is quoted-only now, no flat half/full pricing -- one
+       option instead of three, matching rpState.junkSize's new shape
+       (null or "yes"). Keeps this console consistent with what the
+       website itself now offers, so Liz never quotes a flat $100/$200
+       that a self-serve customer couldn't have gotten online. */
+    if(list.includes("junk")) h+=`<div class="opts" style="margin-bottom:9px">
+      ${opt(`Junk/trash to haul away (quoted separately, NOT in the total)`,`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes")}</div>`;
+    if(list.includes("windows")) h+=`<div class="opts" style="margin-bottom:9px">
+      ${opt(`Exterior windows \u2014 basic (+$${rpAddonCatalog.windows.basic})`,`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
+      ${opt(`Exterior windows \u2014 premium (+$${rpAddonCatalog.windows.premium})`,`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
+    h+=`<div class="opts">`;
+    if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
+    if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
+    /* Round 25 (direct instruction, for phone-booking parity with /book's
+       three new Express add-ons): oven and cabinets are flat $50 same as
+       fridge; Detail Pass is bedroom-tier priced like the tier bases
+       themselves, so it reads rpDetailPassPrice() rather than a catalog
+       constant. */
+    if(list.includes("oven")) h+=opt(`Oven interior (+$${rpAddonCatalog.oven.price})`,`toggle('ovenAddon')`,rpState.ovenAddon);
+    if(list.includes("cabinets")) h+=opt(`Inside cabinets & closets (+$${rpAddonCatalog.cabinets.price})`,`toggle('cabinetsAddon')`,rpState.cabinetsAddon);
+    if(list.includes("detailPass")) h+=opt(`Detail Pass — baseboards, windows, walls, fans/vents/lights (+$${rpDetailPassPrice()})`,`toggle('detailPassAddon')`,rpState.detailPassAddon);
+    h+=`</div>`;
+    /* Round 21: laundry is in rpServiceAddons.hourly but was never
+       rendered on this console, so an Hourly job booked by phone simply
+       could not include it. */
+    if(list.includes("laundry")) h+=`<div style="margin:9px 0">
+      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Laundry <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.laundry.pricePerLoad}/load</span></div>
+      <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
+    /* Extra Time / Additional Cleaner — previously missing entirely from
+       this console, so a Deep/Basic phone booking had no way to add
+       either even though both exist in the shared engine and on /book.
+       Priced per hour actually booked (anchor + any Extra Time already
+       selected), matching rpSecondCleanerPrice()'s live recalculation. */
+    if(list.includes("extraHours")){
+      const anchorHrs = rpState.service==="deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
+      h+=`<div style="margin-bottom:9px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:5px">Extra time <span style="color:var(--muted);font-weight:500">includes ${anchorHrs}hrs \u00b7 +$${RP_EXTRA_HOUR_RATE}/hr beyond that</span></div>
+        <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`+${n}hr`,`pick('addonExtraHours',${n})`,Number(rpState.addonExtraHours)===n)).join("")}</div></div>`;
+    }
+    if(list.includes("secondCleaner"))
+      h+=`<div class="opts" style="margin-bottom:9px">${opt(`Additional cleaner (+$${rpSecondCleanerPrice()} for ${rpSecondCleanerHours()}hrs)`,`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner)}</div>`;
+    /* Round 25 (found while auditing /book vs /call for consistency):
+       "Need Small Handyman Repairs?" is a universal, quoted-separately
+       lead-capture checkbox on every /book addons screen -- same
+       treatment as junk haul, not gated by rpServiceAddons. It never
+       existed on /call at all, in the state, the UI, or the booking
+       payload, so a caller who mentioned wanting a patch job or minor
+       repair had nowhere for Liz to record it -- that interest was just
+       lost instead of reaching the office the way a self-serve customer's
+       always does. Ask it on every service's addons screen, same as
+       /book. */
+    h+=`<div class="opts" style="margin-bottom:9px">${opt("Interested in small handyman repairs? (quoted separately, NOT in the total)",`toggle('handymanInterest')`,rpState.handymanInterest)}</div>`;
+    h+=`<div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
+      ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed"):""}</div>`;
+    return h;
+  }
+
+  if(s==="quote"){
+    const custom=rpIsCustomQuoteOnly();
+    /* Move-out tier switch: let the CSR flip between Inspection Ready and
+       Express from the quote screen after giving the first number, same
+       spirit as /book's cross-sell link. Bedrooms/bathrooms/sqft/addons
+       stay in state either way -- both tiers ask the same size questions
+       -- so this just swaps which price table the shared engine reads.
+       Replaces the old flat/hourly billing-mode toggle (round 19 --
+       hourly move-out removed). */
+    const moveoutTierToggle = (["moveout","moveoutrefresh"].includes(rpState.service) && !custom) ? `
+      <div class="opts" style="margin-bottom:11px">${opt(
+        rpState.service==="moveout" ? "Switch to Move-Out Express (no inspection guarantee)" : "Switch to Inspection Ready (adds Defend Your Deposit)",
+        `switchMoveoutTier('${rpState.service==="moveout" ? "moveoutrefresh" : "moveout"}')`,
+        false
+      )}</div>` : "";
+    /* Round 20: if the tier switch dropped an add-on the new tier already
+       includes, say so on screen so Liz can explain the price change
+       instead of the number moving on its own mid-call. */
+    const dropNotice = rpState.addonDropNotice
+      ? `<div class="opts" style="margin-bottom:11px"><span class="note">Removed (already included in this tier): <strong>${esc(rpState.addonDropNotice)}</strong></span></div>`
+      : "";
+    return `${moveoutScopeRefHtml()}${moveoutTierToggle}${dropNotice}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
+        <small>Quote to give</small>
+        <strong>${custom?"Custom Quote":rpFormatMoneyDisplay(rpFinalPriceCents())}</strong>
+        ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
+          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpState.service==="moveoutrefresh"?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
+      </div>
+      ${custom?"":quoteCloseHelpersHtml()}
+      ${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
+  }
+
+  if(s==="contact") return `
+    <div class="f"><label for="a1">Service address *</label>
+      <input id="a1" value="${esc(rpState.address1)}" placeholder="123 Main St" oninput="set('address1',this.value)"></div>
+    <div class="f-row">
+      <div class="f"><label for="ct">City *</label>
+        <input id="ct" value="${esc(rpState.city)}" placeholder="Lawton" oninput="set('city',this.value)"></div>
+      <div class="f"><label for="zp">ZIP *</label>
+        <input id="zp" inputmode="numeric" value="${esc(rpState.postalCode)}" placeholder="73505" oninput="set('postalCode',this.value)"></div></div>
+    <div class="f"><label for="em">Email (for confirmation)</label>
+      <input id="em" type="email" value="${esc(rpState.email)}" placeholder="name@email.com" oninput="set('email',this.value)"></div>
+    <div class="f"><label for="si">Access / special instructions</label>
+      <textarea id="si" placeholder="Gate code, lockbox, pets, parking\u2026" oninput="set('specialInstructions',this.value)">${esc(rpState.specialInstructions)}</textarea></div>
+    ${chk("addressReadBack","I read the address back and they confirmed it")}`;
+
+  if(s==="calendar") return calendarHtml();
+
+  if(s==="done") return `<div class="guard info" style="margin-top:0"><b>${isCustomService()?"Request Logged":"Booked"}</b>
+      ${isCustomService()
+        ? "No appointment yet \u2014 the office will follow up to schedule a walkthrough or request photos, then confirm a quote."
+        : `${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.`}</div>
+    <p class="sub" style="margin-top:12px">${isCustomService()?"Let them know someone will reach out soon \u2014 no firm timeline promises.":"Repeat the date and time once more before you hang up."}</p>
+    <div class="f" style="margin-top:14px"><label for="csrDone">Not you? Update your name</label>
+      <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="setCsrIdentity(this.value)">
+      <p class="sub" style="margin:5px 0 0">Saved on this device for next call.</p></div>
+    <button class="btn pri" style="width:100%;margin-top:6px" onclick="resetCall()">Start next call</button>`;
+  return "";
+}
+
+/* Shown once, before the first call on this device. Nothing else in the
+   console runs until this is filled in — the greeting script needs a
+   real name, not a placeholder or a generic fallback. Persists via
+   setCsrIdentity(), so this never shows again on this device after. */
+/* The guided script is a default path, not a cage. Real calls skip
+   around — a customer front-loads their address before you've asked,
+   or wants a ballpark price before finishing the details. This lets
+   Liz tap directly to any step in the current flow instead of clicking
+   Next repeatedly through screens she already has the answer to. */
+function renderJumpRail(){
+  const f=flow(), idx=stepIdx();
+  el("jumpRail").innerHTML=f.map((s,i)=>{
+    const cls=i===idx?"now":(i<idx?"done":"");
+    return `<button type="button" class="jump-chip ${cls}" onclick="jumpToStep('${s}')">${SHORT_LABELS[s]||s}</button>`;
+  }).join("");
+}
+function jumpToStep(step){
+  if(!flow().includes(step)) return;
+  rpState.step=step;
+  window.scrollTo({top:0,behavior:"smooth"});
+  render();
+  if(step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+}
+
+function renderSetup(){
+  el("progFill").style.width="0%";
+  el("hdWho").textContent="Internal tool";
+  el("main").innerHTML=`
+    <div class="q">
+      <p class="stepno">Before you start</p>
+      <h2>What's your name?</h2>
+      <p class="sub">Used in the call script and saved on this device \u2014 you'll only enter it once.</p>
+      <div class="f"><input id="setupName" placeholder="Liz" autofocus onkeydown="if(event.key==='Enter')finishSetup()"></div>
+      <button class="btn pri" style="width:100%" onclick="finishSetup()">Start taking calls</button>
+    </div>`;
+  el("rail").innerHTML="";
+  el("jumpRail").innerHTML="";
+}
+function finishSetup(){
+  const v=(el("setupName").value||"").trim();
+  if(!v) return;
+  setCsrIdentity(v);
+  render();
+}
+
+/* =========================================================================
+   STAFF PASSWORD GATE
+   =========================================================================
+   Client-side only — anyone who views page source can see AUTH_PASSWORD.
+   This stops a casual visitor who finds the URL; it is NOT real security
+   and won't stop someone determined to get in. For that, use Cloudflare
+   Access in front of /call at the DNS/edge level instead. Asked once per
+   device, then remembered via localStorage.
+   ========================================================================= */
+const AUTH_KEY="rpCallConsole.authOk";
+const AUTH_PASSWORD="2657";
+function isAuthed(){ try{ return localStorage.getItem(AUTH_KEY)==="1"; }catch(e){ return false; } }
+function renderAuthGate(){
+  el("progFill").style.width="0%";
+  el("jumpRail").innerHTML="";
+  el("hdWho").textContent="Internal tool";
+  el("main").innerHTML=`
+    <div class="q">
+      <p class="stepno">Staff Only</p>
+      <h2>Enter password</h2>
+      <p class="sub">Internal tool \u2014 ask your manager if you don't have the password.</p>
+      <div class="f"><input id="authPass" type="password" inputmode="numeric" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')checkAuth()"></div>
+      <p id="authError" class="sub" style="color:var(--red);min-height:16px"></p>
+      <button class="btn pri" style="width:100%" onclick="checkAuth()">Enter</button>
+    </div>`;
+  el("rail").innerHTML="";
+}
+function checkAuth(){
+  const v=(el("authPass").value||"").trim();
+  if(v===AUTH_PASSWORD){
+    try{ localStorage.setItem(AUTH_KEY,"1"); }catch(e){}
+    render();
+  }else{
+    el("authError").textContent="Incorrect password \u2014 try again.";
+    el("authPass").value="";
+    el("authPass").focus();
+  }
+}
+
+function render(){
+  if(!isAuthed()){ renderAuthGate(); return; }
+  if(!rpState.csrName){ renderSetup(); return; }
+  const t=TITLES[rpState.step]||["",""], sc=resolveScript(rpState.step);
+  const idx=stepIdx(), total=flow().length;
+  el("progFill").style.width=`${Math.round((idx/Math.max(1,total-1))*100)}%`;
+  el("hdWho").textContent = rpState.fullName
+    ? `${rpState.fullName}${phoneOk(rpState.phone)?" \u00b7 "+fmtPhone(rpState.phone):""}` : "Internal tool";
+  renderJumpRail();
+  el("main").innerHTML=`
+    ${sc?`<div class="script">
+      <div class="script-row"><span class="tag t-say">Say</span><span class="say-text">${sc.say}</span></div>
+      <div class="script-row muted"><span class="tag t-listen">Listen</span><span>${sc.listen}</span></div>
+      <div class="script-row muted"><span class="tag t-watch">Watch</span><span>${sc.watch}</span></div>
+    </div>`:""}
+    <div class="q">
+      <p class="stepno">Step ${idx+1} of ${total}</p>
+      <h2>${t[0]}</h2>${t[1]?`<p class="sub">${t[1]}</p>`:""}
+      ${screenHtml()}
+      ${guardrails().map(g=>`<div class="guard ${g.level}"><b>${g.title}</b>${g.body}</div>`).join("")}
+      ${rpState.customLeadError?`<div class="guard stop"><b>Couldn't save</b>${esc(rpState.customLeadError)}</div>`:""}
+      ${rpState.step==="done"?"":`<div class="nav">
+        ${idx>0?`<button class="btn" onclick="back()">Back</button>`:""}
+        <button class="btn pri" onclick="next()" ${rpState.bookingSubmitting||rpState.customLeadSaving?"disabled":""}>
+          ${rpState.step==="calendar"?"Confirm booking":(rpState.step==="contact"&&isCustomService())?(rpState.customLeadSaving?"Saving\u2026":"Submit request"):"Next"}</button></div>`}
+    </div>
+    ${!stepValid()?`<p class="sub" style="text-align:center;margin-top:8px">Not fully filled out \u2014 that's fine, keep going. You can always come back to it.</p>`:""}`;
+  renderRail(); save();
+}
+function fmtPhone(v){ const d=normalizePhone(v);
+  return d.length===10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:v; }
+
+function renderRail(){
+  const custom=rpIsCustomQuoteOnly()||isCustomService(), rows=[];
+  if(rpState.service) rows.push(["Service",isCustomService()?"Custom Quote / Something Else":(rpServices[rpState.service]||{}).name]);
+  if(rpSqftTier()) rows.push(["Size",rpSqftTier().label]);
+  if(rpState.bedrooms) rows.push(["Bedrooms",rpState.bedrooms]);
+  if(rpState.bathrooms) rows.push(["Bathrooms",rpState.bathrooms]);
+  if(rpState.condition) rows.push(["Condition",rpState.condition.replace(/ Conditions?$/,"")]);
+  if(rpState.service==="maintenance" && !rpIsCustomQuoteOnly()) rows.push(["Base (before discount)","$"+rpDisplayBasePrice().toFixed(2)]);
+  if(rpState.frequency) rows.push(["Frequency",rpState.frequency]);
+  if(rpAddonsTotal()>0) rows.push(["Add-ons","+"+rpFormatMoneyDisplay(rpAddonsCents())]);
+  if(rpState.militaryDiscount&&rpMilitaryDiscountAmount()>0) rows.push(["Military","\u2212$"+rpMilitaryDiscountAmount().toFixed(2)]);
+  if(rpState.bookedAt) rows.push(["Scheduled",rpState.bookedAt]);
+  el("rail").innerHTML=`<div class="rail-card">
+    <div class="rail-price"><small>${custom?"Pricing":"Running total"}</small>
+      <strong>${custom?"Custom":(rpFinalPrice()>0?rpFormatMoneyDisplay(rpFinalPriceCents()):"\u2014")}</strong>
+      ${custom?`<span class="note">Don't quote a number.</span>`:""}</div>
+    ${rows.length?`<div class="rail-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div>`:""}
+    ${rpState.service && rpIncludes[rpState.service] ? `<div class="rail-included">
+      <div class="rail-included-title">What's Included \u2014 read this if asked</div>
+      <ul>${rpIncludes[rpState.service].items.map(i=>`<li>${i}</li>`).join("")}</ul>
+      ${/* Round 22: the rail only ever showed what IS included. The most
+            likely question on a Express call is "does that do the oven?"
+            and the answer lived in fineprint, which was never rendered
+            here. Liz has the harder job than the website -- she's saying
+            it out loud without the caller seeing a comparison table. */
+        rpIncludes[rpState.service].fineprint ? `<div class="rail-excluded">
+        <div class="rail-included-title" style="color:var(--red)">NOT included \u2014 say this before they ask</div>
+        <p>${rpIncludes[rpState.service].fineprint}</p>
+      </div>` : ""}
+    </div>` : ""}
+    ${(() => {
+      const a = rpServiceAreaStatus();
+      if (a.status === "core" || a.status === "unknown") return "";
+      return `<div class="rail-area ${a.status==="outside"?"is-out":""}">
+        <b>${a.status==="outside"?"\u26a0 Outside service area":"Edge of service area"}</b>
+        <span>${a.status==="outside"
+          ? "Book it, but tell them the office will confirm coverage and any travel before the date. Flag it in your notes."
+          : `${esc(a.area)} \u2014 extra drive time. Fine to book; the office will see the flag.`}</span>
+      </div>`;
+    })()}
+  </div>`;
+}
+
+/* ---------- Interaction ---------- */
+function set(f,v){ rpState[f]=v; save(); try{renderRail();}catch(e){} 
+  if(f==="fullName"||f==="phone") el("hdWho").textContent = rpState.fullName
+    ? `${rpState.fullName}${phoneOk(rpState.phone)?" \u00b7 "+fmtPhone(rpState.phone):""}` : "Internal tool"; }
+function pick(f,v){ rpState[f]=v; render(); }
+function toggle(f){ rpState[f]=!rpState[f];
+  if(f==="militaryDiscount"&&!rpState.militaryDiscount) rpState.militaryVerified=false; render(); }
+/* Swap Move-Out tier without resetting size/addon state -- unlike
+   pickService(), which is a genuine service change. See the comment on
+   moveoutTierToggle above. */
+/* Round 20: a tier switch changes rpState.service WITHOUT pickService()'s
+   full reset, so any add-on the incoming tier doesn't offer must be
+   dropped explicitly — same bug class as the "$525 instead of $225"
+   note on pickService() below. Concretely: Express offers Refrigerator
+   Interior ($50) because Express excludes it; Inspection Ready includes
+   it in the base, so carrying the selection across quoted $50 for work
+   already in scope. Liz gets a one-line heads-up so she can say it out
+   loud instead of the number quietly changing mid-call. */
+/* Round 22: the website now shows the customer a nine-row scope grid on
+   the tier screen. Liz had nothing equivalent — she was asked to route
+   between two products with one hint line. Same nine rows, formatted for
+   reading aloud, shown on the quote screen for either move-out tier. */
+function moveoutScopeRefHtml(){
+  if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
+  /* Round 25 (parity with /book's scope table, same direct instruction --
+     "each addon should have a price" + cover ceiling fans/vents/lights):
+     every excluded-on-Express row now shows the real dollar figure Liz can
+     say out loud, and baseboards/windows/walls/fans-vents-lights are one
+     combined row matching the single Detail Pass SKU she actually books. */
+  const rows=[
+    ["Kitchen, bathrooms, floors",1,1],
+    ["Appliance exteriors, counters, sinks",1,1],
+    ["Trash out, mirrors & glass",1,1],
+    ["Inside the oven",1,rpAddonCatalog.oven.price],
+    ["Inside the refrigerator",1,rpAddonCatalog.fridge.price],
+    ["Inside cabinets & closets",1,rpAddonCatalog.cabinets.price],
+    ["Baseboards, windows, walls, fans/vents/lights",1,rpDetailPassPrice()]
+  ];
+  const m=v=>v===1?`<span style="color:var(--green);font-weight:800">yes</span>`
+    :typeof v==="number"?`<span style="color:var(--red);font-weight:800">+$${v}</span>`
+    :`<span style="color:var(--muted);font-weight:800">no</span>`;
+  return `<details class="scope-ref" style="margin-bottom:11px">
+    <summary style="cursor:pointer;font-weight:800;font-size:13px">Scope cheat sheet \u2014 Inspection Ready vs Express</summary>
+    <div style="margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:7px 10px;background:rgba(17,17,17,.05);font-size:10.5px;font-weight:800;text-align:center">
+        <span style="text-align:left">&nbsp;</span><span>Insp.<br>Ready</span><span>Express</span></div>
+      ${rows.map(r=>`<div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:6px 10px;border-top:1px solid var(--line);font-size:12px;align-items:center"><span>${r[0]}</span><span style="text-align:center">${m(r[1])}</span><span style="text-align:center">${m(r[2])}</span></div>`).join("")}
+    </div>
+    <p style="margin:7px 0 0;font-size:12px;color:var(--muted);line-height:1.45">${
+      /* Round 23 (sales-review fix): /book now nudges sellers toward
+         Inspection Ready using the rental/selling answer it already
+         collected. Liz collects the same answer on the "intent" step and
+         it went unused after that -- same nudge, said out loud. */
+      rpState.moveoutRentalOrSelling === "selling"
+        ? "They're listing it \u2014 lead with Inspection Ready: buyers notice what a rental tenant wouldn't."
+        : "Inspection Ready runs a <strong>3</strong>-cleaner crew, Express runs <strong>2</strong> \u2014 same standards either way. No inspection at all? Express is the honest recommendation, not a downsell: less scope for less money, and anything specific is still addable by the row above."
+    }</p>
+  </details>`;
+}
+
+function switchMoveoutTier(k){
+  rpState.service=k;
+  const dropped=rpClearUnavailableAddons(k);
+  rpState.addonDropNotice = dropped.length
+    ? dropped.map(x => rpAddonCatalog[x] ? rpAddonCatalog[x].label : x).join(", ")
+    : "";
+  render();
+}
+/* Round 26: the FIRST tier pick, from the new "tiers" screen -- as
+   opposed to switchMoveoutTier() above, which flips an already-chosen
+   tier later from the quote screen. No add-ons exist yet at this point
+   in the flow (tiers sits before addons), so nothing needs dropping;
+   just set the real service, mark it chosen (so the screen shows which
+   one is picked instead of both looking unselected), and move on. */
+function chooseMoveoutTier(k){
+  rpState.service=k;
+  rpState.moveoutTierChosen=true;
+  next();
+}
+function pickService(k){ rpState.service=k;
+  rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
+  rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
+  /* BUG FIX: this reset never touched any addon field, or (once added)
+     the new move-out intent/questionnaire fields. Reproduced live: pick
+     Deep, toggle Additional Cleaner, switch to Carpet without a page
+     reload \u2014 the $300 leftover silently added onto Carpet's total
+     (confirmed $525 instead of $225 in testing). Every addon-ish field
+     and all move-out-specific state resets here now, matching /book's
+     rpResetServiceState() coverage. */
+  rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.addonCarpetPetEnzyme=false; rpState.windowsTier=null;
+  rpState.garageWash=false; rpState.laundryLoads=0;
+  rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.handymanInterest=false; rpState.cleanerCount=null; rpState.addonDropNotice=""; rpState.moveoutTierChosen=false;
+  rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
+  rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
+  rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
+  rpState.moveoutWaterOn=null; rpState.moveoutAcOn=null; rpState.moveoutMoldPests=null;
+  rpState.moveoutRentalOrSelling=null; rpState.moveoutPmOrRealtor="";
+  render();
+  // Fetch availability in the background now, not when she reaches the
+  // calendar step — by the time she's at the price, real slot counts are
+  // already loaded and ready for an honest urgency line, not a guess.
+  if(k!=="custom" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+}
+function next(){
+  if(rpState.bookingSubmitting || rpState.customLeadSaving) return;
+  const f=flow(), i=stepIdx();
+  if(rpState.step==="calendar"){ submitBooking(); return; }
+  if(rpState.step==="contact" && isCustomService()){ submitCustomLead(); return; }
+  if(i<f.length-1){
+    rpState.step=f[i+1];
+    window.scrollTo({top:0,behavior:"smooth"});
+    render();
+    if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+  }
+}
+function back(){ const f=flow(), i=stepIdx();
+  if(i>0){ rpState.step=f[i-1]; window.scrollTo({top:0,behavior:"smooth"}); render(); } }
+
+function openDrawer(id){
+  if(id==="drObj") el("objList").innerHTML=OBJECTIONS.map(o=>
+    `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${typeof o.n==="function"?o.n():o.n}</em></div>`).join("");
+  if(id==="drOut") el("outList").innerHTML=OUTCOMES.map(o=>
+    `<button class="out-btn" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
+  el(id).hidden=false; document.body.style.overflow="hidden";
+}
+function closeDrawer(id){ el(id).hidden=true; document.body.style.overflow=""; }
+
+/* ---------- Persistence (survives an accidental refresh mid-call) ---------- */
+const CSR_IDENTITY_KEY = "rpCallConsole.csrIdentity";
+function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(rpState)); }catch(e){} }
+function load(){
+  try{ const raw=localStorage.getItem(LS_KEY); if(raw){
+    const d=JSON.parse(raw); if(!(d&&d.bookedAt)) Object.assign(rpState,d);
+  } }catch(e){}
+  // CSR identity persists independently of per-call state and survives
+  // "Start next call" — set once at the end of a call, applied to every
+  // call after that without re-entering it.
+  try{ const name=localStorage.getItem(CSR_IDENTITY_KEY); if(name) rpState.csrName=name; }catch(e){}
+}
+function setCsrIdentity(name){
+  rpState.csrName=name;
+  try{ localStorage.setItem(CSR_IDENTITY_KEY,name); }catch(e){}
+  save();
+}
+function resetCall(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} window.location.reload(); }
+
+/* ---------- Office/crew summary ---------- */
+function jobDetails(){
+  const flags=[
+    rpState.noAC?"No A/C":"",
+    rpState.moldConcern?"Mold/musty smell reported":"",
+    rpState.petWasteConcern?"Pets / pet odor / animal waste":"",
+    rpState.hazardConcern?"Excessive trash, hoarding, pests, or smoke":"",
+    rpConditionMultiplier()>0?`Condition ${rpState.condition} \u2014 +${Math.round(rpConditionMultiplier()*100)}% applied, confirm on arrival`:"",
+    rpIsSpecialtyCondition()?"Specialty/unsafe \u2014 office must confirm custom quote before the cleaning date":""
+  ].filter(Boolean);
+  /* Move-out only. Same fields /book sends on a completed booking (fixed
+     last round after they were found missing there too) \u2014 this is a
+     SEPARATE code path from book's rpGetEstimatePayload(), so fixing one
+     never fixed the other. Without this, a phone-booked move-out would
+     lose the rental/PM lead and the pre-clean confirmation entirely,
+     same failure mode as the /book bug. */
+  const moveoutExtras = ["moveout","moveoutrefresh"].includes(rpState.service) ? [
+    `Tier: ${rpState.service==="moveout"?"Inspection Ready (Defend Your Deposit)":"Move-Out Express (Satisfaction Guaranteed, no deposit guarantee)"}`,
+    `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
+    rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
+    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`
+  ].filter(Boolean) : [];
+  /* Round 21: one shared list (rpAddonSummaryText) with prices, replacing
+     a partial hand-maintained copy that only ever mentioned three of the
+     nine add-ons — so a phone-booked carpet or junk haul reached the crew
+     sheet as a dollar figure with no description of what was sold. */
+  return [
+    `BOOKED BY PHONE${rpState.csrName?" (CSR: "+rpState.csrName+")":""}`,
+    `Service: ${(rpServices[rpState.service]||{}).name||"N/A"}`,
+    `Square footage: ${rpSqftTier()?rpSqftTier().label:"N/A"}`,
+    `Bedrooms: ${rpState.bedrooms||"N/A"} | Bathrooms: ${rpState.bathrooms||"N/A"}`,
+    `Condition: ${rpState.condition||"N/A"}`,
+    ...moveoutExtras,
+    `Add-ons: ${rpAddonSummaryText()}${rpAddonsTotal()>0?` | Add-ons total: $${rpAddonsTotal().toFixed(2)}`:""}`,
+    rpHasQuotedAddon()?`\u26a0 Junk haul selected — office must quote it separately; it is NOT in the total above.`:"",
+    rpState.handymanInterest?"Additional service request: Make-ready repairs \u2014 quoted separately, not included.":"",
+    `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
+    `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
+    (()=>{const a=rpServiceAreaStatus();return a.status==="core"?`Service area: ${a.area}`:a.status==="unknown"?"":`\u26a0 SERVICE AREA: ${a.label}${a.area?` (${a.area})`:""}`;})(),
+    `Lead source: ${rpState.csrLeadSource||"N/A"}`,
+    rpState.csrCallNotes?`Call notes: ${rpState.csrCallNotes}`:"",
+    rpState.specialInstructions?`Access/instructions: ${rpState.specialInstructions}`:"",
+    flags.length?`\u26a0 CREW PREP: ${flags.join(", ")}`:""
+  ].filter(Boolean).join("\n");
+}
+
+/* ---------- Calendar: real month grid, current + next month ---------- */
+/* Slot data shape, straight from GHL via the /slots worker endpoint:
+   { "2026-08-05": { slots: ["2026-08-05T10:00:00-05:00", ...] }, ... }
+   Each day is an OBJECT with a .slots array, not a plain array — treating
+   it as a plain array (an earlier version of this file did) silently
+   produces "undefined" everywhere. This matches /book's rpSlotsForDate()
+   exactly, including the 9am-5pm business-hours filter, so both pages
+   show the same bookable window. */
+function slotsForDate(dateKey){
+  const raw=rpState.availableSlots?.[dateKey]?.slots || [];
+  return raw.filter(slot=>{
+    const m=String(slot).match(/T(\d{2}):/);
+    const hour=m?Number(m[1]):NaN;
+    return Number.isFinite(hour) && hour>=9 && hour<=17;
+  });
+}
+function availableDateKeys(){
+  return Object.keys(rpState.availableSlots||{}).filter(k=>slotsForDate(k).length>0).sort();
+}
+function bookingBounds(){
+  const start=centralDateKey();
+  return {start, end:addDaysKey(start,60)};
+}
+function monthKeyFromDateKey(k){ return `${String(k).slice(0,7)}-01`; }
+function clampCalendarMonth(monthKey){
+  const bounds=bookingBounds();
+  const minMonth=monthKeyFromDateKey(bounds.start);
+  const maxMonth=monthKeyFromDateKey(bounds.end);
+  if(!monthKey||monthKey<minMonth) return minMonth;
+  if(monthKey>maxMonth) return maxMonth;
+  return monthKey;
+}
+function canMoveCalendarMonth(delta){
+  const current=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  const target=clampCalendarMonth(addDaysKey(monthBounds(current).first, delta>0?32:-1));
+  return target!==current;
+}
+function changeCalendarMonth(delta){
+  const current=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  const target=addDaysKey(monthBounds(current).first, delta>0?32:-1);
+  rpState.calendarMonth=clampCalendarMonth(monthKeyFromDateKey(target));
+  render();
+}
+function formatMonthTitle(monthKey){
+  return new Intl.DateTimeFormat("en-US",{month:"long",year:"numeric"}).format(dateFromKey(monthKey));
+}
+function calendarGridHtml(monthKey){
+  const bounds=bookingBounds();
+  const first=dateFromKey(monthKey);
+  const year=first.getFullYear(), month=first.getMonth();
+  const firstDow=new Date(year,month,1,12).getDay();
+  const daysInMonth=new Date(year,month+1,0,12).getDate();
+  const today=bounds.start;
+  const cells=[];
+  for(let i=0;i<firstDow;i++) cells.push(`<span class="cal-blank" aria-hidden="true"></span>`);
+  for(let day=1;day<=daysInMonth;day++){
+    const dateKey=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const inWindow=dateKey>=bounds.start && dateKey<=bounds.end;
+    const count=inWindow?slotsForDate(dateKey).length:0;
+    const avail=inWindow && count>0;
+    const isToday=dateKey===today;
+    const isSel=rpState.selectedDay===dateKey;
+    const cls=["cal-day",avail?"avail":"full",isToday?"today":"",isSel?"sel":""].filter(Boolean).join(" ");
+    cells.push(`<button type="button" class="${cls}" ${avail?`onclick="pick('selectedDay','${dateKey}')"`:"disabled"}>
+      <span>${day}</span>${avail?`<small>${count}</small>`:""}
+    </button>`);
+  }
+  return cells.join("");
+}
+function calendarHtml(){
+  if(rpState.slotsLoading) return `<p class="sub">Loading availability\u2026</p>`;
+  if(rpState.slotsError) return `<div class="guard warn"><b>Availability unavailable</b>${esc(rpState.slotsError)}
+    <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div>`;
+  if(!Object.keys(rpState.availableSlots||{}).length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
+
+  const monthKey=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
+  rpState.calendarMonth=monthKey;
+  const daysWithSlots=availableDateKeys();
+  const sel=(rpState.selectedDay && slotsForDate(rpState.selectedDay).length>0) ? rpState.selectedDay : "";
+  const slots=sel?slotsForDate(sel):[];
+
+  return `<div class="cal-nav">
+      <button type="button" onclick="changeCalendarMonth(-1)" ${canMoveCalendarMonth(-1)?"":"disabled"} aria-label="Previous month">\u2039</button>
+      <strong>${formatMonthTitle(monthKey)}</strong>
+      <button type="button" onclick="changeCalendarMonth(1)" ${canMoveCalendarMonth(1)?"":"disabled"} aria-label="Next month">\u203a</button>
+    </div>
+    <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+    <div class="cal-grid">${calendarGridHtml(monthKey)}</div>
+    <div class="cal-key"><span><i class="avail"></i>Open (number = slots)</span><span><i class="today"></i>Today</span></div>
+    ${!daysWithSlots.some(d=>monthKeyFromDateKey(d)===monthKey) ? `<p class="sub">Nothing open this month \u2014 try the other month.</p>` : ""}
+    ${sel ? `<p class="sub" style="margin-top:2px"><b>${fmtDay(sel)}</b> \u2014 tap a time:</p>
+      <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
+        :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>` : ""}
+    ${rpState.bookingError?`<div class="guard stop" style="margin-top:10px"><b>Booking failed</b>${esc(rpState.bookingError)}</div>`:""}
+    ${rpState.bookingSubmitting?`<p class="sub" style="margin-top:10px">Booking\u2026</p>`:""}`;
+}
+function fmtDay(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"}); }
+/* Explicit America/Chicago, same as /book's rpFormatTime() — without
+   this, a device set to a different timezone shows the wrong time. */
+function fmtTime(t){
+  return new Intl.DateTimeFormat("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/Chicago"}).format(new Date(t));
+}
+function pickSlot(t){ rpState.selectedStartTime=t;
+  rpState.bookedAt=`${fmtDay(rpState.selectedDay)} at ${fmtTime(t)}`; render(); }
+
+/* Date helpers — must match /book exactly. The booking worker expects
+   date-only keys (YYYY-MM-DD) in America/Chicago, NOT ISO timestamps.
+   Sending a full .toISOString() gets rejected as "Invalid date range".
+   /book also requests one MONTH at a time (start/end clamped to a single
+   month, within a 60-day booking window), so we do the same and merge two
+   months — otherwise a call late in the month shows almost no dates. */
+function centralDateKey(date=new Date()){
+  const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",
+    year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date)
+    .reduce((a,x)=>{ if(x.type!=="literal") a[x.type]=x.value; return a; },{});
+  return `${p.year}-${p.month}-${p.day}`;
+}
+function isoDate(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function dateFromKey(k){ return new Date(`${k}T12:00:00`); }
+function addDaysKey(key,days){ const d=dateFromKey(key); d.setDate(d.getDate()+days); return isoDate(d); }
+/* Inclusive first/last day of the month containing `key`. */
+function monthBounds(key){
+  const first=dateFromKey(key); first.setDate(1);
+  const last=new Date(first); last.setMonth(last.getMonth()+1,0);
+  return {first:isoDate(first), last:isoDate(last)};
+}
+
+async function fetchSlotRange(start,end){
+  const r=await fetch(`${RP_BOOKING_API}/slots?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
+    {headers:{Accept:"application/json"}});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.ok) throw new Error(j.error||`Availability request failed (HTTP ${r.status})`);
+  const data=j.data||{}; delete data.traceId;
+  return data;
+}
+
+async function loadSlots(){
+  if(rpState.slotsLoading) return;
+  rpState.slotsLoading=true; rpState.slotsError=""; render();
+  try{
+    const today=centralDateKey();
+    const windowEnd=addDaysKey(today,60);            // worker's booking window
+    const thisMonth=monthBounds(today);
+    const nextKey=addDaysKey(thisMonth.last,1);
+    const nextMonth=monthBounds(nextKey);
+
+    const ranges=[
+      {start:today, end:thisMonth.last<windowEnd?thisMonth.last:windowEnd}
+    ];
+    if(nextKey<=windowEnd){
+      ranges.push({start:nextKey, end:nextMonth.last<windowEnd?nextMonth.last:windowEnd});
+    }
+
+    let merged={}, firstError=null;
+    for(const rg of ranges){
+      try{ merged=Object.assign(merged, await fetchSlotRange(rg.start,rg.end)); }
+      catch(e){ if(!firstError) firstError=e; }
+    }
+    if(!Object.keys(merged).length && firstError) throw firstError;
+    rpState.availableSlots=merged;
+  }catch(e){
+    rpState.slotsError=(e.message||"Availability temporarily unavailable.")
+      +" Take their preferred day, tell them you'll confirm by text shortly, and book it in GHL \u2014 don't guess at a time.";
+  }
+  rpState.slotsLoading=false; render();
+}
+
+async function submitBooking(){
+  if(rpState.bookingSubmitting) return;
+  if(!rpState.selectedStartTime){
+    rpState.bookingError="Pick a date and time above first.";
+    render();
+    return;
+  }
+  rpState.bookingSubmitting=true; rpState.bookingError=""; render();
+  const parts=rpState.fullName.trim().split(/\s+/);
+  try{
+    const r=await fetch(`${RP_BOOKING_API}/book`,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        firstName:parts[0]||"", lastName:parts.slice(1).join(" ")||"",
+        email:rpState.email, phone:normalizePhone(rpState.phone),
+        address1:rpState.address1, city:rpState.city, state:"OK", postalCode:rpState.postalCode,
+        startTime:rpState.selectedStartTime,
+        service:(rpServices[rpState.service]||{}).name||"Cleaning",
+        serviceKey:rpState.service,
+        estimate:rpIsCustomQuoteOnly()?0:rpFinalPrice(),
+        bedrooms:rpState.bedrooms, bathrooms:rpState.bathrooms,
+        specialInstructions:rpState.specialInstructions,
+        notes:jobDetails(),
+        /* Round 21: this object used to carry NINE fields while /book sent
+           roughly sixty, so a phone booking arrived in GHL with no
+           guarantee type, no move-out tier, no add-on prices and no
+           questionnaire answers — any workflow branching on those fired
+           wrong on every phone-booked job. rpBuildSharedDetails() is the
+           same builder /book uses; the CSR-specific fields below are the
+           only things that legitimately differ. */
+        details:{
+          ...rpBuildSharedDetails(),
+          source:"RPC Call Console", business:"Red Prairie Cleaning",
+          booking_channel:"phone_csr", csr_name:rpState.csrName,
+          csr_lead_source:rpState.csrLeadSource||"N/A", csr_call_notes:rpState.csrCallNotes||"",
+          condition:rpState.condition||"N/A",
+          condition_adjustment_percent:Math.round(rpConditionMultiplier()*100),
+          custom_quote_required:rpIsCustomQuoteOnly()?"Yes":"No",
+          /* Round 25 (found while auditing /book vs /call): /book has
+             sent this field on every booking for a while now; it never
+             existed here, so a phone-booked handyman lead never reached
+             GHL at all. Same field name as /book's payload so nothing
+             downstream needs a second branch to read it. */
+          handyman_interest:rpState.handymanInterest?"Yes":"No",
+          /* Overrides the shared "Yes"/"No" with the CSR-verified state —
+             Liz ticking "I asked and they confirmed" is a different fact
+             from the website's self-serve checkbox. */
+          military_discount:rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (unconfirmed)"):"No",
+          military_discount_verified:rpState.militaryVerified?"Yes":"No",
+          special_instructions:rpState.specialInstructions||"",
+          submitted_at:new Date().toISOString(),
+          job_details:jobDetails()
+        },
+        companyWebsite:"", dryRun:false
+      })
+    });
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||j.ok===false) throw new Error(j.error||`Booking failed (HTTP ${r.status})`);
+    rpState.bookingSubmitting=false; rpState.step="done"; render();
+  }catch(e){
+    rpState.bookingSubmitting=false;
+    rpState.bookingError=(e.message||"Unknown error")+" \u2014 don't hang up. Take the details down and book it in GHL manually.";
+    render();
+  }
+}
+
+/* ---------- Custom Quote fallback: no booking, just a logged lead ---------- */
+async function submitCustomLead(){
+  if(rpState.customLeadSaving) return;
+  rpState.customLeadSaving=true; rpState.customLeadError=""; render();
+  try{
+    const r=await fetch(`${RP_BOOKING_API}/lead`,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        source:"RPC Call Console", booking_channel:"phone_csr", lead_status:"custom_quote_requested",
+        call_outcome:"Custom quote requested", csr_name:rpState.csrName,
+        csr_lead_source:rpState.csrLeadSource||"N/A", csr_call_notes:rpState.csrCallNotes||"",
+        full_name:rpState.fullName, phone:normalizePhone(rpState.phone), email:rpState.email,
+        service:"Custom Quote / Something Else",
+        quoted_price:"No quote given \u2014 requires in-person visit or photos",
+        details:[
+          `CUSTOM QUOTE REQUEST`,
+          `What they need: ${rpState.customNotes||"(not captured)"}`,
+          `Address: ${rpState.address1}, ${rpState.city}, ${rpState.state} ${rpState.postalCode}`,
+          rpState.specialInstructions?`Notes: ${rpState.specialInstructions}`:""
+        ].filter(Boolean).join("\n"),
+        submitted_at:new Date().toISOString()
+      })
+    });
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    rpState.customLeadSaving=false; rpState.step="done"; render();
+  }catch(e){
+    rpState.customLeadSaving=false;
+    rpState.customLeadError=(e.message||"Unknown error")+" \u2014 don't hang up. Take the details down and pass them to the office manually.";
+    render();
+  }
+}
+
+/* ---------- Outcome logging for calls that don't book ---------- */
+async function logOutcome(outcome){
+  rpState.csrDisposition=outcome;
+  const n=el("outNotes"); if(n) rpState.csrCallNotes=n.value;
+  const st=el("outStatus"); st.textContent="Saving\u2026"; st.style.color="";
+  try{
+    const r=await fetch(`${RP_BOOKING_API}/lead`,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        source:"RPC Call Console", booking_channel:"phone_csr", lead_status:"no_booking",
+        call_outcome:outcome, csr_name:rpState.csrName,
+        csr_lead_source:rpState.csrLeadSource||"N/A", csr_call_notes:rpState.csrCallNotes||"",
+        full_name:rpState.fullName, phone:normalizePhone(rpState.phone), email:rpState.email,
+        service:rpState.service?(rpServices[rpState.service]||{}).name:"Not selected",
+        quoted_price:(rpState.service&&!rpIsCustomQuoteOnly()&&rpFinalPrice()>0)?"$"+rpFinalPrice().toFixed(2):"No quote given",
+        /* Round 21: a lost call is the lead most worth re-working, and it
+           was going to GHL as a text blob only. The structured fields
+           (tier, guarantee, add-ons with prices, questionnaire answers,
+           the exact number Liz quoted) are what make a follow-up
+           campaign targetable rather than a manual read-through. Only
+           spread when a service was actually picked — rpBuildSharedDetails
+           reads rpState.service and would report "N/A" across the board
+           on a hangup at step one. */
+        ...(rpState.service ? rpBuildSharedDetails() : {}),
+        details:jobDetails(), submitted_at:new Date().toISOString()
+      })
+    });
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    st.textContent=`Logged: ${outcome}. Starting a fresh call\u2026`; st.style.color="var(--green)";
+    setTimeout(resetCall,1100);
+  }catch(e){
+    st.innerHTML=`<b>Not saved to CRM (${esc(e.message)}).</b> Copy the name, number and notes into GHL manually before the next call \u2014 don't lose this lead.`;
+    st.style.color="var(--red)";
+  }
+}
+
+load(); render();
+if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+</script>
+</body>
+</html>

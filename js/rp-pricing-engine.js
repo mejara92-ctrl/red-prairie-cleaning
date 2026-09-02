@@ -860,8 +860,16 @@ const rpFlows = {
      resume-check allowlist, not what drives the actual order (that's
      computed in rpCurrentFlow()), but kept in sync here so it doesn't
      read as stale to the next person who opens this file. */
-  moveout:        ["bedrooms", "bathrooms", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
-  moveoutrefresh: ["bedrooms", "bathrooms", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  /* Round 31: "bedrooms" and "bathrooms" merged into one "size" screen.
+     They are the same question asked twice ("how big is it"), they are
+     both a single tap, and splitting them bought a screen transition for
+     nothing. One screen, both rows visible, and the second tap advances
+     -- see rpSelectBedrooms/rpSelectBathrooms in /book. Ten steps became
+     nine. Both old names stay OUT of this allowlist deliberately: a
+     session saved mid-funnel under the old flow should restart cleanly
+     rather than resume onto a screen that no longer renders. */
+  moveout:        ["size", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["size", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -869,7 +877,7 @@ const rpFlows = {
   maintenance: ["included", "frequency", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "addons", "estimate", "lead", "calendar"],
-  airbnb:      ["included", "bedrooms", "bathrooms", "airbnbdetails", "estimate", "lead", "calendar"]
+  airbnb:      ["included", "size", "airbnbdetails", "estimate", "lead", "calendar"]
 };
 
 /* CONTACT GATE — the single biggest leak in the old funnel.
@@ -925,9 +933,9 @@ function rpCurrentFlow() {
        name/phone a second time -- it reads what contactgate collected,
        same as before. */
     if (rpMoveoutBlocked()) {
-      flow = ["bedrooms", "bathrooms", "moveoutquestionnaire", "moveoutblocked"];
+      flow = ["size", "moveoutquestionnaire", "moveoutblocked"];
     } else {
-      flow = ["bedrooms", "bathrooms", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
+      flow = ["size", "moveoutquestionnaire", "moveouttiers", "addons", "estimate", "lead", "calendar"];
     }
     if (!RP_CONTACT_GATE) return flow;
     const at = flow.indexOf("moveoutquestionnaire");

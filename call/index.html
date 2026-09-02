@@ -1,244 +1,417 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-
-<!-- ===================================================================
-     RED PRAIRIE CLEANING — INTERNAL CSR CALL CONSOLE
-     ===================================================================
-     This is NOT a customer-facing page. It is a staff tool used while on
-     the phone with a caller.
-
-     DELIBERATELY ABSENT (do not "restore" these):
-       - Google Analytics / Google Ads tags. Bookings taken here are not
-         ad conversions; firing the /book pixels would inflate Google Ads
-         conversion counts and corrupt bid-strategy data.
-       - Microsoft Clarity. It records session replay including form
-         input — here that means customer names, addresses, phones and
-         emails typed by staff. No product benefit, real PII exposure.
-       - Marketing copy, hero imagery, trust badges, SEO/schema markup.
-         Nothing here persuades the reader; the reader works here.
-
-     Indexing is blocked via robots + googlebot meta and referrer
-     suppression. That stops honest crawlers, NOT people. Put a
-     Cloudflare Access policy in front of /call for real protection.
-     =================================================================== -->
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/>
-<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet"/>
-<meta name="referrer" content="no-referrer"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
 <title>Call Console — Internal</title>
-<link rel="icon" type="image/png" href="/favicon.png"/>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Public+Sans:wght@400;500;600;700;800&display=swap">
 <style>
+/* ==========================================================================
+   RPC CALL CONSOLE 2.0
+   --------------------------------------------------------------------------
+   Design rule for this file, and the reason for the rewrite: a phone console
+   has exactly two jobs — show the words to SAY, and capture the answer in one
+   tap. Everything else is reference. Reference is one keystroke away, never
+   permanently on screen.
+
+   Console 1.0 broke that rule. Measured on a live move-out call, the quote
+   screen carried 541 words and put the Next button 1,268px down the page, so
+   Liz scrolled while she talked. The add-ons screen told her to "ask by name"
+   four separate times, in four different boxes. The right rail printed the
+   same eight scope bullets on all twelve steps.
+
+   So: three fixed zones that never scroll away — the line to say, the thing
+   to tap, and the dock. Coaching collapses. Reference moves into one search.
+   ========================================================================== */
 :root{
-  --ink:#231a14; --muted:#6d6259; --line:#ded3c6; --bg:#f4efe8; --panel:#fffdfa;
-  --red:#9f2027; --green:#3f7d40; --amber:#a8761c; --blue:#2c5d86; --radius:12px;
+  --bg:#eef0f4;
+  --panel:#ffffff;
+  --panel-2:#f6f7fa;
+  --sunk:#e6e9ef;
+  --ink:#14171c;
+  --ink-2:#3d4551;
+  --muted:#6b7482;
+  --line:#d8dde5;
+  --line-2:#c2c9d4;
+  --red:#a4202a;
+  --red-ink:#a4202a;
+  --red-wash:#fbeef0;
+  --green:#186b4d;
+  --green-wash:#e8f3ee;
+  --amber:#8a5a12;
+  --amber-wash:#fbf2e3;
+  --blue:#28517f;
+  --blue-wash:#e9eff7;
+  --focus:#28517f;
+  --shadow:0 1px 2px rgba(16,20,26,.06), 0 10px 28px -16px rgba(16,20,26,.28);
+  --dock-h:68px;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
-body{font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
-button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:15px}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1216; --panel:#181c22; --panel-2:#1e232a; --sunk:#131720;
+    --ink:#eaedf2; --ink-2:#c3cad4; --muted:#8b95a3;
+    --line:#2a3039; --line-2:#3a424e;
+    --red:#c8323d; --red-ink:#f2969c; --red-wash:#2a1719;
+    --green:#5cbd95; --green-wash:#132420;
+    --amber:#dfae63; --amber-wash:#241d12;
+    --blue:#8fb5e2; --blue-wash:#151d29;
+    --focus:#8fb5e2;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -16px rgba(0,0,0,.8);
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:6px}
 
-.hd{position:sticky;top:0;z-index:40;background:var(--ink);color:#fff;display:flex;
-  align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;
-  padding-top:calc(9px + env(safe-area-inset-top))}
-.hd-brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
-.hd-brand h1{margin:0;font-size:13px;font-weight:inherit;line-height:inherit}
-.hd-brand strong{font-size:13px}
-.hd-brand small{font-size:10px;letter-spacing:.04em;opacity:.65;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.hd-acts{display:flex;gap:6px;flex:0 0 auto}
-.hd-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
-  border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap;
-  /* 44px touch floor: these get tapped one-handed, mid-call. */
-  min-height:44px;display:inline-flex;align-items:center;justify-content:center}
-.hd-btn:active{transform:scale(.96)}
-.hd-btn.danger{background:var(--red);border-color:var(--red)}
+/* ── Zone 1: top bar. Caller, elapsed, money, escape hatches. ───────── */
+.top{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:10px;
+  padding:8px 12px calc(8px) 12px; padding-top:calc(8px + env(safe-area-inset-top));
+  background:var(--panel); border-bottom:1px solid var(--line);
+}
+.who{min-width:0; flex:1 1 auto; line-height:1.2}
+.who b{display:block; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.who span{display:block; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.top-actions{display:flex; align-items:center; gap:7px; flex:0 0 auto}
+.clock{
+  font-variant-numeric:tabular-nums; font-size:13px; font-weight:700; color:var(--muted);
+  padding:0 2px; letter-spacing:.02em;
+}
+.money{
+  display:flex; flex-direction:column; align-items:flex-end; justify-content:center;
+  min-height:44px; padding:4px 12px; border-radius:10px;
+  background:var(--sunk); border:1px solid var(--line);
+}
+.money b{font-size:20px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.money small{font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:2px}
+.money.is-custom b{font-size:15px; color:var(--amber)}
+.tbtn{
+  min-height:44px; min-width:44px; padding:0 12px; border-radius:10px; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line-2); color:var(--ink);
+  font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.tbtn:hover{background:var(--sunk)}
+.tbtn.danger{background:var(--red); border-color:var(--red); color:#fff}
+.tbtn kbd{
+  font:600 10px/1 "Public Sans",sans-serif; padding:2px 4px; border-radius:3px;
+  background:rgba(125,135,150,.22); color:var(--muted);
+}
+@media (max-width:560px){ .tbtn .lbl{display:none} .tbtn kbd{display:none} .clock{display:none} }
 
-.prog{height:3px;background:var(--line)}
-.jump-rail{display:flex;gap:5px;overflow-x:auto;padding:8px 12px;background:var(--panel);
-  border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.jump-rail::-webkit-scrollbar{display:none}
-.jump-chip{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:999px;
-  padding:5px 11px;font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
-.jump-chip.done{color:var(--ink);border-color:rgba(63,125,64,.4);background:rgba(63,125,64,.06)}
-.jump-chip.now{background:var(--red);border-color:var(--red);color:#fff}
-.jump-chip:active{transform:scale(.95)}
-.prog i{display:block;height:100%;background:var(--red);transition:width .25s}
+/* ── Step strip. Skipping around is normal on a real call. ──────────── */
+.strip{
+  position:sticky; top:0; z-index:30;
+  display:flex; gap:5px; overflow-x:auto; padding:7px 12px;
+  background:var(--panel-2); border-bottom:1px solid var(--line);
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.strip::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto; padding:6px 12px; border-radius:99px; cursor:pointer; white-space:nowrap;
+  background:transparent; border:1px solid var(--line-2); color:var(--muted);
+  font-size:11.5px; font-weight:700; letter-spacing:.01em; min-height:34px;
+}
+.chip.done{color:var(--ink-2); border-color:var(--line-2); background:var(--panel)}
+.chip.now{background:var(--red); border-color:var(--red); color:#fff}
 
-.wrap{max-width:1060px;margin:0 auto;padding:14px 12px 60px}
-.cols{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:900px){.cols{grid-template-columns:1fr 292px;align-items:start}
-  .rail{position:sticky;top:66px}}
+/* ── Zone 2: the line. The one thing she reads. ─────────────────────── */
+.wrap{max-width:1180px; margin:0 auto; padding:16px 14px calc(var(--dock-h) + 26px)}
+@media (min-width:1000px){ .wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; align-items:start} }
+.col-main{min-width:0}
 
-.script{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);
-  border-radius:var(--radius);padding:13px 15px;margin-bottom:14px}
-.script-row{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
-.script-row+.script-row{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
-.tag{flex:0 0 52px;font-size:9px;font-weight:800;letter-spacing:.06em;padding-top:3px;text-transform:uppercase}
-.t-say{color:var(--red)}.t-listen{color:var(--green)}.t-watch{color:var(--amber)}
-.t-close{color:var(--blue)}.t-pushback{color:var(--amber)}
-.say-text{font-weight:700;font-size:15.5px}
-.script-row.muted{color:var(--muted);font-size:13.5px}
+.say{
+  background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--red);
+  border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); margin-bottom:14px;
+}
+.say-label{
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+  font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--red-ink);
+}
+.say-label .spacer{flex:1}
+.say p{
+  margin:0; font-family:Newsreader,Georgia,serif; font-weight:400;
+  font-size:clamp(20px,2.6vw,25px); line-height:1.38; letter-spacing:-.005em; color:var(--ink);
+  text-wrap:pretty;
+}
+.coach-btn{
+  cursor:pointer; background:transparent; border:1px solid var(--line-2); color:var(--muted);
+  border-radius:99px; padding:6px 12px; font-size:10px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; min-height:34px;
+}
+.coach-btn[aria-expanded="true"]{background:var(--blue-wash); border-color:var(--blue); color:var(--blue)}
+.coach{
+  margin-top:12px; padding-top:11px; border-top:1px dashed var(--line-2);
+  font-size:14px; line-height:1.55; color:var(--ink-2);
+}
+.coach[hidden]{display:none}
+.coach b{color:var(--ink)}
 
-.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
-.q h2{margin:0 0 3px;font-size:19px;letter-spacing:-.01em}
-.sub{color:var(--muted);font-size:13.5px;margin:0 0 13px}
-.stepno{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);
-  text-transform:uppercase;margin:0 0 5px}
+/* ── Zone 3: capture. One tap, numbered for the keyboard. ───────────── */
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  padding:15px 16px 16px; box-shadow:var(--shadow);
+}
+.card + .card{margin-top:12px}
+.card h2{margin:0 0 3px; font-size:19px; font-weight:800; letter-spacing:-.015em}
+.card .sub{margin:0 0 12px; font-size:13.5px; color:var(--muted); line-height:1.45}
+.grp{margin-bottom:13px}
+.grp:last-child{margin-bottom:0}
+.grp-h{
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px; margin-bottom:6px;
+  font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted);
+}
+.grp-h em{font-style:normal; font-weight:600; letter-spacing:0; text-transform:none; font-size:12px; color:var(--muted)}
 
-.opts{display:grid;gap:7px}
+.opts{display:grid; grid-template-columns:1fr; gap:7px}
 .opts.two{grid-template-columns:1fr 1fr}
 .opts.three{grid-template-columns:repeat(3,1fr)}
-.opt{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;
-  background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;
-  font-size:14.5px;font-weight:700;color:var(--ink);width:100%}
-.opt small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
-.opt:active{transform:scale(.99)}
-.opt.on{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1px var(--red)}
-.opt:disabled{opacity:.4;background:#eee7db;cursor:not-allowed;color:var(--muted)}
-.opt:disabled:active{transform:none}
-.opt .chk{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--red);opacity:0}
-.opt.on .chk{opacity:1}
-.opts.two .opt,.opts.three .opt{justify-content:center;text-align:center}
-
-.f{margin-bottom:11px}
-.f label{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.f input,.f select,.f textarea{width:100%;background:#fff;border:1.5px solid var(--line);
-  border-radius:9px;padding:10px 11px;color:var(--ink)}
-.f textarea{min-height:70px;resize:vertical}
-.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--red)}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.check{display:flex;gap:9px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);
-  border-radius:10px;padding:11px 12px;margin-bottom:8px;font-size:14px;font-weight:600}
-.check input{margin:2px 0 0;flex:0 0 auto;width:17px;height:17px;accent-color:var(--red)}
-
-.nav{display:flex;gap:9px;margin-top:14px}
-.btn{border-radius:10px;padding:13px 16px;font-size:15px;font-weight:800;
-  border:1.5px solid var(--line);background:#fff;color:var(--ink)}
-.btn.pri{background:var(--red);border-color:var(--red);color:#fff;flex:1}
-.btn.pri:disabled{opacity:.42}
-.btn:active{transform:scale(.99)}
-
-.rail-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-.rail-price{background:var(--ink);color:#fff;padding:13px 15px}
-.rail-price small{display:block;font-size:10.5px;letter-spacing:.08em;opacity:.65;text-transform:uppercase}
-.rail-price strong{font-size:27px;letter-spacing:-.02em;display:block;margin-top:1px}
-.rail-price .note{font-size:11.5px;opacity:.75;margin-top:3px;display:block;line-height:1.4}
-.rail-list{padding:9px 15px}
-.rail-list div{display:flex;justify-content:space-between;gap:10px;font-size:13px;
-  padding:4px 0;border-bottom:1px solid var(--line)}
-.rail-list div:last-child{border-bottom:none}
-.rail-list span{color:var(--muted)}
-.rail-list b{font-weight:700;text-align:right}
-.rail-included{padding:11px 15px;border-top:1px solid var(--line)}
-.rail-included-title{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.rail-included ul{margin:0;padding:0 0 0 16px;list-style:disc}
-.rail-included li{font-size:12.5px;line-height:1.5;color:var(--ink);margin-bottom:2px}
-.rail-excluded{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line)}
-.rail-excluded p{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink)}
-.rail-area{padding:11px 15px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
-.rail-area b{font-size:12px;font-weight:800}
-.rail-area span{font-size:12px;line-height:1.45;color:var(--muted)}
-.rail-area.is-out b{color:var(--red)}
-
-.guard{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.45;border:1.5px solid}
-.guard b{display:block;margin-bottom:2px;font-size:12px;letter-spacing:.03em;text-transform:uppercase}
-.guard.stop{background:#fdf0f0;border-color:var(--red);color:#7d181e}
-.guard.warn{background:#fdf7ec;border-color:var(--amber);color:#7a560f}
-.guard.info{background:#eef4f9;border-color:var(--blue);color:#204a6b}
-
-.drawer{position:fixed;inset:0;background:rgba(35,26,20,.6);z-index:60;
-  display:flex;align-items:flex-end;justify-content:center}
-.drawer[hidden]{display:none}
-.drawer-in{background:var(--bg);width:100%;max-width:620px;max-height:88vh;overflow-y:auto;
-  border-radius:16px 16px 0 0;padding:18px 16px calc(26px + env(safe-area-inset-bottom))}
-.drawer-in h3{margin:0 0 3px;font-size:19px}
-.obj{border-top:1px solid var(--line);padding:12px 0}
-.obj b{display:block;font-size:14.5px;margin-bottom:4px}
-.obj span{display:block;font-size:13.5px;color:var(--muted);line-height:1.5}
-.obj em{display:block;font-style:normal;font-size:12.5px;color:var(--red);font-weight:700;margin-top:5px}
-.out-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);
-  border-radius:10px;padding:12px 13px;margin-bottom:7px;font-size:14.5px;font-weight:700;color:var(--ink)}
-.out-btn small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px}
-.status{font-size:13.5px;margin:8px 0;min-height:18px;line-height:1.45}
-
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:7px}
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.cal-nav strong{font-size:16px}
-.cal-nav button{background:#fff;border:1.5px solid var(--line);border-radius:9px;width:36px;height:36px;font-size:18px;font-weight:800;color:var(--ink)}
-.cal-nav button:disabled{opacity:.3;cursor:not-allowed}
-.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px}
-.cal-weekdays span{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
-.cal-blank{visibility:hidden}
-.cal-day{
-  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  background:#fff;border:1.5px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:700;color:var(--ink);
-  position:relative;
+/* Single-character choices (bedrooms, baths, hours, room counts) stay five
+   across even on a phone — at 390px that's a 68px button, comfortably over
+   the touch minimum, and it keeps the merged "About the home" screen down to
+   one thumb-scroll instead of four rows of near-empty buttons. */
+.opts.five{grid-template-columns:repeat(5,1fr)}
+.opts.five .o{justify-content:center; text-align:center; padding-inline:6px; font-size:16px}
+.opts.five .o .key{display:none}
+@media (max-width:330px){ .opts.five{grid-template-columns:repeat(4,1fr)} }
+.o{
+  position:relative; display:flex; align-items:center; gap:9px; text-align:left; cursor:pointer;
+  min-height:48px; padding:9px 12px 9px 10px; border-radius:9px;
+  background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink);
+  font-size:15px; font-weight:600; line-height:1.3; width:100%;
 }
-.cal-day.avail{border-color:rgba(159,32,39,.35)}
-.cal-day.avail:active{transform:scale(.94)}
-.cal-day.full{color:rgba(60,50,42,.32);background:#f0ebe1;cursor:not-allowed}
-.cal-day.today{box-shadow:0 0 0 2px rgba(198,161,100,.55)}
-.cal-day.sel{border-color:var(--red);background:#fdf3f3;box-shadow:inset 0 0 0 1.5px var(--red)}
-.cal-day small{font-size:8.5px;font-weight:800;color:var(--red)}
-.cal-day.full small{color:var(--muted)}
-.cal-day.sel small{color:var(--red)}
-.cal-key{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px}
-.cal-key span{display:flex;align-items:center;gap:5px}
-.cal-key i{width:9px;height:9px;border-radius:3px;display:inline-block}
-.cal-key i.avail{background:#fff;border:1.5px solid rgba(159,32,39,.5)}
-.cal-key i.today{background:#fff;box-shadow:0 0 0 2px rgba(198,161,100,.7)}
-.days{margin-bottom:12px}
+.o:hover{border-color:var(--muted)}
+.o.on{background:var(--red-wash); border-color:var(--red); color:var(--red-ink); font-weight:700}
+.o .key{
+  flex:0 0 auto; width:20px; height:20px; border-radius:4px; display:grid; place-items:center;
+  background:var(--sunk); border:1px solid var(--line-2); color:var(--muted);
+  font-size:10.5px; font-weight:800; font-variant-numeric:tabular-nums;
+}
+.o.on .key{background:var(--red); border-color:var(--red); color:#fff}
+@media (max-width:560px){ .o .key{display:none} .o{padding-left:12px} }
+.o .txt{min-width:0}
+.o .txt small{display:block; margin-top:2px; font-size:12.5px; font-weight:500; color:var(--muted); line-height:1.4}
+.o.on .txt small{color:var(--red-ink); opacity:.85}
+.o .amt{margin-left:auto; flex:0 0 auto; font-weight:800; font-variant-numeric:tabular-nums; font-size:14.5px}
+.o.center{justify-content:center; text-align:center}
+
+/* Fields */
+.f{margin-bottom:11px}
+.f:last-child{margin-bottom:0}
+.f label{display:block; margin-bottom:4px; font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+.f input,.f select,.f textarea{
+  width:100%; min-height:48px; padding:11px 12px; border-radius:9px;
+  background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink); font-size:16px;
+}
+.f textarea{min-height:76px; resize:vertical; line-height:1.45}
+.f-row{display:grid; grid-template-columns:1fr 110px; gap:10px}
+
+/* Guardrails: conditional, so they earn their space. */
+.guard{
+  display:flex; gap:9px; margin-top:11px; padding:11px 13px; border-radius:9px;
+  font-size:13.5px; line-height:1.5; border:1px solid;
+}
+.guard b{display:block; margin-bottom:2px; font-size:13px; font-weight:800}
+.guard .ic{flex:0 0 auto; font-size:14px; line-height:1.4}
+.guard.stop{background:var(--red-wash); border-color:var(--red); color:var(--ink)}
+.guard.stop b{color:var(--red-ink)}
+.guard.warn{background:var(--amber-wash); border-color:var(--amber); color:var(--ink)}
+.guard.warn b{color:var(--amber)}
+.guard.info{background:var(--blue-wash); border-color:var(--blue); color:var(--ink)}
+.guard.info b{color:var(--blue)}
+.guard.win{background:var(--green-wash); border-color:var(--green); color:var(--ink)}
+.guard.win b{color:var(--green)}
+
+/* ── Zone 4: the dock. Never scrolls away. ──────────────────────────── */
+.dock{
+  position:fixed; left:0; right:0; bottom:0; z-index:45;
+  display:flex; gap:10px; align-items:center;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:var(--panel); border-top:1px solid var(--line);
+  box-shadow:0 -6px 20px -12px rgba(16,20,26,.35);
+}
+.dock .back{
+  min-height:48px; min-width:56px; padding:0 15px; border-radius:10px; cursor:pointer;
+  background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink-2); font-weight:700;
+}
+.dock .go{
+  flex:1; min-height:48px; border-radius:10px; cursor:pointer; border:0;
+  background:var(--red); color:#fff; font-size:16px; font-weight:800; letter-spacing:.01em;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+}
+.dock .go:disabled{opacity:.55; cursor:default}
+.dock .go kbd{font:700 10px/1 "Public Sans",sans-serif; padding:3px 5px; border-radius:3px; background:rgba(255,255,255,.22)}
+@media (max-width:560px){ .dock .go kbd{display:none} }
+
+/* ── Side panel (desktop) / stacked (mobile): live recap only. ───────── */
+.side{display:flex; flex-direction:column; gap:12px}
+@media (max-width:999px){ .side{margin-top:12px} }
+.recap{background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow)}
+.recap-h{
+  padding:9px 14px; background:var(--sunk); border-bottom:1px solid var(--line);
+  font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.recap-row{display:flex; justify-content:space-between; gap:12px; padding:8px 14px; border-bottom:1px solid var(--line); font-size:13.5px}
+.recap-row:last-child{border-bottom:0}
+.recap-row span{color:var(--muted)}
+.recap-row b{font-weight:700; text-align:right; font-variant-numeric:tabular-nums}
+.recap-row.neg b{color:var(--green)}
+
+/* ── Lookup: one search over everything she used to hunt for. ───────── */
+.sheet{
+  position:fixed; inset:0; z-index:60; display:flex; flex-direction:column;
+  background:var(--bg);
+}
+.sheet[hidden]{display:none}
+.sheet-top{
+  display:flex; gap:9px; align-items:center; padding:12px 14px;
+  padding-top:calc(12px + env(safe-area-inset-top));
+  background:var(--panel); border-bottom:1px solid var(--line);
+}
+.sheet-top input{
+  flex:1; min-height:48px; padding:11px 14px; border-radius:10px; font-size:17px;
+  background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink);
+}
+.sheet-body{flex:1; overflow-y:auto; padding:12px 14px calc(20px + env(safe-area-inset-bottom))}
+.hit{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:13px 15px; margin-bottom:9px}
+.hit-k{
+  display:inline-block; margin-bottom:6px; padding:2px 7px; border-radius:3px;
+  font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  background:var(--sunk); color:var(--muted);
+}
+.hit-k.say{background:var(--red-wash); color:var(--red-ink)}
+.hit h3{margin:0 0 5px; font-size:15px; font-weight:800; line-height:1.35}
+.hit p{margin:0 0 6px; font-size:14.5px; line-height:1.55; color:var(--ink-2)}
+.hit p:last-child{margin-bottom:0}
+.hit .quote{font-family:Newsreader,Georgia,serif; font-size:16.5px; line-height:1.45; color:var(--ink)}
+/* The coaching note is useful once she's found the right card and useless
+   while she's still scanning, so it stays clamped until the card is tapped.
+   The top hit for a real query opens itself. */
+.hit{cursor:pointer}
+.hit .why{
+  font-size:13px; color:var(--muted); border-top:1px dashed var(--line-2);
+  padding-top:6px; margin-top:7px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.hit.open .why{-webkit-line-clamp:unset; overflow:visible}
+.hit .more{display:block; margin-top:5px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--blue)}
+.hit.open .more{display:none}
+.sheet-empty{text-align:center; color:var(--muted); padding:40px 20px; font-size:14.5px}
+.sheet-hint{padding:0 2px 10px; font-size:12px; color:var(--muted)}
+.sheet-hint b{color:var(--ink-2)}
+
+/* End-call sheet reuses .sheet */
+.out-btn{
+  display:block; width:100%; text-align:left; margin-bottom:8px; cursor:pointer;
+  min-height:56px; padding:11px 14px; border-radius:10px;
+  background:var(--panel); border:1.5px solid var(--line-2); color:var(--ink); font-size:15px; font-weight:700;
+}
+.out-btn small{display:block; font-weight:500; font-size:12.5px; color:var(--muted); margin-top:2px}
+.out-btn:hover{border-color:var(--muted)}
+
+/* Calendar (logic unchanged from 1.0; restyled to the new tokens) */
+.cal-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+.cal-nav button{min-height:44px; min-width:44px; border-radius:8px; cursor:pointer; background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink); font-weight:800; font-size:18px}
+.cal-nav button:disabled{opacity:.4; cursor:default}
+.cal-nav strong{font-weight:800; font-size:15px}
+.cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px}
+.cal-weekdays span{text-align:center; font-size:10px; font-weight:800; letter-spacing:.06em; color:var(--muted)}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
+.cal-blank{display:block}
+.cal-day{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  aspect-ratio:1; min-height:42px; border-radius:8px; border:1.5px solid transparent;
+  background:transparent; color:var(--muted); font-size:14px; font-weight:600;
+  cursor:default; font-variant-numeric:tabular-nums;
+}
+.cal-day.avail{background:var(--panel-2); border-color:var(--line-2); color:var(--ink); cursor:pointer}
+.cal-day.avail:hover{border-color:var(--muted)}
+.cal-day small{font-size:9.5px; font-weight:800; color:var(--green); line-height:1}
+.cal-day.sel{background:var(--red); border-color:var(--red); color:#fff}
+.cal-day.sel small{color:#fff; opacity:.85}
+.cal-day.today{box-shadow:inset 0 0 0 2px var(--amber)}
+.cal-day.full{opacity:.42}
+.cal-key{display:flex; flex-wrap:wrap; gap:14px; margin:10px 0 4px; font-size:11.5px; color:var(--muted)}
+.cal-key span{display:flex; align-items:center; gap:5px}
+.cal-key i{width:10px; height:10px; border-radius:3px; display:inline-block}
+.cal-key i.avail{background:var(--panel-2); border:1.5px solid var(--line-2)}
+.cal-key i.today{background:var(--panel-2); box-shadow:0 0 0 2px var(--amber)}
+.slots{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:7px; margin-top:6px}
+@media (max-width:360px){
+  /* Seven columns can't drop to six, so at the narrowest phone width the
+     cells shrink instead of the page scrolling sideways. */
+  .cal-grid,.cal-weekdays{gap:3px}
+  .cal-day{min-height:36px; font-size:13px}
+  .card{padding-left:11px; padding-right:11px}
+  .wrap{padding-left:9px; padding-right:9px}
+}
+.sub{margin:6px 0; font-size:13.5px; color:var(--muted); line-height:1.45}
+.btn{min-height:44px; padding:0 15px; border-radius:9px; cursor:pointer; background:var(--panel-2); border:1.5px solid var(--line-2); color:var(--ink); font-weight:700}
+
+.note{display:block; font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:3px}
+.setup-wrap{max-width:460px; margin:16vh auto 0; padding:0 18px}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
 </style>
 </head>
 <body>
 
-<header class="hd">
-  <div class="hd-brand"><h1><strong>RPC Call Console</strong></h1><small id="hdWho">Internal tool</small></div>
-  <div class="hd-acts">
-    <button class="hd-btn" type="button" onclick="openDrawer('drObj')">Objections</button>
-    <button class="hd-btn danger" type="button" onclick="openDrawer('drOut')">End Call</button>
+<header class="top">
+  <div class="who"><b id="whoName">Call Console</b><span id="whoSub">Internal tool</span></div>
+  <div class="top-actions">
+    <span class="clock" id="clock" title="Time on this call">0:00</span>
+    <div class="money" id="money"><b>—</b><small>Total</small></div>
+    <button class="tbtn" type="button" id="lookupBtn" onclick="openLookup()" aria-label="Look something up">
+      <span aria-hidden="true">🔍</span><span class="lbl">Look up</span><kbd>/</kbd>
+    </button>
+    <button class="tbtn danger" type="button" onclick="openSheet('endSheet')">End</button>
   </div>
 </header>
-<div class="prog"><i id="progFill" style="width:0%"></i></div>
-<div class="jump-rail" id="jumpRail"></div>
+
+<nav class="strip" id="strip" aria-label="Call steps"></nav>
 
 <div class="wrap">
-  <div class="cols">
-    <main id="main" aria-live="polite"></main>
-    <aside class="rail"><div id="rail"></div></aside>
-  </div>
+  <div class="col-main" id="main" aria-live="polite"></div>
+  <aside class="side" id="side"></aside>
 </div>
 
-<div class="drawer" id="drObj" hidden onclick="if(event.target===this)closeDrawer('drObj')">
-  <div class="drawer-in">
-    <h3>Objection handling</h3>
-    <p class="sub">Answer it, then go straight back to booking. The longer you talk after an objection, the more it sounds like you're negotiating.</p>
-    <div id="objList"></div>
-    <button class="btn pri" style="width:100%;margin-top:14px" onclick="closeDrawer('drObj')">Back to call</button>
-  </div>
+<div class="dock" id="dock" hidden>
+  <button class="back" type="button" id="backBtn" onclick="back()">Back</button>
+  <button class="go" type="button" id="goBtn" onclick="next()"><span id="goLabel">Next</span><kbd>↵</kbd></button>
 </div>
 
-<div class="drawer" id="drOut" hidden onclick="if(event.target===this)closeDrawer('drOut')">
-  <div class="drawer-in">
-    <h3>End call</h3>
-    <p class="sub">If they booked, just close this — it's already saved. Use these only when the call ends <b>without</b> a booking, so the lead still gets followed up.</p>
+<!-- Lookup: replaces the always-on scope rail AND the 16-item objection drawer -->
+<section class="sheet" id="lookupSheet" hidden aria-label="Look something up">
+  <div class="sheet-top">
+    <input id="lookupInput" type="search" placeholder="oven, deposit, pay, carpet, not home…" autocomplete="off" oninput="renderLookup()">
+    <button class="tbtn" type="button" onclick="closeSheet('lookupSheet')">Close</button>
+  </div>
+  <div class="sheet-body"><div id="lookupResults"></div></div>
+</section>
+
+<section class="sheet" id="endSheet" hidden aria-label="End the call">
+  <div class="sheet-top">
+    <div class="who" style="flex:1"><b>How did the call end?</b><span>Logs the lead so it can be worked again</span></div>
+    <button class="tbtn" type="button" onclick="closeSheet('endSheet')">Close</button>
+  </div>
+  <div class="sheet-body">
+    <div class="f"><label for="outNotes">Anything worth noting</label>
+      <textarea id="outNotes" placeholder="What they said, what to try next time…"></textarea></div>
     <div id="outList"></div>
-    <div class="f"><label for="outNotes">Follow-up notes</label>
-      <textarea id="outNotes" placeholder="What did they say? What would change their mind?"></textarea></div>
-    <div class="status" id="outStatus"></div>
-    <button class="btn" style="width:100%" onclick="closeDrawer('drOut')">Back to call</button>
+    <p id="outStatus" class="note" style="margin-top:10px"></p>
+    <button class="out-btn" type="button" onclick="closeSheet('endSheet')" style="margin-top:14px;text-align:center;font-weight:700">Never mind — back to the call</button>
   </div>
-</div>
+</section>
 
 <script src="../js/rp-pricing-engine.js"></script>
 <script>
@@ -280,76 +453,41 @@ const rpState = {
   bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:""
 };
 
-/* "custom" is a console-only pseudo-service — not part of the shared
-   pricing engine's rpServices. It's the fallback for anything that
-   doesn't fit a real service (commercial, specialty/one-off jobs). No
-   price is ever given; it captures contact info + what they need, then
-   logs it as a lead via /lead for the office to follow up with an
-   in-person visit or photo request. */
-const FLOWS = {
-  /* "condition" removed for both moveout and deep — Standard/Heavy/
-     Extreme pricing was dropped entirely for moveout (see
-     rp-pricing-engine.js), and deep has been flat-anchor priced with no
-     sqft/bedroom/condition dependency since an earlier round — this
-     console just never caught up until now. That was a previously-
-     flagged gap (Liz was being asked size/condition questions that had
-     zero effect on Deep's price); fixed here alongside the moveout work.
-     Same for maintenance's sqft/bedrooms/bathrooms.
 
-     "intent" (rental vs. selling + PM/realtor) and "questionnaire"
-     (water/power/A/C/mold/pests hard-stop) added to moveout, matching
-     /book exactly. */
-  /* Round 22: "questionnaire" moved AHEAD of "addons". It used to sit
-     after, so Liz worked carpet, junk and windows onto a job and only
-     then discovered the water was off and the job couldn't happen as
-     booked — the productive part of the call spent selling extras on a
-     clean that routes to a callback. /book has always asked the
-     hard-stops before anything priced; this brings the phone in line. */
-  /* Round 25 (found while auditing /book vs /call for consistency): "sqft"
-     was still in these two flows from before round 24 dropped square
-     footage from Move-Out pricing on /book entirely -- flat bedroom-tier
-     price, no large-home surcharge, by direct instruction. Nobody
-     revisited /call's flow when that shipped, so Liz was still asking
-     home size and rpServiceBasePrice() was still adding the (still-live,
-     never-deleted) $100/$200/$300 surcharge -- or routing a >3,400 sq ft
-     home to a custom quote via rpMoveoutIsCustomSqft() -- for a phone
-     caller, while the identical home online got the flat, lower, always-
-     priceable number. A caller could be quoted MORE than the website
-     would ever quote for the same house, or get "we'll call you back"
-     for a home /book prices instantly. Removed here so both channels
-     read the same rpState.sqft === null and compute the same price. If
-     the large-home surcharge is ever wanted back, it has to come back on
-     /book first -- /call should never diverge from what the site quotes. */
-  /* Round 26 (direct instruction: "think differently, how's the sales
-     flow, what's counter-intuitive" -- a fresh pass, not a consistency
-     audit): "tiers" is new here. It ports /book's round-19c decision
-     forward onto the phone -- before that round, /book also made a
-     customer commit to Inspection Ready vs. Express at the very first
-     question, before it could show a single real dollar figure. /book
-     fixed that for itself (one "Move-Out Cleaning" entry, ask size
-     first, THEN show two real prices side-by-side to choose from) but
-     /call was never brought forward: the "service" list below still had
-     Inspection Ready and Express as two separate first-question buttons,
-     so Liz picked a tier for the caller from a landlord/inspector guess
-     alone, before a single number existed -- the exact blind-commitment
-     problem /book was rebuilt to avoid. Now "service" offers one merged
-     "Move-Out Cleaning" entry (see the service-step render below), and
-     this new "tiers" step -- inserted after "questionnaire", before
-     "addons", same position as /book's "moveouttiers" -- shows both real
-     prices for the home just described and she picks (or confirms) the
-     tier there, out loud, with the caller. See chooseMoveoutTier(). */
-  moveout:        ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
-  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
-  deep:        ["service","caller","addons","quote","contact","calendar","done"],
-  maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
-  carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
-  hourly:      ["service","caller","cleaners","hours","addons","quote","contact","calendar","done"],
-  airbnb:      ["service","caller","bedrooms","bathrooms","quote","contact","calendar","done"],
-  custom:      ["service","caller","customDetails","contact","done"]
+/* =========================================================================
+   FLOW — 12 steps became 9.
+   =========================================================================
+   1.0 gave every question its own screen, so a move-out call was twelve
+   screen transitions, several of them a single tap: bedrooms, then
+   bathrooms, then three yes/no questions, then renting-or-selling. Each
+   transition costs a beat of dead air on the phone.
+
+   "home" merges bedrooms + bathrooms + the three hard-stop checks into one
+   screen — they are all just facts about the property, they all fit
+   without scrolling, and it is the block Liz reads out as one breath.
+   "intent" (renting vs selling) moved onto the tier screen, because that
+   is the only place it changes what she does: it decides which tier she
+   leads with. "hourly" merges cleaners + hours for the same reason.
+
+   Step ORDER is unchanged in every way that matters: contact is still
+   captured before any price is spoken, and the hard-stop checks still
+   land before the tier screen shows a number.
+   ========================================================================= */
+const FLOWS = {
+  moveout:        ["service","caller","home","tiers","addons","quote","contact","calendar","done"],
+  moveoutrefresh: ["service","caller","home","tiers","addons","quote","contact","calendar","done"],
+  deep:           ["service","caller","addons","quote","contact","calendar","done"],
+  maintenance:    ["service","caller","frequency","addons","quote","contact","calendar","done"],
+  carpet:         ["service","caller","rooms","quote","contact","calendar","done"],
+  hourly:         ["service","caller","hourly","addons","quote","contact","calendar","done"],
+  airbnb:         ["service","caller","home","quote","contact","calendar","done"],
+  custom:         ["service","caller","customDetails","contact","done"]
 };
+
 function flow(){ return rpState.service ? FLOWS[rpState.service] : ["service"]; }
 function isCustomService(){ return rpState.service==="custom"; }
 function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i; }
+
 
 /* =========================================================================
    CALL SCRIPT
@@ -494,104 +632,99 @@ function doneSayLine(){
   return `\u201cYou're all set for ${rpState.bookedAt||"the time we picked"}. You'll get a text confirmation in just a second \u2014 and if anything comes up before then, have them call back and ask for ${csrGreetingName()}.\u201d`;
 }
 
-const SCRIPT = {
-  /* "service" now runs FIRST \u2014 ask what they need before asking who
-     they are. Old order (identity before purpose) read as interrogative
-     in the first five seconds of the call. */
-  service:{say:()=>`\u201cThanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} \u2014 what can we help you with today?\u201d`,
-    listen:"Let them describe it in their own words first. Callers move for all kinds of reasons \u2014 military transfer, new job, new place \u2014 don't assume they know military terms and don't assume they don't.",
-    /* Round 25 (direct instruction): "Prepare Liz... to have conversations
-       about the difference between Move-Out Express and Inspection Ready.
-       I think this sells to both the customer who needs it perfect and
-       the budget people." This is the moment to say it -- right when a
-       move-out caller first states their need, before either tier gets
-       picked and before a price gets said. The scope cheat sheet on the
-       quote screen (further down the call) still has the size-specific
-       numbers; this is the up-front "how do I even frame this" version.
 
-       Round 26 (fresh-look pass, "apply all recommended settings"):
-       trimmed -- the actual dollar-figure pitch for each tier moved to
-       the new "tiers" screen's watch text below, since that's now where
-       real numbers exist to say out loud. This step's job is only to
-       plant the qualitative question early, before bedrooms/bathrooms
-       are even asked, same spirit as before. */
-    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number.  \u2022  MOVING OUT? Ask now, before you've gathered bedrooms and bathrooms: \u201cIs a landlord, property manager, or a buyer's inspector going to walk through and check the place against a list?\u201d You're not locking in a tier yet \u2014 just noting the lean, so you already know which real price to lead with once you reach the two-price screen a few questions from now."},
-  caller:{say:"\u201cHappy to help with that \u2014 let me just grab your name and a good number for you in case we get cut off.\u201d",
-    listen:"Get the name and number BEFORE anything else past this point.",
-    watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
-  sqft:{say:"\u201cRoughly how big is the home? A ballpark is fine.\u201d",
-    listen:"Lawton-area rough sizes by bedroom count \u2014 1-bed: 600\u2013900 \u00b7 2-bed: 900\u20131,300 \u00b7 3-bed: 1,400\u20131,800 \u00b7 4-bed: 1,800\u20132,200 \u00b7 5-bed: 2,400+. This is just a starting estimate \u2014 if it's off, we adjust on-site, not a big deal.",
-    watch:"If the size sounds way off for the bedroom count, don't push back on it \u2014 just say \u2018no problem, we'll confirm when we arrive\u2019 and move on. It's not worth making them defend a guess."},
-  bedrooms:{say:"\u201cHow many bedrooms?\u201d",
-    listen:"Bedrooms only. An office or bonus room counts only if they'd call it a bedroom.",
-    watch:"Don't count a converted garage or sunroom \u2014 put it in the notes instead."},
-  bathrooms:{say:"\u201cHow many bathrooms?\u201d",
-    listen:"Count full bathrooms only \u2014 if they say \u201ctwo and a half,\u201d that's 2.",
-    watch:"Half-baths aren't priced separately, so don't make a thing of it if they're not sure whether it counts."},
-  condition:{say:"\u201cLast one on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
-    listen:"Standard sounds like: \u2018pretty normal,\u2019 \u2018lived-in,\u2019 \u2018nothing crazy.\u2019 Heavy sounds like: trash, grease, pet hair, \u2018hasn't been cleaned in a while.\u2019 Extreme sounds like: \u2018honestly it's bad,\u2019 mold, strong pet odor, \u2018hasn't really been touched in months.\u2019 Stuck between two? Pick the higher one \u2014 the crew finding it lighter than expected costs nothing; being sent in short costs their whole day.",
-    watch:"Don't default to Standard because you're unsure or don't want to sound judgmental about someone's house \u2014 that's the same costly mistake as underpricing on purpose, just a nicer-feeling reason for it. If they push back after you read the tier back, hold your read \u2014 describe what they told you, let the crew confirm on arrival."},
-  /* Round 26: new step, new script. This is the payoff of asking the
-     landlord/inspector question back on "service" -- real dollar numbers
-     for THIS home, said out loud, instead of a tier picked on a guess. */
-  tiers:{say:()=>{
+/* =========================================================================
+   WHAT SHE SAYS, AND ONE LINE ABOUT IT
+   =========================================================================
+   1.0 split coaching three ways — SAY / LISTEN / WATCH — and LISTEN and
+   WATCH were not a real distinction; both meant "coaching," so under
+   pressure there was no way to know which box held the thing you needed.
+   Worse, the same instruction was often printed three or four times on one
+   screen. On the add-ons screen, "ask them by name" appeared as the
+   subtitle, in LISTEN, inside a 100-word WATCH paragraph, AND in a
+   guardrail box.
+
+   Now: `say` is the line, verbatim, and it is the only thing on screen by
+   default. `coach` is one short paragraph, collapsed, one keypress away.
+   Anything conditional — do not quote this job, the address read-back, the
+   tier-switch math — stays in guardrails(), which only fire when they
+   actually apply, so they keep earning their space.
+   ========================================================================= */
+const LINES = {
+  service:{
+    say:()=>`“Thanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} — what can we help you with today?”`,
+    coach:"Let them describe it in their own words first — people move for all kinds of reasons, so don't assume military and don't assume not. <b>If it's a move-out, ask now, before anything else: is a landlord, property manager or inspector going to walk through and check the place against a list?</b> You're noting the lean, not picking a tier — real numbers come three screens from now."
+  },
+  caller:{
+    say:"“Happy to help with that — let me grab your name and a good number in case we get cut off.”",
+    coach:"The most important screen in the console. If the call drops after this you still have a lead you can call back. If it drops before, you have nothing."
+  },
+  home:{
+    say:"“Let me get a couple of quick details on the place — how many bedrooms, and how many full bathrooms?”",
+    coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the three checks: water, A/C, mold or pests. If any of them fail, the job can't be booked as normal and you do not quote a price."
+  },
+  tiers:{
+    say:()=>{
       const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
       const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
-      return `“For a home like that, I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
+      return `“For a home like that I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
     },
-    listen:"Which one they actually pick once real numbers are on the table — not just the qualitative lean from the service question. Someone who sounded like “no inspection” earlier can still choose Inspection Ready once they hear it's only a small gap for full deposit protection.",
-    watch:"Lead with whichever tier matches what they told you back on the service question. Landlord, PM, or inspector expected (or not sure) → “That's the one most people book for a move-out — full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.” Flat no, just handing over keys → Express is a genuine, honest recommendation, not a downsell: “You don't need to pay for a guarantee nobody's going to test — Express gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.” Both tiers are worth being proud to sell — the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn once add-ons start stacking up on Express, the quote screen will flag it if Inspection Ready has become the better deal."},
-  addons:{say:addonsSayLine,
-    listen:"Ask these by name. Customers almost never volunteer them.",
-    watch:()=>`Pet stains or odor is a crew-prep flag, not automatically a condition bump.  \u2022  ASK THE MILITARY QUESTION HERE, before you say the price, not after they push back on it: \u201cAnd are you or your spouse military or a first responder? I can take ${Math.round(MILITARY_DISCOUNT_RATE*100)}% off if so.\u201d This is Lawton \u2014 a large share of callers qualify, it caps at $${MILITARY_DISCOUNT_CAP}, and offered UP FRONT it's a reason to book with us. Held back until they complain, the same $${MILITARY_DISCOUNT_CAP} only buys you a save on a price objection you'd already lost ground to. Tick the box below so the quote screen shows the discounted number.  \u2022  Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price.`},
-  frequency:{say:"\u201cWould you want this one-time, or set up on a regular schedule?\u201d",
-    listen:"Recurring is worth more long-term.",
-    watch:"If they hesitate, book One-Time. They can switch later; a lost booking can't."},
-  rooms:{say:"\u201cHow many carpeted rooms are we cleaning?\u201d",
-    listen:"Count rooms, not square footage.",
-    watch:"There's a 2-room minimum \u2014 say that up front, not after they've said one room."},
-  cleaners:{say:"\u201cHow many cleaners would you like?\u201d",
-    listen:"Two is the normal default for most homes.",
-    watch:"More cleaners is faster, not cheaper. Make sure they hear it's per cleaner, per hour."},
-  hours:{say:"\u201cAnd about how many hours do you think you'll need?\u201d",
-    listen:()=>`${HOURLY_MIN_HOURS}-hour minimum ($${HOURLY_RATE_PER_CLEANER*HOURLY_MIN_HOURS} for one cleaner). Reads from the pricing engine, so it can't drift from what the site quotes.`,
-    watch:"If they don't know, ask what they want done and estimate for them \u2014 don't make them guess."},
-  quote:{say:quoteSayLine,
-    listen:"Say the number plainly, then STOP TALKING. Let them respond first.",
-    watch:"Pause 2\u20133 seconds after the price. If they don't jump in with a question or objection, that's your cue \u2014 move straight into \u2018Perfect, let me grab your address\u2019 on the next screen. Don't sit in dead silence waiting for them to bring up booking; you lead into it."},
-  contact:{say:"\u201cPerfect \u2014 let me grab the address and get you on the schedule.\u201d",
-    listen:"Read the address back out loud, digit by digit on the house number.",
-    watch:"Wrong address = wasted crew trip and a lost day. Confirm it verbally before moving on."},
-  customDetails:{say:"\u201cThat's a bit outside our standard services, so let me get some details and we'll follow up with a firm quote.\u201d",
-    listen:"Get a clear description of the job \u2014 what, where, how big, anything unusual.",
-    watch:"Set the expectation now: this will likely need an in-person visit or some photos before we can give a real number. Don't guess a price out loud, even a rough one."},
-  calendar:{say:calendarSayLine,
-    listen:"Offer two specific days. Don't ask an open \u201cwhat day works?\u201d",
-    watch:calendarWatchLine},
-  done:{say:doneSayLine,
-    listen:"Confirm they got the text before hanging up.",
-    watch:"Don't hang up without repeating the date and time one more time."}
+    coach:"Lead with whichever tier matches what they told you at the start. Inspection expected, or they're not sure → <b>“That's the one most people book — full interior reset, oven to baseboards, and if something gets flagged after you're gone we come back and fix it free.”</b> Flat no, just handing over keys → Express is an honest recommendation, not a downsell: <b>“No point paying for a guarantee nobody's going to test.”</b> Both are worth being proud to sell."
+  },
+  addons:{
+    say:addonsSayLine,
+    coach:"Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. Pet odour is a crew-prep flag, not a price change. Before you move to the price, try “Sound good so far?” — hesitation is cheap to fix here and expensive to fix after the number."
+  },
+  frequency:{
+    say:"“Would you want this one-time, or set up on a regular schedule?”",
+    coach:"Recurring is worth far more long-term, but if they hesitate, book One-Time. They can switch later; a lost booking can't."
+  },
+  rooms:{
+    say:"“How many carpeted rooms are we cleaning?”",
+    coach:"Count rooms, not square footage. Two-room minimum — say that up front, not after they've told you it's one room."
+  },
+  hourly:{
+    say:"“How many cleaners, and roughly how many hours do you think you'll need?”",
+    coach:"Two cleaners is the normal default. More hands is <em>faster</em>, not cheaper — make sure they hear it's per cleaner, per hour. If they don't know how long, ask what they want done and estimate it for them rather than making them guess."
+  },
+  customDetails:{
+    say:"“That's a bit outside our standard services, so let me get some details and we'll follow up with a firm quote.”",
+    coach:"Get what, where, how big, and anything unusual. Set the expectation now that this needs a look or some photos first — and do not guess a price out loud, not even a rough one."
+  },
+  quote:{
+    say:quoteSayLine,
+    coach:"Give the number once, plainly, then stop talking. Pause two or three seconds. If they don't come back with a question, that's your cue — go straight into “Perfect, let me grab the address.” Don't sit in silence waiting for them to raise booking; you lead into it."
+  },
+  contact:{
+    say:"“Perfect — let me grab the address and get you on the schedule.”",
+    coach:"Read the address back out loud, digit by digit on the house number. A wrong address is the number one cause of a wasted crew trip and a lost day."
+  },
+  calendar:{
+    say:calendarSayLine,
+    coach:calendarWatchLine
+  },
+  done:{
+    say:doneSayLine,
+    coach:"Repeat the date and time one more time before you hang up, and confirm they got the text."
+  }
 };
-function resolveScript(step){
-  const e=SCRIPT[step]; if(!e) return null;
+
+/* Hourly is the one service where a CSR can create real downstream risk —
+   a partial clean sold to someone who then fails a move-out inspection. The
+   qualifier and the guarantee carve-out get forced into the line itself at
+   the steps where they matter, same as 1.0 did. */
+function lineFor(step){
+  const e = LINES[step];
+  if(!e) return null;
   const out = {
-    say: typeof e.say==="function"?e.say():e.say,
-    listen: typeof e.listen==="function"?e.listen():e.listen,
-    watch: typeof e.watch==="function"?e.watch():e.watch
+    say: typeof e.say==="function" ? e.say() : e.say,
+    coach: typeof e.coach==="function" ? e.coach() : e.coach
   };
-  /* Hourly Cleaning is the one service where the CSR can create real
-     downstream risk: a partial clean sold to a move-out caller who then
-     fails inspection. Force the qualifier and the guarantee carve-out
-     into the rail at the steps where they actually matter. */
   const a = angle();
-  if(rpState.service === "hourly"){
-    if(step === "cleaners" || step === "hours"){
-      if(a.qualifier) out.say = `\u201c${a.qualifier}\u201d  \u2014 then: ` + out.say;
-      out.watch = [a.guaranteeWarning, out.watch].filter(Boolean).join("  \u2022  ");
-    }
-    if(step === "contact" || step === "quote"){
-      out.watch = [a.scopeWarning, out.watch].filter(Boolean).join("  \u2022  ");
-    }
+  if(rpState.service==="hourly"){
+    if(step==="hourly" && a.qualifier) out.say = `“${a.qualifier}” — then: ` + out.say;
+    if(step==="hourly" && a.guaranteeWarning) out.coach = `<b>${a.guaranteeWarning}</b> ` + out.coach;
+    if((step==="contact"||step==="quote") && a.scopeWarning) out.coach = `<b>${a.scopeWarning}</b> ` + out.coach;
   }
   return out;
 }
@@ -731,26 +864,8 @@ const QUOTE_SCREEN_OBJECTION_KEYS = [
   "\u201cCan you do better on price?\u201d",
   "\u201cI need to think about it / talk to my spouse.\u201d"
 ];
-function quoteCloseHelpersHtml(){
-  const objs = OBJECTIONS.filter(o => QUOTE_SCREEN_OBJECTION_KEYS.includes(o.q));
-  const urgency = quoteUrgencyLine();
-  return `<div class="script" style="margin-bottom:13px">
-    ${urgency?`<div class="script-row"><span class="tag" style="color:var(--red)">Urgency</span><span class="say-text" style="font-size:14.5px">${urgency}</span></div>`:""}
-    <div class="script-row"><span class="tag t-close">Close</span><span class="say-text" style="font-size:14.5px">
-      ${QUOTE_CLOSERS.map(c=>`<div style="margin-bottom:5px">${c}</div>`).join("")}
-    </span></div>
-    <div class="script-row muted"><span class="tag t-pushback">Pushback</span><span>
-      ${objs.map(o=>`<div style="margin-bottom:8px"><b style="color:var(--ink);font-weight:700">${o.q}</b><br>${typeof o.a==="function"?o.a():o.a}</div>`).join("")}
-      <div style="font-size:12px">Anything else \u2014 tap Objections above.</div>
-    </span></div>
-  </div>`;
-}
-/* Only fires when the loaded calendar actually shows 6 or fewer open
-   slots across the next two months (same threshold as calendarSayLine).
-   Silent otherwise — no fallback "we're pretty busy" guess if the real
-   data doesn't support it. If slots haven't finished loading yet
-   (pickService's background fetch is still in flight), also silent
-   rather than showing a stale or premature number. */
+
+
 function quoteUrgencyLine(){
   if(rpState.slotsLoading || !Object.keys(rpState.availableSlots||{}).length) return "";
   const days=availableDateKeys();
@@ -770,6 +885,7 @@ const OUTCOMES = [
   ["Call dropped","Disconnected before finishing"]
 ];
 
+
 /* =========================================================================
    GUARDRAILS — the dummy-proofing layer. "stop" blocks the Next button.
    ========================================================================= */
@@ -778,11 +894,7 @@ function guardrails(){
   if(rpIsCustomQuoteOnly() && ["quote","contact","calendar"].includes(s))
     g.push({level:"stop",title:"Do not quote a price",
       body:"This job is custom-quote only. Book the visit, tell them the office confirms pricing before the cleaning date, and do NOT say a dollar amount out loud \u2014 even a rough one. A number said on the phone is the number they expect."});
-  if(s==="condition" && rpState.condition==="Standard Condition" &&
-     (rpState.petWasteConcern||rpState.hazardConcern||rpState.moldConcern))
-    g.push({level:"warn",title:"Condition looks under-tagged",
-      body:"You flagged pets, trash, or mold but tagged the home Standard. If any of it is significant this should be Heavy or Extreme \u2014 otherwise the crew eats the extra hours."});
-  if(["questionnaire","bedrooms","bathrooms","sqft","tiers","addons"].includes(s) && rpMoveoutBlocked())
+  if(["home","tiers","addons","quote"].includes(s) && rpMoveoutBlocked())
     g.push({level:"stop",title:"Do not give a price on this call",
       body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
   if(rpState.militaryDiscount && !rpState.militaryVerified)
@@ -791,12 +903,13 @@ function guardrails(){
   if(s==="contact" && rpState.address1 && !rpState.addressReadBack)
     g.push({level:"warn",title:"Read the address back",
       body:"Say the full address out loud and have them confirm before continuing. Wrong address is the #1 cause of a wasted crew trip."});
-  if(s==="quote" && !rpIsCustomQuoteOnly() && rpFinalPrice()>0)
-    g.push({level:"info",title:"Say it, then stop",
-      body:"Give the number once, plainly, then be quiet. Silence is them thinking, not them saying no."});
-  if(s==="addons" && ["moveout","moveoutrefresh"].includes(rpState.service) && rpAddonsTotal()===0)
-    g.push({level:"info",title:"Ask all three by name",
-      body:"Carpet, exterior windows, garage. Most customers won't raise them on their own, and they're the easiest revenue on the call."});
+  /* Console 2.0: the "Say it, then stop" and "Ask all three by name" info
+     guardrails that used to live here are gone. Both are unconditional
+     advice about the current step, and both are now the first sentence of
+     that step's Coach line -- printing them a second time in a coloured box
+     was exactly the duplication this rewrite exists to remove. Guardrails
+     are for things that are only true SOMETIMES: this job can't be quoted,
+     the address wasn't read back, the tier maths just flipped.  */
   /* Round 25 (direct instruction: "I need to make money and the
      expectations need to be clear" -- and the pricing itself was built so
      buying every excluded-scope add-on on Express always costs MORE than
@@ -822,21 +935,19 @@ function hasBlockingGuard(){ return guardrails().some(x=>x.level==="stop"); }
 function normalizePhone(v){ return String(v||"").replace(/\D/g,"").slice(0,10); }
 function phoneOk(v){ return normalizePhone(v).length===10; }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim()); }
+
+
+/* ---------- Validation (merged steps) ---------- */
 function stepValid(){
   switch(rpState.step){
     case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone);
     case "service":   return !!rpState.service;
-    case "sqft":      return !!rpState.sqft;
-    case "bedrooms":  return !!rpState.bedrooms;
-    case "bathrooms": return !!rpState.bathrooms;
-    case "condition": return !!rpState.condition;
-    case "intent":    return !!rpState.moveoutRentalOrSelling;
-    case "questionnaire": return rpMoveoutQuestionnaireAnswered();
+    case "home":      return !!rpState.bedrooms && !!rpState.bathrooms
+                        && (["moveout","moveoutrefresh"].includes(rpState.service) ? rpMoveoutQuestionnaireAnswered() : true);
     case "tiers":     return !!rpState.moveoutTierChosen;
     case "frequency": return !!rpState.frequency;
     case "rooms":     return Number(rpState.carpetRooms)>0;
-    case "cleaners":  return !!rpState.cleanerCount;
-    case "hours":     return !!rpState.hourCount;
+    case "hourly":    return !!rpState.cleanerCount && !!rpState.hourCount;
     case "addons":    return true;
     case "quote":     return rpState.quotedAloud;
     case "contact":   return rpState.address1.trim().length>2 && rpState.city.trim().length>1
@@ -848,329 +959,535 @@ function stepValid(){
   }
 }
 
-/* ---------- Render ---------- */
+/* =========================================================================
+   VIEW
+   ========================================================================= */
 const el = id => document.getElementById(id);
 const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function opt(label,onclick,selected,sub){
-  return `<button type="button" class="opt${selected?" on":""}" onclick="${onclick}"><span>${label}${sub?`<small>${sub}</small>`:""}</span><span class="chk">\u2714</span></button>`;
+function fmtPhone(v){
+  const d=normalizePhone(v);
+  return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : v;
 }
-function chk(field,label){
-  return `<label class="check"><input type="checkbox" ${rpState[field]?"checked":""} onchange="toggle('${field}')"><span>${label}</span></label>`;
+
+/* Every tappable option also registers a number key. Liz on a laptop never
+   has to reach for the mouse; Liz on a phone never sees the numbers. */
+let KEYMAP = [];
+function opt(label, onclick, selected, sub, amount){
+  const n = KEYMAP.length + 1;
+  if(n<=9) KEYMAP.push(onclick);
+  return `<button type="button" class="o ${selected?"on":""}" onclick="${onclick}" aria-pressed="${selected?"true":"false"}">
+    ${n<=9?`<span class="key" aria-hidden="true">${n}</span>`:""}
+    <span class="txt">${label}${sub?`<small>${sub}</small>`:""}</span>
+    ${amount?`<span class="amt">${amount}</span>`:""}
+  </button>`;
+}
+function chk(field,label,sub){
+  return opt(label, `toggle('${field}')`, !!rpState[field], sub);
 }
 
 const TITLES = {
-  service:["What can we help you with?",""],
-  caller:["Who's calling?","Name and number \u2014 you'll need it either way."],
-  sqft:["About how big is the home?",""],
-  bedrooms:["How many bedrooms?",""],
-  bathrooms:["How many bathrooms?",""],
-  condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
-  intent:["Rental or selling?","Ask before pricing \u2014 capture the PM/realtor if there is one."],
-  questionnaire:["A few quick facts","Water, A/C, mold, pests. If anything fails, do not quote a price."],
-  tiers:["Here's what fits — two real prices","Present both, out loud, and let them pick."],
-  frequency:["One-time or recurring?",""],
-  rooms:["How many carpeted rooms?","2-room minimum."],
-  cleaners:["How many cleaners?",""],
-  hours:["How many hours?","3-hour minimum."],
-  addons:["Anything to add on?","Ask carpet, junk, windows, and garage by name."],
-  quote:["Give the quote","Say it once, plainly, then stop talking."],
-  contact:["Service address","Read it back out loud before continuing."],
-  customDetails:["What do they need?","Get enough detail for the office to follow up."],
-  calendar:["Pick a date and time","Offer two specific options."],
-  done:["All set",""]
+  service:      ["What do they need?",""],
+  caller:       ["Who's calling?","Name and number first — everything else can be recovered."],
+  home:         ["About the home",""],
+  tiers:        ["Two real prices","Present both out loud and let them pick."],
+  addons:       ["Anything to add on?",""],
+  frequency:    ["One-time or recurring?",""],
+  rooms:        ["How many carpeted rooms?",""],
+  hourly:       ["Cleaners and hours",""],
+  customDetails:["What do they need?",""],
+  quote:        ["Give the quote",""],
+  contact:      ["Service address",""],
+  calendar:     ["Pick a date and time",""],
+  done:         ["All set",""]
 };
-const SHORT_LABELS = {
-  service:"Service", caller:"Contact", sqft:"Size", bedrooms:"Beds", bathrooms:"Baths",
-  condition:"Condition", tiers:"Tier", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
-  hours:"Hours", addons:"Add-ons", quote:"Quote", contact:"Address",
-  customDetails:"Details", calendar:"Calendar", done:"Done",
-  intent:"Reason", questionnaire:"Checks"
+const SHORT = {
+  service:"Service", caller:"Caller", home:"Home", tiers:"Tier", addons:"Add-ons",
+  frequency:"Frequency", rooms:"Rooms", hourly:"Time", customDetails:"Details",
+  quote:"Quote", contact:"Address", calendar:"Calendar", done:"Done"
 };
 
 function screenHtml(){
   const s=rpState.step;
 
-  if(s==="caller") return `
-    <div class="f"><label for="nm">Caller name *</label>
-      <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" oninput="set('fullName',this.value)"></div>
-    <div class="f"><label for="ph">Best callback number *</label>
-      <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" oninput="set('phone',this.value)"></div>
-    <div class="f"><label for="src">How did they hear about us? (Optional)</label>
-      <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">\u2014</option>
-      ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
-        .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
-
   if(s==="service"){
-    /* Round 26: was two separate rows here -- "Inspection Ready Move-Out"
-       and "Move-Out Express" -- forcing Liz to lock in a tier for the
-       caller before a single real number existed, off a landlord/
-       inspector guess alone. Merged to one "Move-Out Cleaning" entry
-       (filtering "moveoutrefresh" out of this list; rpServices itself is
-       untouched since /call's other screens and the shared engine still
-       need both real keys). The actual tier choice now happens on the
-       new "tiers" screen once bedrooms/bathrooms are known -- same order
-       /book has used since round 19c. */
     const items = Object.entries(rpServices).filter(([k])=>k!=="moveoutrefresh").map(([k,v])=>
       opt(k==="moveout" ? "Move-Out Cleaning" : v.name, `pickService('${k}')`,
         rpState.service==="moveout"||rpState.service==="moveoutrefresh" ? k==="moveout" : rpState.service===k,
-        k==="moveout" ? "One entry covers both tiers. Ask the landlord/inspector question now (see Watch below) -- you'll show real numbers for both a few questions from now."
-        : k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
+        k==="moveout" ? "Both tiers. You'll show two real prices in a moment."
+        : k==="hourly" ? "Only certain areas. 3-hr minimum. Ask first: moving out, or living in it?" : null)
     ).join("");
-    const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
-      "Commercial, specialty, or one-of-a-kind \u2014 we'll follow up with a real quote.");
-    return `<div class="opts">${items}${customBtn}</div>`;
+    return `<div class="opts">${items}${opt("Something Else / Custom Quote","pickService('custom')",rpState.service==="custom","Commercial or one-of-a-kind — no price on this call.")}</div>`;
   }
 
-  if(s==="customDetails") return `
-    <div class="f"><label for="cd">What do they need?</label>
-      <textarea id="cd" placeholder="Describe the job \u2014 commercial space, specialty request, rough size, anything unusual\u2026" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
+  if(s==="caller") return `
+    <div class="f"><label for="nm">Caller name</label>
+      <input id="nm" value="${esc(rpState.fullName)}" placeholder="First and last" autocomplete="off" oninput="set('fullName',this.value)"></div>
+    <div class="f"><label for="ph">Best callback number</label>
+      <input id="ph" type="tel" inputmode="numeric" value="${esc(rpState.phone)}" placeholder="(580) 000-0000" autocomplete="off" oninput="set('phone',this.value)"></div>
+    <div class="f"><label for="src">How did they hear about us? (optional)</label>
+      <select id="src" onchange="set('csrLeadSource',this.value)"><option value="">—</option>
+      ${["Google / Search","Referral","Repeat customer","Facebook / Social","Property manager / Realtor","Drove by / Sign","Other"]
+        .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
 
-  if(s==="intent") return `<div class="opts two">
-      ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
-      ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
-    </div>
-    <div class="f" style="margin-top:13px"><label for="pmName">Property manager or realtor (optional)</label>
-      <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" oninput="set('moveoutPmOrRealtor',this.value)"></div>`;
-
-  if(s==="questionnaire"){
-    const yn=(field,label)=>`<div style="margin-bottom:11px">
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px">${label}</div>
+  /* Merged: bedrooms + bathrooms + the three hard-stop checks. */
+  if(s==="home"){
+    const isMoveout = ["moveout","moveoutrefresh"].includes(rpState.service);
+    const yn=(field,label)=>`<div class="grp">
+        <div class="grp-h">${label}</div>
         <div class="opts two">
           ${opt("Yes",`pick('${field}',true)`,rpState[field]===true)}
           ${opt("No",`pick('${field}',false)`,rpState[field]===false)}
         </div></div>`;
-    return yn("moveoutWaterOn","Is the water on?")
-      + yn("moveoutAcOn","Is the air conditioning working?")
-      + yn("moveoutMoldPests","Any signs of mold or pests?");
+    return `
+      <div class="grp"><div class="grp-h">Bedrooms</div>
+        <div class="opts five">${[1,2,3,4,5].map(n=>opt(`${n}${n===5?"+":""}`,`pick('bedrooms',${n})`,rpState.bedrooms===n,null,null)).join("")}</div></div>
+      <div class="grp"><div class="grp-h">Full bathrooms</div>
+        <div class="opts five">${[1,2,3,4].map(n=>opt(`${n}${n===4?"+":""}`,`pick('bathrooms',${n})`,rpState.bathrooms===n)).join("")}</div></div>
+      ${isMoveout ? `
+      <div class="grp"><div class="grp-h">Quick checks <em>— any “no” and you don't quote</em></div></div>
+      ${yn("moveoutWaterOn","Is the water on?")}
+      ${yn("moveoutAcOn","Is the air conditioning working?")}
+      ${yn("moveoutMoldPests","Any signs of mold or pests?")}` : ""}`;
   }
 
-  if(s==="sqft") return `<div class="opts two">${rpSqftTiersForService(rpState.service)
-    .map(t=>opt(t.label,`pick('sqft','${t.key}')`,rpState.sqft===t.key)).join("")}</div>`;
-
-  if(s==="bedrooms") return `<div class="opts three">${[1,2,3,4,5]
-    .map(n=>opt(`${n}${n===5?"+":""} bed`,`pick('bedrooms',${n})`,rpState.bedrooms===n)).join("")}</div>`;
-
-  if(s==="bathrooms") return `<div class="opts three">${[1,2,3,4]
-    .map(n=>opt(`${n}${n===4?"+":""} bath`,`pick('bathrooms',${n})`,rpState.bathrooms===n)).join("")}</div>`;
-
-  if(s==="condition") return `<div class="opts">${rpConditionOrder
-      .map(c=>opt(c,`pick('condition','${c.replace(/'/g,"\\'")}')`,rpState.condition===c,rpConditionCopy[c])).join("")}</div>
-    <div style="margin-top:13px"><p class="sub" style="margin-bottom:6px">Flag anything the crew needs to prep for:</p>
-      ${chk("petWasteConcern","Pets / pet odor / animal waste")}
-      ${chk("hazardConcern","Excessive trash, hoarding, pests, or smoke")}
-      ${chk("moldConcern","Mold or musty smell reported")}
-      ${chk("noAC","No working A/C")}</div>`;
+  if(s==="tiers"){
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
+    const fmt=p=>p===null?"Custom":`$${p.toFixed(0)}`;
+    const chosen = rpState.moveoutTierChosen ? rpState.service : null;
+    return `
+      <div class="grp"><div class="grp-h">Why are they moving? <em>— decides which one you lead with</em></div>
+        <div class="opts two">
+          ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
+          ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
+        </div></div>
+      <div class="opts">
+        ${opt("Inspection Ready",`chooseMoveoutTier('moveout')`,chosen==="moveout",
+          "Protects the deposit. Oven, fridge, cabinets and the full Detail Pass all in this price.", fmt(irPrice))}
+        ${opt("Move-Out Express",`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
+          "Satisfaction Guaranteed, no deposit guarantee. Oven, fridge, cabinets addable next.", fmt(rfPrice))}
+      </div>
+      <div class="f" style="margin-top:12px"><label for="pmName">Property manager or realtor (optional)</label>
+        <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" autocomplete="off" oninput="set('moveoutPmOrRealtor',this.value)"></div>`;
+  }
 
   if(s==="frequency") return `<div class="opts two">${["One-Time","Weekly","Bi-Weekly","Monthly"]
     .map(f=>opt(f,`pick('frequency','${f}')`,rpState.frequency===f)).join("")}</div>`;
 
-  if(s==="rooms") return `<div class="opts three">${[2,3,4,5,6,7]
-    .map(n=>opt(`${n} rooms`,`pick('carpetRooms',${n})`,Number(rpState.carpetRooms)===n)).join("")}</div>
-    <div class="opts" style="margin-top:13px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room${rpState.carpetRooms?` \u2014 $${rpPetEnzymePrice()} total`:""})`,`toggle('addonPetEnzyme')`,rpState.addonPetEnzyme)}</div>`;
+  if(s==="rooms") return `
+    <div class="grp"><div class="grp-h">Carpeted rooms <em>— two-room minimum</em></div>
+      <div class="opts three">${[2,3,4,5,6,7].map(n=>opt(`${n} rooms`,`pick('carpetRooms',${n})`,Number(rpState.carpetRooms)===n)).join("")}</div></div>
+    <div class="opts">${opt(`Pet enzyme treatment`,`toggle('addonPetEnzyme')`,rpState.addonPetEnzyme,
+      `Breaks down odour at the source`, `+$${RP_PET_ENZYME_RATE}/room`)}</div>`;
 
-  if(s==="cleaners") return `<div class="opts three">${[1,2,3,4]
-    .map(n=>opt(`${n}`,`pick('cleanerCount',${n})`,rpState.cleanerCount===n)).join("")}</div>`;
+  if(s==="hourly") return `
+    <div class="grp"><div class="grp-h">Cleaners <em>— $${HOURLY_RATE_PER_CLEANER}/hr each</em></div>
+      <div class="opts five">${[1,2,3,4].map(n=>opt(`${n}`,`pick('cleanerCount',${n})`,rpState.cleanerCount===n)).join("")}</div></div>
+    <div class="grp"><div class="grp-h">Hours <em>— ${HOURLY_MIN_HOURS}-hour minimum</em></div>
+      <div class="opts five">${Array.from({length:HOURLY_MAX_HOURS-HOURLY_MIN_HOURS+1},(_,i)=>i+HOURLY_MIN_HOURS)
+        .map(n=>opt(`${n}`,`pick('hourCount',${n})`,rpState.hourCount===n)).join("")}</div></div>`;
 
-  if(s==="hours") return `<div class="opts three">${[4,5,6,7,8]
-    .map(n=>opt(`${n} hrs`,`pick('hourCount',${n})`,rpState.hourCount===n)).join("")}</div>`;
-
-  if(s==="tiers"){
-    /* Round 26: the moment Liz shows two real prices instead of asking
-       the caller to commit to a tier blind. Mirrors /book's "moveouttiers"
-       screen -- same rpMoveoutTierBasePrice() call, same two options,
-       just rendered in this console's plainer button style. Picking
-       either one calls chooseMoveoutTier(), which sets the real service
-       and moves on; nothing forces a pick (this console never hard-blocks
-       Next), so leaving it on the default still prices as Inspection
-       Ready -- the safer default if she skips ahead. */
-    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
-    const fmt=p=>p===null?"Custom quote":`$${p.toFixed(0)}`;
-    const chosen = rpState.moveoutTierChosen ? rpState.service : null;
-    return `<div class="opts">
-      ${opt(`Inspection Ready — ${fmt(irPrice)}`,`chooseMoveoutTier('moveout')`,chosen==="moveout",
-        "Protects your security deposit (Defend Your Deposit™) — oven, fridge, cabinets & closets, and the full Detail Pass all included in this price.")}
-      ${opt(`Move-Out Express — ${fmt(rfPrice)}`,`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
-        "Satisfaction Guaranteed, no deposit guarantee — oven, fridge, cabinets, and Detail Pass are addable next screen.")}
-    </div>
-    <p class="sub" style="margin-top:13px">${
-      /* Round 26: this is the actual decision screen now, so the
-         selling/renting signal from "intent" belongs here -- it's the
-         moment it can change which tier Liz leads with, not just a
-         closing-argument aside on the scope cheat sheet three screens
-         later, after a tier's likely already been picked. */
-      rpState.moveoutRentalOrSelling === "selling"
-        ? "They're listing it for sale, not handing it to a new tenant -- lead with Inspection Ready. Buyers notice what a renter wouldn't, and it's the one that protects the security deposit if anything's flagged."
-        : "Not sure which fits? Landlord, property manager, or inspector checking the place after move-out -- Inspection Ready is the one that protects the security deposit. Flat no on any of that, Express is the honest, lower-cost pick."
-    }</p>`;
-  }
+  if(s==="customDetails") return `
+    <div class="f"><label for="cd">What do they need?</label>
+      <textarea id="cd" placeholder="Commercial space, specialty request, rough size, anything unusual…" oninput="set('customNotes',this.value)">${esc(rpState.customNotes)}</textarea></div>`;
 
   if(s==="addons"){
     const list=rpServiceAddons[rpState.service]||[];
     let h="";
-    if(list.includes("carpet")) h+=`<div style="margin-bottom:9px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Carpet cleaning <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.carpet.bundlePrice}/room</span></div>
-      <div class="opts three">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
-      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt(`Pet enzyme treatment (+$${RP_PET_ENZYME_RATE}/room \u2014 $${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE} total)`,`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme)}</div>`:""}</div>`;
-    /* Round 24 (direct instruction, applied here for parity with /book):
-       junk haul is quoted-only now, no flat half/full pricing -- one
-       option instead of three, matching rpState.junkSize's new shape
-       (null or "yes"). Keeps this console consistent with what the
-       website itself now offers, so Liz never quotes a flat $100/$200
-       that a self-serve customer couldn't have gotten online. */
-    if(list.includes("junk")) h+=`<div class="opts" style="margin-bottom:9px">
-      ${opt(`Junk/trash to haul away (quoted separately, NOT in the total)`,`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes")}</div>`;
-    if(list.includes("windows")) h+=`<div class="opts" style="margin-bottom:9px">
-      ${opt(`Exterior windows \u2014 basic (+$${rpAddonCatalog.windows.basic})`,`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic")}
-      ${opt(`Exterior windows \u2014 premium (+$${rpAddonCatalog.windows.premium})`,`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium")}</div>`;
-    h+=`<div class="opts">`;
-    if(list.includes("garage")) h+=opt(`Garage floor wash (+$${rpAddonCatalog.garage.price})`,`toggle('garageWash')`,rpState.garageWash);
-    if(list.includes("fridge")) h+=opt(`Refrigerator interior (+$${rpAddonCatalog.fridge.price})`,`toggle('fridgeAddon')`,rpState.fridgeAddon);
-    /* Round 25 (direct instruction, for phone-booking parity with /book's
-       three new Express add-ons): oven and cabinets are flat $50 same as
-       fridge; Detail Pass is bedroom-tier priced like the tier bases
-       themselves, so it reads rpDetailPassPrice() rather than a catalog
-       constant. */
-    if(list.includes("oven")) h+=opt(`Oven interior (+$${rpAddonCatalog.oven.price})`,`toggle('ovenAddon')`,rpState.ovenAddon);
-    if(list.includes("cabinets")) h+=opt(`Inside cabinets & closets (+$${rpAddonCatalog.cabinets.price})`,`toggle('cabinetsAddon')`,rpState.cabinetsAddon);
-    if(list.includes("detailPass")) h+=opt(`Detail Pass — baseboards, windows, walls, fans/vents/lights (+$${rpDetailPassPrice()})`,`toggle('detailPassAddon')`,rpState.detailPassAddon);
-    h+=`</div>`;
-    /* Round 21: laundry is in rpServiceAddons.hourly but was never
-       rendered on this console, so an Hourly job booked by phone simply
-       could not include it. */
-    if(list.includes("laundry")) h+=`<div style="margin:9px 0">
-      <div style="font-weight:700;font-size:14px;margin-bottom:5px">Laundry <span style="color:var(--muted);font-weight:500">+$${rpAddonCatalog.laundry.pricePerLoad}/load</span></div>
-      <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
-    /* Extra Time / Additional Cleaner — previously missing entirely from
-       this console, so a Deep/Basic phone booking had no way to add
-       either even though both exist in the shared engine and on /book.
-       Priced per hour actually booked (anchor + any Extra Time already
-       selected), matching rpSecondCleanerPrice()'s live recalculation. */
+    if(list.includes("carpet")) h+=`<div class="grp"><div class="grp-h">Carpet cleaning <em>— +$${rpAddonCatalog.carpet.bundlePrice}/room</em></div>
+      <div class="opts five">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
+      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt("Pet enzyme treatment",`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme,null,`+$${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE}`)}</div>`:""}</div>`;
+    if(list.includes("laundry")) h+=`<div class="grp"><div class="grp-h">Laundry <em>— +$${rpAddonCatalog.laundry.pricePerLoad}/load</em></div>
+      <div class="opts five">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
     if(list.includes("extraHours")){
       const anchorHrs = rpState.service==="deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
-      h+=`<div style="margin-bottom:9px">
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px">Extra time <span style="color:var(--muted);font-weight:500">includes ${anchorHrs}hrs \u00b7 +$${RP_EXTRA_HOUR_RATE}/hr beyond that</span></div>
-        <div class="opts three">${[0,1,2,3,4].map(n=>opt(n===0?"None":`+${n}hr`,`pick('addonExtraHours',${n})`,Number(rpState.addonExtraHours)===n)).join("")}</div></div>`;
+      h+=`<div class="grp"><div class="grp-h">Extra time <em>— includes ${anchorHrs}hrs, +$${RP_EXTRA_HOUR_RATE}/hr beyond</em></div>
+        <div class="opts five">${[0,1,2,3,4].map(n=>opt(n===0?"None":`+${n}`,`pick('addonExtraHours',${n})`,Number(rpState.addonExtraHours)===n)).join("")}</div></div>`;
     }
-    if(list.includes("secondCleaner"))
-      h+=`<div class="opts" style="margin-bottom:9px">${opt(`Additional cleaner (+$${rpSecondCleanerPrice()} for ${rpSecondCleanerHours()}hrs)`,`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner)}</div>`;
-    /* Round 25 (found while auditing /book vs /call for consistency):
-       "Need Small Handyman Repairs?" is a universal, quoted-separately
-       lead-capture checkbox on every /book addons screen -- same
-       treatment as junk haul, not gated by rpServiceAddons. It never
-       existed on /call at all, in the state, the UI, or the booking
-       payload, so a caller who mentioned wanting a patch job or minor
-       repair had nowhere for Liz to record it -- that interest was just
-       lost instead of reaching the office the way a self-serve customer's
-       always does. Ask it on every service's addons screen, same as
-       /book. */
-    h+=`<div class="opts" style="margin-bottom:9px">${opt("Interested in small handyman repairs? (quoted separately, NOT in the total)",`toggle('handymanInterest')`,rpState.handymanInterest)}</div>`;
-    h+=`<div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
-      ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed"):""}</div>`;
+    const rows=[];
+    if(list.includes("windows")){
+      rows.push(opt("Exterior windows — basic",`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic",null,`+$${rpAddonCatalog.windows.basic}`));
+      rows.push(opt("Exterior windows — premium",`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium","Screens included",`+$${rpAddonCatalog.windows.premium}`));
+    }
+    if(list.includes("garage")) rows.push(opt("Garage floor wash",`toggle('garageWash')`,rpState.garageWash,"Garage must be empty",`+$${rpAddonCatalog.garage.price}`));
+    if(list.includes("fridge")) rows.push(opt("Refrigerator interior",`toggle('fridgeAddon')`,rpState.fridgeAddon,null,`+$${rpAddonCatalog.fridge.price}`));
+    if(list.includes("oven")) rows.push(opt("Oven interior",`toggle('ovenAddon')`,rpState.ovenAddon,null,`+$${rpAddonCatalog.oven.price}`));
+    if(list.includes("cabinets")) rows.push(opt("Inside cabinets & closets",`toggle('cabinetsAddon')`,rpState.cabinetsAddon,null,`+$${rpAddonCatalog.cabinets.price}`));
+    if(list.includes("detailPass")) rows.push(opt("Detail Pass",`toggle('detailPassAddon')`,rpState.detailPassAddon,"Baseboards, windows, walls, fans, vents, lights",`+$${rpDetailPassPrice()}`));
+    if(list.includes("secondCleaner")) rows.push(opt("Additional cleaner",`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner,`For the full ${rpSecondCleanerHours()}hrs booked`,`+$${rpSecondCleanerPrice()}`));
+    if(rows.length) h+=`<div class="grp"><div class="opts">${rows.join("")}</div></div>`;
+
+    const quoted=[];
+    if(list.includes("junk")) quoted.push(opt("Junk or trash to haul away",`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes","Quoted separately — not in the total"));
+    quoted.push(opt("Small handyman repairs",`toggle('handymanInterest')`,rpState.handymanInterest,"Quoted separately — not in the total"));
+    h+=`<div class="grp"><div class="grp-h">Quoted separately</div><div class="opts">${quoted.join("")}</div></div>`;
+
+    h+=`<div class="grp"><div class="grp-h">Ask before you say the price</div><div class="opts">
+      ${chk("militaryDiscount",`Military or first responder`,`${Math.round(MILITARY_DISCOUNT_RATE*100)}% off, max $${MILITARY_DISCOUNT_CAP} — offer it, don't wait to be asked`)}
+      ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed it"):""}
+    </div></div>`;
     return h;
   }
 
   if(s==="quote"){
     const custom=rpIsCustomQuoteOnly();
-    /* Move-out tier switch: let the CSR flip between Inspection Ready and
-       Express from the quote screen after giving the first number, same
-       spirit as /book's cross-sell link. Bedrooms/bathrooms/sqft/addons
-       stay in state either way -- both tiers ask the same size questions
-       -- so this just swaps which price table the shared engine reads.
-       Replaces the old flat/hourly billing-mode toggle (round 19 --
-       hourly move-out removed). */
-    const moveoutTierToggle = (["moveout","moveoutrefresh"].includes(rpState.service) && !custom) ? `
-      <div class="opts" style="margin-bottom:11px">${opt(
-        rpState.service==="moveout" ? "Switch to Move-Out Express (no inspection guarantee)" : "Switch to Inspection Ready (adds Defend Your Deposit)",
-        `switchMoveoutTier('${rpState.service==="moveout" ? "moveoutrefresh" : "moveout"}')`,
-        false
-      )}</div>` : "";
-    /* Round 20: if the tier switch dropped an add-on the new tier already
-       includes, say so on screen so Liz can explain the price change
-       instead of the number moving on its own mid-call. */
+    const switchTo = rpState.service==="moveout" ? "moveoutrefresh" : "moveout";
+    const tierSwitch = (["moveout","moveoutrefresh"].includes(rpState.service) && !custom)
+      ? `<div class="opts" style="margin-bottom:12px">${opt(
+          rpState.service==="moveout" ? "Switch to Move-Out Express" : "Switch to Inspection Ready",
+          `switchMoveoutTier('${switchTo}')`, false,
+          rpState.service==="moveout" ? "Drops the deposit guarantee" : "Adds Defend Your Deposit",
+          fmtTierPrice(switchTo))}</div>` : "";
     const dropNotice = rpState.addonDropNotice
-      ? `<div class="opts" style="margin-bottom:11px"><span class="note">Removed (already included in this tier): <strong>${esc(rpState.addonDropNotice)}</strong></span></div>`
-      : "";
-    return `${moveoutScopeRefHtml()}${moveoutTierToggle}${dropNotice}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
-        <small>Quote to give</small>
-        <strong>${custom?"Custom Quote":rpFormatMoneyDisplay(rpFinalPriceCents())}</strong>
-        ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
-          :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpState.service==="moveoutrefresh"?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
-      </div>
-      ${custom?"":quoteCloseHelpersHtml()}
-      ${chk("quotedAloud","I gave them this quote and they're ready to book")}`;
+      ? `<div class="guard info"><span class="ic">•</span><div><b>Removed — already in this tier</b>${esc(rpState.addonDropNotice)}</div></div>` : "";
+    return `${tierSwitch}${dropNotice}
+      ${custom?"":closersHtml()}
+      <div class="opts" style="margin-top:12px">${chk("quotedAloud","I gave them this quote and they're ready to book")}</div>`;
   }
 
   if(s==="contact") return `
-    <div class="f"><label for="a1">Service address *</label>
-      <input id="a1" value="${esc(rpState.address1)}" placeholder="123 Main St" oninput="set('address1',this.value)"></div>
+    <div class="f"><label for="a1">Service address</label>
+      <input id="a1" value="${esc(rpState.address1)}" placeholder="123 Main St" autocomplete="off" oninput="set('address1',this.value)"></div>
     <div class="f-row">
-      <div class="f"><label for="ct">City *</label>
-        <input id="ct" value="${esc(rpState.city)}" placeholder="Lawton" oninput="set('city',this.value)"></div>
-      <div class="f"><label for="zp">ZIP *</label>
-        <input id="zp" inputmode="numeric" value="${esc(rpState.postalCode)}" placeholder="73505" oninput="set('postalCode',this.value)"></div></div>
-    <div class="f"><label for="em">Email (for confirmation)</label>
-      <input id="em" type="email" value="${esc(rpState.email)}" placeholder="name@email.com" oninput="set('email',this.value)"></div>
+      <div class="f"><label for="ct">City</label>
+        <input id="ct" value="${esc(rpState.city)}" placeholder="Lawton" autocomplete="off" oninput="set('city',this.value)"></div>
+      <div class="f"><label for="zp">ZIP</label>
+        <input id="zp" inputmode="numeric" value="${esc(rpState.postalCode)}" placeholder="73505" autocomplete="off" oninput="set('postalCode',this.value)"></div></div>
+    <div class="f"><label for="em">Email (for the confirmation)</label>
+      <input id="em" type="email" value="${esc(rpState.email)}" placeholder="name@email.com" autocomplete="off" oninput="set('email',this.value)"></div>
     <div class="f"><label for="si">Access / special instructions</label>
-      <textarea id="si" placeholder="Gate code, lockbox, pets, parking\u2026" oninput="set('specialInstructions',this.value)">${esc(rpState.specialInstructions)}</textarea></div>
-    ${chk("addressReadBack","I read the address back and they confirmed it")}`;
+      <textarea id="si" placeholder="Gate code, lockbox, pets, parking…" oninput="set('specialInstructions',this.value)">${esc(rpState.specialInstructions)}</textarea></div>
+    <div class="opts">${chk("addressReadBack","I read the address back and they confirmed it")}</div>`;
 
   if(s==="calendar") return calendarHtml();
 
-  if(s==="done") return `<div class="guard info" style="margin-top:0"><b>${isCustomService()?"Request Logged":"Booked"}</b>
-      ${isCustomService()
-        ? "No appointment yet \u2014 the office will follow up to schedule a walkthrough or request photos, then confirm a quote."
-        : `${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.`}</div>
-    <p class="sub" style="margin-top:12px">${isCustomService()?"Let them know someone will reach out soon \u2014 no firm timeline promises.":"Repeat the date and time once more before you hang up."}</p>
+  if(s==="done") return `
+    <div class="guard win"><span class="ic">✓</span><div><b>${isCustomService()?"Request logged":"Booked"}</b>${
+      isCustomService()
+        ? "No appointment yet — the office follows up to schedule a walkthrough or request photos, then confirms a quote."
+        : `${rpState.bookedAt?`Confirmed for ${esc(rpState.bookedAt)}. `:""}A confirmation text goes out automatically.`}</div></div>
     <div class="f" style="margin-top:14px"><label for="csrDone">Not you? Update your name</label>
-      <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" oninput="setCsrIdentity(this.value)">
-      <p class="sub" style="margin:5px 0 0">Saved on this device for next call.</p></div>
-    <button class="btn pri" style="width:100%;margin-top:6px" onclick="resetCall()">Start next call</button>`;
+      <input id="csrDone" value="${esc(rpState.csrName)}" placeholder="Liz" autocomplete="off" oninput="setCsrIdentity(this.value)">
+      <span class="note">Saved on this device for the next call.</span></div>
+    <button class="o center on" type="button" style="margin-top:12px;justify-content:center" onclick="resetCall()">Start next call</button>`;
   return "";
 }
 
-/* Shown once, before the first call on this device. Nothing else in the
-   console runs until this is filled in — the greeting script needs a
-   real name, not a placeholder or a generic fallback. Persists via
-   setCsrIdentity(), so this never shows again on this device after. */
-/* The guided script is a default path, not a cage. Real calls skip
-   around — a customer front-loads their address before you've asked,
-   or wants a ballpark price before finishing the details. This lets
-   Liz tap directly to any step in the current flow instead of clicking
-   Next repeatedly through screens she already has the answer to. */
-function renderJumpRail(){
-  const f=flow(), idx=stepIdx();
-  el("jumpRail").innerHTML=f.map((s,i)=>{
-    const cls=i===idx?"now":(i<idx?"done":"");
-    return `<button type="button" class="jump-chip ${cls}" onclick="jumpToStep('${s}')">${SHORT_LABELS[s]||s}</button>`;
-  }).join("");
+function fmtTierPrice(svc){
+  const p = rpMoveoutTierBasePrice(svc);
+  return p===null ? "Custom" : `$${p.toFixed(0)}`;
 }
+
+/* The quote screen's closers. 1.0 also reprinted four full objections here,
+   which is roughly 200 words she has to read past while a customer waits on
+   the other end of a silence she is supposed to be holding. Those live in
+   Lookup now — one keypress, searchable, all sixteen of them. */
+function closersHtml(){
+  const urgency = quoteUrgencyLine();
+  return `
+    ${urgency?`<div class="guard warn"><span class="ic">◷</span><div><b>Real scarcity — say it</b>${urgency}</div></div>`:""}
+    <div class="grp" style="margin-top:12px"><div class="grp-h">Then close</div>
+      ${QUOTE_CLOSERS.map(c=>`<p style="margin:0 0 7px;font-family:Newsreader,Georgia,serif;font-size:17px;line-height:1.4">${c}</p>`).join("")}
+    </div>
+    <p class="note">Pushback? Hit <b>Look up</b> (or press <b>/</b>) and type a word — “expected”, “less”, “spouse”, “deposit”.</p>`;
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+let coachOpen = false;
+try{ coachOpen = localStorage.getItem("rpCallConsole.coachOpen")==="1"; }catch(e){}
+function toggleCoach(){
+  coachOpen = !coachOpen;
+  try{ localStorage.setItem("rpCallConsole.coachOpen", coachOpen?"1":"0"); }catch(e){}
+  render();
+}
+
+function render(){
+  if(!isAuthed()){ renderAuthGate(); return; }
+  if(!rpState.csrName){ renderSetup(); return; }
+  KEYMAP = [];
+
+  const t = TITLES[rpState.step]||["",""];
+  const line = lineFor(rpState.step);
+  const guards = guardrails();
+  const body = screenHtml();          // must run before the dock so KEYMAP is filled
+
+  el("main").innerHTML = `
+    ${line?`<div class="say">
+      <div class="say-label"><span>Say</span><span class="spacer"></span>
+        <button class="coach-btn" type="button" aria-expanded="${coachOpen}" onclick="toggleCoach()">Coach</button></div>
+      <p>${line.say}</p>
+      <div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>
+    </div>`:""}
+    <div class="card">
+      <h2>${t[0]}</h2>${t[1]?`<p class="sub">${t[1]}</p>`:""}
+      ${body}
+      ${guards.map(g=>`<div class="guard ${g.level==="stop"?"stop":g.level}"><span class="ic">${g.level==="stop"?"■":g.level==="warn"?"▲":"•"}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
+      ${rpState.bookingError?`<div class="guard stop"><span class="ic">■</span><div><b>Booking didn't go through</b>${esc(rpState.bookingError)}</div></div>`:""}
+      ${rpState.customLeadError?`<div class="guard stop"><span class="ic">■</span><div><b>Couldn't save</b>${esc(rpState.customLeadError)}</div></div>`:""}
+      ${rpState.slotsError&&rpState.step==="calendar"?`<div class="guard warn"><span class="ic">▲</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}</div></div>`:""}
+    </div>`;
+
+  renderStrip(); renderSide(); renderTop(); renderDock();
+  save();
+}
+
+function renderTop(){
+  el("whoName").textContent = rpState.fullName || "Call Console";
+  el("whoSub").textContent = rpState.fullName
+    ? (phoneOk(rpState.phone) ? fmtPhone(rpState.phone) : "no number yet")
+    : "Internal tool";
+  const custom = rpIsCustomQuoteOnly() || isCustomService();
+  const m = el("money");
+  m.classList.toggle("is-custom", custom);
+  m.innerHTML = custom
+    ? `<b>Custom</b><small>Don't quote</small>`
+    : `<b>${rpFinalPrice()>0?rpFormatMoneyDisplay(rpFinalPriceCents()):"—"}</b><small>Total</small>`;
+}
+
+function renderStrip(){
+  const f=flow(), i=stepIdx();
+  el("strip").innerHTML = f.map((s,n)=>
+    `<button type="button" class="chip ${n===i?"now":n<i?"done":""}" onclick="jumpToStep('${s}')">${SHORT[s]||s}</button>`
+  ).join("");
+  const now = el("strip").querySelector(".now");
+  if(now) now.scrollIntoView({inline:"center", block:"nearest"});
+}
+
+/* The side panel is a live recap of what she has captured — the thing she
+   reads back at the end, and the thing that tells her at a glance what the
+   number is built from. 1.0 used this space for the same eight scope
+   bullets on every step; those are in Lookup now, where they're searchable
+   and only appear when someone actually asks. */
+function renderSide(){
+  const rows=[];
+  if(rpState.service) rows.push(["Service", isCustomService()?"Custom quote":(rpServices[rpState.service]||{}).name]);
+  if(rpState.bedrooms) rows.push(["Bedrooms", rpState.bedrooms]);
+  if(rpState.bathrooms) rows.push(["Bathrooms", rpState.bathrooms]);
+  if(rpState.frequency) rows.push(["Frequency", rpState.frequency]);
+  if(rpState.service && !rpIsCustomQuoteOnly() && rpDisplayBasePrice()>0) rows.push(["Base", rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice()))]);
+  rpAddonLineItems().forEach(r=>rows.push([r.label, r.quoted?"quoted":`+$${r.price.toFixed(0)}`]));
+  if(rpState.militaryDiscount && rpMilitaryDiscountAmount()>0) rows.push(["Military discount", "−"+rpFormatMoneyDisplay(rpMilitaryDiscountCents()), true]);
+  if(rpState.bookedAt) rows.push(["Scheduled", rpState.bookedAt]);
+
+  const area = rpServiceAreaStatus();
+  const areaCard = (area.status==="core"||area.status==="unknown") ? "" : `
+    <div class="guard ${area.status==="outside"?"stop":"warn"}"><span class="ic">▲</span><div>
+      <b>${area.status==="outside"?"Outside the service area":"Edge of the service area"}</b>
+      ${area.status==="outside"
+        ? "Book it, but tell them the office confirms coverage and any travel before the date. Note it."
+        : `${esc(area.area)} — extra drive time. Fine to book; the office sees the flag.`}</div></div>`;
+
+  el("side").innerHTML = `
+    ${rows.length?`<div class="recap">
+      <div class="recap-h">On this call</div>
+      ${rows.map(r=>`<div class="recap-row ${r[2]?"neg":""}"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("")}
+    </div>`:""}
+    ${areaCard}`;
+}
+
+function renderDock(){
+  const d = el("dock");
+  if(rpState.step==="done"){ d.hidden = true; return; }
+  d.hidden = false;
+  const i = stepIdx();
+  el("backBtn").style.visibility = i>0 ? "visible" : "hidden";
+  const busy = rpState.bookingSubmitting || rpState.customLeadSaving;
+  const label = rpState.step==="calendar"
+      ? (rpState.bookingSubmitting?"Booking…":"Confirm booking")
+    : (rpState.step==="contact" && isCustomService())
+      ? (rpState.customLeadSaving?"Saving…":"Submit request")
+    : stepValid() ? "Next" : "Next — skip for now";
+  el("goLabel").textContent = label;
+  el("goBtn").disabled = !!busy;
+}
+
+/* Jumping around is normal on a real call — a caller volunteers the address
+   before you've asked for it. Any step in the current flow, one tap. */
 function jumpToStep(step){
   if(!flow().includes(step)) return;
-  rpState.step=step;
-  window.scrollTo({top:0,behavior:"smooth"});
-  render();
+  rpState.step=step; render();
   if(step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
 }
 
+/* =========================================================================
+   LOOKUP — the feature that let the rail and the objection drawer go away
+   =========================================================================
+   1.0 answered "does that include the oven?" by printing eight scope
+   bullets permanently in the rail, and answered "will I get my deposit
+   back?" by making Liz open a drawer and eyeball sixteen entries. One is
+   always on screen and rarely needed; the other is needed instantly and
+   buried. Both are the same problem: reference material with no index.
+
+   This builds the index fresh on every keystroke, so every price in it is
+   the engine's live number — it cannot go stale the way a written cheat
+   sheet does.
+   ========================================================================= */
+function lookupIndex(){
+  const out=[];
+  const money = n => `$${Number(n).toFixed(0)}`;
+
+  OBJECTIONS.forEach(o=>out.push({
+    kind:"Say this", say:true,
+    title:o.q,
+    answer: typeof o.a==="function"?o.a():o.a,
+    why: typeof o.n==="function"?o.n():o.n
+  }));
+
+  const svc = rpState.service && rpIncludes[rpState.service];
+  if(svc){
+    (svc.items||[]).forEach(i=>out.push({
+      kind:"Included", title:i,
+      answer:`Yes — included in ${(rpServices[rpState.service]||{}).name} at no extra charge.`
+    }));
+    if(svc.fineprint) out.push({kind:"Not included", title:"What's NOT in the base price", answer:svc.fineprint});
+  }
+
+  const ir=RP_MOVEOUT_BEDROOM_TIERS, ex=RP_MOVEOUT_REFRESH_BEDROOM_TIERS;
+  out.push({kind:"Price", title:"Inspection Ready move-out",
+    answer: ir.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — bathrooms included, no square-footage charge."});
+  out.push({kind:"Price", title:"Move-Out Express",
+    answer: ex.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — no deposit guarantee; oven, fridge, cabinets and Detail Pass addable."});
+  out.push({kind:"Price", title:"Deep cleaning", answer:`Flat ${money(RP_DEEP_ANCHOR_PRICE)} for ${RP_DEEP_ANCHOR_HOURS} hours. Extra time ${money(RP_EXTRA_HOUR_RATE)}/hour.`});
+  out.push({kind:"Price", title:"Basic cleaning", answer:`Flat ${money(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours. Recurring saves 20% weekly, 15% biweekly, 10% monthly.`});
+  out.push({kind:"Price", title:"Carpet cleaning", answer:`${money(rpAddonCatalog.carpet.bundlePrice)} per room, two-room minimum. Pet enzyme ${money(RP_PET_ENZYME_RATE)}/room.`});
+  out.push({kind:"Price", title:"Hourly cleaning", answer:`${money(HOURLY_RATE_PER_CLEANER)} per cleaner per hour, ${HOURLY_MIN_HOURS}-hour minimum. Booking our time, not a finished checklist — the deposit guarantee doesn't apply.`});
+  out.push({kind:"Price", title:"Oven interior · fridge interior · inside cabinets",
+    answer:`${money(rpAddonCatalog.oven.price)} each on Express. All three already included on Inspection Ready.`});
+  out.push({kind:"Price", title:"Detail Pass",
+    answer:`${money(RP_DETAIL_PASS_PRICES[0].price)}–${money(RP_DETAIL_PASS_PRICES[RP_DETAIL_PASS_PRICES.length-1].price)} by bedroom count${rpState.bedrooms?` — ${money(rpDetailPassPrice())} for this home`:""}. Baseboards, interior windows, walls, ceiling fans, vents and light fixtures. Included on Inspection Ready.`});
+  out.push({kind:"Price", title:"Exterior windows · garage floor · laundry",
+    answer:`Windows ${money(rpAddonCatalog.windows.basic)} basic or ${money(rpAddonCatalog.windows.premium)} premium (screens included). Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
+  out.push({kind:"Price", title:"Junk hauling", answer:"Quoted separately — volume varies too much for a flat number. Never goes in the booked total without their say-so."});
+  out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit one-time, ${money(RP_RECURRING_MIN_PER_VISIT)} per visit on a recurring plan.`});
+  out.push({kind:"Price", title:"Military and first responder discount", answer:`${Math.round(MILITARY_DISCOUNT_RATE*100)}% off, capped at ${money(MILITARY_DISCOUNT_CAP)}. Not combinable with other offers. Offer it before the price, don't wait to be asked.`});
+
+  out.push({kind:"Policy", title:"Deposit or payment up front?", answer:"“No deposit, nothing due today — we take payment after the clean is done and you've seen it.”", why:"Easiest true close on the list. Lead with it any time they hesitate about committing."});
+  out.push({kind:"Policy", title:"Do they need to be home?", answer:"“Nope — most move-outs are empty. Just get us a key, a lockbox code, or the property manager's contact.”", why:"Capture the access method in the notes right then."});
+  out.push({kind:"Policy", title:"Does the home need to be empty?", answer:"“It cleans best empty, and move-outs usually are. We can work around belongings, but heavy clutter or trash changes the scope.”"});
+  out.push({kind:"Policy", title:"Licensed and insured?", answer:"“Yes — licensed and insured, veteran-owned, and over sixty five-star reviews here in the Lawton area.”"});
+  out.push({kind:"Policy", title:"If something gets missed", answer:"“Call us within 48 hours and we come back and fix it, free.” Defend Your Deposit on Inspection Ready; Satisfaction Guarantee on everything else.", why:"Re-clean, not money back. Don't invent a refund policy."});
+  out.push({kind:"Policy", title:"Service area", answer:"Lawton, Fort Sill, Cache, Elgin, Medicine Park and Duncan are core. Further out, book it and note it — the office confirms coverage and travel before the date."});
+  out.push({kind:"Policy", title:"Rescheduling", answer:"“Just call or text and we'll move it — no deposit riding on it either way.”", why:"Move dates slip constantly on a PCS. Book the date they think they need."});
+  out.push({kind:"Policy", title:"Water off, no A/C, mold or pests", answer:"The job can't be booked as normal. Take the name and number, log it as a callback, and do not say a price.", why:"A number said on the phone is the number they expect."});
+  return out;
+}
+
+function renderLookup(){
+  const q = (el("lookupInput").value||"").trim().toLowerCase();
+  const idx = lookupIndex();
+  const terms = q.split(/\s+/).filter(Boolean);
+
+  /* Rank, don't just filter. Typing "oven" has to surface "the oven costs
+     $50 on Express" before it surfaces a long objection whose coaching note
+     happens to contain the word. Title beats answer beats note, and among
+     equals the shorter entry wins — a one-line answer is faster to read out
+     than a paragraph. */
+  const score = item => {
+    const t=item.title.toLowerCase(), a=String(item.answer).toLowerCase(), w=String(item.why||"").toLowerCase();
+    let n=0;
+    for(const term of terms){
+      if(!t.includes(term) && !a.includes(term) && !w.includes(term)) return -1;
+      if(t.includes(term)) n+=10;
+      if(a.includes(term)) n+=4;
+      if(w.includes(term)) n+=1;
+      if(t.split(/\W+/).includes(term)) n+=6;   // whole-word title hit
+    }
+    return n - Math.min(4, (t.length+a.length)/400);
+  };
+  const hits = !terms.length ? idx
+    : idx.map(i=>({i, s:score(i)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s).map(x=>x.i);
+
+  el("lookupResults").innerHTML = hits.length
+    ? `<p class="sheet-hint">${terms.length?`${hits.length} match${hits.length===1?"":"es"} \u2014 best first`:`Everything, live from the pricing engine. Type to narrow \u2014 try <b>oven</b>, <b>deposit</b>, <b>pay</b>, <b>home</b>, <b>spouse</b>.`}</p>`
+      + hits.map((h,n)=>`<div class="hit ${n===0&&terms.length?"open":""}" onclick="this.classList.toggle('open')">
+          <span class="hit-k ${h.say?"say":""}">${h.kind}</span>
+          <h3>${h.title}</h3>
+          <p class="${h.say?"quote":""}">${h.answer}</p>
+          ${h.why?`<p class="why">${h.why}</p><span class="more">Tap for the note</span>`:""}
+        </div>`).join("")
+    : `<p class="sheet-empty">Nothing matches \u201c${esc(q)}\u201d.<br>Try a single word \u2014 \u201coven\u201d, \u201cdeposit\u201d, \u201cinsured\u201d, \u201clate\u201d.</p>`;
+}
+function openLookup(){
+  el("lookupSheet").hidden=false; document.body.style.overflow="hidden";
+  el("lookupInput").value=""; renderLookup();
+  setTimeout(()=>el("lookupInput").focus(),30);
+}
+function openSheet(id){
+  if(id==="endSheet") el("outList").innerHTML = OUTCOMES.map(o=>
+    `<button class="out-btn" type="button" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
+  el(id).hidden=false; document.body.style.overflow="hidden";
+}
+function closeSheet(id){ el(id).hidden=true; document.body.style.overflow=""; }
+
+/* =========================================================================
+   KEYBOARD — for the half of her shifts she's at a laptop
+   ========================================================================= */
+function typingInAField(t){
+  return t && (t.tagName==="INPUT" || t.tagName==="TEXTAREA" || t.tagName==="SELECT" || t.isContentEditable);
+}
+document.addEventListener("keydown", e=>{
+  const lookupOpen = !el("lookupSheet").hidden;
+  const endOpen = !el("endSheet").hidden;
+  if(e.key==="Escape"){
+    if(lookupOpen) return closeSheet("lookupSheet");
+    if(endOpen) return closeSheet("endSheet");
+    return;
+  }
+  if(lookupOpen || endOpen) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==="/" && !typingInAField(e.target)){ e.preventDefault(); return openLookup(); }
+  if(e.key==="?" && !typingInAField(e.target)){ e.preventDefault(); return toggleCoach(); }
+  if(typingInAField(e.target)){
+    /* Enter still advances from a text field — that's the whole point of a
+       form — but not from a textarea, where Enter is a new line. */
+    if(e.key==="Enter" && e.target.tagName==="INPUT"){ e.preventDefault(); next(); }
+    return;
+  }
+  if(e.key==="Enter"){ e.preventDefault(); if(!el("goBtn").disabled) next(); return; }
+  if(e.key==="Backspace"){ e.preventDefault(); back(); return; }
+  if(/^[1-9]$/.test(e.key)){
+    const fn = KEYMAP[Number(e.key)-1];
+    if(fn){ e.preventDefault(); new Function(fn)(); }
+  }
+});
+
+/* =========================================================================
+   CALL TIMER — 1.0 had no sense of time at all. Pacing is most of the job.
+   ========================================================================= */
+let callStartedAt = null;
+try{ callStartedAt = Number(localStorage.getItem("rpCallConsole.startedAt"))||null; }catch(e){}
+function markCallStart(){
+  if(callStartedAt) return;
+  callStartedAt = Date.now();
+  try{ localStorage.setItem("rpCallConsole.startedAt", String(callStartedAt)); }catch(e){}
+}
+function clearCallStart(){
+  callStartedAt = null;
+  try{ localStorage.removeItem("rpCallConsole.startedAt"); }catch(e){}
+}
+setInterval(()=>{
+  const c = el("clock"); if(!c) return;
+  if(!callStartedAt){ c.textContent="0:00"; return; }
+  const s = Math.floor((Date.now()-callStartedAt)/1000);
+  c.textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+}, 1000);
+
+/* ---------- First-run: who is on the phone today ---------- */
 function renderSetup(){
-  el("progFill").style.width="0%";
-  el("hdWho").textContent="Internal tool";
-  el("main").innerHTML=`
-    <div class="q">
-      <p class="stepno">Before you start</p>
-      <h2>What's your name?</h2>
-      <p class="sub">Used in the call script and saved on this device \u2014 you'll only enter it once.</p>
-      <div class="f"><input id="setupName" placeholder="Liz" autofocus onkeydown="if(event.key==='Enter')finishSetup()"></div>
-      <button class="btn pri" style="width:100%" onclick="finishSetup()">Start taking calls</button>
-    </div>`;
-  el("rail").innerHTML="";
-  el("jumpRail").innerHTML="";
+  el("main").innerHTML=`<div class="setup-wrap"><div class="card">
+    <h2>Who's taking calls?</h2>
+    <p class="sub">Used in your greeting and attached to every lead you log. Saved on this device.</p>
+    <div class="f"><input id="csrName" placeholder="Liz" autocomplete="off" onkeydown="if(event.key==='Enter')finishSetup()"></div>
+    <button class="o center on" type="button" style="justify-content:center" onclick="finishSetup()">Start taking calls</button>
+  </div></div>`;
+  el("side").innerHTML=""; el("strip").innerHTML=""; el("dock").hidden=true;
+  setTimeout(()=>{ const i=el("csrName"); if(i) i.focus(); },30);
 }
 function finishSetup(){
-  const v=(el("setupName").value||"").trim();
-  if(!v) return;
-  setCsrIdentity(v);
-  render();
+  const v=(el("csrName").value||"").trim();
+  if(!v){ el("csrName").focus(); return; }
+  setCsrIdentity(v); render();
 }
 
 /* =========================================================================
@@ -1186,19 +1503,15 @@ const AUTH_KEY="rpCallConsole.authOk";
 const AUTH_PASSWORD="2657";
 function isAuthed(){ try{ return localStorage.getItem(AUTH_KEY)==="1"; }catch(e){ return false; } }
 function renderAuthGate(){
-  el("progFill").style.width="0%";
-  el("jumpRail").innerHTML="";
-  el("hdWho").textContent="Internal tool";
-  el("main").innerHTML=`
-    <div class="q">
-      <p class="stepno">Staff Only</p>
-      <h2>Enter password</h2>
-      <p class="sub">Internal tool \u2014 ask your manager if you don't have the password.</p>
-      <div class="f"><input id="authPass" type="password" inputmode="numeric" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')checkAuth()"></div>
-      <p id="authError" class="sub" style="color:var(--red);min-height:16px"></p>
-      <button class="btn pri" style="width:100%" onclick="checkAuth()">Enter</button>
-    </div>`;
-  el("rail").innerHTML="";
+  el("main").innerHTML=`<div class="setup-wrap"><div class="card">
+    <h2>Staff only</h2>
+    <p class="sub">Internal tool \u2014 ask your manager if you don't have the password.</p>
+    <div class="f"><input id="authPass" type="password" inputmode="numeric" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')checkAuth()"></div>
+    <p id="authError" class="note" style="color:var(--red-ink);min-height:18px"></p>
+    <button class="o center on" type="button" style="justify-content:center" onclick="checkAuth()">Enter</button>
+  </div></div>`;
+  el("side").innerHTML=""; el("strip").innerHTML=""; el("dock").hidden=true;
+  setTimeout(()=>{ const i=el("authPass"); if(i) i.focus(); },30);
 }
 function checkAuth(){
   const v=(el("authPass").value||"").trim();
@@ -1212,85 +1525,12 @@ function checkAuth(){
   }
 }
 
-function render(){
-  if(!isAuthed()){ renderAuthGate(); return; }
-  if(!rpState.csrName){ renderSetup(); return; }
-  const t=TITLES[rpState.step]||["",""], sc=resolveScript(rpState.step);
-  const idx=stepIdx(), total=flow().length;
-  el("progFill").style.width=`${Math.round((idx/Math.max(1,total-1))*100)}%`;
-  el("hdWho").textContent = rpState.fullName
-    ? `${rpState.fullName}${phoneOk(rpState.phone)?" \u00b7 "+fmtPhone(rpState.phone):""}` : "Internal tool";
-  renderJumpRail();
-  el("main").innerHTML=`
-    ${sc?`<div class="script">
-      <div class="script-row"><span class="tag t-say">Say</span><span class="say-text">${sc.say}</span></div>
-      <div class="script-row muted"><span class="tag t-listen">Listen</span><span>${sc.listen}</span></div>
-      <div class="script-row muted"><span class="tag t-watch">Watch</span><span>${sc.watch}</span></div>
-    </div>`:""}
-    <div class="q">
-      <p class="stepno">Step ${idx+1} of ${total}</p>
-      <h2>${t[0]}</h2>${t[1]?`<p class="sub">${t[1]}</p>`:""}
-      ${screenHtml()}
-      ${guardrails().map(g=>`<div class="guard ${g.level}"><b>${g.title}</b>${g.body}</div>`).join("")}
-      ${rpState.customLeadError?`<div class="guard stop"><b>Couldn't save</b>${esc(rpState.customLeadError)}</div>`:""}
-      ${rpState.step==="done"?"":`<div class="nav">
-        ${idx>0?`<button class="btn" onclick="back()">Back</button>`:""}
-        <button class="btn pri" onclick="next()" ${rpState.bookingSubmitting||rpState.customLeadSaving?"disabled":""}>
-          ${rpState.step==="calendar"?"Confirm booking":(rpState.step==="contact"&&isCustomService())?(rpState.customLeadSaving?"Saving\u2026":"Submit request"):"Next"}</button></div>`}
-    </div>
-    ${!stepValid()?`<p class="sub" style="text-align:center;margin-top:8px">Not fully filled out \u2014 that's fine, keep going. You can always come back to it.</p>`:""}`;
-  renderRail(); save();
-}
-function fmtPhone(v){ const d=normalizePhone(v);
-  return d.length===10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:v; }
-
-function renderRail(){
-  const custom=rpIsCustomQuoteOnly()||isCustomService(), rows=[];
-  if(rpState.service) rows.push(["Service",isCustomService()?"Custom Quote / Something Else":(rpServices[rpState.service]||{}).name]);
-  if(rpSqftTier()) rows.push(["Size",rpSqftTier().label]);
-  if(rpState.bedrooms) rows.push(["Bedrooms",rpState.bedrooms]);
-  if(rpState.bathrooms) rows.push(["Bathrooms",rpState.bathrooms]);
-  if(rpState.condition) rows.push(["Condition",rpState.condition.replace(/ Conditions?$/,"")]);
-  if(rpState.service==="maintenance" && !rpIsCustomQuoteOnly()) rows.push(["Base (before discount)","$"+rpDisplayBasePrice().toFixed(2)]);
-  if(rpState.frequency) rows.push(["Frequency",rpState.frequency]);
-  if(rpAddonsTotal()>0) rows.push(["Add-ons","+"+rpFormatMoneyDisplay(rpAddonsCents())]);
-  if(rpState.militaryDiscount&&rpMilitaryDiscountAmount()>0) rows.push(["Military","\u2212$"+rpMilitaryDiscountAmount().toFixed(2)]);
-  if(rpState.bookedAt) rows.push(["Scheduled",rpState.bookedAt]);
-  el("rail").innerHTML=`<div class="rail-card">
-    <div class="rail-price"><small>${custom?"Pricing":"Running total"}</small>
-      <strong>${custom?"Custom":(rpFinalPrice()>0?rpFormatMoneyDisplay(rpFinalPriceCents()):"\u2014")}</strong>
-      ${custom?`<span class="note">Don't quote a number.</span>`:""}</div>
-    ${rows.length?`<div class="rail-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div>`:""}
-    ${rpState.service && rpIncludes[rpState.service] ? `<div class="rail-included">
-      <div class="rail-included-title">What's Included \u2014 read this if asked</div>
-      <ul>${rpIncludes[rpState.service].items.map(i=>`<li>${i}</li>`).join("")}</ul>
-      ${/* Round 22: the rail only ever showed what IS included. The most
-            likely question on a Express call is "does that do the oven?"
-            and the answer lived in fineprint, which was never rendered
-            here. Liz has the harder job than the website -- she's saying
-            it out loud without the caller seeing a comparison table. */
-        rpIncludes[rpState.service].fineprint ? `<div class="rail-excluded">
-        <div class="rail-included-title" style="color:var(--red)">NOT included \u2014 say this before they ask</div>
-        <p>${rpIncludes[rpState.service].fineprint}</p>
-      </div>` : ""}
-    </div>` : ""}
-    ${(() => {
-      const a = rpServiceAreaStatus();
-      if (a.status === "core" || a.status === "unknown") return "";
-      return `<div class="rail-area ${a.status==="outside"?"is-out":""}">
-        <b>${a.status==="outside"?"\u26a0 Outside service area":"Edge of service area"}</b>
-        <span>${a.status==="outside"
-          ? "Book it, but tell them the office will confirm coverage and any travel before the date. Flag it in your notes."
-          : `${esc(a.area)} \u2014 extra drive time. Fine to book; the office will see the flag.`}</span>
-      </div>`;
-    })()}
-  </div>`;
-}
 
 /* ---------- Interaction ---------- */
-function set(f,v){ rpState[f]=v; save(); try{renderRail();}catch(e){} 
-  if(f==="fullName"||f==="phone") el("hdWho").textContent = rpState.fullName
-    ? `${rpState.fullName}${phoneOk(rpState.phone)?" \u00b7 "+fmtPhone(rpState.phone):""}` : "Internal tool"; }
+function set(f,v){
+  rpState[f]=v; save();
+  try{ renderSide(); renderTop(); renderDock(); }catch(e){}
+}
 function pick(f,v){ rpState[f]=v; render(); }
 function toggle(f){ rpState[f]=!rpState[f];
   if(f==="militaryDiscount"&&!rpState.militaryDiscount) rpState.militaryVerified=false; render(); }
@@ -1305,47 +1545,7 @@ function toggle(f){ rpState[f]=!rpState[f];
    it in the base, so carrying the selection across quoted $50 for work
    already in scope. Liz gets a one-line heads-up so she can say it out
    loud instead of the number quietly changing mid-call. */
-/* Round 22: the website now shows the customer a nine-row scope grid on
-   the tier screen. Liz had nothing equivalent — she was asked to route
-   between two products with one hint line. Same nine rows, formatted for
-   reading aloud, shown on the quote screen for either move-out tier. */
-function moveoutScopeRefHtml(){
-  if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
-  /* Round 25 (parity with /book's scope table, same direct instruction --
-     "each addon should have a price" + cover ceiling fans/vents/lights):
-     every excluded-on-Express row now shows the real dollar figure Liz can
-     say out loud, and baseboards/windows/walls/fans-vents-lights are one
-     combined row matching the single Detail Pass SKU she actually books. */
-  const rows=[
-    ["Kitchen, bathrooms, floors",1,1],
-    ["Appliance exteriors, counters, sinks",1,1],
-    ["Trash out, mirrors & glass",1,1],
-    ["Inside the oven",1,rpAddonCatalog.oven.price],
-    ["Inside the refrigerator",1,rpAddonCatalog.fridge.price],
-    ["Inside cabinets & closets",1,rpAddonCatalog.cabinets.price],
-    ["Baseboards, windows, walls, fans/vents/lights",1,rpDetailPassPrice()]
-  ];
-  const m=v=>v===1?`<span style="color:var(--green);font-weight:800">yes</span>`
-    :typeof v==="number"?`<span style="color:var(--red);font-weight:800">+$${v}</span>`
-    :`<span style="color:var(--muted);font-weight:800">no</span>`;
-  return `<details class="scope-ref" style="margin-bottom:11px">
-    <summary style="cursor:pointer;font-weight:800;font-size:13px">Scope cheat sheet \u2014 Inspection Ready vs Express</summary>
-    <div style="margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
-      <div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:7px 10px;background:rgba(17,17,17,.05);font-size:10.5px;font-weight:800;text-align:center">
-        <span style="text-align:left">&nbsp;</span><span>Insp.<br>Ready</span><span>Express</span></div>
-      ${rows.map(r=>`<div style="display:grid;grid-template-columns:1fr 62px 62px;gap:4px;padding:6px 10px;border-top:1px solid var(--line);font-size:12px;align-items:center"><span>${r[0]}</span><span style="text-align:center">${m(r[1])}</span><span style="text-align:center">${m(r[2])}</span></div>`).join("")}
-    </div>
-    <p style="margin:7px 0 0;font-size:12px;color:var(--muted);line-height:1.45">${
-      /* Round 23 (sales-review fix): /book now nudges sellers toward
-         Inspection Ready using the rental/selling answer it already
-         collected. Liz collects the same answer on the "intent" step and
-         it went unused after that -- same nudge, said out loud. */
-      rpState.moveoutRentalOrSelling === "selling"
-        ? "They're listing it \u2014 lead with Inspection Ready: buyers notice what a rental tenant wouldn't."
-        : "Inspection Ready runs a <strong>3</strong>-cleaner crew, Express runs <strong>2</strong> \u2014 same standards either way. No inspection at all? Express is the honest recommendation, not a downsell: less scope for less money, and anything specific is still addable by the row above."
-    }</p>
-  </details>`;
-}
+
 
 function switchMoveoutTier(k){
   rpState.service=k;
@@ -1366,7 +1566,7 @@ function chooseMoveoutTier(k){
   rpState.moveoutTierChosen=true;
   next();
 }
-function pickService(k){ rpState.service=k;
+function pickService(k){ markCallStart(); rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
   /* BUG FIX: this reset never touched any addon field, or (once added)
@@ -1405,14 +1605,6 @@ function next(){
 function back(){ const f=flow(), i=stepIdx();
   if(i>0){ rpState.step=f[i-1]; window.scrollTo({top:0,behavior:"smooth"}); render(); } }
 
-function openDrawer(id){
-  if(id==="drObj") el("objList").innerHTML=OBJECTIONS.map(o=>
-    `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${typeof o.n==="function"?o.n():o.n}</em></div>`).join("");
-  if(id==="drOut") el("outList").innerHTML=OUTCOMES.map(o=>
-    `<button class="out-btn" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
-  el(id).hidden=false; document.body.style.overflow="hidden";
-}
-function closeDrawer(id){ el(id).hidden=true; document.body.style.overflow=""; }
 
 /* ---------- Persistence (survives an accidental refresh mid-call) ---------- */
 const CSR_IDENTITY_KEY = "rpCallConsole.csrIdentity";
@@ -1431,7 +1623,7 @@ function setCsrIdentity(name){
   try{ localStorage.setItem(CSR_IDENTITY_KEY,name); }catch(e){}
   save();
 }
-function resetCall(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} window.location.reload(); }
+function resetCall(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} clearCallStart(); window.location.reload(); }
 
 /* ---------- Office/crew summary ---------- */
 function jobDetails(){
@@ -1480,13 +1672,10 @@ function jobDetails(){
 }
 
 /* ---------- Calendar: real month grid, current + next month ---------- */
-/* Slot data shape, straight from GHL via the /slots worker endpoint:
-   { "2026-08-05": { slots: ["2026-08-05T10:00:00-05:00", ...] }, ... }
-   Each day is an OBJECT with a .slots array, not a plain array — treating
-   it as a plain array (an earlier version of this file did) silently
-   produces "undefined" everywhere. This matches /book's rpSlotsForDate()
-   exactly, including the 9am-5pm business-hours filter, so both pages
-   show the same bookable window. */
+
+
+/* ---------- Calendar ----------
+      show the same bookable window. */
 function slotsForDate(dateKey){
   const raw=rpState.availableSlots?.[dateKey]?.slots || [];
   return raw.filter(slot=>{
@@ -1648,6 +1837,8 @@ async function loadSlots(){
   rpState.slotsLoading=false; render();
 }
 
+
+
 async function submitBooking(){
   if(rpState.bookingSubmitting) return;
   if(!rpState.selectedStartTime){
@@ -1784,6 +1975,13 @@ async function logOutcome(outcome){
 
 load(); render();
 if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+
+
+/* ---------- Boot ---------- */
+load();
+render();
+if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+
 </script>
 </body>
 </html>

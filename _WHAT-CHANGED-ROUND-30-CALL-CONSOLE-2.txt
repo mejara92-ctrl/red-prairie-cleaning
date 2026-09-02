@@ -1,0 +1,247 @@
+RED PRAIRIE — ROUND 30: CALL CONSOLE 2.0
+A rewrite of /call's presentation layer. Every line of pricing, booking,
+webhook and guardrail logic is carried across unchanged.
+========================================================================
+Instruction: "Analyze call, is there too much junk in there? Reimagine
+call so that it better suits Liz to quickly process information and
+assist with sales."
+
+Settings chosen for this build: works on laptop AND phone (touch layout
+with keyboard shortcuts layered on), experienced operator (coaching
+stripped back hard), and it REPLACES /call outright. The previous
+console is preserved verbatim in this zip as call/_legacy-console-1.0.html
+if you ever need to look at it — it is not linked from anywhere and not
+served as a page.
+
+
+========================================================================
+1. WHAT THE AUDIT FOUND
+========================================================================
+Measured by driving a real move-out call in a headless browser and
+counting what was actually on screen at each step:
+
+                     1.0 words   Next button   1.0 screens
+                     on screen   sat at        of scrolling
+  Service list          271      y=908         1.19
+  Caller                115      y=621         1.00
+  Bedrooms               59      y=432         1.00
+  Bathrooms              59      y=432         1.00
+  Questionnaire          49      y=451         1.00
+  Tiers                 364      y=842         1.07
+  Add-ons               291      y=1061        1.31
+  Quote                 417      y=1268        1.59
+  Address                99      y=738         1.00
+
+The quote screen — the exact moment she says a number and then has to go
+quiet — carried 541 words of page text and put the Next button 1,268px
+down. She scrolled while she talked.
+
+THE JUNK, specifically:
+
+a) THE SAME INSTRUCTION, FOUR TIMES, ON ONE SCREEN.
+   On add-ons, "ask them by name" appeared as:
+     - the screen subtitle ("Ask carpet, junk, windows and garage by name")
+     - the LISTEN row ("Ask these by name. Customers almost never volunteer")
+     - inside a 100-word WATCH paragraph
+     - a blue guardrail box ("ASK ALL THREE BY NAME")
+   (One of those four was mine, added last round. Removing it.)
+
+b) SAY / LISTEN / WATCH WAS A THREE-WAY SPLIT THAT ISN'T A REAL
+   DISTINCTION. LISTEN and WATCH both mean "coaching." Under pressure
+   there was no way to know which box held the thing you needed, so
+   both got skipped.
+
+c) THE RAIL WAS STATIC REFERENCE. The same eight "what's included"
+   bullets and the same NOT-INCLUDED paragraph rendered on all twelve
+   steps. Needed maybe one call in ten; costing screen space on the
+   other nine.
+
+d) TWELVE STEPS, SEVERAL OF THEM ONE TAP. Bedrooms was its own screen.
+   Bathrooms was its own screen. Renting-or-selling was its own screen.
+   Each transition is a beat of dead air on a live call.
+
+e) NOTHING WAS GLANCEABLE. Everything was prose paragraphs at 14px.
+   The running total — the single most valuable number on the page —
+   was small text in a side rail.
+
+f) NO WAY TO LOOK ANYTHING UP. "Do I need to be there?" meant opening a
+   drawer and eyeballing sixteen entries. "Does that include the oven?"
+   meant reading the eight-bullet rail. No search, no index.
+
+g) NO SENSE OF TIME. No call timer at all, on a tool whose own script
+   says "pause two or three seconds."
+
+
+========================================================================
+2. WHAT 2.0 IS
+========================================================================
+One rule: a phone console has two jobs — show the words to SAY, and
+capture the answer in one tap. Everything else is reference, and
+reference is one keystroke away, never permanently on screen.
+
+FOUR FIXED ZONES, none of which scroll away:
+  TOP     caller · call timer · running total (large) · Look up · End
+  STRIP   step chips, tap any one to jump
+  MAIN    the line to say, then the thing to tap
+  DOCK    Back / Next, pinned to the bottom, always reachable
+
+THE LINE. One sentence, in quotation marks, 20-25px serif, alone in its
+own card. It is the only thing on screen by default.
+
+COACH, COLLAPSED. LISTEN and WATCH merged into one short paragraph
+behind a "Coach" toggle (or the ? key). The setting is remembered, so
+someone newer can leave it open permanently and Liz can leave it shut.
+
+GUARDRAILS STAYED — they are the opposite of junk. They only fire when
+they apply: this job can't be quoted, the address wasn't read back, the
+add-ons just made Inspection Ready the better deal. Two 1.0 guardrails
+were deleted because they were unconditional advice about the current
+step and are now the first sentence of that step's Coach line ("Say it,
+then stop" and "Ask all three by name").
+
+RESULT, same measurements:
+
+                     1.0 words   2.0 words    change
+  Service list          271         80        -70%
+  Caller                115         66        -43%
+  Beds/baths/checks     167         76        -55%   (3 screens -> 1)
+  Tiers                 364        103        -72%
+  Add-ons               291        159        -45%
+  Quote                 417        144        -65%
+  Address                99         39        -61%
+
+Every screen is now one viewport or close to it (worst case 1.28), with
+the Next button pinned to the bottom of the window rather than 1,268px
+down the page.
+
+
+========================================================================
+3. LOOK UP — the feature that let the rail and the drawer go away
+========================================================================
+Press "/" (or tap Look up) and type a word. One search across:
+  - all 16 objections, with the answer AND the coaching note
+  - every scope item for the current service ("is the oven included?")
+  - every price in the catalog, read live from the pricing engine
+  - the policies that were never written down anywhere: deposit and
+    payment, do they need to be home, does it need to be empty,
+    licensed/insured, what if something's missed, service area,
+    rescheduling, and what to do when the water is off
+
+Results are RANKED, not just filtered — a title match beats an answer
+match beats a coaching-note match, and shorter entries win ties. Typing
+"oven" returns the oven's price and scope first, not a long objection
+whose footnote happens to contain the word. Verified:
+
+    "oven"     -> Included: oven, fridge & appliances / Price: oven interior
+    "deposit"  -> Policy: deposit or payment up front?
+    "pay"      -> Say this: "How do I pay? Do you need a deposit?"
+    "not home" -> Policy: do they need to be home?
+    "insured"  -> Policy: licensed and insured?
+    "spouse"   -> Say this: "I need to think about it / talk to my spouse"
+
+The index is rebuilt on every keystroke from the engine's own constants,
+so no price in it can go stale the way a written cheat sheet does.
+
+
+========================================================================
+4. FEWER STEPS
+========================================================================
+Move-out went from 12 steps to 9.
+
+  "home"    merges bedrooms + bathrooms + the three hard-stop checks.
+            They're all just facts about the property, they all fit on
+            one screen, and it's the block she reads out as one breath.
+  "tiers"   absorbed renting-vs-selling, because that is the only place
+            the answer changes what she does: it decides which tier she
+            leads with.
+  "hourly"  merges cleaners + hours, same reasoning.
+
+ORDER IS UNCHANGED IN EVERY WAY THAT MATTERS. Name and number are still
+captured before any price is spoken. The hard-stop checks still land
+before the tier screen shows a number. A blocked job still routes to a
+callback with the lead already captured.
+
+
+========================================================================
+5. KEYBOARD
+========================================================================
+For the half of her shifts she's at a laptop. All of it is additive —
+every one of these is also a tap target.
+
+  1-9         pick that numbered option on this screen
+  Enter       Next (also works from a text field)
+  Backspace   Back
+  /           open Look up, cursor already in the box
+  ?           toggle Coach
+  Esc         close whatever is open
+
+Enter inside a TEXTAREA still makes a new line rather than advancing —
+verified, because getting that wrong would eat her call notes.
+
+
+========================================================================
+6. ALSO NEW
+========================================================================
+  - CALL TIMER in the top bar, starting when she picks a service.
+  - RUNNING TOTAL is now a large number in the top bar instead of small
+    text in a side rail. On a custom-quote job it reads "Custom / Don't
+    quote" in amber instead of a dollar figure.
+  - THE SIDE PANEL is now a live recap of what she has captured — every
+    add-on as its own line with its price — which is the thing she reads
+    back at the end of the call. It replaced the static scope bullets.
+  - DARK MODE, because a console someone stares at for a whole shift
+    should follow the machine.
+  - The console works down to 320px with no horizontal scrolling, and
+    every control clears the 44px touch minimum except the step chips
+    (34px, secondary navigation, well clear of the 24px WCAG floor).
+
+
+========================================================================
+7. WHAT DID NOT CHANGE — and how that was proven
+========================================================================
+Every piece of business logic was carried across verbatim: the shared
+pricing engine integration, guardrails(), the GHL booking payload,
+the custom-quote lead path, outcome logging, the calendar and its
+slot-fetching, localStorage persistence mid-call, the CSR identity, the
+password gate, jobDetails() for the crew sheet, and all 16 objections
+with their answers and notes.
+
+PROOF, not assertion. The same call was driven through 1.0 and through
+2.0 with byte-identical state, and the POST body sent to the booking
+worker was captured from both and diffed:
+
+    total fields compared: 76
+    differences:            0   (excluding submitted_at)
+
+Also verified in a headless browser against the live pricing engine:
+
+  ✓ moveout 3BR Inspection Ready ............... $539
+  ✓ moveout 4BR Express ........................ $299
+  ✓ deep ....................................... $300
+  ✓ maintenance one-time ....................... $150
+  ✓ carpet 3 rooms ............................. $150
+  ✓ hourly 2 cleaners x 4hrs ................... $400
+  ✓ airbnb ..................................... custom quote
+  ✓ custom quote flow .......................... no price shown
+  ✓ water off -> "Do not give a price" stop guard fires
+  ✓ outcome logging posts 57 fields incl. call notes
+  ✓ every step of every one of the 8 flows renders, no JS errors
+  ✓ no horizontal overflow at 320 / 390 / 768 / 1280px
+  ✓ tools/check-prices.py still passes
+
+
+========================================================================
+8. THINGS I DELIBERATELY DID NOT DO
+========================================================================
+- The password is still a plaintext constant in the page source. That is
+  unchanged from 1.0 and it's fine for what it is (keeping the tool off
+  the open web, not protecting secrets) — but it is not security, and
+  anyone who views source can read it. If that ever matters, it needs to
+  move behind the worker.
+
+- I did not add a "what did the customer say" free-text field on every
+  step. It's tempting, but it's a typing task in the middle of a
+  conversation. Call notes stay where they were: one box, at the end.
+
+- I did not build call recording, dispositions beyond the existing seven,
+  or any kind of queue/CRM view. Those are a different tool.
