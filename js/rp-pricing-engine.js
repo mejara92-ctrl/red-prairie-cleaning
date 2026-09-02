@@ -36,7 +36,7 @@ const rpServices = {
      rationale and RP_GUARANTEE note in rpGuaranteeType() for the
      guarantee split. */
   moveout:        { name: "Inspection Ready Move-Out",     emoji: "🏠" },
-  moveoutrefresh: { name: "Move-Out Refresh",               emoji: "🧹" },
+  moveoutrefresh: { name: "Move-Out Express",               emoji: "🧹" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
@@ -93,27 +93,58 @@ const rpServices = {
      price      = cost / (1 - 20% target margin)
 
    Using the worksheet's own assumed hours (Inspection Ready 6/8/10/12,
-   Refresh 3/4/5/6, by bedroom tier) this formula outputs $374/$480/
-   $587/$693 for Inspection Ready and $197/$246/$295/$344 for Refresh --
+   Express 3/4/5/6, by bedroom tier) this formula outputs $374/$480/
+   $587/$693 for Inspection Ready and $197/$246/$295/$344 for Express --
    rounded below to clean, ends-in-9 numbers that land AT OR SLIGHTLY
    ABOVE the formula's own target at every size, so the margin is a
    floor, not a ceiling. Inspection Ready's old prices ($299/$399/$499/
    $599) were the exact same numbers charged before the two-tier split
    existed -- the guarantee reserve was adopted structurally but never
-   actually funded into the price. This is that fix. Refresh's old
+   actually funded into the price. This is that fix. Express's old
    prices ($179/$229/$279/$329) were closer to correct (round 19's
    "~60% of Inspection Ready, rounded" heuristic) but still $15-18 under
    the formula at every size; nudged up to clear it cleanly. */
+/* ROUND 26 (direct instruction: "Change Inspection Move-Out from 2
+   cleaners to 3 cleaners, 5-8 hours") -- re-run through the SAME Deposit
+   Math formula the round-25 comment above documents, with crew and hours
+   swapped for Inspection Ready only (Express is untouched -- still 2
+   crew, still its own hours):
+
+     labor(hrs) = hrs * 3 crew * $17.50/hr * 1.12 burden
+     cost       = labor + $15 supplies + $25 overhead
+     cost       = cost / (1 - 8% guarantee reserve)
+     price      = cost / (1 - 20% target margin)
+
+   "5-8 hours" replaces the old 6-10 display range; assumed per-tier
+   hours are the four whole numbers in that range, one per bedroom tier
+   (5/6/7/8), the same even one-hour-per-tier step pattern the old
+   6/8/10/12 assumption used (see RP_MOVEOUT_TIER_HOURS below for the
+   display string these feed). That gives $453.80/$533.70/$613.59/
+   $693.48 -- rounded up to the nearest ends-in-9 number at or above,
+   same convention as round 25: $459/$539/$619/$699. The 5+ bedroom
+   price barely moves ($699 unchanged) because 3 crew x 8 hours is the
+   same 24 person-hours 2 crew x 12 hours used to cost before; the
+   smaller tiers go up more (+$80/+$60/+$30) because fewer hours at the
+   new crew size doesn't fully offset the extra person on a shorter job.
+
+   This reopened the round-25 "a la carte should never be cheaper than
+   switching tiers outright" invariant on Detail Pass pricing -- fixed
+   in round 27, see the comment above RP_DETAIL_PASS_PRICES below for
+   the corrected math (an earlier flag written in this comment named
+   the wrong two bedroom sizes as the broken ones -- 1-2BR and 3BR were
+   actually the sizes that broke, not 4BR/5+; that mistake was caught
+   and fixed before anything shipped on it, see the round-27 note
+   below). */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 379, includedBathrooms: 1, label: "1\u20132 bedrooms" },
-  { min: 3, max: 3, base: 479, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 589, includedBathrooms: 2, label: "4 bedrooms" },
+  { min: 1, max: 2, base: 459, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 3, max: 3, base: 539, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 619, includedBathrooms: 2, label: "4 bedrooms" },
   { min: 5, max: 999, base: 699, includedBathrooms: 3, label: "5+ bedrooms" }
 ];
-/* Move-Out Refresh -- same bedroom brackets and included-bathroom
+/* Move-Out Express -- same bedroom brackets and included-bathroom
    convention as Inspection Ready above so the two stay directly
    comparable size-for-size; only the base price and scope differ. Still
-   a starting estimate pending real logged Refresh job hours, same as
+   a starting estimate pending real logged Express job hours, same as
    before -- only the number changed this round, not that caveat. */
 const RP_MOVEOUT_REFRESH_BEDROOM_TIERS = [
   { min: 1, max: 2, base: 199, includedBathrooms: 1, label: "1\u20132 bedrooms" },
@@ -129,21 +160,53 @@ function rpMoveoutBedroomTier(beds, service = rpState.service) {
   return rpMoveoutTierTable(service).find(t => b >= t.min && b <= t.max) || null;
 }
 /* Round 25 (direct instruction): Detail Pass pricing (baseboards & trim,
-   interior windows, wall spot-cleaning, bundled) for Move-Out Refresh --
+   interior windows, wall spot-cleaning, bundled) for Move-Out Express --
    same bedroom brackets as the tier tables above, $50-step convention.
    Anchored so buying every excluded-scope add-on (fridge $50 + oven $50
    + cabinets $50 + this) still costs MORE than just switching to
    Inspection Ready outright, at every size -- a la carte should never
-   be the cheaper way to get the full checklist:
+   be the cheaper way to get the full checklist. That held at round 25's
+   prices:
      1-2BR: $50*3 + $75  = $225  vs. tier gap $379-$199 = $180  (+$45)
      3BR:   $50*3 + $125 = $275  vs. tier gap $479-$249 = $230  (+$45)
      4BR:   $50*3 + $175 = $325  vs. tier gap $589-$299 = $290  (+$35)
-     5+BR:  $50*3 + $225 = $375  vs. tier gap $699-$349 = $350  (+$25) */
+     5+BR:  $50*3 + $225 = $375  vs. tier gap $699-$349 = $350  (+$25)
+
+   BROKEN as of round 26 -- Inspection Ready's crew/hours change (see the
+   comment above RP_MOVEOUT_BEDROOM_TIERS) moved the tier gap without
+   touching this table. Checked by actually running the numbers (a first
+   pass at this got the direction backwards and named the wrong two
+   sizes -- corrected here): the invariant fails on the two SMALLEST
+   sizes, not the two biggest, because the gap grew more on the small
+   end (2-crew-for-6-hours vs. 3-crew-for-5-hours is a bigger jump than
+   2-for-12 vs. 3-for-8):
+     1-2BR: $50*3 + $75  = $225  vs. tier gap $459-$199 = $260  (-$35, cheaper a la carte)
+     3BR:   $50*3 + $125 = $275  vs. tier gap $539-$249 = $290  (-$15, cheaper a la carte)
+     4BR:   $50*3 + $175 = $325  vs. tier gap $619-$299 = $320  (+$5,  still fine, but thin)
+     5+BR:  $50*3 + $225 = $375  vs. tier gap $699-$349 = $350  (+$25, still fine)
+
+   ROUND 27 (direct instruction: "do not make refresh cheaper than
+   inspection ready") fixes this by re-pricing Detail Pass alone, not
+   Express's base price or the flat $50 add-ons -- this table is the one
+   built specifically to be the invariant's anchor, so it's the natural
+   place to absorb the correction rather than touching Express's
+   advertised "starting at $199" figure. Solved for a flat $40 cushion
+   at every size (a little more breathing room than round 25's smallest
+   cushion of $25, so a future small nudge to Inspection Ready doesn't
+   immediately break it again):
+     1-2BR: need >= 260-150 = 110, +$40 cushion = $150
+     3BR:   need >= 290-150 = 140, +$40 cushion = $180
+     4BR:   need >= 320-150 = 170, +$40 cushion = $210
+     5+BR:  need >= 350-150 = 200, +$40 cushion = $240
+   Comes out to a clean $30-per-tier step (was $50) with identical $40
+   margin at every size -- verify: $150+$150=$300 vs $260 (+40); $150+
+   $180=$330 vs $290 (+40); $150+$210=$360 vs $320 (+40); $150+$240=
+   $390 vs $350 (+40). */
 const RP_DETAIL_PASS_PRICES = [
-  { min: 1, max: 2, price: 75 },
-  { min: 3, max: 3, price: 125 },
-  { min: 4, max: 4, price: 175 },
-  { min: 5, max: 999, price: 225 }
+  { min: 1, max: 2, price: 150 },
+  { min: 3, max: 3, price: 180 },
+  { min: 4, max: 4, price: 210 },
+  { min: 5, max: 999, price: 240 }
 ];
 function rpDetailPassPrice(beds = rpState.bedrooms) {
   const b = Number(beds || 0);
@@ -174,8 +237,8 @@ const rpSqftTiers = [
   { key: "t4", label: "3,000\u20133,400 sq ft",     base: 300 },
   { key: "t5", label: "Over 3,400 sq ft",      base: null }
 ];
-/* Move-Out Refresh's own large-home surcharge -- same steps as Inspection
-   Ready above, halved, since Refresh's whole point is a smaller number.
+/* Move-Out Express's own large-home surcharge -- same steps as Inspection
+   Ready above, halved, since Express's whole point is a smaller number.
    Same t5 = custom-quote convention. */
 const rpRefreshSqftTiers = [
   { key: "t1", label: "Under 2,200 sq ft",     base: 0 },
@@ -262,7 +325,7 @@ const HOURLY_MAX_CLEANERS = 4;
 
 /* PEAK-SEASON KILL SWITCH — flip to false to pull Hourly Cleaning off the
    public /book service list in one line (e.g. during peak PCS weeks when
-   a $150 3-hour booking would otherwise eat a Friday slot a $379+
+   a $150 3-hour booking would otherwise eat a Friday slot a $459+
    move-out wanted). /call is unaffected: CSRs can always book it by
    phone, so turning this off routes the demand through Christa and Liz
    instead of killing it. */
@@ -305,8 +368,8 @@ function rpServiceIsPublic(key) {
                      Your Deposit promise: come back free if a landlord
                      flags something.
 
-   - "satisfaction" Move-Out Refresh, Deep, and Basic. None of these
-                     promise a completed, inspection-proof reset — Refresh
+   - "satisfaction" Move-Out Express, Deep, and Basic. None of these
+                     promise a completed, inspection-proof reset — Express
                      is intentionally a lighter/faster scope (no landlord
                      walkthrough to answer to), Deep/Basic sell an
                      anchored block of time. A deposit-style completion
@@ -407,7 +470,7 @@ const rpAddonCatalog = {
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
   /* Round 25 (direct instruction): three new real SKUs for Move-Out
-     Refresh's excluded scope, so every row on the moveouttiers scope
+     Express's excluded scope, so every row on the moveouttiers scope
      table (see book/index.html) shows a real price instead of "-".
      Oven and cabinets/closets are flat, same rate as the existing
      fridge interior -- interior appliance and storage cleaning time
@@ -433,8 +496,8 @@ const rpAddonCatalog = {
 
 const rpServiceAddons = {
   moveout:        ["carpet", "junk", "windows", "garage"],
-  /* Refresh doesn't include the fridge interior by default (Inspection
-     Ready does) -- so unlike "moveout" above, Refresh gets "fridge" as a
+  /* Express doesn't include the fridge interior by default (Inspection
+     Ready does) -- so unlike "moveout" above, Express gets "fridge" as a
      purchasable add-on. This is the concrete version of "tell the
      customer exactly what's excluded, and how to add it back": the
      included screen names the exclusion, and this is where they can
@@ -464,7 +527,7 @@ const rpServiceAddons = {
    selection made under one service could survive a switch and keep
    charging under another.
 
-   Reproduced live: pick Move-Out Refresh, add Refrigerator Interior
+   Reproduced live: pick Move-Out Express, add Refrigerator Interior
    ($50), then use the estimate screen's "See Inspection Ready pricing"
    link. Result was $449 on a 3BR instead of $399 -- a $50 charge for a
    fridge interior that Inspection Ready already includes in its base
@@ -639,7 +702,7 @@ const rpIncludes = {
       ["home", "Every room, inside & out"],
       ["check", "Oven, fridge & cabinets included"],
       ["shield", "Defend Your Deposit"],
-      ["repeat", "2-cleaner crew"]
+      ["repeat", "<strong>3</strong>-cleaner crew"]
     ],
     outcome: "Built to pass a landlord walkthrough, or to photograph well if you're listing the home for sale.",
     /* Exclusions folded into the fine print instead of their own
@@ -653,7 +716,7 @@ const rpIncludes = {
   },
   /* NEW (round 19) — the lighter counterpart to "moveout" above. Opposite
      framing on purpose: "moveout" claims totality (naming a few
-     exclusions to make "everything" credible); Refresh is the opposite
+     exclusions to make "everything" credible); Express is the opposite
      kind of promise, so it leads with what's bounded and names its
      exclusions as the MAIN point, not a footnote, per direct instruction
      that the customer should know exactly the scope they're getting. */
@@ -662,7 +725,7 @@ const rpIncludes = {
     highlights: [
       ["home", "Kitchen, bathrooms & floors"],
       ["check", "Surfaces & appliance exteriors wiped"],
-      ["repeat", "2-cleaner crew"],
+      ["repeat", "<strong>2</strong>-cleaner crew"],
       [null, "No inspection guarantee"]
     ],
     outcome: "Built for tenants and owners who just need it clean — not for a landlord walkthrough.",
@@ -670,7 +733,7 @@ const rpIncludes = {
        individually on the next step," but the refrigerator interior is
        the ONLY one of those exclusions that exists as a purchasable
        add-on (rpServiceAddons.moveoutrefresh). A customer picking
-       Refresh on the strength of that sentence reached the add-ons step
+       Express on the strength of that sentence reached the add-ons step
        and found four of the five missing. Naming the one that's real and
        routing the rest to Inspection Ready keeps the promise accurate
        without needing new SKUs. */
@@ -807,7 +870,7 @@ function rpCurrentFlow() {
     /* Round 19c (direct instruction): tier is no longer picked up front.
        One "Move-Out Cleaning" entry on the service list asks bedrooms and
        bathrooms immediately, THEN "moveouttiers" -- a side-by-side
-       Refresh vs. Inspection Ready price comparison for the home just
+       Express vs. Inspection Ready price comparison for the home just
        described, using rpMoveoutTierBasePrice() below. The customer
        picks a real tier there; rpState.service switches to whichever
        they pick (see rpChooseMoveoutTier in /book) and everything
@@ -856,7 +919,10 @@ function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
    same reason rpMoveoutTierBasePrice() exists for the prices. The hours
    are the clearest justification for the gap between the two numbers,
    and they weren't stated anywhere on that screen. */
-const RP_MOVEOUT_TIER_HOURS = { moveout: "6–10 hours", moveoutrefresh: "3–5 hours" };
+/* Round 26: Inspection Ready's range dropped from "6-10" to "5-8" to
+   match the new 3-cleaner crew (see RP_MOVEOUT_BEDROOM_TIERS above) --
+   more hands, less time on site for the same job. Express untouched. */
+const RP_MOVEOUT_TIER_HOURS = { moveout: "5–8 hours", moveoutrefresh: "3–5 hours" };
 function rpMoveoutTierHours(service) { return RP_MOVEOUT_TIER_HOURS[service] || ""; }
 
 function rpTimeEstimate() {
@@ -876,7 +942,11 @@ function rpTimeEstimate() {
   return "";
 }
 function rpTeamSize() {
-  if (rpState.service === "moveout" || rpState.service === "moveoutrefresh") return "2 cleaners";
+  /* Round 26: Inspection Ready moved to a 3-cleaner crew; Express is
+     still 2. Was one shared line for both -- split so this doesn't go
+     stale the next time only one tier's crew size changes. */
+  if (rpState.service === "moveout") return "3 cleaners";
+  if (rpState.service === "moveoutrefresh") return "2 cleaners";
   if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
   if (rpState.service === "hourly") return rpState.cleanerCount ? `${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}` : "You choose";
   if (rpState.service === "airbnb") return "1–2 cleaners";
@@ -1312,7 +1382,7 @@ function rpFrequencySummary() {
    effect: a phone booking arrived in GHL missing the guarantee type, the
    move-out tier, the add-on prices, the questionnaire answers, and the
    pricing breakdown — so any GHL automation that branches on those fields
-   (a Refresh confirmation SMS must NOT promise Defend Your Deposit) fired
+   (a Express confirmation SMS must NOT promise Defend Your Deposit) fired
    wrong or not at all on every phone-booked job.
 
    Same fix as the pricing engine itself: put the shared fields in ONE
@@ -1332,14 +1402,14 @@ function rpBuildSharedDetails() {
   const addonsTotal = rpAddonsTotal();
   const isMoveout = ["moveout", "moveoutrefresh"].includes(rpState.service);
   const tierLabel = !isMoveout ? "N/A"
-    : rpState.service === "moveout" ? "Inspection Ready" : "Refresh";
+    : rpState.service === "moveout" ? "Inspection Ready" : "Express";
   const guarantee = rpGuaranteeType();
   return {
     /* --- service identity --- */
     service: (rpServices[rpState.service] || {}).name || "N/A",
     service_key: rpState.service || "N/A",
     /* Discrete tier + guarantee fields so GHL can branch without parsing
-       a text blob. THIS is what a Refresh confirmation message must read
+       a text blob. THIS is what a Express confirmation message must read
        to avoid promising a deposit guarantee that doesn't apply. */
     moveout_tier: tierLabel,
     guarantee_type: guarantee,

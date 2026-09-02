@@ -2658,14 +2658,14 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <p class="rp-faq-intro">Tap a question. Your estimate and selections stay saved.</p>
 
       <details class="rp-animated-details"><summary>Is the instant estimate the final price?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>It is based on the size and options you select. We contact you before changing it for severe buildup, heavy trash, unusual access, biohazards, or work outside the selected scope.</p></div></div></details>
-      <details class="rp-animated-details"><summary>What's the difference between Inspection Ready and Move-Out Refresh?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Inspection Ready is the full interior reset — oven, fridge, cabinets, closets, baseboards, interior windows, ceiling fans, vents and light fixtures, everything — backed by our Defend Your Deposit™ guarantee. It's built for anyone facing a landlord, property manager, or housing office walkthrough, or listing the home for sale. Move-Out Refresh is a faster, lighter clean — kitchen, bathrooms, floors, and surfaces — for when nobody's checking the place against a list, at a lower price with our standard Satisfaction Guarantee. You can add specific items to Refresh individually (the oven, the fridge, cabinets, or a bundled Detail Pass), or just book Inspection Ready if you want it all covered at once. Compare both side by side on the pricing screen before you choose — you can switch tiers right up until the crew is booked.</p></div></div></details>
+      <details class="rp-animated-details"><summary>What's the difference between Inspection Ready and Move-Out Express?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Inspection Ready is the full interior reset — oven, fridge, cabinets, closets, baseboards, interior windows, ceiling fans, vents and light fixtures, everything — backed by our Defend Your Deposit™ guarantee. It's built for anyone facing a landlord, property manager, or housing office walkthrough, or listing the home for sale. Move-Out Express is a faster, lighter clean — kitchen, bathrooms, floors, and surfaces — for when nobody's checking the place against a list, at a lower price with our standard Satisfaction Guarantee. You can add specific items to Express individually (the oven, the fridge, cabinets, or a bundled Detail Pass), or just book Inspection Ready if you want it all covered at once. Compare both side by side on the pricing screen before you choose — you can switch tiers right up until the crew is booked.</p></div></div></details>
       <details class="rp-animated-details"><summary>How do booking and arrival work?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>No deposit is required. Same-day openings are often available, and we use a 30-minute arrival window so the team can finish the prior appointment properly and travel safely.</p></div></div></details>
       <details class="rp-animated-details"><summary>Do I need to be home or have the property empty?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>You do not need to be home. Move-in and move-out cleans work best in an empty property; provide a key, lockbox, property-manager contact, or other access instructions.</p></div></div></details>
       <details class="rp-animated-details"><summary>How should I prepare?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></div></div></details>
       <details class="rp-animated-details"><summary>What do the optional add-ons cover?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Tap any add-on for its exact scope and price. Garage floor washing requires an empty garage; exterior window washing has a basic and a premium (screens included) option; and junk or trash hauling is quoted separately based on volume rather than a flat price, since a truckload can vary so much.</p></div></div></details>
       <details class="rp-animated-details"><summary>How long will the cleaning take?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Your estimate shows the expected time and team size. Actual time varies with the home, access, and condition.</p></div></div></details>
-      <details class="rp-animated-details"><summary>What if something is missed?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>If we miss something in the selected scope, contact us within 48 hours and we'll return to fix it, free — that's Defend Your Deposit™ on Inspection Ready Move-Out, or our Satisfaction Guarantee on every other service, including Move-Out Refresh.</p></div></div></details>
-      <p class="rp-faq-footnote">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and surrounding Southwest Oklahoma communities. Military and first responders save 10%.</p>
+      <details class="rp-animated-details"><summary>What if something is missed?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>If we miss something in the selected scope, contact us within 48 hours and we'll return to fix it, free — that's Defend Your Deposit™ on Inspection Ready Move-Out, or our Satisfaction Guarantee on every other service, including Move-Out Express.</p></div></div></details>
+      <p class="rp-faq-footnote">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and surrounding Southwest Oklahoma communities. Military and first responders save 10% (up to $25).</p>
 
       <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
     </div>
@@ -2716,7 +2716,7 @@ const rpState = {
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
-  /* Round 25 (direct instruction): real priced add-ons for Refresh's
+  /* Round 25 (direct instruction): real priced add-ons for Express's
      remaining excluded scope -- see rpAddonCatalog.oven/cabinets/
      detailPass in the engine. */
   ovenAddon: false,
@@ -3246,13 +3246,13 @@ function rpScreenHtml() {
           <div class="rp-tier-guarantee">${featured ? "Defend Your Deposit™" : "Satisfaction Guaranteed"}</div>
           <ul>${(inc.highlights || []).slice(0, 4).map(([, text]) => `<li>${text}</li>`).join("")}</ul>
           ${!featured ? `<p class="rp-tier-exclusions">Not in the base price: oven &amp; fridge interiors, inside cabinets, Detail Pass (baseboards, windows, fans/vents/lights) — all addable next.</p>` : ""}
-          <button type="button" class="rp-tier-choose ${featured ? "is-featured" : ""}" onclick="rpChooseMoveoutTier('${service}')">${alreadyChosen ? "Selected ✓" : `Choose ${featured ? "Inspection Ready" : "Refresh"}`}</button>
+          <button type="button" class="rp-tier-choose ${featured ? "is-featured" : ""}" onclick="rpChooseMoveoutTier('${service}')">${alreadyChosen ? "Selected ✓" : `Choose ${featured ? "Inspection Ready" : "Express"}`}</button>
         </div>`;
     };
     return { scroll: `<div class="rp-center" style="max-width:560px">
       ${eyebrow}
       <h2>Here's what fits your home</h2>
-      <p class="rp-sub">Same crew, same home — two different scopes. Pick the one you need.</p>
+      <p class="rp-sub">Same home, two different scopes and crew sizes. Pick the one you need.</p>
       <div class="rp-tier-grid">
         ${tierCard("moveout")}
         ${tierCard("moveoutrefresh")}
@@ -3266,7 +3266,7 @@ function rpScreenHtml() {
            the /pricing ledgers. */
         /* Round 25 (direct instruction: "each addon should have a price" +
            "doesn't mention ceiling fans, vents, light fixtures, make the
-           list cover all the big stuff"): every excluded-on-Refresh row
+           list cover all the big stuff"): every excluded-on-Express row
            now shows the real dollar figure instead of a bare dash, and
            baseboards/interior windows/walls/fans/vents/lights are folded
            into one "Detail Pass" row (matching the single bundled SKU
@@ -3286,11 +3286,11 @@ function rpScreenHtml() {
           : `<span class="rp-scope-no" aria-label="not included">&minus;</span>`;
         return `<div class="rp-scope-table">
           <div class="rp-scope-head">
-            <span></span><span>Inspection<br>Ready</span><span>Refresh</span>
+            <span></span><span>Inspection<br>Ready</span><span>Express</span>
           </div>
           ${scope.map(([label, ir, rf]) => `<div class="rp-scope-row"><span>${label}</span>${mark(ir)}${mark(rf)}</div>`).join("")}
         </div>
-        <p class="rp-scope-foot">Both tiers: same 2-cleaner crew, same insurance, same standards. The difference is how far into the home we go.</p>`;
+        <p class="rp-scope-foot">Inspection Ready is worked by a <strong>3</strong>-cleaner crew; Express by <strong>2</strong> — same insurance, same standards either way. The difference is how far into the home we go, and how many hands it takes to do it in one visit.</p>`;
       })()}
       ${(() => {
         /* Round 25 (direct instruction): these four used to be cards on
@@ -3298,14 +3298,14 @@ function rpScreenHtml() {
            windows bumped both "high quality" add-ons out of the visible
            top-3 slot. They're the exact four rows the scope table above
            already prices out, so putting a checkbox right here -- where
-           the customer is already looking at what Refresh doesn't
+           the customer is already looking at what Express doesn't
            include -- lets them close the gap without ever visiting the
            add-ons screen for these. Same state fields and toggle
            functions as before; checking one here or (for fridge, on
            Hourly Cleaning) elsewhere behaves identically everywhere
            else in the funnel. Harmless to leave checked if they end up
            choosing Inspection Ready instead -- rpAddonAvailable() only
-           counts these toward the total on Refresh, since Inspection
+           counts these toward the total on Express, since Inspection
            Ready already includes all of it. */
         const items = [
           { state: rpState.fridgeAddon, label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills.", price: rpAddonCatalog.fridge.price, action: "rpSelectFridge" },
@@ -3313,7 +3313,7 @@ function rpScreenHtml() {
           { state: rpState.cabinetsAddon, label: "Inside Cabinets & Closets", desc: "Empty cabinet and closet interiors wiped down.", price: rpAddonCatalog.cabinets.price, action: "rpSelectCabinets" },
           { state: rpState.detailPassAddon, label: "Detail Pass", desc: "Baseboards, interior windows, walls, ceiling fans, vents & light fixtures.", price: rpDetailPassPrice(), action: "rpSelectDetailPass" }
         ];
-        return `<p class="rp-addon-section-label" style="margin-top:18px">Going with Refresh? Add any of these:</p>
+        return `<p class="rp-addon-section-label" style="margin-top:18px">Going with Express? Add any of these:</p>
         ${items.map((it, i) => `<label class="rp-checkbox-card${i ? " rp-mt" : ""}">
           <input type="checkbox" ${it.state ? "checked" : ""} onchange="${it.action}(this.checked)">
           <div><strong>${it.label}</strong><span>${it.desc} +$${it.price}</span></div>
@@ -3446,13 +3446,13 @@ function rpAddonsScreen(eyebrow) {
 
      Round 25 (direct instruction: "the move-out addons from the refresh
      toppling over the high quality addons like carpet and windows"):
-     same pattern, applied to fridge/oven/cabinets/detailPass on Refresh
+     same pattern, applied to fridge/oven/cabinets/detailPass on Express
      specifically. Prepending 3 new cards ahead of carpet/windows bumped
      both out of the visible top-3 "primaryKeys" slot and behind "Show
      more" -- exactly backwards, since carpet and windows are the
      bigger, more considered purchases. All four now render as
      checkboxes on the moveouttiers comparison screen instead (see
-     "Add these to Move-Out Refresh?" there) -- same state fields, same
+     "Add these to Move-Out Express?" there) -- same state fields, same
      toggle functions, so nothing about pricing/line items/webhook
      changes, only where the customer checks the box. Scoped to
      moveoutrefresh only: "fridge" is also legitimately a card on
@@ -3708,12 +3708,12 @@ function rpEstimateScreen(eyebrow) {
           return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")}<span>You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</span></div>`;
         })()}
         ${rpState.service === "moveout"
-          ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveoutrefresh')">Don't need the inspection guarantee? See Refresh pricing \u2192</button>`
+          ? `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveoutrefresh')">Don't need the inspection guarantee? See Express pricing \u2192</button>`
           : rpState.service === "moveoutrefresh"
             ? (() => {
                 /* Round 25 (parity with the same nudge built for Liz's
                    console): the pricing is deliberately built so stacking
-                   every excluded-scope add-on on Refresh always costs MORE
+                   every excluded-scope add-on on Express always costs MORE
                    than switching tiers outright -- but a self-serve
                    customer piling them on here had no way to know that,
                    only the CSR did. Same live comparison, same threshold. */
@@ -3862,7 +3862,7 @@ function rpSubmitContactGate() {
   const quoted = rpIsCustomQuoteOnly()
     ? "Custom quote required"
     : ["moveout", "moveoutrefresh"].includes(rpState.service)
-      ? `Inspection Ready $${(rpMoveoutTierBasePrice("moveout") ?? 0).toFixed(2)} / Refresh $${(rpMoveoutTierBasePrice("moveoutrefresh") ?? 0).toFixed(2)} (tier not yet chosen)`
+      ? `Inspection Ready $${(rpMoveoutTierBasePrice("moveout") ?? 0).toFixed(2)} / Express $${(rpMoveoutTierBasePrice("moveoutrefresh") ?? 0).toFixed(2)} (tier not yet chosen)`
       : rpPriceLabel();
   const sizeSummary = [
     rpSqftTier() ? `Size: ${rpSqftTier().label}` : "",
@@ -4237,8 +4237,8 @@ function rpRender(direction) {
      funnel now does and it was invisible to analytics. screen_view fires
      with service = "moveout" here (the neutral placeholder), so without
      these two events there is no way to answer "what share of customers
-     pick Refresh, at what home size, at what price gap" — which is
-     exactly the data the Refresh pricing question needs. */
+     pick Express, at what home size, at what price gap" — which is
+     exactly the data the Express pricing question needs. */
   if (rpState.step === "moveouttiers") rpTrack("moveout_tiers_viewed", {
     price_inspection_ready: rpMoveoutTierBasePrice("moveout") ?? "custom",
     price_refresh: rpMoveoutTierBasePrice("moveoutrefresh") ?? "custom",
@@ -4380,7 +4380,7 @@ function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh();
 /* Round 20: a tier switch changes rpState.service WITHOUT the full
    rpResetServiceState() a real service change gets, so any add-on the
    incoming tier doesn't offer has to be dropped explicitly. Concretely:
-   Refresh offers Refrigerator Interior ($50) because Refresh excludes it
+   Express offers Refrigerator Interior ($50) because Express excludes it
    — Inspection Ready includes it in the base, so carrying that selection
    across billed $50 for work already in scope, on a line the customer
    couldn't remove. rpClearUnavailableAddons() returns what it dropped so
@@ -4599,7 +4599,7 @@ function rpGetEstimatePayload() {
     `Frequency: ${rpState.frequency ? rpFrequencySummary() : "N/A"}`,
     `Monthly billing: ${rpIsRecurringPlan() ? `$${rpMonthlyTotal().toFixed(2)}/mo recurring (${rpFrequencyPlan().visitsPerMonth} visits at $${rpMaintenanceBasePerVisit().toFixed(2)} each, no contract)${rpAddonsOnceCharge() ? ` + $${rpAddonsOnceCharge()} one-time add-ons this visit` : ""}` : "N/A"}`,
     `Carpet rooms (primary): ${rpState.carpetRooms || "0"}`, `Laundry loads: ${rpState.laundryLoads || "0"}`, `Heavy soil: ${rpState.heavySoil ? "Yes" : "No"}`, `Pet odor: ${rpState.petOdor ? "Yes" : "No"}`,
-    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Tier: ${rpState.service === "moveout" ? "Inspection Ready (Defend Your Deposit)" : "Move-Out Refresh (Satisfaction Guaranteed, no deposit guarantee)"}` : "",
+    ["moveout", "moveoutrefresh"].includes(rpState.service) ? `Tier: ${rpState.service === "moveout" ? "Inspection Ready (Defend Your Deposit)" : "Move-Out Express (Satisfaction Guaranteed, no deposit guarantee)"}` : "",
     /* "Rental or selling" / "Property manager/realtor" removed (round 24)
        -- /book no longer asks this (see "moveoutintent" removal, engine
        rpFlows.moveout comment). rpState.moveoutRentalOrSelling never gets
