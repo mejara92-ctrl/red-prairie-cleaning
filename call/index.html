@@ -250,11 +250,11 @@ const LS_KEY = "rpCallConsole.v1";
 
 /* The engine reads this global. Field names match /book's rpState. */
 const rpState = {
-  step:"service", service:null,
+  step:"service", service:null, moveoutTierChosen:false,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
-  garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, addonDropNotice:"",
+  garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, handymanInterest:false, addonDropNotice:"",
   militaryDiscount:false, militaryVerified:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
   heavySoil:false, petOdor:false,
@@ -302,8 +302,41 @@ const FLOWS = {
      booked — the productive part of the call spent selling extras on a
      clean that routes to a callback. /book has always asked the
      hard-stops before anything priced; this brings the phone in line. */
-  moveout:        ["service","caller","intent","bedrooms","bathrooms","sqft","questionnaire","addons","quote","contact","calendar","done"],
-  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","sqft","questionnaire","addons","quote","contact","calendar","done"],
+  /* Round 25 (found while auditing /book vs /call for consistency): "sqft"
+     was still in these two flows from before round 24 dropped square
+     footage from Move-Out pricing on /book entirely -- flat bedroom-tier
+     price, no large-home surcharge, by direct instruction. Nobody
+     revisited /call's flow when that shipped, so Liz was still asking
+     home size and rpServiceBasePrice() was still adding the (still-live,
+     never-deleted) $100/$200/$300 surcharge -- or routing a >3,400 sq ft
+     home to a custom quote via rpMoveoutIsCustomSqft() -- for a phone
+     caller, while the identical home online got the flat, lower, always-
+     priceable number. A caller could be quoted MORE than the website
+     would ever quote for the same house, or get "we'll call you back"
+     for a home /book prices instantly. Removed here so both channels
+     read the same rpState.sqft === null and compute the same price. If
+     the large-home surcharge is ever wanted back, it has to come back on
+     /book first -- /call should never diverge from what the site quotes. */
+  /* Round 26 (direct instruction: "think differently, how's the sales
+     flow, what's counter-intuitive" -- a fresh pass, not a consistency
+     audit): "tiers" is new here. It ports /book's round-19c decision
+     forward onto the phone -- before that round, /book also made a
+     customer commit to Inspection Ready vs. Refresh at the very first
+     question, before it could show a single real dollar figure. /book
+     fixed that for itself (one "Move-Out Cleaning" entry, ask size
+     first, THEN show two real prices side-by-side to choose from) but
+     /call was never brought forward: the "service" list below still had
+     Inspection Ready and Refresh as two separate first-question buttons,
+     so Liz picked a tier for the caller from a landlord/inspector guess
+     alone, before a single number existed -- the exact blind-commitment
+     problem /book was rebuilt to avoid. Now "service" offers one merged
+     "Move-Out Cleaning" entry (see the service-step render below), and
+     this new "tiers" step -- inserted after "questionnaire", before
+     "addons", same position as /book's "moveouttiers" -- shows both real
+     prices for the home just described and she picks (or confirms) the
+     tier there, out loud, with the caller. See chooseMoveoutTier(). */
+  moveout:        ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
+  moveoutrefresh: ["service","caller","intent","bedrooms","bathrooms","questionnaire","tiers","addons","quote","contact","calendar","done"],
   deep:        ["service","caller","addons","quote","contact","calendar","done"],
   maintenance: ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:      ["service","caller","rooms","quote","contact","calendar","done"],
@@ -460,8 +493,15 @@ const SCRIPT = {
        move-out caller first states their need, before either tier gets
        picked and before a price gets said. The scope cheat sheet on the
        quote screen (further down the call) still has the size-specific
-       numbers; this is the up-front "how do I even frame this" version. */
-    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number.  \u2022  MOVING OUT? Ask before quoting either tier: \u201cIs a landlord, property manager, or a buyer's inspector going to walk through and check the place against a list?\u201d Yes or not sure \u2192 lead with Inspection Ready: \u201cThat's the one most people book for a move-out \u2014 full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.\u201d Flat no, they're just handing over keys \u2192 Refresh is a genuine, honest recommendation, not a downsell: \u201cYou don't need to pay for a guarantee nobody's going to test \u2014 Refresh gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d Both tiers are worth being proud to sell \u2014 the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn on price once add-ons start stacking up on Refresh, the quote screen will flag it if Inspection Ready has become the better deal."},
+       numbers; this is the up-front "how do I even frame this" version.
+
+       Round 26 (fresh-look pass, "apply all recommended settings"):
+       trimmed -- the actual dollar-figure pitch for each tier moved to
+       the new "tiers" screen's watch text below, since that's now where
+       real numbers exist to say out loud. This step's job is only to
+       plant the qualitative question early, before bedrooms/bathrooms
+       are even asked, same spirit as before. */
+    watch:"If it doesn't match anything listed, don't force it into the wrong bucket. Hourly covers general/miscellaneous work. For something truly unique \u2014 commercial, specialty \u2014 use Custom Quote and tell them it'll likely need a quick in-person look or some photos before we can give a firm number.  \u2022  MOVING OUT? Ask now, before you've gathered bedrooms and bathrooms: \u201cIs a landlord, property manager, or a buyer's inspector going to walk through and check the place against a list?\u201d You're not locking in a tier yet \u2014 just noting the lean, so you already know which real price to lead with once you reach the two-price screen a few questions from now."},
   caller:{say:"\u201cHappy to help with that \u2014 let me just grab your name and a good number for you in case we get cut off.\u201d",
     listen:"Get the name and number BEFORE anything else past this point.",
     watch:"This is the most important screen. If the call drops after this you still have a lead to call back. If it drops before, you have nothing."},
@@ -477,6 +517,16 @@ const SCRIPT = {
   condition:{say:"\u201cLast one on the home \u2014 how would you describe the kitchen and bathrooms right now?\u201d",
     listen:"Standard sounds like: \u2018pretty normal,\u2019 \u2018lived-in,\u2019 \u2018nothing crazy.\u2019 Heavy sounds like: trash, grease, pet hair, \u2018hasn't been cleaned in a while.\u2019 Extreme sounds like: \u2018honestly it's bad,\u2019 mold, strong pet odor, \u2018hasn't really been touched in months.\u2019 Stuck between two? Pick the higher one \u2014 the crew finding it lighter than expected costs nothing; being sent in short costs their whole day.",
     watch:"Don't default to Standard because you're unsure or don't want to sound judgmental about someone's house \u2014 that's the same costly mistake as underpricing on purpose, just a nicer-feeling reason for it. If they push back after you read the tier back, hold your read \u2014 describe what they told you, let the crew confirm on arrival."},
+  /* Round 26: new step, new script. This is the payoff of asking the
+     landlord/inspector question back on "service" -- real dollar numbers
+     for THIS home, said out loud, instead of a tier picked on a guess. */
+  tiers:{say:()=>{
+      const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
+      const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
+      return `“For a home like that, I can do it two ways — Inspection Ready at ${fmt(ir)}, backed by our Defend Your Deposit guarantee, or Move-Out Refresh at ${fmt(rf)} if nobody's inspecting it afterward. Which sounds like the fit?”`;
+    },
+    listen:"Which one they actually pick once real numbers are on the table — not just the qualitative lean from the service question. Someone who sounded like “no inspection” earlier can still choose Inspection Ready once they hear it's only a small gap for full deposit protection.",
+    watch:"Lead with whichever tier matches what they told you back on the service question. Landlord, PM, or inspector expected (or not sure) → “That's the one most people book for a move-out — full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.” Flat no, just handing over keys → Refresh is a genuine, honest recommendation, not a downsell: “You don't need to pay for a guarantee nobody's going to test — Refresh gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.” Both tiers are worth being proud to sell — the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn once add-ons start stacking up on Refresh, the quote screen will flag it if Inspection Ready has become the better deal."},
   addons:{say:addonsSayLine,
     listen:"Ask these by name. Customers almost never volunteer them.",
     watch:"Pet stains or odor is a crew-prep flag, not automatically a condition bump. Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price."},
@@ -671,7 +721,7 @@ function guardrails(){
      (rpState.petWasteConcern||rpState.hazardConcern||rpState.moldConcern))
     g.push({level:"warn",title:"Condition looks under-tagged",
       body:"You flagged pets, trash, or mold but tagged the home Standard. If any of it is significant this should be Heavy or Extreme \u2014 otherwise the crew eats the extra hours."});
-  if(["questionnaire","bedrooms","bathrooms","sqft","addons"].includes(s) && rpMoveoutBlocked())
+  if(["questionnaire","bedrooms","bathrooms","sqft","tiers","addons"].includes(s) && rpMoveoutBlocked())
     g.push({level:"stop",title:"Do not give a price on this call",
       body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
   if(rpState.militaryDiscount && !rpState.militaryVerified)
@@ -721,6 +771,7 @@ function stepValid(){
     case "condition": return !!rpState.condition;
     case "intent":    return !!rpState.moveoutRentalOrSelling;
     case "questionnaire": return rpMoveoutQuestionnaireAnswered();
+    case "tiers":     return !!rpState.moveoutTierChosen;
     case "frequency": return !!rpState.frequency;
     case "rooms":     return Number(rpState.carpetRooms)>0;
     case "cleaners":  return !!rpState.cleanerCount;
@@ -755,6 +806,7 @@ const TITLES = {
   condition:["What condition is it in?","Let them describe it \u2014 you pick the tier."],
   intent:["Rental or selling?","Ask before pricing \u2014 capture the PM/realtor if there is one."],
   questionnaire:["A few quick facts","Water, A/C, mold, pests. If anything fails, do not quote a price."],
+  tiers:["Here's what fits — two real prices","Present both, out loud, and let them pick."],
   frequency:["One-time or recurring?",""],
   rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
@@ -768,7 +820,7 @@ const TITLES = {
 };
 const SHORT_LABELS = {
   service:"Service", caller:"Contact", sqft:"Size", bedrooms:"Beds", bathrooms:"Baths",
-  condition:"Condition", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
+  condition:"Condition", tiers:"Tier", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
   hours:"Hours", addons:"Add-ons", quote:"Quote", contact:"Address",
   customDetails:"Details", calendar:"Calendar", done:"Done"
 };
@@ -787,10 +839,19 @@ function screenHtml(){
         .map(o=>`<option ${rpState.csrLeadSource===o?"selected":""}>${o}</option>`).join("")}</select></div>`;
 
   if(s==="service"){
-    const items = Object.entries(rpServices).map(([k,v])=>
-      opt(v.name, `pickService('${k}')`, rpState.service===k,
-        k==="moveout" ? "ASK FIRST: will a landlord or property manager inspect this? If yes, this is the tier."
-        : k==="moveoutrefresh" ? "No landlord inspection expected. Lighter/faster, no deposit guarantee."
+    /* Round 26: was two separate rows here -- "Inspection Ready Move-Out"
+       and "Move-Out Refresh" -- forcing Liz to lock in a tier for the
+       caller before a single real number existed, off a landlord/
+       inspector guess alone. Merged to one "Move-Out Cleaning" entry
+       (filtering "moveoutrefresh" out of this list; rpServices itself is
+       untouched since /call's other screens and the shared engine still
+       need both real keys). The actual tier choice now happens on the
+       new "tiers" screen once bedrooms/bathrooms are known -- same order
+       /book has used since round 19c. */
+    const items = Object.entries(rpServices).filter(([k])=>k!=="moveoutrefresh").map(([k,v])=>
+      opt(k==="moveout" ? "Move-Out Cleaning" : v.name, `pickService('${k}')`,
+        rpState.service==="moveout"||rpState.service==="moveoutrefresh" ? k==="moveout" : rpState.service===k,
+        k==="moveout" ? "One entry covers both tiers. Ask the landlord/inspector question now (see Watch below) -- you'll show real numbers for both a few questions from now."
         : k==="hourly" ? "Caller only wants certain areas done. 3-hr minimum. ASK FIRST: move-out, or living in it?" : null)
     ).join("");
     const customBtn = opt("Something Else / Custom Quote", "pickService('custom')", rpState.service==="custom",
@@ -851,6 +912,36 @@ function screenHtml(){
   if(s==="hours") return `<div class="opts three">${[4,5,6,7,8]
     .map(n=>opt(`${n} hrs`,`pick('hourCount',${n})`,rpState.hourCount===n)).join("")}</div>`;
 
+  if(s==="tiers"){
+    /* Round 26: the moment Liz shows two real prices instead of asking
+       the caller to commit to a tier blind. Mirrors /book's "moveouttiers"
+       screen -- same rpMoveoutTierBasePrice() call, same two options,
+       just rendered in this console's plainer button style. Picking
+       either one calls chooseMoveoutTier(), which sets the real service
+       and moves on; nothing forces a pick (this console never hard-blocks
+       Next), so leaving it on the default still prices as Inspection
+       Ready -- the safer default if she skips ahead. */
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
+    const fmt=p=>p===null?"Custom quote":`$${p.toFixed(0)}`;
+    const chosen = rpState.moveoutTierChosen ? rpState.service : null;
+    return `<div class="opts">
+      ${opt(`Inspection Ready — ${fmt(irPrice)}`,`chooseMoveoutTier('moveout')`,chosen==="moveout",
+        "Defend Your Deposit™ — oven, fridge, cabinets & closets, and the full Detail Pass all included in this price.")}
+      ${opt(`Move-Out Refresh — ${fmt(rfPrice)}`,`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
+        "Satisfaction Guaranteed, no deposit guarantee — oven, fridge, cabinets, and Detail Pass are addable next screen.")}
+    </div>
+    <p class="sub" style="margin-top:13px">${
+      /* Round 26: this is the actual decision screen now, so the
+         selling/renting signal from "intent" belongs here -- it's the
+         moment it can change which tier Liz leads with, not just a
+         closing-argument aside on the scope cheat sheet three screens
+         later, after a tier's likely already been picked. */
+      rpState.moveoutRentalOrSelling === "selling"
+        ? "They're listing it for sale, not handing it to a new tenant -- lead with Inspection Ready. Buyers notice what a renter wouldn't, and it's the one backed by Defend Your Deposit."
+        : "Not sure which fits? Landlord, property manager, or inspector checking the place after move-out -- Inspection Ready is the one backed by Defend Your Deposit. Flat no on any of that, Refresh is the honest, lower-cost pick."
+    }</p>`;
+  }
+
   if(s==="addons"){
     const list=rpServiceAddons[rpState.service]||[];
     let h="";
@@ -900,6 +991,17 @@ function screenHtml(){
     }
     if(list.includes("secondCleaner"))
       h+=`<div class="opts" style="margin-bottom:9px">${opt(`Additional cleaner (+$${rpSecondCleanerPrice()} for ${rpSecondCleanerHours()}hrs)`,`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner)}</div>`;
+    /* Round 25 (found while auditing /book vs /call for consistency):
+       "Need Small Handyman Repairs?" is a universal, quoted-separately
+       lead-capture checkbox on every /book addons screen -- same
+       treatment as junk haul, not gated by rpServiceAddons. It never
+       existed on /call at all, in the state, the UI, or the booking
+       payload, so a caller who mentioned wanting a patch job or minor
+       repair had nowhere for Liz to record it -- that interest was just
+       lost instead of reaching the office the way a self-serve customer's
+       always does. Ask it on every service's addons screen, same as
+       /book. */
+    h+=`<div class="opts" style="margin-bottom:9px">${opt("Interested in small handyman repairs? (quoted separately, NOT in the total)",`toggle('handymanInterest')`,rpState.handymanInterest)}</div>`;
     h+=`<div style="margin-top:13px">${chk("militaryDiscount",`Military / first responder discount (${Math.round(MILITARY_DISCOUNT_RATE*100)}%, max $${MILITARY_DISCOUNT_CAP})`)}
       ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed"):""}</div>`;
     return h;
@@ -1191,6 +1293,17 @@ function switchMoveoutTier(k){
     : "";
   render();
 }
+/* Round 26: the FIRST tier pick, from the new "tiers" screen -- as
+   opposed to switchMoveoutTier() above, which flips an already-chosen
+   tier later from the quote screen. No add-ons exist yet at this point
+   in the flow (tiers sits before addons), so nothing needs dropping;
+   just set the real service, mark it chosen (so the screen shows which
+   one is picked instead of both looking unselected), and move on. */
+function chooseMoveoutTier(k){
+  rpState.service=k;
+  rpState.moveoutTierChosen=true;
+  next();
+}
 function pickService(k){ rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
@@ -1203,7 +1316,7 @@ function pickService(k){ rpState.service=k;
      rpResetServiceState() coverage. */
   rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.addonCarpetPetEnzyme=false; rpState.windowsTier=null;
   rpState.garageWash=false; rpState.laundryLoads=0;
-  rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.cleanerCount=null; rpState.addonDropNotice="";
+  rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.handymanInterest=false; rpState.cleanerCount=null; rpState.addonDropNotice=""; rpState.moveoutTierChosen=false;
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
@@ -1293,6 +1406,7 @@ function jobDetails(){
     ...moveoutExtras,
     `Add-ons: ${rpAddonSummaryText()}${rpAddonsTotal()>0?` | Add-ons total: $${rpAddonsTotal().toFixed(2)}`:""}`,
     rpHasQuotedAddon()?`\u26a0 Junk haul selected — office must quote it separately; it is NOT in the total above.`:"",
+    rpState.handymanInterest?"Additional service request: Make-ready repairs \u2014 quoted separately, not included.":"",
     `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
     (()=>{const a=rpServiceAreaStatus();return a.status==="core"?`Service area: ${a.area}`:a.status==="unknown"?"":`\u26a0 SERVICE AREA: ${a.label}${a.area?` (${a.area})`:""}`;})(),
@@ -1510,6 +1624,12 @@ async function submitBooking(){
           condition:rpState.condition||"N/A",
           condition_adjustment_percent:Math.round(rpConditionMultiplier()*100),
           custom_quote_required:rpIsCustomQuoteOnly()?"Yes":"No",
+          /* Round 25 (found while auditing /book vs /call): /book has
+             sent this field on every booking for a while now; it never
+             existed here, so a phone-booked handyman lead never reached
+             GHL at all. Same field name as /book's payload so nothing
+             downstream needs a second branch to read it. */
+          handyman_interest:rpState.handymanInterest?"Yes":"No",
           /* Overrides the shared "Yes"/"No" with the CSR-verified state —
              Liz ticking "I asked and they confirmed" is a different fact
              from the website's self-serve checkbox. */

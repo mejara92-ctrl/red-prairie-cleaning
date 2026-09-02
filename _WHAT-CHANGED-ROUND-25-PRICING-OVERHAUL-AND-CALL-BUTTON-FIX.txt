@@ -442,5 +442,184 @@ probably worth a real look soon rather than another round of "still
 flagging it."
 
 
+--------------------------------------------------------
+8. DEEP AUDIT: "make sure /book supports /call and the FAQs are good"
+--------------------------------------------------------
+You asked me to specifically check that /book and /call stay consistent
+with each other and that the FAQ is accurate. This turned up the most
+serious issue found in this whole round.
+
+/CALL COULD QUOTE A DIFFERENT PRICE THAN /BOOK FOR THE SAME HOME
+Root cause: round 24 dropped square footage from Move-Out pricing on
+/book entirely -- flat bedroom-tier price, no large-home surcharge, by
+direct instruction. /call's own flow was never updated to match. It
+still had a "sqft" question in both moveout and moveoutrefresh, and
+that answer was still feeding the (never-deleted) large-home surcharge
+formula in the engine: +$100/$200/$300 on Inspection Ready, +$50/$100/
+$150 on Refresh, for anything 2,200 sq ft or over -- or, for anything
+over 3,400 sq ft, routing the job to a custom quote instead of a price
+at all. A caller with a 2,600 sq ft 3-bedroom home would have been
+quoted $200 more over the phone than the identical home would get
+booking online, or told "we'll call you back" for a home /book prices
+instantly. That's the kind of thing that costs trust the moment a
+customer compares notes with a neighbor or checks the website after
+hanging up. Fixed by removing "sqft" from both flows in /call, so
+rpState.sqft stays unset on both channels and they compute the exact
+same price. Verified: a 3-bed/2-bath Inspection Ready home now returns
+$479 on both /call and /book with nothing else changed. If a large-home
+surcharge is ever wanted back, it needs to go on /book first -- /call
+should never be the one carrying pricing logic the website doesn't.
+
+HANDYMAN-INTEREST LEAD CAPTURE DIDN'T EXIST ON THE PHONE AT ALL
+/book has had a universal "Need Small Handyman Repairs?" checkbox on
+every service's add-ons screen for a while -- quoted separately, not
+priced, just a lead flag sent to the office. It never existed on /call
+in any form: not in the state, not on the addons screen, not in the
+booking payload. A caller who mentioned wanting a small repair done had
+nowhere for Liz to record it -- that lead was simply lost, where a
+self-serve customer's always reached the office. Added the field, the
+checkbox (same wording and placement as /book, right after junk haul),
+the crew-note line, and the `handyman_interest` field in the booking
+payload, matching /book's field name exactly so nothing downstream
+needs a separate case for phone-booked jobs.
+
+FAQ ACCURACY PASS
+Read all 9 questions against current site behavior line by line:
+  - "Is the instant estimate final?" said the estimate is based on
+    "size, condition, and options" -- condition-based pricing was
+    removed from every service a while back (nothing is priced by a
+    Standard/Heavy/Extreme tier anymore), so that line was describing a
+    pricing lever that no longer exists. Removed "condition."
+  - "What do the add-ons cover?" said "larger junk loads have separate
+    options" -- round 24 replaced the half/full/oversized junk picker
+    with one single "quoted separately" checkbox; there's no load-size
+    option anymore, on either channel. Reworded to describe what's
+    actually there.
+  - "What if something is missed?" was generic ("we'll return to fix
+    it") without naming either guarantee, right below a new question
+    that names both by name -- reworded to name Defend Your Deposit and
+    the Satisfaction Guarantee explicitly, and cite the 48-hour window
+    that's already the real policy everywhere else on the site.
+  - The footnote's service-area list ("Lawton, Fort Sill, Elgin, Cache")
+    was missing Medicine Park and Duncan -- both are core service-area
+    cities everywhere else on this same page (the hero eyebrow, the
+    outside-service-area note), just not in the FAQ footnote. Fixed to
+    match.
+
+VERIFIED THIS PASS
+node --check clean on call/index.html and book/index.html after every
+edit. Scripted browser check: /call's moveout flow no longer contains
+"sqft" and computes $479 for a 3-bed/2-bath Inspection Ready home
+(matching /book exactly); the handyman checkbox renders on a non-move-
+out service's addons screen (confirmed universal, not gated) and
+toggles rpState.handymanInterest correctly with no console errors.
+
+=============================================================================
+9. FRESH-LOOK PASS: /CALL WAS STILL MAKING LIZ PICK A MOVE-OUT TIER BLIND
+   (direct instruction: "check again think differently, how's the sales
+   flow, what's counter-intuitive, what would work better, apply all
+   recommended settings")
+=============================================================================
+THE FIND
+Every previous round this session treated /book and /call as basically
+symmetric and hunted for places they'd drifted apart. Looking at the
+sales flow itself with fresh eyes instead of a consistency checklist
+turned up something the consistency audits couldn't see, because both
+channels weren't actually meant to work the same way here -- one of
+them had simply never caught up to a decision the other made two
+rounds ago.
+
+Round 19c rebuilt /book specifically to stop making customers pick
+Inspection Ready vs. Move-Out Refresh before a single real number
+existed. The old flow asked "which tier?" as the very first question;
+19c changed it to one "Move-Out Cleaning" entry, ask bedrooms and
+bathrooms, THEN show both real prices side-by-side and let the
+customer choose with actual numbers in front of them. That fix was
+never brought over to /call. The CSR console still had "Inspection
+Ready Move-Out" and "Move-Out Refresh" as two separate buttons on the
+very first screen Liz sees -- she had to commit the caller to a tier
+based only on one qualitative question ("will a landlord inspect
+this?"), before bedrooms, bathrooms, or a single dollar figure existed.
+The only way to correct a bad early call was a "switch tiers" link
+buried on the quote screen, after the entire addons conversation had
+already happened around the wrong number.
+
+This is the real-world version of the exact problem 19c was written to
+solve on the website, just still live on the phone: a caller says "not
+sure, maybe?" to the landlord question, Liz picks a tier on a guess,
+spends five minutes walking through add-ons priced against that guess,
+and only then does anything correct it -- or doesn't, if she doesn't
+think to use the switch link once she's already committed out loud.
+
+WHAT WAS CHANGED (call/index.html)
+  - "service" step now shows one "Move-Out Cleaning" entry instead of
+    two separate tier buttons (rpServices itself is untouched -- both
+    real keys still exist for every other screen, the shared engine,
+    guardrails, and SCRIPT; only this one screen's rendering merges
+    them). Picking it defaults rpState.service to "moveout" as a
+    placeholder, same convention /book has used since 19c.
+  - New "tiers" step, inserted into FLOWS.moveout and
+    FLOWS.moveoutrefresh right after "questionnaire" and before
+    "addons" -- the same position /book's "moveouttiers" occupies.
+    Shows both real prices for the home just described
+    (rpMoveoutTierBasePrice(), the same call /book's screen makes) and
+    lets Liz pick -- or confirm -- the tier there, with the caller, out
+    loud. Leaving it on the default (no explicit pick) still prices as
+    Inspection Ready if she skips ahead, the safer of the two to fall
+    back on.
+  - New chooseMoveoutTier(k) sets the real service and advances --
+    distinct from the existing switchMoveoutTier(k), which still does
+    its original job: a later course-correction from the quote screen,
+    after add-ons exist, with the already-selected-but-now-unavailable
+    ones dropped and announced. Nothing about that later safety valve
+    changed.
+  - The landlord/inspector question stays on "service" (asked before
+    bedrooms/bathrooms are even known, same as before) but its SCRIPT
+    text was trimmed to just planting that qualitative question --  the
+    actual per-tier dollar pitch moved to the new "tiers" step's script,
+    since that's the point real numbers exist to say out loud. New
+    SCRIPT.tiers entry states both real prices dynamically in its "say"
+    line.
+  - The tiers screen's fine-print also now reads the rental/selling
+    answer already captured on "intent" and leads with Inspection Ready
+    when they're selling -- the same signal /book's old moveouttiers
+    screen used to read before round 24 removed that question from
+    /book's own flow (call still asks it on its own script step, it
+    just wasn't being used anywhere after round 24). This is the actual
+    tier-decision screen now, so it's a more useful place for that nudge
+    than the scope cheat sheet three screens later, after a tier is
+    probably already picked.
+  - rpMoveoutBlocked()'s "stop, don't quote a price" guardrail list
+    gained "tiers" alongside the other pre-price steps, so a blocked
+    home (water off, AC off, mold/pests) still can't reach a priced
+    screen without the guard showing.
+  - rpState gained moveoutTierChosen (mirrors /book's field of the same
+    name), reset in pickService() same as every other move-out-specific
+    field.
+
+WHY NOT JUST LEAVE THE LATE "SWITCH TIERS" LINK
+That link still exists and still works -- it's for a caller who changes
+their mind mid-call after hearing the full add-on list, which is a real
+and different scenario. It was never a substitute for putting real
+numbers in front of the decision at the point the decision is actually
+made. Relying on it as the only correction meant every call started
+with a guess and needed an active save to fix, instead of the numbers
+just being there before the guess had to happen.
+
+VERIFIED THIS PASS
+node --check clean on call/index.html. Scripted browser walkthrough,
+local server + Playwright: confirmed the merged "Move-Out Cleaning"
+service entry renders as one row; walked bedrooms=3/bathrooms=2 through
+to the new "tiers" screen and confirmed it shows Inspection Ready $479
+and Move-Out Refresh $249 (matching rpMoveoutTierBasePrice() and
+/book's own numbers for the same size home); confirmed picking either
+card sets rpState.service and advances straight to "addons" with that
+service's correct add-on list (oven/cabinets/detailPass present for
+Refresh); confirmed a 4-bedroom "selling" scenario shows $589/$299 and
+the seller-specific lead-with-Inspection-Ready nudge; confirmed the
+existing quote-screen switchMoveoutTier() safety valve still works
+unchanged after the new screen is added ahead of it in the flow.
+
+
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
