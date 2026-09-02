@@ -607,6 +607,26 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
    narrowest phones in the site's own breakpoint list, so the price and
    its three bullets never get crushed. */
 .rp-slots-low { margin: -4px 3px 10px; font-size: 12.5px; font-weight: 800; color: var(--red-dark); text-align: center; }
+/* Round 29: the same honest low-availability line, shown on the estimate
+   screen (where hesitation actually happens) as well as the calendar. It
+   sits in the footer dock above the CTA, so it needs a touch more room
+   than the calendar's inline version. */
+.rp-slots-low-estimate { margin: 0 3px 7px; }
+/* The military / first-responder offer moved out of the bottom of the
+   invoice ledger and up under the price. In a Fort Sill town this is one
+   of the strongest close levers on the page and it was the last thing on
+   the screen, styled as a bare unlabelled checkbox. */
+.rp-discount-inline.is-offer {
+  margin: 12px 0 2px;
+  padding: 12px 13px;
+  border: 1px solid rgba(159,32,39,.30);
+  border-top: 1px solid rgba(159,32,39,.30);
+  border-radius: 15px;
+  background: rgba(159,32,39,.06);
+  align-items: center;
+}
+.rp-discount-inline.is-offer strong { color: var(--red-dark); }
+.rp-discount-inline.is-offer input { width: 22px; height: 22px; margin-top: 0; }
 .rp-area-note { margin: 2px 2px 0; font-size: 12.5px; line-height: 1.5; font-weight: 600; color: var(--muted); }
 .rp-addon-quoted-note { margin: 0 3px 8px; font-size: 11.5px; line-height: 1.45; font-weight: 700; color: var(--red); text-align: center; }
 .rp-scope-table { margin: 14px 0 4px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: rgba(255,255,255,.9); }
@@ -648,7 +668,16 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   font-size: clamp(24px, 8vw, 30px); color: var(--red-dark); line-height: 1; margin: 8px 0 2px;
 }
 .rp-tier-card .rp-tier-price small { display: block; font-family: "Manrope", sans-serif; font-size: 10px; font-weight: 700; color: var(--muted); margin-top: 4px; }
+/* Round 28 (direct instruction: "put crew size as the first line... top
+   line all the way in bold" -- crew size used to be the LAST bullet in
+   the checklist, easy to miss on the one thing that actually explains
+   why the two prices differ. Now it's the first piece of information on
+   the card, styled like a second badge so it reads as a headline fact,
+   not a footnote. */
+.rp-tier-card .rp-tier-crew { font-size: 12.5px; font-weight: 800; letter-spacing: .01em; text-transform: uppercase; color: var(--red-dark); margin: 0 0 6px; }
 .rp-tier-card .rp-tier-guarantee { font-size: 10.5px; font-weight: 700; color: var(--muted); margin: 2px 0 10px; }
+.rp-tier-card .rp-tier-guarantee b { color: var(--ink); font-weight: 800; }
+.rp-tier-card .rp-tier-guarantee-brand { font-weight: 600; opacity: .7; }
 .rp-tier-card ul { list-style: none; margin: 0 0 14px; padding: 0; text-align: left; width: 100%; flex: 1; }
 .rp-tier-card ul li { font-size: 11px; line-height: 1.4; color: var(--ink); margin-bottom: 6px; padding-left: 15px; position: relative; }
 .rp-tier-card ul li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--sage); font-weight: 800; }
@@ -1370,12 +1399,23 @@ details.rp-includes li::before {
   grid-template-columns: 42px minmax(0, 1fr) auto;
   gap: 8px;
 }
-.rp-wordmark { justify-self: center; }
-.rp-head-actions { display: flex; align-items: center; gap: 6px; }
+/* justify-self:center sizes the wordmark to max-content, so with
+   white-space:nowrap on its two spans it used to overflow the middle
+   grid track in BOTH directions and sit underneath the FAQ button on
+   narrow phones (measured: 12px of overlap at 320px, 5px at 390px).
+   Clamping it to the track and letting the copy wrap keeps it centred
+   when there's room and shrinks it cleanly when there isn't. */
+.rp-wordmark { justify-self: center; max-width: 100%; min-width: 0; overflow: hidden; }
+.rp-wordmark-copy { min-width: 0; flex-wrap: wrap; justify-content: center; row-gap: 1px; }
+.rp-head-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .rp-head-faq,
 .rp-head-call,
 .rp-head-text {
-  min-height: 36px;
+  /* 44px is the WCAG 2.5.8 / iOS HIG minimum touch target. These were
+     36px — a real miss on a header whose whole job is to give a
+     hesitating phone visitor a one-tap escape hatch to a human. */
+  min-height: 44px;
+  min-width: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3104,7 +3144,7 @@ function rpScreenHtml() {
       </div>` : ""}
       ${inc && inc.outcome ? `<p class="rp-included-body" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
       <p class="rp-included-note">${fine}</p>
-    </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+    </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue</button>` };
   }
 
   /* Round 24 (direct instruction): the "sqft" screen is gone entirely,
@@ -3176,7 +3216,7 @@ function rpScreenHtml() {
         ${Array.from({ length: HOURLY_MAX_HOURS - HOURLY_MIN_HOURS + 1 }, (_, i) => i + HOURLY_MIN_HOURS).map(n => rpRowBtn({
           onclick:`rpSelectHourCount(${n}, this)`,
           title:`${n} hour${n > 1 ? "s" : ""}`,
-          val: rpState.cleanerCount ? `$${(HOURLY_RATE_PER_CLEANER * rpState.cleanerCount * n).toFixed(2)}` : "",
+          val: rpState.cleanerCount ? rpFormatMoneyDisplay(rpToCents(HOURLY_RATE_PER_CLEANER * rpState.cleanerCount * n)) : "",
           selected: rpState.hourCount === n
         })).join("")}
       </div>
@@ -3221,7 +3261,7 @@ function rpScreenHtml() {
         ${q("moveoutAcOn", "Is the air conditioning working?")}
         ${q("moveoutMoldPests", "Is the home free of mold or pest issues?", true)}
       </div>
-    </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+    </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue</button>` };
   }
 
   /* Round 19c: the moment "which Move-Out do I need" gets answered with
@@ -3231,19 +3271,35 @@ function rpScreenHtml() {
      changing rpState.service. Picking a card calls rpChooseMoveoutTier(),
      which sets the tier for real and moves on to add-ons. */
   if (rpState.step === "moveouttiers") {
+    /* Round 28 (direct instruction, after live screenshot review: "this
+       looks like crap, put crew size as the first line... no one knows
+       what 'Defend Your Deposit' means"). Two fixes to the card itself:
+       crew size moves from the last checklist bullet to a bold headline
+       line right under the badge -- it's the single fact that actually
+       explains why the two prices are different, so it shouldn't be the
+       easiest thing to miss. And "Defend Your Deposit™" no longer
+       appears on its own with zero explanation -- it's kept as the named
+       guarantee (it's real marketing language used elsewhere on the
+       site), but always paired with what it actually DOES in plain
+       words: protects your security deposit if something gets missed. */
     const tierCard = (service) => {
       const svc = rpServices[service];
       const inc = rpIncludes[service];
       const price = rpMoveoutTierBasePrice(service);
       const featured = service === "moveout";
+      const crew = featured ? 3 : 2;
       const alreadyChosen = rpState.moveoutTierChosen && rpState.service === service;
+      const guaranteeLine = featured
+        ? `<b>Protects your security deposit</b> <span class="rp-tier-guarantee-brand">(Defend Your Deposit™)</span>`
+        : "Satisfaction Guaranteed";
       return `
         <div class="rp-tier-card ${featured ? "is-featured" : ""} ${alreadyChosen ? "is-chosen" : ""}">
           ${featured ? `<span class="rp-tier-badge">Most Popular</span>` : ""}
+          <div class="rp-tier-crew">${crew}-cleaner crew</div>
           <h3>${svc.name}</h3>
           <div class="rp-tier-price">${price === null ? "Custom" : `$${price.toFixed(0)}`}${price === null ? "" : "<small>starting price</small>"}</div>
           <div class="rp-tier-hours">${rpMoveoutTierHours(service)} on site</div>
-          <div class="rp-tier-guarantee">${featured ? "Defend Your Deposit™" : "Satisfaction Guaranteed"}</div>
+          <div class="rp-tier-guarantee">${guaranteeLine}</div>
           <ul>${(inc.highlights || []).slice(0, 4).map(([, text]) => `<li>${text}</li>`).join("")}</ul>
           ${!featured ? `<p class="rp-tier-exclusions">Not in the base price: oven &amp; fridge interiors, inside cabinets, Detail Pass (baseboards, windows, fans/vents/lights) — all addable next.</p>` : ""}
           <button type="button" class="rp-tier-choose ${featured ? "is-featured" : ""}" onclick="rpChooseMoveoutTier('${service}')">${alreadyChosen ? "Selected ✓" : `Choose ${featured ? "Inspection Ready" : "Express"}`}</button>
@@ -3252,7 +3308,7 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center" style="max-width:560px">
       ${eyebrow}
       <h2>Here's what fits your home</h2>
-      <p class="rp-sub">Same home, two different scopes and crew sizes. Pick the one you need.</p>
+      <p class="rp-sub">Same home, two different crew sizes and scopes — pick the one you need.</p>
       <div class="rp-tier-grid">
         ${tierCard("moveout")}
         ${tierCard("moveoutrefresh")}
@@ -3290,7 +3346,7 @@ function rpScreenHtml() {
           </div>
           ${scope.map(([label, ir, rf]) => `<div class="rp-scope-row"><span>${label}</span>${mark(ir)}${mark(rf)}</div>`).join("")}
         </div>
-        <p class="rp-scope-foot">Inspection Ready is worked by a <strong>3</strong>-cleaner crew; Express by <strong>2</strong> — same insurance, same standards either way. The difference is how far into the home we go, and how many hands it takes to do it in one visit.</p>`;
+        <p class="rp-scope-foot">Same insurance, same standards either way — the real difference is how far into the home we go, and how many hands it takes to do it in one visit.</p>`;
       })()}
       ${(() => {
         /* Round 25 (direct instruction): these four used to be cards on
@@ -3319,7 +3375,7 @@ function rpScreenHtml() {
           <div><strong>${it.label}</strong><span>${it.desc} +$${it.price}</span></div>
         </label>`).join("")}`;
       })()}
-      <p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave \u2014 or you're listing it for sale \u2014 Inspection Ready is the one backed by Defend Your Deposit.</p>
+      <p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave \u2014 or you're listing it for sale \u2014 Inspection Ready is the one that protects your security deposit if anything gets missed.</p>
     </div>` };
   }
 
@@ -3334,7 +3390,7 @@ function rpScreenHtml() {
         ${eyebrow}
         <h2>Let's talk it through first</h2>
         <p class="rp-sub">${rpMoveoutBlockReasons().join(", ")}. We can't price this online until we've talked it through. We already have your number, ${rpState.fullName.split(" ")[0]} — we'll call you directly, usually within the hour.</p>
-      </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+      </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback</button>` };
     }
     return { scroll: `<div class="rp-center">
       ${eyebrow}
@@ -3345,7 +3401,7 @@ function rpScreenHtml() {
         <div class="rp-lead-field"><label for="rpBlockedPhone">Phone Number *</label><input id="rpBlockedPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)"></div>
         <div class="rp-error" id="rpBlockedError" style="display:none"></div>
       </div>
-    </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+    </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback</button>` };
   }
 
   if (rpState.step === "moveoutblockedconfirmed") {
@@ -3457,11 +3513,33 @@ function rpAddonsScreen(eyebrow) {
      changes, only where the customer checks the box. Scoped to
      moveoutrefresh only: "fridge" is also legitimately a card on
      Hourly Cleaning's addons screen and must stay there. */
+  /* Round 29 (review fix): the four Express-scope add-ons above are
+     surfaced as checkboxes on the "moveouttiers" screen, but were then
+     filtered out of this screen entirely -- so once a customer chose
+     Express, the oven, the fridge, cabinets and the Detail Pass became
+     literally unreachable. The only way back to them was the browser
+     Back button onto a screen whose whole framing was "pick a tier,"
+     roughly 3,300px of scrolling down on a phone. That is a straight
+     revenue leak on the four highest-margin SKUs in the catalog, on the
+     one screen headed "Would you like any add-ons?".
+
+     Round 25's concern was ordering, not existence: prepending these
+     ahead of carpet/windows pushed the bigger, more-considered
+     purchases behind "Show more." So they come back as their own
+     labelled group BELOW the primary cards instead of being removed --
+     carpet and windows keep the top slots, and nothing the customer
+     might want to buy is unreachable. Same cardFor()/bodyFor() render
+     path, same state fields, same line items, same webhook. */
+  const EXPRESS_SCOPE_KEYS = ["fridge", "oven", "cabinets", "detailPass"];
+  const isExpress = rpState.service === "moveoutrefresh";
   const keys = (rpServiceAddons[rpState.service] || []).filter(k => {
     if (k === "junk") return false;
-    if (rpState.service === "moveoutrefresh" && ["fridge", "oven", "cabinets", "detailPass"].includes(k)) return false;
+    if (isExpress && EXPRESS_SCOPE_KEYS.includes(k)) return false;
     return true;
   });
+  const expressScopeKeys = isExpress
+    ? EXPRESS_SCOPE_KEYS.filter(k => (rpServiceAddons[rpState.service] || []).includes(k))
+    : [];
   const junkAvailable = (rpServiceAddons[rpState.service] || []).includes("junk");
   const isSelected = {
     carpet: rpState.addonCarpetRooms > 0,
@@ -3634,11 +3712,25 @@ function rpAddonsScreen(eyebrow) {
         </div>
     </section>` : "";
 
+  const expressScopeCards = expressScopeKeys.length ? `
+    <p class="rp-addon-section-label">Add anything Inspection Ready already includes</p>
+    <div class="rp-rows">${expressScopeKeys.map(cardFor).join("")}</div>
+    ${(() => {
+      /* Same guardrail the estimate screen and Liz's console both run:
+         stacking these always costs more than switching tiers outright,
+         by design. Say so here, at the moment the customer is stacking
+         them, instead of letting them find out on the next screen. */
+      const ir = rpMoveoutTierBasePrice("moveout"), rf = rpMoveoutTierBasePrice("moveoutrefresh"), added = rpAddonsTotal();
+      if (ir === null || rf === null || added <= 0 || added < (ir - rf)) return "";
+      return `<button type="button" class="rp-inline-link rp-moveout-switch" onclick="rpSwitchMoveoutTier('moveout')">You're at $${(rf + added).toFixed(0)} with these \u2014 Inspection Ready is $${ir.toFixed(0)} and covers all of it, guaranteed \u2192</button>`;
+    })()}` : "";
+
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Would you like any add-ons?</h2>
     <div class="rp-rows">${cards}</div>
     ${moreToggle}
+    ${expressScopeCards}
     <p class="rp-addon-section-label">Need help beyond cleaning?</p>
     ${junkAvailable ? `
     <label class="rp-make-ready-card">
@@ -3680,14 +3772,14 @@ function rpEstimateScreen(eyebrow) {
   const noGuaranteedPrice = rpIsCustomQuoteOnly();
   const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
   const discountActive = rpState.militaryDiscount && !noGuaranteedPrice && rpMilitaryDiscountCents() > 0;
-  return { scroll: `<div>
+  return { onMount: rpPrefetchSlots, scroll: `<div>
     ${rpState.service === "maintenance" && rpState.frequency && rpState.frequency !== "One-Time" ? `
     <div class="rp-recurring-summary">
       ${rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0 ? `
-      <div class="rp-recurring-total"><span><strong>First visit: Deep Clean (required)</strong></span><strong>$${rpRecurringDeepFirstPrice().toFixed(2)}</strong></div>
-      <div class="rp-recurring-total"><span>Then ${rpState.frequency.toLowerCase()} visits</span><strong>$${rpMaintenanceBasePerVisit().toFixed(2)} each</strong></div>
+      <div class="rp-recurring-total"><span><strong>First visit: Deep Clean (required)</strong></span><strong>${rpFormatMoneyDisplay(rpRecurringDeepFirstCents())}</strong></div>
+      <div class="rp-recurring-total"><span>Then ${rpState.frequency.toLowerCase()} visits</span><strong>${rpFormatMoneyDisplay(rpToCents(rpMaintenanceBasePerVisit()))} each</strong></div>
       <p class="rp-fineprint" style="margin:8px 0 0">Recurring plans start with one Deep Clean so every visit after it stays on schedule and on price. You're charged the Deep rate on visit one only.</p>
-      ` : `${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · $${rpMaintenanceBasePerVisit().toFixed(2)} each</span><strong>$${rpMonthlyTotal().toFixed(2)}/mo</strong></div>` : ""}`}
+      ` : `${rpIsRecurringPlan() ? `<div class="rp-recurring-total"><span>${rpFrequencyPlan().visitsPerMonth} visits/month · ${rpFormatMoneyDisplay(rpToCents(rpMaintenanceBasePerVisit()))} each</span><strong>${rpFormatMoneyDisplay(rpToCents(rpMonthlyTotal()))}/mo</strong></div>` : ""}`}
       ${rpIsRecurringPlan() && rpAddonsOnceCharge() ? `<div class="rp-recurring-total"><span>Add-ons for this visit (one-time)</span><strong>+$${rpAddonsOnceCharge()}</strong></div>` : ""}
       <span class="rp-no-contract">✓ No contract, cancel or reschedule anytime</span>
     </div>` : ""}
@@ -3726,6 +3818,11 @@ function rpEstimateScreen(eyebrow) {
             : ""}
         ${rpState.addonDropNotice ? `<p class="rp-addon-drop-notice">Removed from your estimate: <strong>${rpState.addonDropNotice}</strong> — already included in this tier.</p>` : ""}
         <div class="rp-trust-signal"><strong>★ 5.0</strong> · 61+ reviews · Veteran-owned & insured</div>
+        ${!noGuaranteedPrice ? `
+        <label class="rp-discount-inline is-offer">
+          <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
+          <span><strong>Military or first responder? Take 10% off.</strong><small>Up to $25 off, as a thank-you for your service. Just tick the box — no ID needed to book. Can't be combined with other promotional offers.</small></span>
+        </label>` : ""}
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
       ${["moveout", "moveoutrefresh"].includes(rpState.service) && rpSqftTier() ? `<div class="rp-mini-row"><span>Home Size</span><strong>${rpSqftTier().label}</strong></div>` : ""}
@@ -3735,7 +3832,7 @@ function rpEstimateScreen(eyebrow) {
       ${rpState.service === "hourly" && rpState.cleanerCount ? `<div class="rp-mini-row"><span>Cleaners</span><strong>${rpState.cleanerCount}</strong></div>` : ""}
       ${rpState.service === "hourly" && rpState.hourCount ? `<div class="rp-mini-row"><span>Hours</span><strong>${rpState.hourCount}</strong></div>` : ""}
       ${rpState.service === "hourly" ? `<div class="rp-mini-row"><span>Rate</span><strong>$${HOURLY_RATE_PER_CLEANER}/hr per cleaner</strong></div>` : ""}
-      ${["moveout","moveoutrefresh","deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>$${rpDisplayBasePrice().toFixed(2)}</strong></div>` : ""}
+      ${["moveout","moveoutrefresh","deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice ? `<div class="rp-mini-row"><span>Base Service</span><strong>${rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice()))}</strong></div>` : ""}
       ${rpState.condition ? `<div class="rp-mini-row"><span>Condition</span><strong>${rpState.condition}</strong></div>` : ""}
       ${rpMoveoutIsCustomSqft() || rpIsSpecialtyCondition() ? `<div class="rp-mini-row"><span>Pricing</span><strong>Custom Quote</strong></div>` : ""}
       ${rpState.frequency ? `<div class="rp-mini-row"><span>Frequency</span><strong>${rpFrequencySummary()}</strong></div>` : ""}
@@ -3747,12 +3844,7 @@ function rpEstimateScreen(eyebrow) {
       ${isQuoteOnly && rpState.airbnbSameDay ? `<div class="rp-mini-row"><span>Same-day turnover</span><strong>Yes</strong></div>` : ""}
       ${rpAddonSummaryRows()}
       ${rpState.handymanInterest ? `<div class="rp-mini-row rp-separate-quote-row"><span>Additional service request</span><strong>Make-ready repairs<small>Quoted separately · not included</small></strong></div>` : ""}
-      ${!noGuaranteedPrice ? `
-      <label class="rp-discount-inline">
-        <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
-        <span><strong>Military or First Responder?</strong><small>Save 10% (up to $25) as a thank-you for your service. Cannot be combined with other promotional offers.</small></span>
-      </label>` : ""}
-      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder Discount</span><strong>-$${rpMilitaryDiscountAmount().toFixed(2)}</strong></div>` : ""}
+      ${discountActive ? `<div class="rp-mini-row rp-discount-row"><span>Military &amp; First Responder Discount</span><strong>−${rpFormatMoneyDisplay(rpMilitaryDiscountCents())}</strong></div>` : ""}
     </div>
     ${showHandymanHere ? `
     <label class="rp-make-ready-card rp-mt">
@@ -3762,6 +3854,12 @@ function rpEstimateScreen(eyebrow) {
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>` : ""}
   </div>`, footer: `
+    ${(() => {
+      if (rpState.slotsLoading || rpState.slotsError) return "";
+      const openCount = rpUpcomingWeekOpenSlotsCount();
+      if (openCount <= 0 || openCount > RP_LOW_AVAILABILITY_THRESHOLD) return "";
+      return `<p class="rp-slots-low rp-slots-low-estimate">Only ${openCount} opening${openCount === 1 ? "" : "s"} left in the next 7 days.</p>`;
+    })()}
     <p class="rp-notice rp-dock-notice">Price may change only for severe buildup, heavy trash, access issues, biohazards, or work outside the selected scope. Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>
     <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>` };
 }
@@ -3807,7 +3905,7 @@ function rpContactGateScreen(eyebrow) {
       <div class="rp-error" id="rpGateError" style="display:none"></div>
       <p class="rp-fineprint">If something seems unusual about your quote, we'll reach out before you book. No spam, no pressure otherwise.</p>
     </div>
-  </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` };
+  </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price</button>` };
 }
 
 /* Posts a real PARTIAL lead to the Worker's /lead endpoint. This is the
@@ -4797,8 +4895,17 @@ async function rpLoadNativeSlots(force = false) {
     rpTrack("slots_load_error", { message: rawMessage });
   } finally {
     rpState.slotsLoading = false;
-    if (rpState.step === "calendar") rpRefresh();
+    if (rpState.step === "calendar" || rpState.step === "estimate") rpRefresh();
   }
+}
+/* Fire-and-forget warm-up, called when the estimate screen mounts. Gives the
+   estimate screen real availability data to decide whether the low-slots
+   line is honest, and means the calendar step opens populated instead of
+   on a spinner. Safe to call repeatedly: rpLoadNativeSlots() no-ops while a
+   request is in flight and when the month is already cached. */
+function rpPrefetchSlots() {
+  if (!rpState.calendarMonth) rpState.calendarMonth = rpMonthKeyFromDateKey(rpCentralDateKey());
+  try { rpLoadNativeSlots(false); } catch (e) { /* never block the estimate on this */ }
 }
 function rpMountNativeCalendar() {
   if (!rpState.calendarMonth) rpState.calendarMonth = rpMonthKeyFromDateKey(rpCentralDateKey());

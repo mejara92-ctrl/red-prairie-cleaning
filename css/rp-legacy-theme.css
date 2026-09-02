@@ -162,3 +162,31 @@ body {
   .navbar .rp-site-wordmark-copy small { font-size: 10px; }
   .navbar .book-btn { padding-inline: 8px; font-size: 12px; }
 }
+
+/* ==========================================================================
+   Round 29 — touch-target floor (WCAG 2.5.8 / iOS HIG: 44px)
+   --------------------------------------------------------------------------
+   Audited at 390px across every landing page: the FAQ <summary> rows were
+   25px tall, the "Prefer to call / Prefer to text" hero links 16px, and the
+   footer phone links 16px. Those are the highest-intent taps on the whole
+   page — a renter with one thumb, mid-move, trying to reach a human — and
+   they were the smallest. Padding is added rather than font-size so nothing
+   about the visual rhythm of these pages changes.
+   ========================================================================== */
+.faq-item > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding-block: 10px;
+}
+.rp-hero-text-link a,
+.footer-content a,
+.hero-trust .google-review-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.logo.rp-site-wordmark { min-height: 44px; }
+/* Inline links inside a sentence must not become 44px-tall blocks — those
+   are read, not tapped, and stretching them breaks the line box. */
+.rp-hero-text-link { line-height: 1.35; }

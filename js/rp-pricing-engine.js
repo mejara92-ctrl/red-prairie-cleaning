@@ -698,11 +698,23 @@ const rpIncludes = {
      service as of this round. Do not delete items. */
   moveout: {
     intro: "This isn't a checklist. It's a full interior reset: oven, fridge, cabinets, closets, bathrooms, baseboards, windows, and floors, all included and nothing billed separately.",
+    /* Round 28: crew size moved OFF this list entirely -- the
+       moveouttiers card now renders it as its own bold headline line
+       above the tier name (see tierCard() in book/index.html), so
+       repeating it as bullet #4 here would just be clutter. The bare
+       "Defend Your Deposit" bullet was replaced too -- it's the same
+       trademark rendered a second time right next to the card's own
+       .rp-tier-guarantee line, and on its own it doesn't say what the
+       guarantee actually DOES. Swapped for the plain-language mechanism
+       (lifted from the site's own existing FAQ copy, not invented), and
+       added a 4th accurate bullet -- Inspection Ready's base scope
+       already includes baseboards/windows/fixtures per the scope table
+       below, it just wasn't said here before. */
     highlights: [
       ["home", "Every room, inside & out"],
       ["check", "Oven, fridge & cabinets included"],
-      ["shield", "Defend Your Deposit"],
-      ["repeat", "<strong>3</strong>-cleaner crew"]
+      ["check", "Baseboards, interior windows & fixtures included"],
+      ["shield", "If something's missed, we come back free"]
     ],
     outcome: "Built to pass a landlord walkthrough, or to photograph well if you're listing the home for sale.",
     /* Exclusions folded into the fine print instead of their own
@@ -722,11 +734,17 @@ const rpIncludes = {
      that the customer should know exactly the scope they're getting. */
   moveoutrefresh: {
     intro: "A fast, affordable clean for when there's no landlord or PM inspection to pass — just a place that needs to be clean and ready to hand over.",
+    /* Round 28: crew size moved OFF this list, same reasoning as
+       moveout's highlights above -- it's now a bold headline line on
+       the card itself, not a checklist bullet. Replaced with an
+       accurate 4th bullet naming the real flexibility this tier has
+       (fridge/oven/cabinets/Detail Pass are all real, priced add-ons —
+       see the round-25 fineprint fix below). */
     highlights: [
       ["home", "Kitchen, bathrooms & floors"],
       ["check", "Surfaces & appliance exteriors wiped"],
-      ["repeat", "<strong>2</strong>-cleaner crew"],
-      [null, "No inspection guarantee"]
+      [null, "No inspection guarantee"],
+      ["zap", "Add fridge, oven, cabinets & more if needed"]
     ],
     outcome: "Built for tenants and owners who just need it clean — not for a landlord walkthrough.",
     /* Round 20 copy fix: the old version said "add any of them
@@ -834,9 +852,16 @@ const rpFlows = {
          (see that screen's render block).
        - "contactgate" moved from right before "moveouttiers" to right
          after "bathrooms" -- see the comment on rpCurrentFlow() below
-         for why. */
-  moveout:        ["bedrooms", "bathrooms", "contactgate", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
-  moveoutrefresh: ["bedrooms", "bathrooms", "contactgate", "moveoutquestionnaire", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+         for why.
+
+     Round 28 (direct instruction): "contactgate" moved again, from right
+     after "bathrooms" to right after "moveoutquestionnaire" -- see the
+     comment on rpCurrentFlow() below. This array is still just the
+     resume-check allowlist, not what drives the actual order (that's
+     computed in rpCurrentFlow()), but kept in sync here so it doesn't
+     read as stale to the next person who opens this file. */
+  moveout:        ["bedrooms", "bathrooms", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
+  moveoutrefresh: ["bedrooms", "bathrooms", "moveoutquestionnaire", "contactgate", "moveoutblocked", "moveoutblockedconfirmed", "moveouttiers", "addons", "estimate", "lead", "calendar"],
   /* Deep and Basic dropped sqft/bedrooms/bathrooms/condition entirely —
      both are flat time-anchored (RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE
      above) with Extra Time as an add-on instead of a size bracket. */
@@ -879,18 +904,26 @@ function rpCurrentFlow() {
        in round 19.
 
        Round 24 (direct instruction): "sqft" and "moveoutintent" removed
-       (see the comment on rpFlows above). "contactgate" is built in here
-       directly now, rather than left to the generic insertion logic
-       below -- it needs to land right after "bathrooms" and before
+       (see the comment on rpFlows above). "contactgate" was built in
+       here directly, landing right after "bathrooms" and before
        "moveoutquestionnaire" for BOTH branches, blocked included, so
-       that even a home that turns out to be blocked has already handed
-       over a name and number before it finds that out. That's earlier
-       than every other service's gate (which still sits right before its
-       first real price -- see the generic insertion below), and earlier
-       than Move-Out's OWN gate used to sit (round 19c-23 put it right
-       before "moveouttiers"). The moveoutblocked screen itself no longer
-       asks for name/phone a second time -- it reads what contactgate
-       already collected. */
+       that even a home that turns out to be blocked had already handed
+       over a name and number before it found that out.
+
+       Round 28 (direct instruction, after live review: "put the 3
+       questions about water/AC/mold before the phone number name
+       screen, I think it'll flow better") -- contactgate now lands
+       right AFTER "moveoutquestionnaire" instead of before it, so the
+       customer answers "tell us about your home" as one uninterrupted
+       block (bedrooms, bathrooms, then the three hard-stop questions)
+       before being asked for a name and number. The round-24 lead-
+       capture goal isn't lost: contactgate still lands before
+       "moveoutblocked" in both branches below, so a home that turns out
+       to be blocked still hands over a name and number first -- just
+       one screen later than before, after the questions instead of
+       ahead of them. The moveoutblocked screen still doesn't ask for
+       name/phone a second time -- it reads what contactgate collected,
+       same as before. */
     if (rpMoveoutBlocked()) {
       flow = ["bedrooms", "bathrooms", "moveoutquestionnaire", "moveoutblocked"];
     } else {
@@ -899,7 +932,7 @@ function rpCurrentFlow() {
     if (!RP_CONTACT_GATE) return flow;
     const at = flow.indexOf("moveoutquestionnaire");
     if (at === -1) return flow;
-    return flow.slice(0, at).concat(["contactgate"], flow.slice(at));
+    return flow.slice(0, at + 1).concat(["contactgate"], flow.slice(at + 1));
   }
   if (!RP_CONTACT_GATE) return flow;
   if (flow.includes("contactgate")) return flow;
@@ -1286,11 +1319,25 @@ function rpFinalPrice() {
   return rpCentsToDollars(rpFinalPriceCents());
 }
 
+/* Display formatter for HEADLINE prices — the big number on /book's
+   estimate screen, the add-on screen's live chip, and the "quote to
+   give" card Liz reads off on /call. Every price this business charges
+   is a whole dollar amount, so ".00" added nothing but noise: it made a
+   confident "$539" read like an invoice line, and made the CSR script
+   literally say "five hundred thirty-nine dollars and zero cents" out
+   loud. Cents are still rendered by rpFormatMoney() wherever a real
+   fractional amount can occur (the military discount line, recurring
+   per-visit math), so nothing is lost where it matters. */
+function rpFormatMoneyDisplay(cents) {
+  const abs = Math.abs(cents);
+  return abs % 100 === 0 ? `$${Math.round(abs / 100)}` : rpFormatMoney(cents);
+}
+
 function rpPriceLabel() {
   if (rpIsCustomQuoteOnly()) return "Custom Quote";
   const cents = rpFinalPriceCents();
-  if (!cents) return "$0.00";
-  return rpFormatMoney(cents);
+  if (!cents) return "$0";
+  return rpFormatMoneyDisplay(cents);
 }
 
 function rpIsRecurringPlan() {

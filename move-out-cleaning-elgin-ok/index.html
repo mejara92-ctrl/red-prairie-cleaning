@@ -401,7 +401,7 @@ window.__rpScheduleDeferred(function(){
             border: 1px solid #eee;
         }
         .trust-card i { color: var(--black); font-size: 24px; margin-bottom: 8px; }
-        .trust-card h3 { font-size: 18px; margin: 0 0 4px; }
+        .trust-card h3, .trust-card b { display: block; font-size: 18px; font-weight: 700; margin: 0 0 4px; }
         .trust-card p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
 
         .rp-funnel { background: var(--light); color: var(--text); padding: 56px 14px; }
@@ -750,7 +750,7 @@ window.__rpScheduleDeferred(function(){
         }
         .review-carousel .review-card { min-width: 86%; scroll-snap-align: center; }
         .review-card p { margin: 14px 0; color: #444; font-size: 14px; }
-        .review-card h4 { margin: 0; }
+        .review-card h4, .review-card .review-author { margin: 0; font-size: 15px; font-weight: 700; color: #111; }
         .review-card span { display: inline-block; margin-top: 6px; color: var(--black); font-weight: 900; font-size: 13px; }
         .review-cta { display: flex; justify-content: center; margin-top: 24px; }
 
@@ -2069,6 +2069,32 @@ line-height:1.5;
 
 
 <link href="/css/rp-legacy-theme.css" rel="stylesheet"/>
+
+<style id="rp-price-band">
+/* Round 29: real starting prices on the landing pages. These pages ranked
+   for cost-intent queries and published no number, so the visitor's actual
+   question went unanswered until after they committed to the estimator. */
+.rp-price-band{background:var(--light);padding:44px 16px}
+.rp-price-band-wrap{max-width:1000px;margin:0 auto;text-align:center}
+.rp-price-band-wrap h2{margin:0 0 10px}
+.rp-price-band-lead{max-width:640px;margin:0 auto 26px;color:var(--muted);font-size:15px;line-height:1.6}
+.rp-price-band-grid{display:grid;grid-template-columns:1fr;gap:16px;text-align:left}
+@media(min-width:760px){.rp-price-band-grid{grid-template-columns:1fr 1fr}}
+.rp-price-card{position:relative;background:#fffdf9;border:1px solid #e6d9c6;border-radius:18px;
+  padding:22px 20px;box-shadow:0 8px 22px rgba(0,0,0,.05)}
+.rp-price-card.is-featured{border-color:var(--red);border-width:2px}
+.rp-price-card-tag{position:absolute;top:-11px;left:20px;background:var(--red);color:#fff;
+  border-radius:99px;padding:4px 12px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.rp-price-card > b{display:block;font-size:19px;font-weight:800;margin-bottom:2px}
+.rp-price-card-amt{margin:0 0 10px;font-size:34px;font-weight:800;color:var(--red);line-height:1.1}
+.rp-price-card-note{margin:0 0 14px;font-size:14px;line-height:1.6;color:var(--muted)}
+.rp-price-card-tiers{list-style:none;margin:0;padding:0;border-top:1px solid #eee2d1}
+.rp-price-card-tiers li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;
+  border-bottom:1px solid #f1e8db;font-size:14.5px}
+.rp-price-card-tiers li b{font-weight:800}
+.rp-price-band-fine{margin:22px auto 18px;max-width:640px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.rp-price-band-fine a{font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;min-height:44px}
+</style>
 </head>
 <body>
 <header class="navbar">
@@ -2160,6 +2186,28 @@ line-height:1.5;
 </ul>
 <a class="book-btn" href="/book?service=moveout">Build Estimate</a>
 </div>
+</div>
+</section><section class="rp-price-band" aria-labelledby="rp-price-band-h">
+<div class="rp-price-band-wrap">
+<h2 id="rp-price-band-h">Elgin Move-Out Cleaning Prices</h2>
+<p class="rp-price-band-lead">Published up front. Bathrooms are included at every size and there is no square-footage surcharge — the number you see is the number you pay unless you add something yourself.</p>
+<div class="rp-price-band-grid">
+<div class="rp-price-card is-featured">
+<div class="rp-price-card-tag">Most booked</div>
+<b>Inspection Ready</b>
+<p class="rp-price-card-amt">From $459</p>
+<p class="rp-price-card-note">Full interior reset — oven, fridge, cabinets, closets, baseboards, interior windows, ceiling fans, vents and light fixtures. Backed by our Defend Your Deposit™ guarantee: if a landlord flags something we missed, we come back free within 48 hours.</p>
+<ul class="rp-price-card-tiers"><li>1–2 bedrooms <b>$459</b></li><li>3 bedrooms <b>$539</b></li><li>4 bedrooms <b>$619</b></li><li>5+ bedrooms <b>$699</b></li></ul>
+</div>
+<div class="rp-price-card">
+<b>Move-Out Express</b>
+<p class="rp-price-card-amt">From $199</p>
+<p class="rp-price-card-note">Kitchen, bathrooms, floors and surfaces — the right call when nobody is inspecting the place against a list. Oven, fridge, cabinets and a full Detail Pass can each be added individually.</p>
+<ul class="rp-price-card-tiers"><li>1–2 bedrooms <b>$199</b></li><li>3 bedrooms <b>$249</b></li><li>4 bedrooms <b>$299</b></li><li>5+ bedrooms <b>$349</b></li></ul>
+</div>
+</div>
+<p class="rp-price-band-fine">Military and first responders save 10%, up to $25. Carpet cleaning $50 per room (two-room minimum). Junk hauling quoted separately. <a href="/pricing/">See every price up front →</a></p>
+<a class="book-btn" href="/book?service=moveout">Get My Exact Price — About A Minute</a>
 </div>
 </section><section class="rp-comparison" id="included">
 <div class="rp-comparison-wrap">
@@ -2307,25 +2355,25 @@ line-height:1.5;
 <div class="review-card">
 <div class="stars">★★★★★</div>
 <p>"Christa and her team were excellent for my move-out clean. They were professional, responsive, and did a fantastic job. The house looked great, and the entire process was smooth and stress-free."</p>
-<h4>Corey M.</h4>
+<p class="review-author">Corey M.</p>
 <span>Move-Out Cleaning Customer</span>
 </div>
 <div class="review-card">
 <div class="stars">★★★★★</div>
 <p>"Christa was professional, detail-oriented, and did an excellent job. We were very happy with the results and would definitely recommend them."</p>
-<h4>Nina O.</h4>
+<p class="review-author">Nina O.</p>
 <span>Verified Customer</span>
 </div>
 <div class="review-card">
 <div class="stars">★★★★★</div>
 <p>"The BEST cleaning I've ever had in my house before. The staff was AMAZING, efficient and super detailed."</p>
-<h4>Ava C.</h4>
+<p class="review-author">Ava C.</p>
 <span>Verified Customer</span>
 </div>
 <div class="review-card">
 <div class="stars">★★★★★</div>
 <p>"I contacted Red Prairie Cleaning and was able to get on the schedule right away. They were very polite and professional."</p>
-<h4>Tyler A.</h4>
+<p class="review-author">Tyler A.</p>
 <span>Verified Customer</span>
 </div>
 </div>
@@ -2377,7 +2425,7 @@ line-height:1.5;
 <div class="footer-content">
 <div><h3>Red Prairie Cleaning</h3><p>Move-out cleaning, deep cleaning, maintenance cleaning, and carpet cleaning — plus yard care, junk hauling, window washing, Airbnb turnover, upholstery, and commercial cleaning across Southwest Oklahoma.</p><div class="footer-badges"><span class="footer-badge"><i class="fa-solid fa-shield-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 L19 6 V11 C19 16 16 19.5 12 21 C8 19.5 5 16 5 11 V6 Z"/><path d="M8.5 12 L11 14.5 L15.5 9.5"/></svg></i> Licensed &amp; Insured</span><span class="footer-badge"><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i> Chamber of Commerce Member</span></div></div>
 <div><h3>Contact</h3><ul><li><a href="sms:5802150915" style="color:#ccc;">Text: (580) 215-0915</a></li><li>Elgin, Lawton, Fort Sill, Cache, Medicine Park, Duncan</li></ul></div>
-<div><h3>Services</h3><p class="footer-services-label">Core Services</p><ul><li>Move-Out Cleaning</li><li>Deep Cleaning</li><li>Maintenance Cleaning</li><li>Carpet Cleaning</li></ul><p class="footer-services-label">Also Available</p><ul><li>Exterior Windows</li><li>Junk Hauling</li><li>Airbnb Turnover</li><li>Hourly Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div>
+<div><h3>Services</h3><p class="footer-services-label">Cleaning Services</p><ul><li><a href="/move-out-cleaning-lawton-ok/">Move-Out Cleaning</a></li><li><a href="/apartment-move-out-cleaning-lawton-ok/">Apartment Move-Out Cleaning</a></li><li><a href="/pcs-cleaning-fort-sill-ok/">PCS Cleaning (Fort Sill)</a></li><li><a href="/deep-cleaning-lawton-ok/">Deep Cleaning</a></li><li><a href="/house-cleaning-lawton-ok/">House Cleaning</a></li><li><a href="/recurring-cleaning-lawton-ok/">Recurring Maid Service</a></li><li><a href="/carpet-cleaning-lawton-ok/">Carpet Cleaning</a></li><li><a href="/pricing/">See All Prices</a></li></ul><p class="footer-services-label">Also Available</p><ul><li>Exterior Windows</li><li>Junk Hauling</li><li>Airbnb Turnover</li><li>Hourly Cleaning</li><li>Upholstery Cleaning</li><li>Commercial Cleaning</li></ul></div><div><h3>Service Areas</h3><p class="footer-services-label">Move-Out Cleaning By Town</p><ul><li><a href="/move-out-cleaning-lawton-ok/">Lawton</a></li><li><a href="/move-out-cleaning-fort-sill-ok/">Fort Sill</a></li><li><a href="/move-out-cleaning-cache-ok/">Cache</a></li><li><span aria-current="page">Elgin</span></li><li><a href="/move-out-cleaning-medicine-park-ok/">Medicine Park</a></li><li><a href="/move-out-cleaning-duncan-ok/">Duncan</a></li><li><a href="/deep-cleaning-elgin-ok/">Deep Cleaning in Elgin</a></li><li><a href="/house-cleaning-elgin-ok/">House Cleaning in Elgin</a></li></ul><p class="footer-services-label">Free Guides</p><ul><li><a href="/move-out-resource-center/">Move-Out Resource Center</a></li><li><a href="/move-out-cleaning-checklist/">Move-Out Cleaning Checklist</a></li><li><a href="/how-to-get-your-security-deposit-back-lawton-ok/">How to Get Your Deposit Back</a></li></ul></div>
 </div>
 <div class="copyright">© 2026 Red Prairie Cleaning. A Zyvara Services LLC company.</div></footer>
 <div aria-label="Quick actions" class="sticky-mobile-cta">

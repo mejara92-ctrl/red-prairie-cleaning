@@ -1,0 +1,285 @@
+RED PRAIRIE — ROUND 29: FULL-SITE REVIEW
+Price-drift repair, /book funnel fixes, /call sales tooling, and the
+site's first real internal-link structure.
+========================================================================
+Instruction: "Do a full review on my website, make any recommendations
+and fixes that are good. /book needs to be a great sales funnel, /call
+needs to help my assistant sell cleans."
+
+Everything below was found by auditing the shipped files and driving the
+live pages in a headless browser at 320/360/390/414/768/1280px. Fixes are
+applied; the open recommendations are listed at the bottom.
+
+
+========================================================================
+A. PRICE DRIFT — the site was publishing four different wrong prices
+========================================================================
+rp-pricing-engine.js opens with a rule: prices live here, never duplicate
+one into a page. That rule was being kept inside /book and /call and
+nowhere else, and nothing checked. Live, simultaneously:
+
+  index.html FAQ ................ carpet "$75 per carpeted room"   (engine: $50)
+  carpet-cleaning-lawton-ok ..... "$75 per room", in BOTH the visible
+                                  FAQ and the FAQPage JSON-LD schema    (engine: $50)
+  house-cleaning-lawton-ok ...... "Deep cleaning starts at $199"    (engine: flat $300)
+  house-cleaning-lawton-ok ...... "Maintenance cleaning starts at $149" (engine: $150)
+  recurring-cleaning-lawton-ok .. "Maintenance visits start at $149"  (engine: $150,
+                                  less 10-20% on a recurring plan)
+  index.html Offer schema ....... Inspection Ready "299", Express "179"
+                                  — two full pricing rounds out of date
+  call/index.html ............... hourly "4-hour minimum" in TWO places
+                                  (engine HOURLY_MIN_HOURS = 3)
+
+The deep-cleaning one is the expensive one: a visitor read "starts at
+$199," clicked through, and the estimator said $300. That is a 50% jump
+at the exact moment trust is being decided, on a site whose entire
+positioning is "the price you see is the price you pay."
+
+All fixed against the engine's real numbers.
+
+NEW: tools/check-prices.py
+  Reads the live constants out of rp-pricing-engine.js and greps every
+  published page for retired figures and for copy claims that have to
+  track a constant ("N-hour minimum", "N-room minimum"). Exit 1 on drift.
+  It is not a second copy of the price list, so it cannot itself go
+  stale. Run it before shipping any round that touches pricing:
+
+      python3 tools/check-prices.py
+
+  It has already earned its keep — it caught the second, hidden copy of
+  "4-hour minimum" in call/index.html's TITLES map that the manual pass
+  missed.
+
+
+========================================================================
+B. /book — FUNNEL BUGS
+========================================================================
+B1. HEADER WORDMARK OVERLAPPED THE FAQ / CALL / TEXT BUTTONS
+    .rp-head is a grid with `grid-template-columns: 42px minmax(0,1fr)
+    auto`, and .rp-wordmark used `justify-self:center`, which sizes an
+    element to max-content. With white-space:nowrap on both wordmark
+    spans it overflowed the middle track in both directions and printed
+    underneath the FAQ button. Measured: 12px of overlap at 320px, 5px
+    at 390px (iPhone 14/15/16 standard width). Clean at 360 and 414,
+    which is presumably why it survived this long.
+    Fixed by clamping the wordmark to its track and letting the copy
+    wrap. Verified clean at 320/360/390/414/768/1280.
+
+B2. EVERY PRIMARY CTA RENDERED TWO ARROWS
+    `.rp-primary::after { content: "→" }` supplies an arrow, and five
+    buttons ALSO passed rpIcon("chev") inline — so "Continue › →",
+    "Show My Price › →", "Looks good, continue › →", and both "Request
+    a Callback › →". Removed the inline chevrons; the CSS arrow stays.
+
+B3. THE FOUR EXPRESS ADD-ONS WERE UNREACHABLE AFTER PICKING A TIER
+    The biggest revenue leak found. Round 25 moved fridge / oven /
+    cabinets / Detail Pass onto the "moveouttiers" screen as checkboxes
+    and filtered them OUT of the add-ons screen. So a customer who chose
+    Express and then wanted the oven done had no way to buy it: the
+    screen headed "Would you like any add-ons?" simply did not list it.
+    The only path back was the browser Back button onto a screen framed
+    as "pick a tier," about 3,300px of scrolling down on a phone.
+
+    Those are four of the highest-margin SKUs in the catalog ($50/$50/
+    $50/$150-240) on the tier most likely to want them.
+
+    Round 25's actual concern was ORDER, not existence — prepending them
+    ahead of carpet and windows pushed the bigger considered purchases
+    behind "Show more." So they are back as their own labelled group
+    BELOW the primary cards: carpet and windows keep the top slots, and
+    nothing purchasable is unreachable. Same render path, same state
+    fields, same line items, same webhook payload.
+
+    The tier-switch guardrail came with them: stack all four on a 3BR
+    and the screen now says "You're at $579 with these — Inspection
+    Ready is $539 and covers all of it, guaranteed →". Verified live.
+
+B4. HEADLINE PRICES SHOWED CENTS
+    "$539.00" / "$249.00" on the price screen, the add-on chip and the
+    quote card Liz reads aloud. Every price this business charges is a
+    whole dollar. Added rpFormatMoneyDisplay() to the engine: whole
+    dollars when the amount is whole, cents when it genuinely isn't (a
+    10% military discount on $249 is $24.90 and still renders as such).
+    The webhook / crew-sheet payload deliberately keeps .toFixed(2) —
+    that's accounting data, not a headline.
+
+B5. TOUCH TARGETS BELOW THE 44px MINIMUM
+    /book's header FAQ / Call / Text buttons were 36px. That header
+    exists to give a hesitating visitor a one-tap route to a human, and
+    it had the smallest targets on the page. Now 44x44. Same floor
+    applied across the landing pages (FAQ rows were 25px, the "Prefer
+    to call / text" links 16px, footer phone links 16px) and to /call's
+    Objections / End Call buttons (30px — tapped one-handed, mid-call).
+
+
+========================================================================
+C. /book — CONVERSION
+========================================================================
+C1. MILITARY DISCOUNT MOVED TO THE PRICE, AND MADE A REAL OFFER
+    It was an unstyled bare checkbox at the very bottom of the invoice
+    ledger, below every line item. In a Fort Sill town that is one of
+    the strongest close levers on the page. It now sits directly under
+    the price as a bordered offer card — "Military or first responder?
+    Take 10% off." — in the same eyeful as the number it discounts.
+    The itemised "−$25" line stays in the ledger where it belongs.
+
+C2. HONEST SCARCITY AT THE PRICE MOMENT, NOT ONE SCREEN LATER
+    The "Only N openings left in the next 7 days" line already existed
+    and was already honest (it reads live calendar data and renders
+    NOTHING when availability is healthy). It only appeared on the
+    calendar screen — one step AFTER the decision that loses people.
+    It now also renders on the estimate screen, under the same guard.
+
+C3. SLOTS PREFETCH ON THE ESTIMATE SCREEN
+    Availability used to be fetched when the calendar mounted, so the
+    highest-drop-off screen in the funnel opened on a spinner. It now
+    warms on the estimate screen — which is also what makes C2 possible.
+
+
+========================================================================
+D. /call — HELPING LIZ SELL
+========================================================================
+D1. A LINE SHE READS ALOUD WAS UNGRAMMATICAL
+    quoteSayLine() built "So for a 3 bedrooms, 2 bathrooms, your total
+    is..." — plural nouns behind the article "a". This is spoken
+    verbatim to a paying customer at the single most important moment
+    of the call. Now: "So for a 3-bedroom, 2-bath home, your total is
+    $539 — ..."
+
+D2. THE MILITARY DISCOUNT WAS PURELY REACTIVE
+    The only place it appeared in the script was as an answer to "can
+    you do better on price?" In Lawton that is backwards. Offered
+    unprompted it costs at most $25 and buys a reason to say yes; held
+    back until they complain, the same $25 only buys a save on a price
+    objection you have already lost ground to. The add-ons step now
+    scripts the ask, with the words, before the price is said.
+    (Judgement call — reverse it by editing SCRIPT.addons.watch if you'd
+    rather keep the discount in reserve.)
+
+D3. A HARDCODED PRICE INSIDE AN OBJECTION NOTE
+    The "how much for a move-out clean?" note hardcoded "$459" in the
+    example quote — the exact thing the engine's own editing rules
+    forbid, and the way every drift in section A started. Objection
+    notes can now be functions (answers already could); this one reads
+    RP_MOVEOUT_BEDROOM_TIERS[0].base live.
+
+D4. THREE OBJECTIONS SHE HAD NO SCRIPT FOR
+    Added, because these come up on real calls and were being improvised
+    at the moments a booking is won or lost:
+      "How do I pay? / Do you need a deposit?"  — "nothing due today"
+        is the easiest true close on the list and wasn't written down
+      "What if my move date changes?"  — the #1 reason a move-out caller
+        says "let me call you back" instead of booking
+      "I need it this week / my walkthrough is in two days."  — highest-
+        intent caller on the board; must not be lost to a callback
+
+D5. TWO JUMP-RAIL CHIPS SHOWED RAW STEP NAMES
+    "intent" and "questionnaire" had no SHORT_LABELS entry, so the rail
+    fell back to the internal identifier — two lowercase code names in a
+    row of Title Case labels, on the one control she uses to navigate
+    mid-call. Now "Reason" and "Checks".
+
+D6. /call had no <h1> at all. Added.
+
+
+========================================================================
+E. SEO
+========================================================================
+E1. 16 OF 21 PAGES HAD ZERO INBOUND INTERNAL LINKS
+    The single biggest SEO problem on the site. Every landing page
+    linked only to "/" and "/book". The homepage linked to nothing but
+    "/pricing". The footer's "Services" list and the on-page service-area
+    cards were plain <li> and <h3> TEXT, not links. Which meant every
+    city page, every service page, the resource center, the checklist
+    and the deposit guide were reachable only from sitemap.xml — the
+    weakest discovery and ranking signal there is.
+
+    Added a crawlable link block to all 19 indexable pages: services,
+    move-out-by-town, and the three free guides, with the current page
+    rendered as non-link text (aria-current). Two variants, matching the
+    two footer styles already in use.
+
+    Inbound internal links per page: 0 → 18. Verified by crawl.
+
+E2. THE HOMEPAGE HAD NO CANONICAL TAG
+    Every other indexable page had one. The homepage — the page most
+    exposed to ?utm_/?gclid/ /index.html / trailing-slash duplicates,
+    and now the page carrying every one of those new internal links —
+    did not. Added.
+
+E3. NO PRICES ON THE LANDING PAGES
+    These pages rank for cost-intent queries and published no number
+    anywhere, so the visitor's actual question went unanswered until
+    after they committed to the estimator. Added a price band to the
+    seven move-out pages (both tiers, all four bedroom sizes, the
+    military line, and a link to /pricing), mirroring the block the PCS
+    page already had. Covered by tools/check-prices.py.
+
+E4. STALE PRICES IN THE HOMEPAGE Offer SCHEMA — see section A.
+
+E5. META DESCRIPTIONS OVER THE TRUNCATION LIMIT
+    Homepage 251 chars, /pricing 281, the deposit guide 231. All three
+    were comma-lists of services; rewritten to ~155 leading with the
+    query intent and a real number.
+
+E6. BROKEN HEADING OUTLINES
+    Reviewer names were <h4> directly under an <h2> (16 pages), and the
+    trust-bar badges were <h3> directly under the <h1> (17 pages).
+    Neither is a document section. Now <p class="review-author"> and
+    <b>, with the existing styling carried over — no visual change.
+
+E7. SITEMAP HAD NO <lastmod>
+    Added, plus priorities. Every URL just changed and wants recrawling.
+    Keep the dates honest — a sitemap claiming everything changed today
+    gets ignored.
+
+
+========================================================================
+F. RECOMMENDED, NOT DONE — needs your call
+========================================================================
+F1. THE HOMEPAGE → /book REDIRECT IS TECHNICALLY CLOAKING  ** read this **
+    index.html redirects every human to /book but explicitly exempts
+    crawlers by user-agent string. Serving different content to Googlebot
+    than to users, keyed on the UA, is what Google's spam policy calls
+    cloaking. The comment explains why it's done this way (a server 301
+    to a noindex page would risk dropping the homepage) and that reasoning
+    is sound — but the UA branch is the risky part, not the redirect.
+    Options, roughly in order of safety:
+      (a) Drop the redirect. Make the homepage do the selling and put a
+          large estimator CTA above the fold — it mostly already does.
+      (b) Keep /book as the landing page for PAID traffic only (it's
+          already the ad destination) and let organic land on "/".
+      (c) Make /book indexable with a canonical to "/", and redirect
+          without the UA branch.
+    I did not change this: it is a deliberate, documented business
+    decision and reversing it would change where all your traffic lands.
+
+F2. THE GUARANTEE BLOCK DOMINATES THE PRICE SCREEN
+    On Express it is the largest element on the screen and sits directly
+    under the number, and roughly half of it is "switch to Inspection
+    Ready." Good upsell placement, but at the moment of price reveal the
+    dominant message is "this tier might not be enough for you," which
+    reads as doubt. Worth A/B testing a two-line version with the switch
+    offer as a link only.
+
+F3. "STEP 5 OF 10" IS A LOT OF STEPS TO SEE
+    The progress counter is honest, but ten steps is a discouraging
+    number at step five. Consider counting only the remaining decisions,
+    or a bare progress bar with no numbers.
+
+F4. DEAD CODE IN THE ENGINE
+    rpDeepSqftTiers, rpMaintenanceSqftTiers, rpMaintenancePrice() and
+    rpSqftTiersForService()'s deep/maintenance branches are unreachable —
+    both services have been flat-anchor priced since round 12.
+    SCRIPT.sqft and SCRIPT.condition in /call are likewise unreachable
+    (no flow contains those steps). Harmless, but it's the kind of thing
+    that makes a future reader think square footage still matters.
+
+F5. THE LIGHTBOX <img src=""> ON 15 PAGES
+    An empty src is invalid and makes some browsers re-request the page
+    URL. JS sets the real src on open, so the attribute can just go.
+
+F6. GOOGLE NO LONGER SHOWS SELF-SERVING REVIEW RICH RESULTS for
+    LocalBusiness/Organization markup. Your AggregateRating and Review
+    blocks aren't harmful and the reviews look genuine, so I left them —
+    just don't expect stars in the SERP from them.

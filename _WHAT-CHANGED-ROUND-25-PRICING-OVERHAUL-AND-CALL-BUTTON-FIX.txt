@@ -621,5 +621,543 @@ existing quote-screen switchMoveoutTier() safety valve still works
 unchanged after the new screen is added ahead of it in the flow.
 
 
+=============================================================================
+10. "TOP 10 MISTAKES" AUDIT -- WHAT GOT FIXED, AND TWO CORRECTIONS TO THAT
+    AUDIT ITSELF (direct instruction: "apply all recommended changes")
+=============================================================================
+A broader business/site audit this session produced a "top 10 mistakes"
+list. Two items on that list were investigated further while trying to
+apply them and turned out to be overstated -- corrected below, in the
+interest of not leaving a wrong claim standing just because it was
+already said.
+
+CORRECTION 1 -- the stale homepage/landing-page widget was NEVER LIVE
+The audit said the homepage and all 15 city/service landing pages ran a
+separate, outdated booking widget that was actively quoting visitors
+wrong prices. That widget existed exactly as described (see fix below),
+but checking its actual markup before touching it showed its wrapper
+section carried `style="display:none" aria-hidden="true"`, and nothing
+anywhere on any of the 15 pages ever removed that hiding -- no toggle,
+no anchor link, no JS reference to its container ID at all. It was
+already fully unreachable by any real visitor on every single page. The
+correct framing: this was dead weight bloating page-load size (roughly
+30% of each landing page's HTML was this unreachable script), and a
+latent risk if anyone ever accidentally un-hid it or copied the pattern
+forward -- not an active pricing leak costing money today.
+
+CORRECTION 2 -- the military discount cap and the "quoted separately"
+items were already disclosed clearly in the places that matter most
+The audit called the $25 discount cap a possible hidden "gotcha" and
+called "quoted separately" pricing a trust problem. Rechecking the
+actual copy: /book's own discount checkbox already says "Save 10% (up
+to $25)" right where the customer decides, and /pricing's dedicated
+discount section spells out the same cap in full sentences. Junk
+hauling's "we can't price this online, it never lands in your total
+without your say-so" language is already on /pricing, in the /book FAQ,
+and on the addon checkbox itself in all-caps. The one real gap found:
+/book's FAQ footnote said flatly "Military and first responders save
+10%" with no cap mentioned, inconsistent with every other spot on the
+same page. Fixed that one line; the broader "hidden gotcha" framing
+should not have been applied to the checkbox or /pricing copy, which
+were already accurate.
+
+WHAT ACTUALLY GOT CHANGED THIS PASS
+  - Removed the dead, permanently-hidden booking widget (markup +
+    inline script) from all 15 landing pages (index.html and every
+    /*-lawton-ok, /*-elgin-ok, /*-cache-ok, /*-duncan-ok,
+    /*-medicine-park-ok, and pcs-cleaning-fort-sill-ok page). Verified
+    per file, before deletion, that none of the ~55 functions the dead
+    script defined were referenced anywhere else on that page -- each
+    was fully self-contained, so removing it changes nothing a visitor
+    can see or do. Also removed the now-orphaned #rpApp CSS rules the
+    same widget's markup needed. Result: roughly 30% smaller HTML on
+    all 15 pages (about 46-47KB each), faster parse/load, and one less
+    place a future redesign could accidentally resurrect stale
+    Standard/Heavy/Extreme condition pricing and flat $199-$599 tiers
+    that haven't been real prices in several rounds.
+  - Standardized the Google review count to 61 everywhere it appears
+    (visible "NN+ Ratings" badges and every page's AggregateRating
+    JSON-LD) -- was a mix of "57" and "61" across different pages, an
+    internal inconsistency regardless of which number is actually
+    current. move-out-cleaning-fort-sill-ok/index.html had no
+    AggregateRating block at all (missing priceRange and Chamber-of-
+    Commerce memberOf too); added the same block every sibling page
+    already had. NOTE: nobody -- including this session, which tried
+    and could not independently verify a live Google listing -- knows
+    for certain that 61 is the CURRENT real count. This just makes
+    every page agree with each other; the real number still needs
+    confirming against the actual Google Business Profile.
+  - Fixed the one FAQ line that stated the military discount as a flat
+    10% with no cap (see Correction 2 above) to match the rest of the
+    site: "Military and first responders save 10% (up to $25)."
+
+DELIBERATELY NOT CHANGED -- NEEDS MIKE'S INPUT, NOT A CODE FIX
+Several audit items are real business decisions or need facts this
+session doesn't have, and inventing them would mean putting fabricated
+claims on a live public site:
+  - Raising the $25 military discount cap (or leaving it) is a margin
+    decision, not a bug.
+  - A cancellation/no-show policy (notice window, any fee) doesn't
+    exist anywhere on the site today -- that's a real gap, but the
+    terms are a business decision, not something to invent.
+  - A referral program, if wanted, needs a real incentive amount
+    decided first.
+  - Any "years in business" / founding-story credibility copy needs
+    real facts -- the site already has "Licensed, Insured &
+    Veteran-Owned" and a Chamber-of-Commerce membership in its schema
+    (both missed in the original audit list), just no explicit tenure
+    claim.
+  - The 15 near-identical city pages still share templated body copy
+    aside from city name -- genuine unique local content (real
+    neighborhoods, real customer specifics per city) needs Mike's
+    input, not invented specificity.
+  - Funnel drop-off analysis needs no code change -- rpTrack() already
+    fires a "screen_continue" event (to GA4 via gtag and to Microsoft
+    Clarity) on every step of /book's flow, so the data to answer
+    "where do people abandon" already exists; it just needs someone to
+    go look at it.
+
+VERIFIED THIS PASS
+node --check clean on all 15 landing pages plus book/index.html after
+every edit. All AggregateRating/LocalBusiness JSON-LD blocks re-parsed
+successfully as valid JSON after the review-count edits. Playwright
+load of the homepage, the PCS Fort Sill page, and a move-out city page
+post-cleanup: zero uncaught JS errors, hero/CTA/review-badge sections
+render identically to before, "Book Now" and "Start Instant Estimate"
+still point to /book as they did before.
+
+
+=============================================================================
+11. INSPECTION READY MOVE-OUT: 2 CLEANERS -> 3 CLEANERS, 5-8 HOURS
+    (direct instruction: "Change Inspection Move-Out from 2 cleaners to
+    3 cleaners, 5-8 hours" + "make sure number of cleaners is in bold")
+=============================================================================
+Move-Out Refresh is UNCHANGED throughout this section -- still a
+2-cleaner crew, still its own hours and prices. Only Inspection Ready
+moved.
+
+RE-PRICED USING THE SAME DEPOSIT MATH FORMULA ROUND 25 ESTABLISHED
+  labor(hrs) = hrs * 3 crew * $17.50/hr * 1.12 burden   (was 2 crew)
+  cost       = labor + $15 supplies + $25 overhead
+  cost       = cost / (1 - 8% guarantee reserve)
+  price      = cost / (1 - 20% target margin)
+"5-8 hours" replaces the old "6-10 hours" display range. Assumed
+per-tier hours are the four whole numbers in that range, one per
+bedroom tier (5/6/7/8) -- same one-hour-per-tier-step pattern the old
+6/8/10/12 assumption used. That formula outputs $453.80/$533.70/
+$613.59/$693.48, rounded up to the nearest ends-in-9 number at or
+above (same convention as round 25):
+
+  Bedrooms    Old price    New price
+  1-2          $379         $459
+  3            $479         $539
+  4            $589         $619
+  5+           $699         $699 (barely moves -- 3 crew x 8 hours is
+                                   the same 24 person-hours 2 crew x 12
+                                   hours used to cost before)
+
+WHAT ACTUALLY CHANGED
+  - RP_MOVEOUT_BEDROOM_TIERS (js/rp-pricing-engine.js): new prices above.
+  - RP_MOVEOUT_TIER_HOURS.moveout: "6-10 hours" -> "5-8 hours".
+  - rpIncludes.moveout's crew highlight chip and rpTeamSize(): "2
+    cleaners"/"2-cleaner crew" -> "3". Refresh's stayed "2" but was
+    split into its own line in rpTeamSize() (used to be one shared
+    return for both services) so a future single-tier change like this
+    one doesn't require re-splitting it again.
+  - Every place that said "same crew" between the two tiers, since
+    that's no longer true, now says which tier gets which crew size:
+    /book's moveouttiers subhead and scope-table footer, /call's scope
+    cheat-sheet closing line.
+  - /pricing's Move-Out table, crew-size sentence, and worked example
+    (3-bedroom: $539 base, $514 with the military discount capped at
+    $25 -- 10% of $539 would be $53.90, so the cap is what applies).
+  - pcs-cleaning-fort-sill-ok's PCS Package price list (linked from
+    ?service=moveout, so it's specifically the Inspection Ready number).
+  - Two illustrative example prices in /call's script content that
+    would otherwise have Liz reading a stale number out loud: the
+    "how much for a move-out" objection script's example quote
+    ($379 -> $459) and a code comment referencing the old starting
+    price. Also bumped a "50 five-star reviews" line in the same
+    OBJECTIONS array to "60", matching the review-count fix in section
+    10 above (comment there already said "if the review count changes,
+    this line needs updating too").
+  - Number of cleaners is bolded (<strong>) everywhere it's stated, per
+    direct instruction: both highlight chips, both "same crew" rewrites
+    on /book and /call, and the /pricing crew sentence.
+
+FLAGGED, NOT CHANGED: A ROUND-25 PRICING INVARIANT NOW FAILS
+Round 25 deliberately priced Move-Out Refresh's a-la-carte add-ons
+(fridge+oven+cabinets+Detail Pass) to always cost MORE than switching
+to Inspection Ready outright, at every bedroom size -- so a customer
+piecing together the full checklist on Refresh never comes out ahead of
+just booking the real thing. Raising Inspection Ready's price without
+touching Refresh or Detail Pass pricing breaks that on the two biggest
+sizes:
+  4BR:  $325 a la carte on Refresh  vs.  tier gap $619-$299 = $320  (a la carte is $5 CHEAPER)
+  5+BR: $375 a la carte on Refresh  vs.  tier gap $699-$349 = $350  (a la carte is $25 CHEAPER)
+Left alone because only Inspection Ready's crew/hours were the
+instruction -- restoring the invariant means re-pricing Refresh and/or
+Detail Pass, which is a separate decision. Documented in full in the
+code comment above RP_DETAIL_PASS_PRICES in js/rp-pricing-engine.js.
+
+VERIFIED THIS PASS
+node --check clean on rp-pricing-engine.js, book/index.html,
+call/index.html, pricing/index.html, and pcs-cleaning-fort-sill-ok/
+index.html. Scripted browser check on both /book and /call: a 3-bed/
+2-bath Inspection Ready home now returns exactly $539 and "5-8 hours"
+on both channels (matching each other, matching the new formula output
+rounded up); the moveouttiers/tiers screens and scope-table footers
+render "3" and "2" in <strong> tags on both /book and /call; the old
+"same crew" line on /book's moveouttiers screen (missed on the first
+pass, caught by screenshot review) was also fixed since it was still
+claiming both tiers shared a crew size.
+
+
+=============================================================================
+12. FIXED: REFRESH A-LA-CARTE WAS CHEAPER THAN INSPECTION READY
+    (direct instruction: "do not make refresh cheaper than inspection
+    ready") -- AND A CORRECTION TO SECTION 11's OWN MATH
+=============================================================================
+CORRECTION FIRST: section 11 above named 4-bedroom and 5+ bedroom homes
+as the sizes where buying every excluded add-on on Refresh had become
+cheaper than switching to Inspection Ready. That was backwards. Redone
+carefully (and checked by running the actual numbers, not doing it in
+my head a second time): the two SMALLEST sizes were the broken ones --
+1-2BR and 3BR -- because Inspection Ready's price jumped further on the
+small end than the large end (see section 11's own note on why: 3
+crew x 5 hours vs. 2 crew x 6 hours is a bigger relative jump than 3 x
+8 vs. 2 x 12). 4BR and 5+BR were actually still fine, just with a
+thinner cushion than round 25 intended ($5 and $25 instead of $35/$45).
+Section 11's in-code comment (js/rp-pricing-engine.js, above
+RP_MOVEOUT_BEDROOM_TIERS) has been corrected to point here instead of
+repeating the wrong claim.
+
+THE FIX
+Re-priced RP_DETAIL_PASS_PRICES (js/rp-pricing-engine.js) only --
+Refresh's base prices and the flat $50 fridge/oven/cabinet add-ons are
+untouched, so Refresh's advertised "starting at $199" stays true.
+Detail Pass is the table that was purpose-built to be this invariant's
+anchor (round 25's own comment says so), so it's the natural place to
+absorb the correction:
+
+  Bedrooms    Old Detail Pass    New Detail Pass
+  1-2          $75                $150
+  3            $125               $180
+  4            $175               $210
+  5+           $225               $240
+
+Solved for a flat $40 cushion at every size (a la carte total minus the
+cost of switching tiers), a bit more than round 25's thinnest cushion
+($25) so a future small Inspection Ready price nudge doesn't
+immediately reopen this again. Verified live: buying every excluded
+item (fridge $50 + oven $50 + cabinets $50 + Detail Pass) now costs
+exactly $40 more than switching tiers outright, at all four bedroom
+sizes -- and /call's existing "Inspection Ready is now the better deal"
+guardrail (built in round 25 for exactly this scenario) correctly fires
+once a Refresh customer's add-ons reach that threshold.
+
+Updated everywhere Detail Pass's old $75-$225 range was written out:
+/pricing's Refresh ledger footer and its Optional Add-ons table row.
+/book and /call's own Detail Pass copy already reads rpDetailPassPrice()
+live, so those needed no changes.
+
+VERIFIED THIS PASS
+node --check clean on rp-pricing-engine.js and pricing/index.html;
+JSON-LD on /pricing re-parsed valid. Scripted browser check: at every
+bedroom size, (fridge+oven+cabinets+Detail Pass) minus (Inspection
+Ready price - Refresh price) now equals exactly $40, confirmed via
+rpMoveoutTierBasePrice() and rpDetailPassPrice() directly. Loaded
+/call, set a 1-2BR Refresh job with all four excluded add-ons checked
+($499 total), and confirmed the info guardrail correctly fires:
+"Inspection Ready is now the better deal ... Inspection Ready is
+$459.00" -- the exact scenario this fix exists to prevent.
+
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
+
+
+=============================================================================
+SECTION 13: "MOVE-OUT REFRESH" RENAMED TO "MOVE-OUT EXPRESS"; ALL
+"FACTORY RESET" BRANDING REMOVED SITEWIDE (direct instruction)
+=============================================================================
+Direct instruction: get rid of "Factory Reset" branding entirely, and
+replace "Move-Out Refresh" with a better name. After talking through
+options (Move-Out Standard risked undercutting Inspection Ready's "Most
+Popular" positioning; Eco Move-Out was an unsubstantiated claim -- nothing
+about the service is actually eco-differentiated; Move-Out Basic would
+collide with the existing "Basic Cleaning" recurring service name), the
+names landed on: Inspection Ready Move-Out stays exactly as-is, and
+Move-Out Refresh becomes Move-Out Express.
+
+WHAT CHANGED -- NAMING
+rpServices.moveoutrefresh.name (js/rp-pricing-engine.js) is now "Move-Out
+Express". Every user-facing "Refresh" reference tied to this tier was
+renamed to "Express" across js/rp-pricing-engine.js, book/index.html,
+call/index.html, pricing/index.html, and index.html (homepage) -- copy,
+FAQ answers, the moveouttiers/tiers comparison screens, CSR call-script
+lines, guardrail/objection text, and the two GHL-bound data VALUES
+(rpBuildSharedDetails()'s moveout_tier field, and the "Tier: ..." lead
+note built in both /book and /call). Internal identifiers were left
+alone on purpose: the service key stays "moveoutrefresh", constant names
+like RP_MOVEOUT_REFRESH_BEDROOM_TIERS and rpRefreshSqftTiers are
+unchanged, and GHL custom FIELD NAMES are untouched -- only the tier's
+display name and the text values sent into fields changed.
+
+>>> FLAG FOR MIKE: if any GHL workflow/automation branches on the exact
+    text "Refresh" or "Move-Out Refresh" (e.g. a condition on the
+    moveout_tier field or the lead-notes Tier: line), it needs to be
+    updated to "Express" / "Move-Out Express" on the GHL side. This
+    change only touched the website and pricing engine.
+
+WHAT CHANGED -- FACTORY RESET REMOVAL (19 files)
+"Factory Reset" never appeared in the live /book, /call, or /pricing
+booking flow -- it only ever lived in landing-page SEO/marketing copy
+and one already-dead, unreferenced JS file. Removed everywhere:
+
+  - js/rp-canonical-estimator.js DELETED outright. This was a leftover,
+    fully orphaned copy of an old booking widget (confirmed zero
+    <script src> references anywhere on the site, consistent with the
+    dead widget already stripped from all 15 landing pages last round)
+    -- its "Factory Reset™ Move-Out/Move-In Cleaning" strings are now
+    gone because the file itself is gone, not because anything still
+    used them.
+  - Homepage (index.html): <title>, og:title, meta description,
+    og:description, twitter:description, and the JSON-LD organization
+    "name" field all dropped "Factory Reset" -- e.g. title is now
+    "Red Prairie Cleaning | Move-Out Cleaning in Lawton & Fort Sill".
+    These fields already read fine (and arguably read BETTER for SEO)
+    without the branded term, since nobody searches "factory reset
+    cleaning" -- the actual keyword phrase ("Move-Out Cleaning in
+    Lawton & Fort Sill") is preserved intact.
+  - 14 other landing pages: their actual <title>/meta/OG tags never had
+    "Factory Reset" in them (that part of the original "top 10" concern
+    was already fine). What DID have it: a footer service-list item
+    ("Factory Reset™ Move-Out Clean" -> "Move-Out Cleaning"), a footer
+    description paragraph ("Factory Reset™ move-out cleaning, deep
+    cleaning..." -> "Move-out cleaning, deep cleaning..."), a dev-only
+    CSS comment ("/* Factory Reset brand polish */" -> "/* Move-out
+    outcome cards */", invisible to visitors either way), and on 8 of
+    them a body section heading ("Factory Reset Detail" -> "Home Reset
+    Detail", matching the "Home Reset" eyebrow label already sitting
+    directly above it in the same card). move-out-cleaning-elgin-ok had
+    its own unique heading ("Factory Reset Cleaning For Elgin Homes")
+    on a card that links to /book?service=moveout -- renamed to
+    "Inspection Ready Move-Out Cleaning For Elgin Homes" to actually
+    name the service it sells.
+  - 3 move-out resource/guide pages (how-to-get-your-security-deposit-
+    back-lawton-ok, move-out-cleaning-checklist, move-out-resource-
+    center): trust-card headings ("Factory Reset™" -> "Inspection
+    Ready"), CTA headings ("Want the Factory Reset instead of doing it
+    yourself?" -> "Want an Inspection Ready clean instead of doing it
+    yourself?"; "Ready for the Factory Reset™?" -> "Ready for an
+    Inspection Ready clean?"), and their shorter footer paragraph
+    ("Factory Reset™ move-out cleaning, deep cleaning, carpet cleaning,
+    and upholstery cleaning." -> "Move-out cleaning, deep cleaning,
+    carpet cleaning, and upholstery cleaning.").
+
+BONUS FIND (not asked for, fixed while in these files): all 15 of the
+above pages' footer "Also Available" service list still had a
+"Yard Refresh" line item. Yard Refresh was already removed sitewide
+from the actual add-on catalog per an earlier direct instruction (see
+the standing comment above rpServiceAddons in js/rp-pricing-engine.js:
+"Yard Refresh removed sitewide (direct instruction) -- it's gone from
+the catalog above too") -- this footer line was simply never updated
+to match. Removed the stale <li>Yard Refresh</li> from all 15 footers.
+This is unrelated to the Express rename (nothing here was renamed to
+Express) -- it was a leftover mention of a service that no longer
+exists at all.
+
+WHAT WAS DELIBERATELY NOT CHANGED
+Internal identifiers (moveoutrefresh key, RP_MOVEOUT_REFRESH_BEDROOM_
+TIERS, rpRefreshSqftTiers, GHL field NAMES) -- renaming these carries
+real risk (existing ad URLs like ?service=moveoutrefresh, GHL workflow
+automations keyed to field names) for zero visitor-facing benefit,
+since none of it is ever displayed. Only display copy and the specific
+data VALUES sent to GHL (flagged above) changed.
+
+VERIFIED THIS PASS
+node --check clean on rp-pricing-engine.js; every inline <script> block
+across all 21 touched HTML files re-extracted and node --check clean
+(JSON-LD blocks re-parsed with json.loads() instead). Full-repo grep
+confirms zero remaining "factory reset" (case-insensitive) and zero
+remaining tier-name "Refresh" (a lookbehind-protected regex correctly
+left rpRefresh() function calls, the moveoutrefresh identifier, and
+RP_MOVEOUT_REFRESH_BEDROOM_TIERS/rpRefreshSqftTiers untouched). Scripted
+browser walkthroughs on live /book and /call confirmed the tiers/
+moveouttiers screens render "Move-Out Express" at the correct $249+
+prices with zero leftover "Refresh" text, including the CSR call-script
+lines, guardrail copy, and scope-comparison table. Homepage title tag,
+meta tags, JSON-LD, FAQ answer, and footer list all confirmed rendering
+"Move-Out Cleaning: Express" / "Move-Out Express" correctly with no
+"Factory Reset" anywhere on the page.
+
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
+
+
+=============================================================================
+SECTION 14: TIERS SCREEN REDESIGN, FLOW REORDER, AND /CALL OBJECTION
+HANDLING OVERHAUL (direct instruction, after live screenshot review)
+=============================================================================
+Direct feedback on a live screenshot of /book's moveouttiers screen:
+"this looks like crap, put crew size as the first line... no one knows
+what 'Defend Your Deposit TM' means... make the language better... put
+the 3 questions about water/AC/mold before the phone number name
+screen... make /call an absolute weapon."
+
+TIERS CARD REDESIGN (book/index.html, mirrored on /call's tiers screen)
+Crew size moved from the last bullet in a 4-item checklist to a bold,
+uppercase headline line right under the badge, on both cards -- it's the
+single fact that actually explains the price gap between the two tiers,
+so it shouldn't be the easiest thing to miss. "Defend Your Deposit™"
+no longer appears bare anywhere a customer or caller would see/hear it
+with zero context. It's kept as the named guarantee (real marketing
+language used elsewhere on the site, not being retired the way Factory
+Reset was), but always paired with plain language for what it actually
+DOES: "Protects your security deposit" as the primary line, with
+"(Defend Your Deposit™)" as a small secondary note. Same treatment
+applied to every spoken/customer-facing line in /call that used the bare
+trademark: the tiers-step SAY line, the tiers option cards, the
+moveoutrefresh objection line, the intent-based nudge text, and the
+hourly-cleaning guarantee warning (which also still said "the Move-Out
+Clean" -- fixed to the tier's real current name, Inspection Ready
+Move-Out). Liz's internal-only scope cheat sheet (moveoutScopeRefHtml)
+was left alone -- that's reference notes she reads, never spoken
+verbatim, so the bare term is fine there.
+
+Removed the redundant duplicate: "Defend Your Deposit" used to appear
+TWICE on the Inspection Ready card (once as its own line, once again as
+a checklist bullet). Freed-up bullet slots on both cards were replaced
+with accurate, previously-unstated facts rather than left empty:
+Inspection Ready gained "Baseboards, interior windows & fixtures
+included" (already true per the scope table, just never said in the
+highlight list) and its guarantee bullet became "If something's missed,
+we come back free" (the plain mechanism, lifted from the site's own
+existing FAQ language). Express gained "Add fridge, oven, cabinets &
+more if needed" naming its real flexibility. Tightened the subhead,
+the scope-table footer, and the closing fine print on the same screen
+to stop repeating the crew-size fact a third time now that it's already
+the card headline, and to drop the last bare "backed by Defend Your
+Deposit" in favor of "protects your security deposit if anything gets
+missed."
+
+FLOW REORDER (js/rp-pricing-engine.js, rpCurrentFlow())
+"contactgate" (the name-and-phone screen) used to run right after
+bathrooms and BEFORE the water/power/AC/mold questionnaire -- a round-24
+decision made specifically so even a home that turns out to be blocked
+had already handed over contact info before finding that out. Direct
+instruction this round moved it to run right AFTER the questionnaire
+instead, so a customer answers every "tell us about your home" question
+as one uninterrupted block before being asked for a name and number.
+The round-24 goal wasn't sacrificed to do this: contactgate still lands
+before "moveoutblocked" in both branches, so a home that ends up blocked
+still hands over contact info first -- just one screen later than
+before, after the questions rather than ahead of them. Confirmed live:
+new order is bedrooms -> bathrooms -> moveoutquestionnaire -> contactgate
+-> moveouttiers (or -> moveoutblocked, on the blocked branch). The
+rpFlows static allowlist array was updated to match for anyone reading
+the file later, though it was never what drove the actual order (that's
+computed in rpCurrentFlow()) -- only the resume-validation check reads
+it. /call's flow was NOT touched -- it already asks its questionnaire
+step well before its own "contact" step (which sits near the end of the
+call, after the price is quoted, matching how a live phone call
+naturally works), so it never had the problem being described.
+
+/CALL OBJECTION HANDLING (direct instruction: "make /call an absolute
+weapon that makes sense for liz to sell these products and handle
+rejections")
+Found and fixed a real bug first: the very first objection in the list
+("How much for a move-out clean?", the one most likely to fire in the
+first 20 seconds of a paid call) still told Liz to ask about square
+footage and condition -- both dropped from Move-Out pricing entirely
+back in round 24 (flat bedroom-tier pricing now). Rewritten to ask
+bedrooms/bathrooms and the landlord-inspection question instead, with an
+explicit note in the guidance that size/condition no longer affect this
+service's price at all.
+
+Added three new objections that didn't exist before, all specific to
+having two real tiers instead of one product: "Why does it take three
+people / two people?" (frames crew size as speed/thoroughness, not
+padding), "What's actually different between the two options?" (the
+tiers-screen pitch, restated for whenever the question resurfaces later
+in the call), and "Can't I just add the oven and fridge to Express
+instead of paying for Inspection Ready?" (leverages the round-27
+pricing invariant directly -- Express plus enough add-ons always lands
+at or above Inspection Ready's price by design, so the honest answer
+sells itself).
+
+Made two existing objections tier-aware instead of one-size-fits-all,
+via new depositAnswer() and competitorAnswer() functions (same pattern
+as the existing objectionPriceAnswer()):
+  - "Will I get my deposit back?" now gives an Express caller a genuine
+    upsell prompt if there's any real inspection risk, instead of a
+    vague non-answer that left a legitimate rejection sitting on the
+    table.
+  - "Another company quoted me less?" now gives Liz an honest way to
+    actually WIN a move-out call instead of only defending Inspection
+    Ready's price: if what the caller describes really has no inspection
+    coming, pivoting to Express (which undercuts on price too) can close
+    the call on a truthful lower number rather than losing it entirely.
+    Every other service keeps the original generic answer unchanged.
+
+VERIFIED THIS PASS
+node --check clean on rp-pricing-engine.js; every inline <script> block
+in book/index.html and call/index.html re-extracted and node --check
+clean. Scripted browser walkthrough on /book confirmed the exact new
+step order live (bedrooms -> bathrooms -> moveoutquestionnaire ->
+contactgate -> moveouttiers), confirmed the session-resume allowlist
+still contains every step name, and screenshotted the redesigned tier
+cards. Scripted walkthrough on /call confirmed all 13 objections
+(10 original + 3 new) are present with correct text, confirmed
+depositAnswer() and competitorAnswer() return the correct tier-specific
+text when rpState.service is toggled between moveout/moveoutrefresh/
+other, and screenshotted the tiers screen and objections drawer.
+
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub
+
+
+=============================================================================
+SECTION 15: DEAD-CODE CLEANUP + REAL WAGE DATA RECEIVED (no price changes)
+=============================================================================
+Two small, safe fixes with no judgment calls involved:
+
+1. /call's quoteSayLine() had a leftover check that prepended a
+   square-footage description to the spoken price line for moveout,
+   moveoutrefresh, deep, and maintenance -- all four dropped square
+   footage from pricing entirely in earlier rounds, so rpState.sqft is
+   never set for any of them and this check always evaluated to nothing.
+   Removed rather than left as a silent no-op.
+
+2. Investigated a suspected duplicate <footer> bug on the landing pages
+   (flagged after noticing two footer-looking blocks in one file's
+   output during an earlier check). False alarm on re-verification --
+   grep confirms exactly one <footer>...</footer> per page across all 15
+   landing pages plus the homepage. Nothing to fix; noting it here so
+   the false alarm doesn't get re-investigated later.
+
+REAL WAGE DATA (direct instruction: "Wage is $15/hr and I have two lead
+cleaners at $20/hr") -- NOT applied to pricing. Every price on the site
+was derived assuming a $17.50/hr blended wage. The real number is lower
+across the board: $15/hr for standard cleaners, $20/hr for the two leads.
+Ran both bounding scenarios (every crew all-$15, versus every Move-Out
+crew carrying exactly one of the two $20 leads) through the same formula
+already used everywhere else on the site -- in EVERY case, real margins
+come out equal to or better than what the $17.50 assumption implied,
+never worse. Basic/Deep margins move from 34%/47.5% to as high as
+39.7%/53.1% if fully $15-staffed. Move-Out margins move from ~20-21% to
+24-31% depending on how the two leads are actually deployed across
+crews. Deliberately did NOT lower any price to match the real, lower
+cost -- the current prices already bake in MORE margin than originally
+intended, which is a cushion, not a problem to correct. Repricing down
+to match real cost would only give that cushion away for no reason. This
+was purely a "how are we actually doing" input, not a "change the
+prices" input -- flagged clearly to Mike so this isn't misread later as
+an authorization to reprice off real wages.
+
+
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_012kaXXZT6YqpFLG2HXv3Xub

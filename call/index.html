@@ -49,12 +49,15 @@ input,select,textarea{font-family:inherit;font-size:15px}
   align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;
   padding-top:calc(9px + env(safe-area-inset-top))}
 .hd-brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.hd-brand h1{margin:0;font-size:13px;font-weight:inherit;line-height:inherit}
 .hd-brand strong{font-size:13px}
 .hd-brand small{font-size:10px;letter-spacing:.04em;opacity:.65;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
 .hd-acts{display:flex;gap:6px;flex:0 0 auto}
 .hd-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
-  border-radius:9px;padding:7px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+  border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap;
+  /* 44px touch floor: these get tapped one-handed, mid-call. */
+  min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .hd-btn:active{transform:scale(.96)}
 .hd-btn.danger{background:var(--red);border-color:var(--red)}
 
@@ -200,7 +203,7 @@ input,select,textarea{font-family:inherit;font-size:15px}
 <body>
 
 <header class="hd">
-  <div class="hd-brand"><strong>RPC Call Console</strong><small id="hdWho">Internal tool</small></div>
+  <div class="hd-brand"><h1><strong>RPC Call Console</strong></h1><small id="hdWho">Internal tool</small></div>
   <div class="hd-acts">
     <button class="hd-btn" type="button" onclick="openDrawer('drObj')">Objections</button>
     <button class="hd-btn danger" type="button" onclick="openDrawer('drOut')">End Call</button>
@@ -388,7 +391,7 @@ const SERVICE_ANGLES = {
        people toward the guaranteed tier. */
     value: "that's the fast, affordable option when there's no landlord walkthrough to answer to \u2014 kitchen, bathrooms, floors, surfaces wiped down",
     addon: "If they mention a landlord or property manager checking the place afterward, stop and ask before quoting \u2014 that's Inspection Ready, not Express.",
-    objection: "This one's priced lighter because it skips the deep-clean items a landlord inspection checks for \u2014 oven and fridge interiors, inside cabinets, baseboards. If there's any inspection at all, Inspection Ready is the one backed by Defend Your Deposit.",
+    objection: "This one's priced lighter because it skips the deep-clean items a landlord inspection checks for \u2014 oven and fridge interiors, inside cabinets, baseboards. If there's any inspection at all, Inspection Ready is the one that protects the deposit \u2014 if something's flagged, we come back and fix it free.",
     urgencyNoun: "move-out slots",
     seasonNote: "our busiest moving season"
   },
@@ -424,7 +427,7 @@ const SERVICE_ANGLES = {
        spot; the ones who don't were never paying $459+ anyway, and a booked
        slot beats a lost call. */
     qualifier: "Is this a move-out, or a house you're living in?",
-    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and the Defend Your Deposit guarantee only covers the full reset. If you want it inspection-backed, that's the Move-Out Clean.\"",
+    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and only the full reset is backed by our deposit-protection guarantee. If you want it inspection-backed, that's Inspection Ready Move-Out.\"",
     scopeWarning: "GET THE PRIORITY LIST BEFORE YOU QUOTE. Most important first. Type it into notes verbatim \u2014 the crew works it in that order. Never promise the list gets finished."
   },
   airbnb: {
@@ -438,12 +441,23 @@ const SERVICE_ANGLES = {
 function angle(){ return SERVICE_ANGLES[rpState.service] || {}; }
 
 function quoteSayLine(){
+  /* Round 28 cleanup: the sqft-tier bit this used to prepend for
+     moveout/moveoutrefresh/deep/maintenance was already fully dead --
+     all four dropped square footage from their pricing entirely
+     (moveout/moveoutrefresh in round 24, deep/maintenance back in round
+     12), so rpState.sqft is never set for any of them and rpSqftTier()
+     always returned null here. Removed rather than left as a silent
+     no-op, since a future reader would otherwise assume it still did
+     something. */
+  /* This string is read OUT LOUD, verbatim, to a paying customer, so it
+     has to be grammatical. It used to build "for a 3 bedrooms, 2
+     bathrooms" -- pluralised nouns behind the article "a". Rendered as
+     an attributive phrase instead: "for a 3-bedroom, 2-bath home". */
   const bits=[];
-  if(["moveout","moveoutrefresh","deep","maintenance"].includes(rpState.service) && rpSqftTier()) bits.push(rpSqftTier().label.toLowerCase()+" home");
-  if(rpState.bedrooms) bits.push(`${rpState.bedrooms} bedroom${rpState.bedrooms>1?"s":""}`);
-  if(rpState.bathrooms) bits.push(`${rpState.bathrooms} bathroom${rpState.bathrooms>1?"s":""}`);
-  const desc = bits.length ? `for a ${bits.join(", ")}` : "for this job";
-  const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : `$${rpFinalPrice().toFixed(2)}`;
+  if(rpState.bedrooms) bits.push(`${rpState.bedrooms}-bedroom`);
+  if(rpState.bathrooms) bits.push(`${rpState.bathrooms}-bath`);
+  const desc = bits.length ? `for a ${bits.join(", ")} home` : "for this job";
+  const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : rpFormatMoneyDisplay(rpFinalPriceCents());
   const rawVal = angle().value;
   const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that's the full price, nothing added at the door";
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
@@ -523,13 +537,13 @@ const SCRIPT = {
   tiers:{say:()=>{
       const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
       const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
-      return `“For a home like that, I can do it two ways — Inspection Ready at ${fmt(ir)}, backed by our Defend Your Deposit guarantee, or Move-Out Express at ${fmt(rf)} if nobody's inspecting it afterward. Which sounds like the fit?”`;
+      return `“For a home like that, I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
     },
     listen:"Which one they actually pick once real numbers are on the table — not just the qualitative lean from the service question. Someone who sounded like “no inspection” earlier can still choose Inspection Ready once they hear it's only a small gap for full deposit protection.",
     watch:"Lead with whichever tier matches what they told you back on the service question. Landlord, PM, or inspector expected (or not sure) → “That's the one most people book for a move-out — full interior reset, oven to baseboards, and it's backed by our Defend Your Deposit guarantee, so if something gets flagged after you're gone, we come back and fix it free.” Flat no, just handing over keys → Express is a genuine, honest recommendation, not a downsell: “You don't need to pay for a guarantee nobody's going to test — Express gets it clean and ready for less, and you can still add the oven, the fridge, cabinets, or a full detail pass individually if there's something specific you want done.” Both tiers are worth being proud to sell — the choice is about what THEY actually need, not steering them toward the bigger number. If they're torn once add-ons start stacking up on Express, the quote screen will flag it if Inspection Ready has become the better deal."},
   addons:{say:addonsSayLine,
     listen:"Ask these by name. Customers almost never volunteer them.",
-    watch:"Pet stains or odor is a crew-prep flag, not automatically a condition bump. Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price."},
+    watch:()=>`Pet stains or odor is a crew-prep flag, not automatically a condition bump.  \u2022  ASK THE MILITARY QUESTION HERE, before you say the price, not after they push back on it: \u201cAnd are you or your spouse military or a first responder? I can take ${Math.round(MILITARY_DISCOUNT_RATE*100)}% off if so.\u201d This is Lawton \u2014 a large share of callers qualify, it caps at $${MILITARY_DISCOUNT_CAP}, and offered UP FRONT it's a reason to book with us. Held back until they complain, the same $${MILITARY_DISCOUNT_CAP} only buys you a save on a price objection you'd already lost ground to. Tick the box below so the quote screen shows the discounted number.  \u2022  Before moving to price, try: \u2018Sound good so far?\u2019 \u2014 catches hesitation now, while it's cheap to fix, instead of at the price.`},
   frequency:{say:"\u201cWould you want this one-time, or set up on a regular schedule?\u201d",
     listen:"Recurring is worth more long-term.",
     watch:"If they hesitate, book One-Time. They can switch later; a lost booking can't."},
@@ -540,7 +554,7 @@ const SCRIPT = {
     listen:"Two is the normal default for most homes.",
     watch:"More cleaners is faster, not cheaper. Make sure they hear it's per cleaner, per hour."},
   hours:{say:"\u201cAnd about how many hours do you think you'll need?\u201d",
-    listen:"4-hour minimum.",
+    listen:()=>`${HOURLY_MIN_HOURS}-hour minimum ($${HOURLY_RATE_PER_CLEANER*HOURLY_MIN_HOURS} for one cleaner). Reads from the pricing engine, so it can't drift from what the site quotes.`,
     watch:"If they don't know, ask what they want done and estimate for them \u2014 don't make them guess."},
   quote:{say:quoteSayLine,
     listen:"Say the number plainly, then STOP TALKING. Let them respond first.",
@@ -612,6 +626,32 @@ function doBetterPriceAnswer(){
   const removeLine = removable ? ` Or if you'd rather handle ${removable} yourself, I can take that off the total.` : "";
   return `\u201cI can't move the base price, but if you're military or first responder that's 10% off.${removeLine}\u201d`;
 }
+/* Round 28 (direct instruction: "make /call an absolute weapon... handle
+   rejections"). Tier-aware deposit answer -- the old line was the same
+   regardless of which tier they were on, which meant an Express caller
+   asking about their deposit got a vague non-answer instead of the
+   honest, genuinely useful redirect: Express was never built to survive
+   an inspection, and if there's a real chance of one, that's exactly
+   the moment to offer the switch, not dodge the question. */
+function depositAnswer(){
+  if(rpState.service === "moveoutrefresh"){
+    return "\u201cI can't promise that on this one \u2014 Express is priced for when nobody's checking, so it skips some of what a landlord walkthrough looks for. If there's any real chance of an inspection, Inspection Ready is the tier built to protect it \u2014 want me to switch it over?\u201d";
+  }
+  return "\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it free \u2014 that's exactly what Inspection Ready is built for.\u201d";
+}
+/* Move-out-specific competitor answer -- the generic version just
+   defends the price. This one gives Liz an honest way to actually WIN
+   the call instead of just holding ground: if what the caller describes
+   really is a no-inspection situation, Express undercuts most
+   competitors' "everything included" quotes on price AND is a truthful
+   fit, not a downsell. Turns a price objection into a second at-bat
+   instead of a wall. */
+function competitorAnswer(){
+  if(["moveout","moveoutrefresh"].includes(rpState.service)){
+    return "\u201cThey might be quoting a lighter scope \u2014 worth asking if inside the oven, the fridge, and the cabinets are included, since a lot of move-out quotes leave those out and add them later. But if it's genuinely just a light clean with nobody inspecting afterward, that might actually be our Express option, which runs lower too \u2014 want me to price that one out for you instead?\u201d";
+  }
+  return "\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d";
+}
 const OBJECTIONS = [
   /* FIRST, because on a paid LSA call this fires within about 20 seconds
      and it's where most of them are lost. Quoting a bare number here
@@ -619,8 +659,8 @@ const OBJECTIONS = [
      the whole value of a paid phone lead is the human in the middle.
      Bridge, get the two facts, THEN quote bundled with what's included. */
   {q:"\u201cHow much for a move-out clean?\u201d (asked before you've got any details)",
-   a:"\u201cHappy to \u2014 it's based on square footage and condition, so let me get it exactly right instead of guessing high. About how big is the place, and how many bedrooms and full baths?\u201d",
-   n:"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's $459, and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause."},
+   a:"\u201cHappy to \u2014 it comes down to bedroom count and which of two options fits, so let me get you the real number instead of guessing high. How many bedrooms and full baths, and is a landlord or property manager going to inspect the place after you leave?\u201d",
+   n:()=>"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Move-Out pricing is flat by bedroom count now (no square footage, no condition tiers), so don't ask about size or condition \u2014 bedrooms and the inspection question are the only two things that change the price. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's [the price], and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause. (Inspection Ready currently starts at $"+RP_MOVEOUT_BEDROOM_TIERS[0].base+" for a 1\u20132 bedroom; the tiers screen a few questions from now gives you the real number for THIS home \u2014 read it from there, not from memory.)"},
   {q:"\u201cHave you done this before? / Are you legit?\u201d",
    a:"\u201cWe're a veteran-owned local company, fully insured, with over 60 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
    n:"Real, verifiable numbers only \u2014 don't round up or guess. If the review count changes, this line needs updating too."},
@@ -628,8 +668,8 @@ const OBJECTIONS = [
    a:objectionPriceAnswer,
    n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
   {q:"\u201cAnother company quoted me less.\u201d",
-   a:"\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d",
-   n:"Never bad-mouth a competitor by name."},
+   a:competitorAnswer,
+   n:"Never bad-mouth a competitor by name. For a move-out caller, this is a real second at-bat, not just a defense \u2014 if what they describe genuinely has no inspection coming, pivoting to Express can win the call on a truthful, lower number instead of just holding the line on Inspection Ready."},
   {q:"\u201cCan you do better on price?\u201d",
    a:doBetterPriceAnswer,
    n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, it just offers the military/first responder discount instead of naming something that was never there."},
@@ -637,8 +677,17 @@ const OBJECTIONS = [
    a:"\u201cTotally fair \u2014 we can at least get you on the calendar. No deposit required, and you can let us know if anything changes.\u201d",
    n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
   {q:"\u201cWill I get my deposit back?\u201d",
-   a:"\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it.\u201d",
-   n:"NEVER promise a deposit back. The landlord decides, not us."},
+   a:depositAnswer,
+   n:"NEVER promise a deposit back \u2014 the landlord decides, not us. But this is also a real moment to sell: if they're on Express and clearly worried about an inspection, that's the caller Inspection Ready was built for \u2014 offer the switch, don't just reassure and move on."},
+  {q:"\u201cWhy does it take three people / two people?\u201d",
+   a:"\u201cMore hands means we're in and done in one visit instead of stretching it out \u2014 Inspection Ready runs three cleaners so the full interior reset gets finished same-day, Express runs two since it's a lighter scope. Either way it's the same crew, same insurance, just sized to the job.\u201d",
+   n:"Comes up right after they hear the crew size on the tiers screen. Frame it as speed and thoroughness, not extra cost tacked on \u2014 it isn't; the price already reflects it."},
+  {q:"\u201cWhat's actually different between the two options?\u201d",
+   a:"\u201cInspection Ready is the full interior reset \u2014 inside the oven, fridge, cabinets, baseboards, windows, everything \u2014 and it's the one that protects your deposit if a landlord flags something. Express covers the kitchen, bathrooms, floors and surfaces, which is plenty if nobody's inspecting the place, and you can still add the oven, fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d",
+   n:"Same pitch as the tiers screen, for whenever the question resurfaces later \u2014 on addons, or even at the price. Keep leading with whichever tier matches what they've told you about an inspection, not the bigger number."},
+  {q:"\u201cCan't I just add the oven and fridge to Express instead of paying for Inspection Ready?\u201d",
+   a:"\u201cYou can, but once you add a couple of those on it usually comes out to about the same as just switching over \u2014 and Inspection Ready throws in the full guarantee on top, so at that point it's the better deal, not just the safer one.\u201d",
+   n:"This is true by design, not a sales trick \u2014 Express plus enough add-ons always lands at or above Inspection Ready's price, and the quote screen's own guardrail will flag it the moment it happens. Don't fight this objection, just point it out plainly; the math sells itself."},
   {q:"\u201cCan you come today or tomorrow?\u201d",
    a:"Check the calendar and offer the soonest real opening.",
    n:"Never promise a slot you haven't confirmed on the calendar."},
@@ -647,7 +696,19 @@ const OBJECTIONS = [
    n:"Capture the access method in the notes right then."},
   {q:"\u201cWhat if I'm not happy with it?\u201d",
    a:"\u201cIf we miss something in the scope you booked, call us and we come back and fix it.\u201d",
-   n:"Don't invent a refund policy. Re-clean, not money back."}
+   n:"Don't invent a refund policy. Re-clean, not money back."},
+  /* Round 29 (review addition): three questions that come up on real calls
+     and had no scripted answer, so they were being improvised at exactly
+     the moments a booking is won or lost. */
+  {q:"\u201cHow do I pay? / Do you need a deposit?\u201d",
+   a:"\u201cNo deposit, nothing due today \u2014 we take payment after the clean is done and you've seen it. Getting you on the calendar doesn't cost you anything.\u201d",
+   n:"\u201cNothing due today\u201d is the single easiest close on this list and it's true \u2014 lead with it any time someone hesitates about committing, not just when they ask about payment. If they ask which methods specifically, and you're not certain, say you'll confirm in the text confirmation rather than guessing."},
+  {q:"\u201cWhat if my move date changes?\u201d",
+   a:"\u201cJust call or text us and we'll move it \u2014 move dates slip all the time, especially on a PCS. There's no deposit riding on it either way.\u201d",
+   n:"A slipping move date is the #1 reason a move-out caller says \u2018let me call you back\u2019 instead of booking. Book the date they think they need; a reschedule is trivial and a lost call is not."},
+  {q:"\u201cI need it this week / my walkthrough is in two days.\u201d",
+   a:"Check the calendar and offer the soonest real opening, by name: \u201cI can get you [day] \u2014 want me to hold it?\u201d",
+   n:"Highest-intent caller on the board: a hard deadline they can't move. Do not lose them to a callback. If nothing on the calendar fits their deadline, take the booking request anyway and flag it for the office rather than saying no on the phone."}
 ];
 
 /* Closing lines for the quote screen — proactive, not reactive. Used
@@ -751,7 +812,7 @@ function guardrails(){
     const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh"), addonsTotal=rpAddonsTotal();
     if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && addonsTotal>=(irPrice-rfPrice))
       g.push({level:"info",title:"Inspection Ready is now the better deal",
-        body:`With these add-ons, Express comes to $${(rfPrice+addonsTotal).toFixed(2)} — Inspection Ready is $${irPrice.toFixed(2)} for the same home, fully guaranteed, nothing left out. Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
+        body:`With these add-ons, Express comes to $${(rfPrice+addonsTotal).toFixed(0)} — Inspection Ready is $${irPrice.toFixed(0)} for the same home, fully guaranteed, nothing left out. Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
   }
   return g;
 }
@@ -810,7 +871,7 @@ const TITLES = {
   frequency:["One-time or recurring?",""],
   rooms:["How many carpeted rooms?","2-room minimum."],
   cleaners:["How many cleaners?",""],
-  hours:["How many hours?","4-hour minimum."],
+  hours:["How many hours?","3-hour minimum."],
   addons:["Anything to add on?","Ask carpet, junk, windows, and garage by name."],
   quote:["Give the quote","Say it once, plainly, then stop talking."],
   contact:["Service address","Read it back out loud before continuing."],
@@ -822,7 +883,8 @@ const SHORT_LABELS = {
   service:"Service", caller:"Contact", sqft:"Size", bedrooms:"Beds", bathrooms:"Baths",
   condition:"Condition", tiers:"Tier", frequency:"Frequency", rooms:"Rooms", cleaners:"Cleaners",
   hours:"Hours", addons:"Add-ons", quote:"Quote", contact:"Address",
-  customDetails:"Details", calendar:"Calendar", done:"Done"
+  customDetails:"Details", calendar:"Calendar", done:"Done",
+  intent:"Reason", questionnaire:"Checks"
 };
 
 function screenHtml(){
@@ -926,7 +988,7 @@ function screenHtml(){
     const chosen = rpState.moveoutTierChosen ? rpState.service : null;
     return `<div class="opts">
       ${opt(`Inspection Ready — ${fmt(irPrice)}`,`chooseMoveoutTier('moveout')`,chosen==="moveout",
-        "Defend Your Deposit™ — oven, fridge, cabinets & closets, and the full Detail Pass all included in this price.")}
+        "Protects your security deposit (Defend Your Deposit™) — oven, fridge, cabinets & closets, and the full Detail Pass all included in this price.")}
       ${opt(`Move-Out Express — ${fmt(rfPrice)}`,`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
         "Satisfaction Guaranteed, no deposit guarantee — oven, fridge, cabinets, and Detail Pass are addable next screen.")}
     </div>
@@ -937,8 +999,8 @@ function screenHtml(){
          closing-argument aside on the scope cheat sheet three screens
          later, after a tier's likely already been picked. */
       rpState.moveoutRentalOrSelling === "selling"
-        ? "They're listing it for sale, not handing it to a new tenant -- lead with Inspection Ready. Buyers notice what a renter wouldn't, and it's the one backed by Defend Your Deposit."
-        : "Not sure which fits? Landlord, property manager, or inspector checking the place after move-out -- Inspection Ready is the one backed by Defend Your Deposit. Flat no on any of that, Express is the honest, lower-cost pick."
+        ? "They're listing it for sale, not handing it to a new tenant -- lead with Inspection Ready. Buyers notice what a renter wouldn't, and it's the one that protects the security deposit if anything's flagged."
+        : "Not sure which fits? Landlord, property manager, or inspector checking the place after move-out -- Inspection Ready is the one that protects the security deposit. Flat no on any of that, Express is the honest, lower-cost pick."
     }</p>`;
   }
 
@@ -1030,7 +1092,7 @@ function screenHtml(){
       : "";
     return `${moveoutScopeRefHtml()}${moveoutTierToggle}${dropNotice}<div class="rail-price" style="border-radius:12px;margin-bottom:13px">
         <small>Quote to give</small>
-        <strong>${custom?"Custom Quote":"$"+rpFinalPrice().toFixed(2)}</strong>
+        <strong>${custom?"Custom Quote":rpFormatMoneyDisplay(rpFinalPriceCents())}</strong>
         ${custom?`<span class="note">Do not say a dollar amount. The office confirms before the cleaning date.</span>`
           :`<span class="note">${esc(rpTimeEstimate()||"")}${rpState.militaryDiscount?" \u00b7 military discount applied":""}${rpState.service==="moveoutrefresh"?" \u00b7 Satisfaction Guaranteed, not Defend Your Deposit":""}</span>`}
       </div>
@@ -1191,12 +1253,12 @@ function renderRail(){
   if(rpState.condition) rows.push(["Condition",rpState.condition.replace(/ Conditions?$/,"")]);
   if(rpState.service==="maintenance" && !rpIsCustomQuoteOnly()) rows.push(["Base (before discount)","$"+rpDisplayBasePrice().toFixed(2)]);
   if(rpState.frequency) rows.push(["Frequency",rpState.frequency]);
-  if(rpAddonsTotal()>0) rows.push(["Add-ons","+$"+rpAddonsTotal().toFixed(2)]);
+  if(rpAddonsTotal()>0) rows.push(["Add-ons","+"+rpFormatMoneyDisplay(rpAddonsCents())]);
   if(rpState.militaryDiscount&&rpMilitaryDiscountAmount()>0) rows.push(["Military","\u2212$"+rpMilitaryDiscountAmount().toFixed(2)]);
   if(rpState.bookedAt) rows.push(["Scheduled",rpState.bookedAt]);
   el("rail").innerHTML=`<div class="rail-card">
     <div class="rail-price"><small>${custom?"Pricing":"Running total"}</small>
-      <strong>${custom?"Custom":(rpFinalPrice()>0?"$"+rpFinalPrice().toFixed(2):"\u2014")}</strong>
+      <strong>${custom?"Custom":(rpFinalPrice()>0?rpFormatMoneyDisplay(rpFinalPriceCents()):"\u2014")}</strong>
       ${custom?`<span class="note">Don't quote a number.</span>`:""}</div>
     ${rows.length?`<div class="rail-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div>`:""}
     ${rpState.service && rpIncludes[rpState.service] ? `<div class="rail-included">
@@ -1345,7 +1407,7 @@ function back(){ const f=flow(), i=stepIdx();
 
 function openDrawer(id){
   if(id==="drObj") el("objList").innerHTML=OBJECTIONS.map(o=>
-    `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${o.n}</em></div>`).join("");
+    `<div class="obj"><b>${o.q}</b><span>${typeof o.a==="function"?o.a():o.a}</span><em>${typeof o.n==="function"?o.n():o.n}</em></div>`).join("");
   if(id==="drOut") el("outList").innerHTML=OUTCOMES.map(o=>
     `<button class="out-btn" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
   el(id).hidden=false; document.body.style.overflow="hidden";
