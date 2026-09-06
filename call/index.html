@@ -371,6 +371,45 @@ button.cmp-h:hover{color:var(--ink-2)}
   color:var(--red-ink); margin-left:6px;
 }
 
+/* Script-first cards (round 37): the words she says, then the question
+   that decides it, then each answer wired to a real price. */
+.cmp-ask{
+  margin:8px 10px 2px; padding:9px 12px; border-radius:9px;
+  background:var(--panel-2); border-left:3px solid var(--line-2);
+  font-family:Newsreader,Georgia,serif; font-size:14.5px; line-height:1.4; color:var(--ink);
+}
+.cmp-ask .k, .cmp-say .k{
+  display:block; margin-bottom:4px; font-family:"Public Sans",sans-serif;
+  font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+}
+.cmp-ask .k{color:var(--muted)}
+.cmp-branch{
+  display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+  padding:5px 14px; font-size:12.5px; color:var(--ink-2);
+}
+.cmp-branch b{font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* A fold inside a card — "the numbers", present but not first. */
+.cmp-fold{margin-top:8px; border-top:1px solid var(--line)}
+.cmp-fold-h{
+  display:flex; align-items:center; gap:8px; width:100%; min-height:38px;
+  padding:8px 14px; background:transparent; border:0; cursor:pointer; text-align:left;
+  font:800 10px/1.2 "Public Sans",sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.cmp-fold-h:hover{color:var(--ink-2)}
+.cmp-fold-b{padding-bottom:4px}
+
+/* Objection chips: the five she hears every day, one click from the words. */
+.cmp-obj-row{display:flex; flex-wrap:wrap; gap:6px; padding:8px 12px 4px}
+.cmp-obj{
+  flex:0 0 auto; max-width:100%; padding:7px 11px; border-radius:99px; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line-2); color:var(--ink-2);
+  font:700 12px/1.25 "Public Sans",sans-serif; text-align:left; min-height:34px;
+}
+.cmp-obj:hover{border-color:var(--red); color:var(--red-ink)}
+.cmp-obj.is-open{background:var(--red); border-color:var(--red); color:#fff}
+.cmp-obj-answer{padding-top:2px}
+
 /* Mobile keeps round 30's lean screen: one collapsed disclosure, closed. */
 .cmp-mobile{background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow)}
 .cmp-mobile > summary{
@@ -1471,7 +1510,8 @@ function renderSide(){
 /* Open/closed state lives in localStorage, not rpState — it is how Liz
    likes the tool set up, not a fact about this caller, so it survives
    "Start next call" the same way her name does. */
-let cmpOpen = { alacarte:true, scope:false, recurring:true, services:true, tiers:true };
+let cmpOpen = { alacarte:true, scope:false, recurring:true, services:true, tiers:true,
+                basicdeep:true, objections:true, tiernums:false, cleannums:false };
 try{
   const raw = localStorage.getItem("rpCallConsole.cmpOpen");
   if(raw) Object.assign(cmpOpen, JSON.parse(raw));
@@ -1520,6 +1560,27 @@ function cmpVerdict(html, level){
    The reason this rail exists. Both real prices for this home, the gap
    between them, what the cheaper one leaves out, and what each of those
    costs to add back. */
+/* A block of collapsible detail inside a card. Used for "the numbers" —
+   present, one click away, not the first thing in the column. */
+function cmpFold(key, label, body){
+  if(!body) return "";
+  const open = !!cmpOpen[key];
+  return `<div class="cmp-fold">
+    <button type="button" class="cmp-fold-h" aria-expanded="${open}" onclick="toggleCmp('${key}')">
+      <span>${esc(label)}</span><span class="cmp-chev" aria-hidden="true">${open?"−":"+"}</span>
+    </button>
+    ${open?`<div class="cmp-fold-b">${body}</div>`:""}
+  </div>`;
+}
+
+/* The line she says, then the question that decides it. This is the whole
+   point of the card — everything below it is backup. */
+function cmpScript(say, ask, answers){
+  return `<div class="cmp-say"><span class="k">Say</span>${esc(say)}</div>
+    <div class="cmp-ask"><span class="k">Then ask</span>“${esc(ask)}”</div>
+    ${answers.map(a=>`<div class="cmp-branch"><span>${esc(a[0])}</span><b>${esc(a[1])}</b></div>`).join("")}`;
+}
+
 function cmpTiers(){
   if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
 
@@ -1539,37 +1600,76 @@ function cmpTiers(){
   const irMath = RP_MSG.crewMath("moveout") || {};
   const exMath = RP_MSG.crewMath("moveoutrefresh") || {};
 
-  let h = cmpRow(known?`${beds} bedroom${beds===1?"":"s"}`:"Any size", "INSPECTION", "EXPRESS", {head:true, pick});
+  /* Round 37: script first. Her job the second someone asks "what's the
+     difference" is to SAY something, not to read a table and translate it
+     into a sentence while the caller waits. The table is still here, one
+     click down, because "how many people come out?" is a real question --
+     it just isn't the first thing in the column any more. */
+  let h = cmpScript(
+    RP_MSG.tiers.spoken,
+    RP_MSG.tiers.spokenAsk,
+    known
+      ? [["Yes, or not sure  →  Inspection Ready", cmpMoney(ir)],
+         ["A firm no  →  Express", cmpMoney(ex)]]
+      : [["Yes, or not sure  →", "Inspection Ready"],
+         ["A firm no  →", "Express"]]
+  );
 
   if(known){
-    h += cmpRow("Price", cmpMoney(ir), cmpMoney(ex), {big:true, pick});
     h += `<div class="cmp-gap"><b>${cmpMoney(ir-ex)}</b> apart — that's the whole decision.</div>`;
-  } else {
-    RP_MOVEOUT_BEDROOM_TIERS.forEach((t,i)=>{
-      const e = RP_MOVEOUT_REFRESH_BEDROOM_TIERS[i];
-      h += cmpRow(t.label, cmpMoney(t.base), cmpMoney(e?e.base:null));
-    });
-    h += `<div class="cmp-line">Ask bedrooms and these become one row.</div>`;
-  }
-
-  h += cmpRow("Cleaners", String(irMath.crew||3), String(exMath.crew||2));
-  h += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
-  if(irMath.lo && exMath.lo){
-    h += cmpRow("Hours of work", `${irMath.lo}–${irMath.hi}`, `${exMath.lo}–${exMath.hi}`);
-  }
-  h += cmpRow("Deposit backed", "Yes", "No", {pick});
-
-  h += `<div class="cmp-line">Both come back free within ${esc(RP_MSG.guarantee.window)}. Only Inspection Ready is sold as protecting a deposit — ${esc(RP_MSG.guarantee.depositName)}.</div>`;
-
-  /* The deposit anchor for THIS home. The number that reframes a caller
-     who is comparing us against a cheaper cleaner. */
-  if(known){
+    /* The deposit anchor for THIS home. The number that reframes a caller
+       who is comparing us against a cheaper cleaner. */
     const d = RP_MSG.deposit.for(beds);
     if(d) h += `<div class="cmp-line"><b>On the line: ${esc(d.amount)}</b> — ${esc(d.subject.toLowerCase())} around here.</div>`;
+  } else {
+    h += `<div class="cmp-line">Ask bedrooms and both prices land here.</div>`;
   }
 
-  h += cmpSay(RP_MSG.tiers.chooser);
-  return cmpCard("tiers","Inspection Ready vs Express", h);
+  /* The numbers, folded. With bedrooms unknown this used to open with the
+     entire three-row ladder -- a wall of prices for a home nobody had
+     described yet. */
+  let nums = "";
+  if(known){
+    nums += cmpRow(`${beds} bedroom${beds===1?"":"s"}`, "INSPECTION", "EXPRESS", {head:true, pick});
+    nums += cmpRow("Price", cmpMoney(ir), cmpMoney(ex), {pick});
+  } else {
+    nums += cmpRow("Any size", "INSPECTION", "EXPRESS", {head:true});
+    RP_MOVEOUT_BEDROOM_TIERS.forEach((t,i)=>{
+      const e = RP_MOVEOUT_REFRESH_BEDROOM_TIERS[i];
+      nums += cmpRow(t.label, cmpMoney(t.base), cmpMoney(e?e.base:null));
+    });
+  }
+  nums += cmpRow("Cleaners", String(irMath.crew||3), String(exMath.crew||2));
+  nums += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
+  if(irMath.lo && exMath.lo){
+    nums += cmpRow("Hours of work", `${irMath.lo}–${irMath.hi}`, `${exMath.lo}–${exMath.hi}`);
+  }
+  nums += cmpRow("Deposit backed", "Yes", "No", {pick});
+  nums += `<div class="cmp-line">Both come back free within ${esc(RP_MSG.guarantee.window)}. Only Inspection Ready is sold as protecting a deposit — ${esc(RP_MSG.guarantee.depositName)}.</div>`;
+  h += cmpFold("tiernums", "The numbers", nums);
+
+  return cmpCard("tiers","Saying the difference", h);
+}
+
+/* Basic vs Deep — asked for directly, and previously absent. Same shape as
+   the tier card: the sentence, the question, then the numbers folded. */
+function cmpBasicDeep(){
+  if(!["deep","maintenance"].includes(rpState.service)) return "";
+  const pick = rpState.service==="deep" ? "b" : "a";
+  let h = cmpScript(
+    RP_MSG.cleans.spoken,
+    RP_MSG.cleans.spokenAsk,
+    [[`${RP_MSG.cleans.basicWhen}  →  Basic`, cmpMoney(RP_BASIC_ANCHOR_PRICE)],
+     [`${RP_MSG.cleans.deepWhen}  →  Deep`, cmpMoney(RP_DEEP_ANCHOR_PRICE)]]
+  );
+  let nums = cmpRow("", "BASIC", "DEEP", {head:true, pick});
+  nums += cmpRow("Price", cmpMoney(RP_BASIC_ANCHOR_PRICE), cmpMoney(RP_DEEP_ANCHOR_PRICE), {pick});
+  nums += cmpRow("Hours included", `${RP_BASIC_ANCHOR_HOURS}h`, `${RP_DEEP_ANCHOR_HOURS}h`);
+  nums += cmpRow("Extra time", cmpMoney(RP_EXTRA_HOUR_RATE)+"/h", cmpMoney(RP_EXTRA_HOUR_RATE)+"/h");
+  nums += cmpRow("Inside the oven", "No", "Yes");
+  nums += `<div class="cmp-line">Both are flat whatever the size, and both carry the ${esc(RP_MSG.guarantee.window)} come-back-free promise. Neither is sold as protecting a deposit — that's the move-out tier.</div>`;
+  h += cmpFold("cleannums", "The numbers", nums);
+  return cmpCard("basicdeep","Basic vs Deep", h);
 }
 
 /* ---- 2. Express + add-ons vs just upgrading ------------------------------
@@ -1723,6 +1823,101 @@ function cmpScope(){
   return cmpCard("scope","What's in the price", h);
 }
 
+/* =========================================================================
+   OBJECTIONS IN THE RAIL (round 37)
+   =========================================================================
+   "Liz needs to be able to handle objections quicker."
+
+   Lookup was the only route: press "/", type, read, close. Right for the
+   long tail, too slow for the five she hears every day — it is a
+   full-screen context switch mid-sentence.
+
+   These are the same OBJECTIONS entries, filtered to the current step and
+   rendered as chips in the rail. One click opens the words in place. The
+   search box keeps everything, including these; this is just the fast path
+   for the ones that are predictable.
+
+   Matching is by keyword against the objection's own title, not by index,
+   so editing or re-ordering OBJECTIONS cannot quietly point a step at the
+   wrong answer. A step whose keywords match nothing renders no card at
+   all, rather than a card full of chips for objections nobody is making. */
+const MOVEOUT = ["moveout","moveoutrefresh"];
+/* Each entry: the keyword that finds the objection in OBJECTIONS, the SHORT
+   label for the chip, and optionally the services it applies to.
+
+   The short label is written here rather than derived from the question,
+   because a chip is scanned, not read -- the first pass at this cut the
+   titles mechanically and produced "Can't I just add the oven and fridge to
+   Express instead of paying for Inspection Ready?" as a chip, which is a
+   paragraph pretending to be a button.
+
+   The service scope matters just as much: without it, a Deep Cleaning call
+   was offering her the Express add-on objection, which cannot come up. */
+const CMP_OBJECTIONS_BY_STEP = {
+  service:  [{k:"how much", s:"How much?"}, {k:"legit", s:"Are you legit?"}],
+  caller:   [{k:"legit", s:"Are you legit?"}],
+  home:     [{k:"need to be there", s:"Do I need to be there?"}],
+  tiers:    [{k:"actually different", s:"What's the difference?", svc:MOVEOUT},
+             {k:"deposit back", s:"Will I get my deposit back?", svc:MOVEOUT},
+             {k:"add the oven", s:"Just add the oven instead?", svc:["moveoutrefresh"]}],
+  addons:   [{k:"add the oven", s:"Just add the oven instead?", svc:["moveoutrefresh"]},
+             {k:"three people", s:"Why so many cleaners?", svc:MOVEOUT},
+             {k:"how much", s:"How much?"}],
+  quote:    [{k:"more than i expected", s:"More than I expected"},
+             {k:"quoted me less", s:"Someone quoted less"},
+             {k:"do better on price", s:"Can you do better?"},
+             {k:"think about it", s:"Need to think about it"},
+             {k:"do you need a deposit", s:"How do I pay?"}],
+  contact:  [{k:"need to be there", s:"Do I need to be there?"},
+             {k:"move date", s:"If my date changes"}],
+  calendar: [{k:"today or tomorrow", s:"Can you come today?"},
+             {k:"this week", s:"I need it this week"},
+             {k:"move date", s:"If my date changes"}],
+  frequency:[{k:"think about it", s:"Need to think about it"}],
+  rooms:    [{k:"how much", s:"How much?"}],
+  hourly:   [{k:"how much", s:"How much?"}, {k:"not happy", s:"What if I'm not happy?"}]
+};
+
+let cmpOpenObjection = null;
+function toggleObjection(i){
+  cmpOpenObjection = (cmpOpenObjection === i) ? null : i;
+  renderSide();
+}
+
+function cmpObjections(){
+  const keys = CMP_OBJECTIONS_BY_STEP[rpState.step];
+  if(!keys || !keys.length) return "";
+
+  const all = OBJECTIONS.map((o,i)=>({ o, i, title:String(o.q||"").toLowerCase() }));
+  const picked = [];
+  keys.forEach(entry=>{
+    if(entry.svc && !entry.svc.includes(rpState.service)) return;
+    const hit = all.find(x => x.title.includes(entry.k) && !picked.some(p=>p.i===x.i));
+    if(hit) picked.push({ ...hit, short: entry.s });
+  });
+  if(!picked.length) return "";
+
+  const chips = picked.map(x=>
+    `<button type="button" class="cmp-obj ${cmpOpenObjection===x.i?"is-open":""}"
+       aria-expanded="${cmpOpenObjection===x.i}" onclick="toggleObjection(${x.i})">${esc(x.short)}</button>`
+  ).join("");
+
+  let body = `<div class="cmp-obj-row">${chips}</div>`;
+
+  const open = picked.find(x=>x.i===cmpOpenObjection);
+  if(open){
+    const a = typeof open.o.a==="function" ? open.o.a() : open.o.a;
+    const n = typeof open.o.n==="function" ? open.o.n() : open.o.n;
+    body += `<div class="cmp-obj-answer">
+      <div class="cmp-say"><span class="k">Say</span>${esc(String(a).replace(/^[“"]|[”"]$/g,""))}</div>
+      ${n?`<div class="cmp-sub">${esc(n)}</div>`:""}
+    </div>`;
+  } else {
+    body += `<div class="cmp-sub">Tap one for the words. Everything else is in Look up (/).</div>`;
+  }
+  return cmpCard("objections","If they push back", body);
+}
+
 /* Mobile keeps round 30's screen: everything above collapses into one
    closed disclosure so the phone layout is unchanged until she asks. */
 function comparePanels(){
@@ -1733,9 +1928,20 @@ function comparePanels(){
      position that reliably gets seen. */
   const buyingBack = rpState.service==="moveoutrefresh"
     && (rpState.ovenAddon || rpState.fridgeAddon || rpState.cabinetsAddon || rpState.detailPassAddon);
-  const order = buyingBack
-    ? [cmpAlaCarte(), cmpTiers(), cmpServices(), cmpRecurring(), cmpScope()]
-    : [cmpTiers(), cmpAlaCarte(), cmpServices(), cmpRecurring(), cmpScope()];
+  /* Round 37: objections lead on the steps where somebody pushes back --
+     the quote screen above all -- because at that moment the difference
+     between the two tiers is settled and what she needs is a reply. On
+     every other step the articulation card leads and objections sit under
+     it, still one click from open. */
+  const objectionsFirst = ["quote","contact","calendar"].includes(rpState.step);
+  let order;
+  if(objectionsFirst){
+    order = [cmpObjections(), cmpAlaCarte(), cmpTiers(), cmpBasicDeep(), cmpServices(), cmpRecurring(), cmpScope()];
+  } else if(buyingBack){
+    order = [cmpAlaCarte(), cmpTiers(), cmpBasicDeep(), cmpObjections(), cmpServices(), cmpRecurring(), cmpScope()];
+  } else {
+    order = [cmpTiers(), cmpBasicDeep(), cmpObjections(), cmpAlaCarte(), cmpServices(), cmpRecurring(), cmpScope()];
+  }
   const cards = order.filter(Boolean).join("");
   if(!cards) return "";
   const desktop = !window.matchMedia || window.matchMedia("(min-width:1000px)").matches;
@@ -1855,7 +2061,7 @@ function lookupIndex(){
   out.push({kind:"Policy", title:"Service area", answer:`${RP_MSG.areaSentence()} are core. Further out, book it and note it — the office confirms coverage and travel before the date.`});
   out.push({kind:"Policy", title:"Rescheduling", answer:`“${RP_MSG.scheduling.reschedule}”`, why:"Move dates slip constantly on a PCS. Book the date they think they need."});
   out.push({kind:"Policy", title:"Arrival window", answer:RP_MSG.scheduling.window});
-  out.push({kind:"Price", title:"Is there anything over $599?", answer:`${RP_MSG.price.ceiling()} That's the top of the move-out ladder — a 4-bedroom and a 6-bedroom are the same number.`, why:"Worth saying out loud to anyone bracing for a big number."});
+  out.push({kind:"Price", title:"What about a really big house?", answer:`The move-out ladder tops out at $${RP_MOVEOUT_BEDROOM_TIERS[RP_MOVEOUT_BEDROOM_TIERS.length-1].base} — a 4-bedroom and a 6-bedroom are the same number.`, why:"Say it as a fact about the ladder, not as a promise. Worth having ready for anyone bracing for a big number."});
   out.push({kind:"Policy", title:"Water off, no A/C, mold or pests", answer:"The job can't be booked as normal. Take the name and number, log it as a callback, and do not say a price.", why:"A number said on the phone is the number they expect."});
   return out;
 }

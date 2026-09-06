@@ -602,13 +602,6 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   margin-top: 7px; font-size: 11.5px; font-weight: 700; color: var(--muted);
 }
 .rp-tier-quote figcaption span { color: #c8901f; letter-spacing: .06em; }
-/* The price ceiling, stated on the tier screen. Deliberately quiet — it is
-   reassurance for someone bracing for a big number, not a promotion. */
-.rp-ceiling-note {
-  margin: 0 0 4px; padding: 8px 12px; border-radius: 12px;
-  background: rgba(24,107,77,.07); border: 1px solid rgba(24,107,77,.26);
-  font-size: 13px; font-weight: 700; color: #145c42; text-align: center; line-height: 1.4;
-}
 /* Round 33: what's actually on the line. Given the page's most emphatic
    quiet treatment — bordered, centred, above the cards — because it is the
    one sentence most likely to decide which tier gets chosen. */
@@ -3244,7 +3237,7 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:`Two real prices in about a minute. ${RP_MSG.price.ceiling()}`, featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices in about a minute, no callback.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
@@ -4058,7 +4051,7 @@ function rpEstimateScreen(eyebrow) {
          of a silent bounce. */""}
     <p class="rp-reassure">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>${RP_MSG.payment.short}</strong> You pay after the clean is done and you've seen it.</span></p>
     <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>
-    ${noGuaranteedPrice ? "" : `<button type="button" class="rp-soft-cta" id="rpTextQuoteBtn" onclick="rpTextMeThisQuote()">Not ready? Text me this price instead</button>`}
+    ${noGuaranteedPrice ? "" : `<button type="button" class="rp-soft-cta" id="rpTextQuoteBtn" onclick="rpTextMeThisQuote()">Not ready? Send this quote to my phone</button>`}
     <p class="rp-notice rp-dock-notice">${RP_MSG.price.exception} Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>` };
 }
 
@@ -4080,16 +4073,49 @@ function rpEstimateScreen(eyebrow) {
    worst case is a duplicate follow-up, which is a far better failure than
    a lost one.
    ========================================================================= */
+/* The message the customer's own SMS app opens with. Short on purpose —
+   it has to survive being read on a lock screen, and it has to make sense
+   to whoever at Red Prairie reads the inbound. */
+function rpQuoteTextBody() {
+  const bits = [];
+  const svc = (rpServices[rpState.service] || {}).name;
+  bits.push(`Hi Red Prairie \u2014 saving my quote from your website.`);
+  if (svc) bits.push(svc);
+  if (rpState.bedrooms) {
+    bits.push(`${rpState.bedrooms} bed${rpState.bathrooms ? `, ${rpState.bathrooms} bath` : ""}`);
+  }
+  bits.push(`Quote: ${rpPriceLabel()}`);
+  if (rpState.fullName) bits.push(`Name: ${rpState.fullName}`);
+  return bits.join("\n");
+}
+
 function rpTextMeThisQuote() {
   const btn = document.getElementById("rpTextQuoteBtn");
   if (!btn || btn.dataset.sent === "1") return;
   btn.dataset.sent = "1";
   btn.classList.add("is-sent");
-  const digits = String(rpState.phone || "").replace(/\D/g, "");
-  const pretty = digits.length === 10 ? `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}` : (rpState.phone || "your number");
-  btn.textContent = `Sent \u2014 we'll text your price to ${pretty}`;
+  /* Round 37: this used to say "Sent — we'll text your price to (580)
+     555-1234". Nothing in this codebase sends a text; it posted a lead and
+     assumed a GHL automation existed to do it. Reported as not working,
+     which means that automation isn't there, which means every person who
+     tapped this was told a text was coming and never got one.
+
+     Now it opens their own message composer, pre-filled with the quote and
+     addressed to us. That puts the price in their hand for real, and turns
+     a silent bounce into a live text thread Christa can answer. The
+     confirmation below is true regardless of whether the composer opened,
+     whether they hit send, or whether any automation ever gets built. */
+  btn.textContent = "Quote saved \u2014 we'll follow up. Text us any time.";
   btn.disabled = true;
   rpTrack("text_quote_requested", { service: rpState.service, estimate: rpPriceLabel() });
+
+  /* Opened in a try/catch and after the UI has already settled: on a
+     desktop browser with no SMS handler this simply does nothing, which is
+     why the confirmation above never mentions a message being sent. */
+  try {
+    const href = `sms:${RP_MSG.facts.phoneDigits}${/iPhone|iPad|Macintosh/i.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(rpQuoteTextBody())}`;
+    window.setTimeout(() => { try { window.location.href = href; } catch (e) {} }, 120);
+  } catch (error) { /* no SMS handler — the quote is still saved */ }
 
   const details = (typeof rpBuildSharedDetails === "function") ? rpBuildSharedDetails() : {};
   try {
@@ -4099,7 +4125,7 @@ function rpTextMeThisQuote() {
       keepalive: true,
       body: JSON.stringify({
         lead_type: "website_quote_requested",
-        call_outcome: "Asked us to text the quote - not booked yet",
+        call_outcome: "Saved their quote from the website - not booked yet",
         csr_lead_source: "Website Estimator",
         full_name: rpState.fullName,
         phone: rpState.phone,
@@ -4108,11 +4134,11 @@ function rpTextMeThisQuote() {
         quoted_price: rpPriceLabel(),
         ...details,
         details: [
-          "CUSTOMER ASKED FOR THE QUOTE BY TEXT \u2014 they saw the price and want to think about it.",
+          "CUSTOMER SAVED THEIR QUOTE \u2014 they saw the price and want to think about it.",
           `Quote shown: ${rpPriceLabel()}`,
           rpState.bedrooms ? `Bedrooms: ${rpState.bedrooms} | Bathrooms: ${rpState.bathrooms || "N/A"}` : "",
           `Add-ons: ${rpAddonSummaryText()}`,
-          "Text them the number, then follow up. Do not re-quote a different price."
+          "They were shown their own message app pre-filled with this quote, so they may text in first. Follow up either way. Do not re-quote a different price."
         ].filter(Boolean).join("\n"),
         submitted_at: new Date().toISOString()
       })

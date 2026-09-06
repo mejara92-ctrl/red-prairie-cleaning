@@ -159,9 +159,15 @@ def main():
                             % (rel, line_no, amount, label, now, line.strip()[:140]))
                         break
 
-    # Round 32: the $599 ceiling is a promise now ("No move-out over $599"),
-    # so a published move-out figure above the engine's top tier is not just
-    # drift, it makes the promise a lie.
+    # A published move-out figure above the engine's top tier is drift: the
+    # ladder stops there, so any larger number on a move-out line came from
+    # somewhere other than the engine.
+    #
+    # Round 37 note: this rule used to exist because "No move-out over $599"
+    # was a promise the site made. That claim is gone (direct instruction),
+    # but the check is still worth keeping on its own merits — it just
+    # guards against a stale number now rather than against a broken
+    # promise.
     ceiling = p["inspection_ready"][-1]
     for f in html_files():
         rel = os.path.relpath(f, ROOT)
@@ -181,10 +187,8 @@ def main():
     # every other page said 61+).
     msg = read(os.path.join(ROOT, "js", "rp-messages.js"))
     review_count = int(re.search(r"reviewCount:\s*(\d+)", msg).group(1))
-    declared_ceiling = int(re.search(r"priceCeiling:\s*(\d+)", msg).group(1))
-    if declared_ceiling != ceiling:
-        problems.append("js/rp-messages.js declares priceCeiling %d but the engine's top tier is %d"
-                        % (declared_ceiling, ceiling))
+    # (The priceCeiling assertion that used to sit here went with the claim
+    #  it checked -- see round 37. The fact no longer exists to check.)
     for f in html_files() + [os.path.join(ROOT, "book", "index.html"),
                              os.path.join(ROOT, "call", "index.html")]:
         rel = os.path.relpath(f, ROOT)

@@ -53,8 +53,7 @@ const RP_MSG = {
     reviewCount: 61,
     rating: "5.0",
     phone: "(580) 215-0915",
-    phoneDigits: "5802150915",
-    priceCeiling: 599
+    phoneDigits: "5802150915"
   },
 
   /* ── The trust line ──────────────────────────────────────────────────
@@ -79,8 +78,11 @@ const RP_MSG = {
     promiseSpoken: "that's the full price — nothing gets added when we show up",
     /* The honest exception. This is the ONLY place the carve-outs are
        listed; if they ever change, they change once. */
-    exception: "Price only changes for severe buildup, heavy trash, access problems, biohazards, or work outside what you picked — and we call you first, before the crew starts.",
-    ceiling() { return `No move-out over $${RP_MSG.facts.priceCeiling}.`; }
+    exception: "Price only changes for severe buildup, heavy trash, access problems, biohazards, or work outside what you picked — and we call you first, before the crew starts."
+    /* Round 37 (direct instruction): the price-ceiling claim is gone. The
+       top of the move-out ladder is still the top of the ladder — we just
+       don't make a promise out of it any more. Deleted rather than left
+       unused, so nothing can quietly start saying it again. */
   },
 
   /* ── Payment terms ───────────────────────────────────────────────────
@@ -130,7 +132,33 @@ const RP_MSG = {
     /* The honest way to tell someone which one they need. This is a
        question about their situation, not an upsell. */
     chooser: "If a landlord, property manager or housing office is going to walk through and check the place after you leave, Inspection Ready is the one that protects your deposit. If nobody's checking, Express gets it clean for less.",
-    expressAddable: "Oven, fridge, cabinets and a full Detail Pass can each be added to Express individually."
+    expressAddable: "Oven, fridge, cabinets and a full Detail Pass can each be added to Express individually.",
+    /* ── The spoken versions ──────────────────────────────────────────
+       Round 37. The written copy above is for a screen someone reads at
+       their own pace. These are for a person saying it out loud while
+       somebody waits, which is a different job: shorter, no subordinate
+       clauses, and it has to survive being said in one breath.
+
+       Kept here rather than in /call so the CSR and the website can never
+       describe the same two products differently — the whole reason this
+       file exists. */
+    spoken: "Inspection Ready is the full reset — inside the oven, the fridge, cabinets, baseboards, the works — and it's the one we stand behind if your landlord flags something. Express is kitchen, bathrooms, floors and surfaces. Clean, just not built for an inspection.",
+    /* The question that actually decides it. Not a preference question —
+       a fact about their situation, which is why it closes cleanly. */
+    spokenAsk: "Is anyone walking through and checking the place after you're out?"
+  },
+
+  /* ── Basic vs Deep, said out loud ───────────────────────────────────
+     Round 37, asked for directly: the console could articulate the two
+     move-out tiers and had nothing at all for these two, which are
+     confused just as often on the phone. Same shape as tiers.spoken
+     above, and the same rule — the difference is about the state of the
+     home, not about how much someone wants to spend. */
+  cleans: {
+    spoken: "Basic is upkeep — a place that's already in decent shape, kept that way. Deep is the one that gets what upkeep misses: inside the oven, the baseboards, the buildup you stop noticing. If it's been a while, you want the deep one.",
+    spokenAsk: "When was it last cleaned top to bottom?",
+    basicWhen: "Under a month, and it's tidy",
+    deepWhen: "Longer than that, or never"
   },
 
   /* ── What's actually at risk ─────────────────────────────────────────

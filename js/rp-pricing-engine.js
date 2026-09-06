@@ -144,7 +144,7 @@ const rpServices = {
 
    1. THE LADDER TOPS OUT AT $599. That is now a hard ceiling, and it is
       worth stating as a promise rather than hiding as a constraint:
-      nothing this business quotes for a move-out is over $599.
+      the move-out ladder tops out at $599.
 
    2. FOUR TIERS BECAME THREE. With $599 as the ceiling and $599 already
       spoken for by the 4-bedroom, a separate 5+ tier could only ever be
