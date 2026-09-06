@@ -135,22 +135,63 @@ const rpServices = {
    actually the sizes that broke, not 4BR/5+; that mistake was caught
    and fixed before anything shipped on it, see the round-27 note
    below). */
+/* ROUND 32 — "RED PRAIRIE 3.0" PRICING (direct instruction: "Lets decrease
+   the price. An inspection ready 3bed move-out for $499, 4 bed for $599. I
+   don't think I can ask more than $599 for a move-out, no one's gonna want
+   that.")
+
+   Two structural changes, not just smaller numbers.
+
+   1. THE LADDER TOPS OUT AT $599. That is now a hard ceiling, and it is
+      worth stating as a promise rather than hiding as a constraint:
+      nothing this business quotes for a move-out is over $599.
+
+   2. FOUR TIERS BECAME THREE. With $599 as the ceiling and $599 already
+      spoken for by the 4-bedroom, a separate 5+ tier could only ever be
+      $599 as well — two rows at the same price, which reads as a mistake.
+      "4+ bedrooms" is one honest row instead.
+
+   The formula is unchanged; what changed is the hours it has to fit into.
+   Solving price = ((hrs × crew × $17.50 × 1.12) + $15 + $25) / 0.92 / 0.80
+   backwards from the prices given:
+
+      $399 funds 12.9 crew-hours     $499 funds 16.7     $599 funds 20.5
+
+   At the round-26 crew of 3, that is 4.3 / 5.6 / 6.8 hours on site. Rounded
+   to 4 / 5.5 / 6.5, margins come out 25.0% / 20.8% / 23.4% — at or above
+   the 20% target at every size, with the 8% guarantee reserve still funded
+   inside the cost.
+
+   READ THIS BEFORE CHANGING ANYTHING HERE: those hours are the assumption
+   the whole ladder rests on. Round 26 planned 5 / 6 / 7 for the same crew;
+   this round plans 4 / 5.5 / 6.5. If real jobs run longer than that, the
+   margin above is fiction, and the honest fix is fewer included items —
+   not a quieter number. Log actual on-site hours for a month and check.
+
+   THE ONE RISK THE CEILING CREATES: a genuine 5-bedroom now prices at the
+   4+ row. If it really takes 8 hours with 3 cleaners (24 crew-hours) it
+   costs $554.78 and returns 7.4% at $599. Rare in this market, and
+   rpMoveoutLargeHome() below marks it on the crew sheet so it can be
+   measured rather than guessed at. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 459, includedBathrooms: 1, label: "1\u20132 bedrooms" },
-  { min: 3, max: 3, base: 539, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 619, includedBathrooms: 2, label: "4 bedrooms" },
-  { min: 5, max: 999, base: 699, includedBathrooms: 3, label: "5+ bedrooms" }
+  { min: 1, max: 2, base: 399, includedBathrooms: 1, label: "1–2 bedrooms" },
+  { min: 3, max: 3, base: 499, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 999, base: 599, includedBathrooms: 3, label: "4+ bedrooms" }
 ];
 /* Move-Out Express -- same bedroom brackets and included-bathroom
    convention as Inspection Ready above so the two stay directly
    comparable size-for-size; only the base price and scope differ. Still
    a starting estimate pending real logged Express job hours, same as
    before -- only the number changed this round, not that caveat. */
+/* Round 32: same three brackets as Inspection Ready above, so the two stay
+   directly comparable size for size. Express prices are UNCHANGED at every
+   size that still exists — it was already at ~21% margin on its own
+   2-cleaner hours and nothing about it needed to move. The old 5+ row
+   ($349) is gone only because the bracket it belonged to is gone. */
 const RP_MOVEOUT_REFRESH_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 199, includedBathrooms: 1, label: "1\u20132 bedrooms" },
+  { min: 1, max: 2, base: 199, includedBathrooms: 1, label: "1–2 bedrooms" },
   { min: 3, max: 3, base: 249, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 4, base: 299, includedBathrooms: 2, label: "4 bedrooms" },
-  { min: 5, max: 999, base: 349, includedBathrooms: 3, label: "5+ bedrooms" }
+  { min: 4, max: 999, base: 299, includedBathrooms: 3, label: "4+ bedrooms" }
 ];
 function rpMoveoutTierTable(service) {
   return service === "moveoutrefresh" ? RP_MOVEOUT_REFRESH_BEDROOM_TIERS : RP_MOVEOUT_BEDROOM_TIERS;
@@ -202,12 +243,66 @@ function rpMoveoutBedroomTier(beds, service = rpState.service) {
    margin at every size -- verify: $150+$150=$300 vs $260 (+40); $150+
    $180=$330 vs $290 (+40); $150+$210=$360 vs $320 (+40); $150+$240=
    $390 vs $350 (+40). */
+/* Round 32: three brackets, and the "a la carte must never beat switching
+   tiers outright" invariant re-checked against the new ladder. Buying the
+   three flat $50 items plus a Detail Pass, versus just paying the tier gap:
+
+     1-2 bed  $150 + $150 = $300  vs gap $399-$199 = $200   cushion +$100
+     3 bed    $150 + $180 = $330  vs gap $499-$249 = $250   cushion  +$80
+     4+ bed   $150 + $210 = $360  vs gap $599-$299 = $300   cushion  +$60
+
+   Every cushion GREW. Lowering Inspection Ready narrows the tier gap, which
+   makes switching the better deal by more, not less. Nothing here moved. */
 const RP_DETAIL_PASS_PRICES = [
   { min: 1, max: 2, price: 150 },
   { min: 3, max: 3, price: 180 },
-  { min: 4, max: 4, price: 210 },
-  { min: 5, max: 999, price: 240 }
+  { min: 4, max: 999, price: 210 }
 ];
+/* =========================================================================
+   EXPRESS BUY-BACKS — the scope Inspection Ready includes and Express sells
+   =========================================================================
+   These four are the WHOLE difference in scope between the two move-out
+   tiers. Inspection Ready has them in its base price; Express excludes them
+   and sells each one back. rpDetailPassPrice() above exists specifically to
+   keep buying all four more expensive than paying the tier gap, so that
+   a la carte is never the cheaper route to the full checklist.
+
+   Every other add-on -- carpet, exterior windows, the garage floor, junk --
+   is sold on BOTH tiers at the same price. Switching tiers does not make
+   them free, so they must never appear in a tier-versus-tier comparison.
+
+   That distinction was the bug this function exists to prevent. /call's
+   "Inspection Ready is now the better deal" guardrail used rpAddonsTotal()
+   -- every add-on -- so a 3-bedroom Express quote carrying $300 of carpet
+   and garage tripped it, and told the CSR to say Inspection Ready was $499
+   "for the same home". It would actually have been $799. One list, read by
+   every consumer, is the fix.
+
+   Returns one row per buy-back:
+     { key, stateField, label, price, selected } */
+function rpExpressBuyBackItems(beds = rpState.bedrooms) {
+  return [
+    { key: "oven",       stateField: "ovenAddon",       label: "Oven interior",            price: rpAddonCatalog.oven.price },
+    { key: "fridge",     stateField: "fridgeAddon",     label: "Refrigerator interior",    price: rpAddonCatalog.fridge.price },
+    { key: "cabinets",   stateField: "cabinetsAddon",   label: "Inside cabinets & closets", price: rpAddonCatalog.cabinets.price },
+    { key: "detailPass", stateField: "detailPassAddon", label: "Detail Pass",              price: rpDetailPassPrice(beds) }
+  ].map(row => Object.assign(row, { selected: !!rpState[row.stateField] }));
+}
+/* Dollars of buy-back scope currently on the quote. This -- not
+   rpAddonsTotal() -- is the number to compare against the tier gap. */
+function rpExpressBuyBackTotal(beds = rpState.bedrooms) {
+  return rpExpressBuyBackItems(beds).reduce((sum, r) => sum + (r.selected ? r.price : 0), 0);
+}
+/* Add-ons on the quote that BOTH tiers charge for identically. They travel
+   with the customer through a tier switch, so any "switching costs X"
+   sentence has to name them rather than quietly drop them. */
+function rpTierNeutralAddonTotal() {
+  const buyBackKeys = rpExpressBuyBackItems().map(r => r.key);
+  return rpAddonLineItems()
+    .filter(r => !buyBackKeys.includes(r.key))
+    .reduce((sum, r) => sum + (r.price || 0), 0);
+}
+
 function rpDetailPassPrice(beds = rpState.bedrooms) {
   const b = Number(beds || 0);
   const tier = RP_DETAIL_PASS_PRICES.find(t => b >= t.min && b <= t.max);
@@ -963,7 +1058,20 @@ function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 /* Round 26: Inspection Ready's range dropped from "6-10" to "5-8" to
    match the new 3-cleaner crew (see RP_MOVEOUT_BEDROOM_TIERS above) --
    more hands, less time on site for the same job. Express untouched. */
-const RP_MOVEOUT_TIER_HOURS = { moveout: "5–8 hours", moveoutrefresh: "3–5 hours" };
+/* Round 32: Inspection Ready's displayed range follows the new planning
+   hours (4 / 5.5 / 6.5 with 3 cleaners) instead of round 26's 5 / 6 / 7.
+   Express untouched. The crew-hours line on the tier card and the estimate
+   screen both multiply out from this, so changing it changes those too —
+   which is the point of it living in one place. */
+const RP_MOVEOUT_TIER_HOURS = { moveout: "4–7 hours", moveoutrefresh: "3–5 hours" };
+
+/* Round 32: the $599 ceiling folds every home of 4 bedrooms or more into
+   one price. Most of those are 4-bedrooms and price correctly; a genuine
+   5+ is the edge the cap creates. This flags it for the crew sheet so the
+   office can see how often it actually happens instead of guessing. */
+function rpMoveoutLargeHome() {
+  return ["moveout", "moveoutrefresh"].includes(rpState.service) && Number(rpState.bedrooms || 0) >= 5;
+}
 function rpMoveoutTierHours(service) { return RP_MOVEOUT_TIER_HOURS[service] || ""; }
 
 function rpTimeEstimate() {

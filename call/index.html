@@ -82,7 +82,11 @@ button,input,select,textarea{font:inherit; color:inherit}
   background:var(--panel); border-bottom:1px solid var(--line);
 }
 .who{min-width:0; flex:1 1 auto; line-height:1.2}
-.who b{display:block; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+/* The caller's name is the page's heading — the console had no <h1>
+   at all. An earlier fix put one here and a later re-assembly dropped
+   it, so the rule below styles h1 and b identically and both files
+   carry the markup. */
+.who b, .who h1{display:block; margin:0; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .who span{display:block; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums}
 .top-actions{display:flex; align-items:center; gap:7px; flex:0 0 auto}
 .clock{
@@ -268,6 +272,115 @@ button,input,select,textarea{font:inherit; color:inherit}
 .recap-row b{font-weight:700; text-align:right; font-variant-numeric:tabular-nums}
 .recap-row.neg b{color:var(--green)}
 
+/* ── Compare rail (round 35): the desktop column, earning its space. ──
+   Sticky, because it is reference read WHILE talking — a rail that
+   scrolls away at the moment she needs it is the same as no rail. Scrolls
+   internally rather than growing the page. */
+@media (min-width:1000px){
+  .side{
+    position:sticky; top:calc(var(--top-h, 60px) + 10px);
+    max-height:calc(100vh - var(--top-h, 60px) - var(--dock-h) - 26px);
+    overflow-y:auto; overscroll-behavior:contain;
+    scrollbar-width:thin; scrollbar-color:var(--line-2) transparent;
+  }
+  .side::-webkit-scrollbar{width:9px}
+  .side::-webkit-scrollbar-thumb{background:var(--line-2); border-radius:9px; border:3px solid var(--bg)}
+  .side::-webkit-scrollbar-track{background:transparent}
+}
+/* More room on a real monitor. 300px cannot hold two price columns and a
+   label without wrapping every row. */
+@media (min-width:1280px){ .wrap{grid-template-columns:minmax(0,1fr) 372px} }
+
+.cmp{background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow)}
+.cmp-h{
+  display:flex; align-items:center; gap:8px; width:100%;
+  padding:9px 14px; background:var(--sunk); border-bottom:1px solid var(--line);
+  font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  text-align:left;
+}
+button.cmp-h{border:0; border-bottom:1px solid var(--line); cursor:pointer; font-family:inherit; min-height:36px}
+button.cmp-h:hover{color:var(--ink-2)}
+.cmp-h .cmp-chev{margin-left:auto; font-size:14px; font-weight:700; line-height:1; color:var(--muted)}
+.cmp-b{padding:4px 0 10px}
+
+/* The comparison table. Three columns: what, tier A, tier B. */
+.cmp-row{
+  display:grid; grid-template-columns:minmax(0,1fr) 78px 78px; gap:8px; align-items:baseline;
+  padding:6px 14px; font-size:13px;
+}
+.cmp-row span{color:var(--muted); min-width:0}
+.cmp-row b{font-weight:700; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
+.cmp-row.head{padding-top:9px; padding-bottom:7px; border-bottom:1px solid var(--line); margin-bottom:3px}
+.cmp-row.head span{font-weight:800; color:var(--ink-2); text-transform:none; letter-spacing:0}
+.cmp-row.head b{font-size:9.5px; font-weight:800; letter-spacing:.08em; color:var(--muted)}
+.cmp-row.big b{font-size:18px; font-family:Newsreader,Georgia,serif; font-weight:500}
+.cmp-row b.pick{color:var(--red-ink)}
+.cmp-row.head b.pick{color:var(--red-ink)}
+
+.cmp-gap{
+  margin:5px 10px 7px; padding:6px 12px; border-radius:8px; background:var(--panel-2);
+  font-size:12.5px; line-height:1.45; color:var(--ink-2);
+}
+.cmp-gap b{color:var(--ink); font-weight:800}
+
+/* Full-width lines: the conclusion, not the data. */
+.cmp-line{padding:7px 14px; font-size:12.5px; line-height:1.5; color:var(--ink-2)}
+.cmp-line b{color:var(--ink)}
+.cmp-verdict{
+  margin:7px 10px 3px; padding:9px 12px; border-radius:9px; font-size:13px; line-height:1.5;
+  background:var(--green-wash); color:var(--ink); border:1px solid transparent;
+}
+.cmp-verdict.warn{background:var(--amber-wash)}
+.cmp-verdict.stop{background:var(--red-wash)}
+.cmp-verdict b{font-weight:800}
+.cmp-say{
+  margin:8px 10px 3px; padding:10px 12px; border-radius:9px;
+  background:var(--red-wash); border-left:3px solid var(--red);
+  font-family:Newsreader,Georgia,serif; font-size:14.5px; line-height:1.45; color:var(--ink);
+}
+.cmp-say .k{
+  display:block; margin-bottom:4px; font-family:"Public Sans",sans-serif;
+  font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--red-ink);
+}
+
+/* Scope list: what's in the price, what isn't. */
+.cmp-list{margin:0; padding:2px 14px 0; list-style:none; font-size:12.5px; line-height:1.5}
+.cmp-list li{position:relative; padding:3px 0 3px 17px; color:var(--ink-2)}
+.cmp-list li::before{position:absolute; left:0; top:3px; font-weight:800; color:var(--green)}
+.cmp-list li.yes::before{content:"✓"}
+.cmp-list li.no::before{content:"✗"; color:var(--red)}
+.cmp-sub{padding:3px 14px 0; font-size:11.5px; line-height:1.45; color:var(--muted)}
+
+.cmp-split{
+  margin:10px 0 2px; padding:7px 14px 3px; border-top:1px solid var(--line);
+  font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+
+/* Priced rows inside a card (the Express buy-back list, recurring plans). */
+.cmp-item{
+  display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+  padding:5px 14px; font-size:13px;
+}
+.cmp-item span{color:var(--ink-2)}
+.cmp-item b{font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
+.cmp-item.sum{border-top:1px solid var(--line); margin-top:4px; padding-top:8px}
+.cmp-item.sum span, .cmp-item.sum b{color:var(--ink); font-weight:800}
+.cmp-item.on span{color:var(--ink); font-weight:600}
+.cmp-item .tag{
+  font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--red-ink); margin-left:6px;
+}
+
+/* Mobile keeps round 30's lean screen: one collapsed disclosure, closed. */
+.cmp-mobile{background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow)}
+.cmp-mobile > summary{
+  padding:12px 14px; cursor:pointer; min-height:44px; display:flex; align-items:center;
+  font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.cmp-mobile[open] > summary{border-bottom:1px solid var(--line)}
+.cmp-mobile .cmp{border:0; border-radius:0; box-shadow:none; border-bottom:1px solid var(--line)}
+.cmp-mobile .cmp:last-child{border-bottom:0}
+
 /* ── Lookup: one search over everything she used to hunt for. ───────── */
 .sheet{
   position:fixed; inset:0; z-index:60; display:flex; flex-direction:column;
@@ -367,7 +480,7 @@ button,input,select,textarea{font:inherit; color:inherit}
 <body>
 
 <header class="top">
-  <div class="who"><b id="whoName">Call Console</b><span id="whoSub">Internal tool</span></div>
+  <div class="who"><h1 id="whoName">Call Console</h1><span id="whoSub">Internal tool</span></div>
   <div class="top-actions">
     <span class="clock" id="clock" title="Time on this call">0:00</span>
     <div class="money" id="money"><b>—</b><small>Total</small></div>
@@ -413,6 +526,7 @@ button,input,select,textarea{font:inherit; color:inherit}
   </div>
 </section>
 
+<script src="../js/rp-messages.js"></script>
 <script src="../js/rp-pricing-engine.js"></script>
 <script>
 /* =========================================================================
@@ -450,7 +564,10 @@ const rpState = {
   quotedAloud:false,
   selectedDay:null, selectedStartTime:null, bookedAt:null, calendarMonth:null,
   availableSlots:{}, slotsLoading:false, slotsError:"",
-  bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:""
+  bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:"",
+  /* Round 36: true once a partial lead has been posted for THIS call, so a
+     re-render, a step back, or a mid-call refresh can't post a second. */
+  partialLeadSent:false
 };
 
 
@@ -562,7 +679,7 @@ const SERVICE_ANGLES = {
     seasonNote: "a busy week",
     /* ASK THIS FIRST. Living-in-it \u2192 book Hourly Cleaning, easy. Moving out
        \u2192 be straight about the guarantee before booking. Some upgrade on the
-       spot; the ones who don't were never paying $459+ anyway, and a booked
+       spot; the ones who don't were never paying the full ticket anyway, and a booked
        slot beats a lost call. */
     qualifier: "Is this a move-out, or a house you're living in?",
     guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and only the full reset is backed by our deposit-protection guarantee. If you want it inspection-backed, that's Inspection Ready Move-Out.\"",
@@ -597,7 +714,7 @@ function quoteSayLine(){
   const desc = bits.length ? `for a ${bits.join(", ")} home` : "for this job";
   const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : rpFormatMoneyDisplay(rpFinalPriceCents());
   const rawVal = angle().value;
-  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that's the full price, nothing added at the door";
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || RP_MSG.price.promiseSpoken;
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
 }
 function addonsSayLine(){
@@ -669,11 +786,20 @@ const LINES = {
       const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
       return `“For a home like that I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
     },
-    coach:"Lead with whichever tier matches what they told you at the start. Inspection expected, or they're not sure → <b>“That's the one most people book — full interior reset, oven to baseboards, and if something gets flagged after you're gone we come back and fix it free.”</b> Flat no, just handing over keys → Express is an honest recommendation, not a downsell: <b>“No point paying for a guarantee nobody's going to test.”</b> Both are worth being proud to sell."
+    /* Round 33: the deposit figure for THIS home, handed to her at the
+       moment she recommends a tier. It is the argument that reframes a
+       price-sensitive caller, and it only renders once bedrooms are known. */
+    coach:()=>{
+      const d = RP_MSG.deposit.for(rpState.bedrooms);
+      const lead = d
+        ? `<b>On this home the deposit is usually ${d.amount}.</b> Say that before the price if they sound price-sensitive — it reframes the whole call. `
+        : "";
+      return lead + `Lead with whichever tier matches what they told you at the start. Inspection expected, or they're not sure → <b>“That's the one most people book — full interior reset, oven to baseboards, and if something gets flagged after you're gone we come back and fix it free.”</b> Flat no, just handing over keys → Express is an honest recommendation, not a downsell: <b>“No point paying for a guarantee nobody's going to test.”</b> Both are worth being proud to sell.`;
+    }
   },
   addons:{
     say:addonsSayLine,
-    coach:"Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. Pet odour is a crew-prep flag, not a price change. Before you move to the price, try “Sound good so far?” — hesitation is cheap to fix here and expensive to fix after the number."
+    coach:()=>`Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. <b>Then ask the military question, before you say the price, not after they push back on it:</b> “${RP_MSG.military().spoken}” This is Lawton; a large share qualify, it caps at $${RP_MSG.military().cap}, and offered up front it's a reason to book. Held back until they complain it only buys a save. Pet odour is a crew-prep flag, not a price change.`
   },
   frequency:{
     say:"“Would you want this one-time, or set up on a regular schedule?”",
@@ -732,8 +858,18 @@ function lineFor(step){
 function objectionPriceAnswer(){
   const rawVal = angle().value;
   const rawObj = angle().objection;
-  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || "that covers everything, nothing added at the door";
+  const val = (typeof rawVal === "function" ? rawVal() : rawVal) || RP_MSG.price.promiseSpoken;
   const obj = (typeof rawObj === "function" ? rawObj() : rawObj) || "";
+  /* Round 33: on a move-out, lead with the deposit rather than a defence
+     of the price. "That's more than I expected" is a comparison against
+     other cleaners; the deposit is what they are actually trying to
+     protect, and it is a bigger number than anything we charge. Only
+     fires once bedrooms are known, and only on the move-out tiers --
+     there is no deposit riding on a recurring clean. */
+  if (["moveout","moveoutrefresh"].includes(rpState.service) && rpState.bedrooms && rpFinalPrice() > 0) {
+    const dep = RP_MSG.deposit.spoken(rpState.bedrooms, Math.round(rpFinalPrice()));
+    if (dep) return `\u201cI hear you \u2014 and honestly, that's the wrong number to compare it against. ${dep}\u201d`;
+  }
   return `\u201cI hear you. ${val.charAt(0).toUpperCase()+val.slice(1)} \u2014 ${obj}\u201d`;
 }
 /* Only names an add-on that's actually on THIS order — checked against
@@ -795,8 +931,8 @@ const OBJECTIONS = [
    a:"\u201cHappy to \u2014 it comes down to bedroom count and which of two options fits, so let me get you the real number instead of guessing high. How many bedrooms and full baths, and is a landlord or property manager going to inspect the place after you leave?\u201d",
    n:()=>"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Move-Out pricing is flat by bedroom count now (no square footage, no condition tiers), so don't ask about size or condition \u2014 bedrooms and the inspection question are the only two things that change the price. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's [the price], and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause. (Inspection Ready currently starts at $"+RP_MOVEOUT_BEDROOM_TIERS[0].base+" for a 1\u20132 bedroom; the tiers screen a few questions from now gives you the real number for THIS home \u2014 read it from there, not from memory.)"},
   {q:"\u201cHave you done this before? / Are you legit?\u201d",
-   a:"\u201cWe're a veteran-owned local company, fully insured, with over 60 five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d",
-   n:"Real, verifiable numbers only \u2014 don't round up or guess. If the review count changes, this line needs updating too."},
+   a:()=>`\u201cWe're a veteran-owned local company, fully insured, with over ${RP_MSG.facts.reviewCount} five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d`,
+   n:"The review count reads from js/rp-messages.js now, so it can't go stale the way it just had (this line said 60 while every page said 61). Never round it up."},
   {q:"\u201cThat's more than I expected.\u201d",
    a:objectionPriceAnswer,
    n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
@@ -921,11 +1057,26 @@ function guardrails(){
      actually the better fit. Computed live off the same base-price
      function /book and /pricing use, so it can't drift out of sync with
      the real numbers. */
+  /* Round 35b: this used to test rpAddonsTotal() — EVERY add-on. Only the
+     four buy-backs (oven, fridge, cabinets, Detail Pass) are scope
+     Inspection Ready already includes; carpet, windows, garage and junk
+     cost the same on both tiers and travel with the customer through a
+     switch. On a 3-bedroom carrying $300 of carpet and garage the old test
+     fired and told the CSR that Inspection Ready was "$499 for the same
+     home" when the real figure was $799. Basis is now
+     rpExpressBuyBackTotal(), and the body names the carried-over add-ons
+     so the number said out loud is the number they would actually pay. */
   if(["addons","quote"].includes(s) && rpState.service==="moveoutrefresh" && !rpIsCustomQuoteOnly()){
-    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh"), addonsTotal=rpAddonsTotal();
-    if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && addonsTotal>=(irPrice-rfPrice))
+    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
+    const buyBacks=rpExpressBuyBackTotal(), carried=rpTierNeutralAddonTotal();
+    if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && buyBacks>=(irPrice-rfPrice)){
+      const nowAt=rfPrice+buyBacks+carried, switched=irPrice+carried;
+      const carriedNote = carried>0
+        ? ` The other $${carried.toFixed(0)} of add-ons costs the same either way, so it carries over.`
+        : "";
       g.push({level:"info",title:"Inspection Ready is now the better deal",
-        body:`With these add-ons, Express comes to $${(rfPrice+addonsTotal).toFixed(0)} — Inspection Ready is $${irPrice.toFixed(0)} for the same home, fully guaranteed, nothing left out. Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
+        body:`Express with these comes to $${nowAt.toFixed(0)}. The same home on Inspection Ready is $${switched.toFixed(0)} — fully guaranteed, nothing left out.${carriedNote} Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
+    }
   }
   return g;
 }
@@ -1122,7 +1273,7 @@ function screenHtml(){
     h+=`<div class="grp"><div class="grp-h">Quoted separately</div><div class="opts">${quoted.join("")}</div></div>`;
 
     h+=`<div class="grp"><div class="grp-h">Ask before you say the price</div><div class="opts">
-      ${chk("militaryDiscount",`Military or first responder`,`${Math.round(MILITARY_DISCOUNT_RATE*100)}% off, max $${MILITARY_DISCOUNT_CAP} — offer it, don't wait to be asked`)}
+      ${chk("militaryDiscount",`Military or first responder`,`${RP_MSG.military().pct}% off, max $${RP_MSG.military().cap} — offer it, don't wait to be asked`)}
       ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed it"):""}
     </div></div>`;
     return h;
@@ -1256,9 +1407,16 @@ function renderStrip(){
 
 /* The side panel is a live recap of what she has captured — the thing she
    reads back at the end, and the thing that tells her at a glance what the
-   number is built from. 1.0 used this space for the same eight scope
-   bullets on every step; those are in Lookup now, where they're searchable
-   and only appear when someone actually asks. */
+   number is built from.
+
+   Round 35 adds the compare rail underneath it (see comparePanels()). The
+   round-30 rule that emptied this column still stands and is worth
+   restating, because it is what keeps the rail from sliding back into
+   wallpaper: nothing goes in here that is merely reference. 1.0's eight
+   scope bullets are still in Lookup, where they are searchable and appear
+   only when someone actually asks. What lives here instead is the class of
+   thing a search box handles badly — a side-by-side, computed from this
+   caller's own answers. */
 function renderSide(){
   const rows=[];
   if(rpState.service) rows.push(["Service", isCustomService()?"Custom quote":(rpServices[rpState.service]||{}).name]);
@@ -1283,8 +1441,319 @@ function renderSide(){
       <div class="recap-h">On this call</div>
       ${rows.map(r=>`<div class="recap-row ${r[2]?"neg":""}"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("")}
     </div>`:""}
-    ${areaCard}`;
+    ${areaCard}
+    ${comparePanels()}`;
 }
+
+/* =========================================================================
+   COMPARE RAIL (round 35)
+   =========================================================================
+   Round 30 emptied this column deliberately: 1.0 printed the same eight
+   scope bullets on all twelve steps, the rail became wallpaper, and the
+   fix was to move reference into Lookup where it appears only when asked
+   for. That reasoning still holds on a phone.
+
+   It does not hold on the desktop this console is actually worked on. A
+   300px column sits empty for the whole call, and the question it could be
+   answering is the one a search box handles worst: "what's the difference
+   between the two?" is not a search result, it is two columns side by
+   side, and on a move-out call it is the most common question there is.
+
+   So the rule for anything that goes in here: it must be a COMPARISON, and
+   it must be about THIS call. "$499 against $249 for the 3-bedroom you're
+   talking to" gets read. The full price ladder is wallpaper again.
+
+   Everything below computes from the engine and rp-messages.js. The rail
+   cannot contradict the quote she is about to give, or the website the
+   caller very likely has open while they talk.
+   ========================================================================= */
+
+/* Open/closed state lives in localStorage, not rpState — it is how Liz
+   likes the tool set up, not a fact about this caller, so it survives
+   "Start next call" the same way her name does. */
+let cmpOpen = { alacarte:true, scope:false, recurring:true, services:true, tiers:true };
+try{
+  const raw = localStorage.getItem("rpCallConsole.cmpOpen");
+  if(raw) Object.assign(cmpOpen, JSON.parse(raw));
+}catch(e){}
+function toggleCmp(key){
+  cmpOpen[key] = !cmpOpen[key];
+  try{ localStorage.setItem("rpCallConsole.cmpOpen", JSON.stringify(cmpOpen)); }catch(e){}
+  renderSide();
+}
+
+const cmpMoney = n => (n===null||n===undefined||isNaN(n)) ? "—" : rpFormatMoneyDisplay(rpToCents(n));
+/* Four-figure numbers only show up on the recurring card's annual value, and
+   "$5760" reads as $576 at a glance. Comma them. */
+const cmpBigMoney = n => "$" + Math.round(Number(n)||0).toLocaleString("en-US");
+
+function cmpCard(key, title, body){
+  if(!body) return "";
+  const open = !!cmpOpen[key];
+  return `<section class="cmp">
+    <button class="cmp-h" type="button" aria-expanded="${open}" onclick="toggleCmp('${key}')">
+      <span>${esc(title)}</span><span class="cmp-chev" aria-hidden="true">${open?"−":"+"}</span>
+    </button>
+    ${open?`<div class="cmp-b">${body}</div>`:""}
+  </section>`;
+}
+function cmpRow(label, a, b, o){
+  o = o||{};
+  const cls = ["cmp-row", o.head?"head":"", o.big?"big":""].filter(Boolean).join(" ");
+  return `<div class="${cls}"><span>${o.raw?label:esc(label)}</span>`
+       + `<b class="${o.pick==="a"?"pick":""}">${o.raw?a:esc(a)}</b>`
+       + `<b class="${o.pick==="b"?"pick":""}">${o.raw?b:esc(b)}</b></div>`;
+}
+function cmpItem(label, value, o){
+  o = o||{};
+  const cls = ["cmp-item", o.sum?"sum":"", o.on?"on":""].filter(Boolean).join(" ");
+  return `<div class="${cls}"><span>${esc(label)}${o.tag?`<span class="tag">${esc(o.tag)}</span>`:""}</span><b>${esc(value)}</b></div>`;
+}
+function cmpSay(text){
+  return `<div class="cmp-say"><span class="k">Say</span>“${esc(text)}”</div>`;
+}
+function cmpVerdict(html, level){
+  return `<div class="cmp-verdict ${level||""}">${html}</div>`;
+}
+
+/* ---- 1. Inspection Ready vs Express -------------------------------------
+   The reason this rail exists. Both real prices for this home, the gap
+   between them, what the cheaper one leaves out, and what each of those
+   costs to add back. */
+function cmpTiers(){
+  if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
+
+  const ir = rpMoveoutTierBasePrice("moveout");
+  const ex = rpMoveoutTierBasePrice("moveoutrefresh");
+
+  /* Blocked questionnaire or an off-ladder home: the console's own guard
+     already says don't quote. Repeating a number here would undo it. */
+  if(ir===null || ex===null){
+    return cmpCard("tiers","Inspection Ready vs Express",
+      cmpVerdict("<b>Don't quote either tier on this call.</b> This home doesn't price on the ladder — take the details and log it as a callback.","stop"));
+  }
+
+  const beds = Number(rpState.bedrooms||0);
+  const known = beds>0 && ir>0 && ex>0;
+  const pick = rpState.service==="moveout" ? "a" : "b";
+  const irMath = RP_MSG.crewMath("moveout") || {};
+  const exMath = RP_MSG.crewMath("moveoutrefresh") || {};
+
+  let h = cmpRow(known?`${beds} bedroom${beds===1?"":"s"}`:"Any size", "INSPECTION", "EXPRESS", {head:true, pick});
+
+  if(known){
+    h += cmpRow("Price", cmpMoney(ir), cmpMoney(ex), {big:true, pick});
+    h += `<div class="cmp-gap"><b>${cmpMoney(ir-ex)}</b> apart — that's the whole decision.</div>`;
+  } else {
+    RP_MOVEOUT_BEDROOM_TIERS.forEach((t,i)=>{
+      const e = RP_MOVEOUT_REFRESH_BEDROOM_TIERS[i];
+      h += cmpRow(t.label, cmpMoney(t.base), cmpMoney(e?e.base:null));
+    });
+    h += `<div class="cmp-line">Ask bedrooms and these become one row.</div>`;
+  }
+
+  h += cmpRow("Cleaners", String(irMath.crew||3), String(exMath.crew||2));
+  h += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
+  if(irMath.lo && exMath.lo){
+    h += cmpRow("Hours of work", `${irMath.lo}–${irMath.hi}`, `${exMath.lo}–${exMath.hi}`);
+  }
+  h += cmpRow("Deposit backed", "Yes", "No", {pick});
+
+  h += `<div class="cmp-line">Both come back free within ${esc(RP_MSG.guarantee.window)}. Only Inspection Ready is sold as protecting a deposit — ${esc(RP_MSG.guarantee.depositName)}.</div>`;
+
+  /* The deposit anchor for THIS home. The number that reframes a caller
+     who is comparing us against a cheaper cleaner. */
+  if(known){
+    const d = RP_MSG.deposit.for(beds);
+    if(d) h += `<div class="cmp-line"><b>On the line: ${esc(d.amount)}</b> — ${esc(d.subject.toLowerCase())} around here.</div>`;
+  }
+
+  h += cmpSay(RP_MSG.tiers.chooser);
+  return cmpCard("tiers","Inspection Ready vs Express", h);
+}
+
+/* ---- 2. Express + add-ons vs just upgrading ------------------------------
+   The pricing engine has an invariant: buying back everything Express
+   leaves out must always cost MORE than paying the tier gap outright, so
+   a la carte is never the cheaper route to the full checklist. That
+   invariant is checked in the engine's comments at every price change,
+   and it has been broken and repaired once already (round 26 -> 27).
+
+   Liz has no way to see it. This card is that invariant, rendered live:
+   what Express leaves out, what each costs, what she's added so far, and
+   whether this caller has now spent past the point where switching is the
+   better deal. */
+function cmpAlaCarte(){
+  if(rpState.service!=="moveoutrefresh") return "";
+  const ir = rpMoveoutTierBasePrice("moveout");
+  const ex = rpMoveoutTierBasePrice("moveoutrefresh");
+  if(ir===null || ex===null || !rpState.bedrooms || ir<=0 || ex<=0) return "";
+
+  const beds = Number(rpState.bedrooms);
+  /* Same list the guardrail uses — see rpExpressBuyBackItems() in the
+     engine for why this must not be rpAddonsTotal(). */
+  const BUYBACK = rpExpressBuyBackItems(beds);
+  const gap  = ir - ex;
+  const all  = BUYBACK.reduce((a,r)=>a+r.price,0);
+  const on   = BUYBACK.filter(r=>r.selected);
+  const spent= rpExpressBuyBackTotal(beds);
+  const now  = ex + spent;
+  const diff = now - ir;   // positive = Express has passed Inspection Ready
+  /* Carpet, windows, garage and junk cost the same on either tier, so they
+     are excluded from the comparison above and called out separately —
+     otherwise the rail would repeat the bug it was written to catch. */
+  const carried = rpTierNeutralAddonTotal();
+
+  /* Conclusion first. This card is tall, and on a laptop the bottom of it
+     is below the fold — putting the itemised list on top meant the one
+     line she actually needs to act on was the one she could not see. The
+     running numbers and the verdict lead; the priced list underneath is
+     reference for quoting each item. */
+  let h = "";
+  /* Labelled explicitly rather than "this caller is at", because when the
+     quote also carries carpet or a garage wash this figure is deliberately
+     LOWER than the running total in the header — those cost the same on
+     either tier and would cancel out of the comparison. A vague label here
+     reads as the two disagreeing. */
+  h += cmpItem(`Express + these ${on.length===1?"one":on.length===4?"four":on.length}`, cmpMoney(now), {sum:true});
+  h += cmpItem("Inspection Ready", cmpMoney(ir));
+
+  if(spent===0){
+    h += cmpVerdict(`All four cost <b>${cmpMoney(all)}</b>. Paying the gap costs <b>${cmpMoney(gap)}</b>. Adding everything back is <b>${cmpMoney(all-gap)} worse</b> than just switching — and it still isn't guaranteed.`);
+  } else if(diff > 0){
+    h += cmpVerdict(`<b>${cmpMoney(diff)} past Inspection Ready</b> — and this one isn't deposit-backed. Switch it.`,"stop")
+       + cmpSay(`Actually, at that point Inspection Ready is the cheaper one — ${cmpMoney(ir)} instead of ${cmpMoney(now)}, and it's the one we guarantee. Want me to just put you on that?`);
+  } else if(diff === 0){
+    /* Reachable, and not rare: at 1-2 bedrooms any one flat buy-back plus a
+       Detail Pass is $200, which is exactly the tier gap. Without this branch
+       it fell into "$X under" and rendered "$0 under Inspection Ready. One
+       more add-on and switching is cheaper" — nonsense on its face, and it
+       contradicted the guardrail, which fires at >= the gap and was telling
+       her to offer the switch on the very same screen. */
+    h += cmpVerdict(`<b>Exactly level with Inspection Ready</b> — same price, less scope, no deposit backing. Switch it.`,"stop")
+       + cmpSay(`At that point it's the same money either way — ${cmpMoney(ir)} — so let me put you on Inspection Ready instead. You get the whole checklist and it's the one we guarantee.`);
+  } else if(diff > -50){
+    h += cmpVerdict(`<b>${cmpMoney(Math.abs(diff))} under Inspection Ready.</b> One more add-on and switching is cheaper.`,"warn")
+       + cmpSay(`One more of those and you're past what the full one costs — for ${cmpMoney(ir - now)} more than where you are now I can put you on Inspection Ready and it's guaranteed.`);
+  } else {
+    h += cmpVerdict(`<b>${cmpMoney(Math.abs(diff))} under Inspection Ready.</b> Room for ${on.length<4?"more":"no more"} before switching wins.`);
+  }
+  if(carried>0) h += `<div class="cmp-sub">The ${cmpMoney(carried)} of carpet, windows, garage or junk on this quote isn't in that comparison — it costs the same on either tier and carries over whichever they book.</div>`;
+
+  h += `<div class="cmp-split">What Express leaves out</div>`;
+  BUYBACK.forEach(r=>{
+    h += cmpItem(r.label, (r.selected?"":"+")+cmpMoney(r.price), {on:r.selected, tag:r.selected?"added":""});
+  });
+  h += `<div class="cmp-sub">Detail Pass is baseboards, interior windows, walls, ceiling fans, vents and light fixtures. All four are already in Inspection Ready's base price.</div>`;
+  return cmpCard("alacarte","Adding on vs upgrading", h);
+}
+
+/* ---- 3. Which service is this? ------------------------------------------
+   Callers describe a situation, not a product. The split that actually
+   matters is not move-out vs deep clean, it's "is anyone inspecting this
+   place after you leave" — one question that routes the whole call. */
+function cmpServices(){
+  if(rpState.service && rpState.step!=="service") return "";
+  if(isCustomService()) return "";
+  /* Airbnb and anything else that is custom-quote-only sits under an
+     explicit "Do not quote a price" guardrail. Printing the move-out and
+     deep ladders in the rail on that same screen directly contradicts it,
+     and a number on screen during a do-not-quote call is exactly how a
+     number ends up said out loud. */
+  if(rpIsCustomQuoteOnly() || !rpServiceIsPublic(rpState.service || "moveout")) return "";
+  const irLo = RP_MOVEOUT_BEDROOM_TIERS[0].base;
+  const irHi = RP_MOVEOUT_BEDROOM_TIERS[RP_MOVEOUT_BEDROOM_TIERS.length-1].base;
+
+  let h = cmpRow("", "MOVE-OUT", "DEEP", {head:true});
+  h += cmpRow("Price", `${cmpMoney(irLo)}–${cmpMoney(irHi)}`, cmpMoney(RP_DEEP_ANCHOR_PRICE));
+  h += cmpRow("Home", "Empty", "Lived in");
+  h += cmpRow("Time", rpMoveoutTierHours("moveout"), `${RP_DEEP_ANCHOR_HOURS}h`);
+  h += cmpRow("Deposit backed", "Yes", "No");
+  h += `<div class="cmp-line">Deep is a flat ${cmpMoney(RP_DEEP_ANCHOR_PRICE)} whatever the size; move-out is priced by bedrooms. Basic is ${cmpMoney(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours and is for an already-tidy home.</div>`;
+  h += cmpSay("Before I price it — is a landlord, property manager or housing office going to walk through and check the place after you're out?");
+  h += `<div class="cmp-line">Yes, or they're not sure → a move-out tier. A firm no and they still live there → deep or basic.</div>`;
+  return cmpCard("services","Which service is this?", h);
+}
+
+/* ---- 4. One-time vs recurring -------------------------------------------
+   Move-out is a one-shot business: every customer is acquired once and
+   never returns by design. Basic Cleaning is the only service on the
+   ladder that can become a repeat account, and the discount ladder is
+   already built — she just has never had the per-visit numbers in front
+   of her while the caller is deciding. Percentages and visit counts come
+   from rpFrequencyPlans, and the per-visit figure uses the engine's own
+   rounding so this rail can never quote a cent the estimate won't. */
+function cmpRecurring(){
+  if(rpState.service!=="maintenance") return "";
+  const base = RP_BASIC_ANCHOR_PRICE;
+  const order = ["One-Time","Monthly","Biweekly","Weekly"];
+  let h = "";
+  order.forEach(name=>{
+    const plan = rpFrequencyPlans[name];
+    if(!plan) return;
+    const per = Math.round(base * (1 - plan.discount));
+    const chosen = rpState.frequency===name;
+    const pct = plan.discount ? ` −${Math.round(plan.discount*100)}%` : "";
+    h += cmpItem(name+pct, cmpMoney(per)+" / visit", {on:chosen, tag:chosen?"chosen":""});
+  });
+  const wk = rpFrequencyPlans["Weekly"];
+  const wkPer = Math.round(base * (1 - wk.discount));
+  const wkYear = wkPer * wk.visitsPerMonth * 12;
+  h += cmpItem("A weekly account is worth", cmpBigMoney(wkYear)+" / year", {sum:true});
+  h += `<div class="cmp-sub">Internal — that's ${wk.visitsPerMonth * 12} visits at ${cmpMoney(wkPer)}, against ${cmpMoney(base)} for a one-time. Minimum on any recurring plan is ${cmpMoney(RP_RECURRING_MIN_PER_VISIT)} a visit.</div>`;
+  if(!rpState.frequency || rpState.frequency==="One-Time"){
+    h += cmpSay(`Most people start every-other-week — it's ${cmpMoney(Math.round(base*(1-rpFrequencyPlans["Biweekly"].discount)))} a visit instead of ${cmpMoney(base)}, and you can change or stop it any time.`);
+    h += cmpVerdict("Offer it once, plainly. If they hesitate, book One-Time — they can switch later, a lost booking can't.","warn");
+  }
+  return cmpCard("recurring","One-time vs recurring", h);
+}
+
+/* ---- 5. What's in the price ---------------------------------------------
+   "Does that include the oven?" is the most common question on the phone
+   and it is a scope question, not a price question. rpIncludes is the same
+   list /book renders, so the answer she gives matches the page they're
+   reading. */
+function cmpScope(){
+  const svc = rpState.service && rpIncludes[rpState.service];
+  if(!svc) return "";
+  const name = (rpServices[rpState.service]||{}).name || "";
+  let h = `<div class="cmp-line"><b>${esc(name)}</b></div>`;
+  h += `<ul class="cmp-list">` + (svc.items||[]).map(i=>`<li class="yes">${esc(i)}</li>`).join("") + `</ul>`;
+  if(svc.fineprint) h += `<ul class="cmp-list"><li class="no">${esc(svc.fineprint)}</li></ul>`;
+  return cmpCard("scope","What's in the price", h);
+}
+
+/* Mobile keeps round 30's screen: everything above collapses into one
+   closed disclosure so the phone layout is unchanged until she asks. */
+function comparePanels(){
+  /* Ordered by what she needs THIS second, not by a fixed list. Once a
+     caller has started adding things onto Express, "are they about to buy a
+     worse deal than the upgrade" outranks the tier explainer she has already
+     read to them. The rail is tall enough that first position is the only
+     position that reliably gets seen. */
+  const buyingBack = rpState.service==="moveoutrefresh"
+    && (rpState.ovenAddon || rpState.fridgeAddon || rpState.cabinetsAddon || rpState.detailPassAddon);
+  const order = buyingBack
+    ? [cmpAlaCarte(), cmpTiers(), cmpServices(), cmpRecurring(), cmpScope()]
+    : [cmpTiers(), cmpAlaCarte(), cmpServices(), cmpRecurring(), cmpScope()];
+  const cards = order.filter(Boolean).join("");
+  if(!cards) return "";
+  const desktop = !window.matchMedia || window.matchMedia("(min-width:1000px)").matches;
+  return desktop ? cards
+    : `<details class="cmp-mobile"><summary>Compare &amp; reference</summary>${cards}</details>`;
+}
+
+/* The sticky offset has to clear the real header, which changes height with
+   the safe-area inset and the name length. Measured once, then on resize. */
+function cmpSyncTopVar(){
+  const top = document.querySelector(".top");
+  if(top) document.documentElement.style.setProperty("--top-h", Math.round(top.getBoundingClientRect().height)+"px");
+}
+let cmpResizeTimer = null;
+window.addEventListener("resize", function(){
+  clearTimeout(cmpResizeTimer);
+  cmpResizeTimer = setTimeout(function(){ cmpSyncTopVar(); renderSide(); }, 160);
+});
 
 function renderDock(){
   const d = el("dock");
@@ -1360,15 +1829,33 @@ function lookupIndex(){
     answer:`Windows ${money(rpAddonCatalog.windows.basic)} basic or ${money(rpAddonCatalog.windows.premium)} premium (screens included). Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
   out.push({kind:"Price", title:"Junk hauling", answer:"Quoted separately — volume varies too much for a flat number. Never goes in the booked total without their say-so."});
   out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit one-time, ${money(RP_RECURRING_MIN_PER_VISIT)} per visit on a recurring plan.`});
-  out.push({kind:"Price", title:"Military and first responder discount", answer:`${Math.round(MILITARY_DISCOUNT_RATE*100)}% off, capped at ${money(MILITARY_DISCOUNT_CAP)}. Not combinable with other offers. Offer it before the price, don't wait to be asked.`});
+  out.push({kind:"Price", title:"Military and first responder discount", answer:`${RP_MSG.military().offer} ${RP_MSG.military().detail} Offer it BEFORE the price, don't wait to be asked.`});
 
-  out.push({kind:"Policy", title:"Deposit or payment up front?", answer:"“No deposit, nothing due today — we take payment after the clean is done and you've seen it.”", why:"Easiest true close on the list. Lead with it any time they hesitate about committing."});
-  out.push({kind:"Policy", title:"Do they need to be home?", answer:"“Nope — most move-outs are empty. Just get us a key, a lockbox code, or the property manager's contact.”", why:"Capture the access method in the notes right then."});
-  out.push({kind:"Policy", title:"Does the home need to be empty?", answer:"“It cleans best empty, and move-outs usually are. We can work around belongings, but heavy clutter or trash changes the scope.”"});
-  out.push({kind:"Policy", title:"Licensed and insured?", answer:"“Yes — licensed and insured, veteran-owned, and over sixty five-star reviews here in the Lawton area.”"});
-  out.push({kind:"Policy", title:"If something gets missed", answer:"“Call us within 48 hours and we come back and fix it, free.” Defend Your Deposit on Inspection Ready; Satisfaction Guarantee on everything else.", why:"Re-clean, not money back. Don't invent a refund policy."});
-  out.push({kind:"Policy", title:"Service area", answer:"Lawton, Fort Sill, Cache, Elgin, Medicine Park and Duncan are core. Further out, book it and note it — the office confirms coverage and travel before the date."});
-  out.push({kind:"Policy", title:"Rescheduling", answer:"“Just call or text and we'll move it — no deposit riding on it either way.”", why:"Move dates slip constantly on a PCS. Book the date they think they need."});
+  /* Round 32: every one of these used to be a second, hand-typed copy of a
+     claim /book also made, in /book's own different words. They now read
+     from js/rp-messages.js, so Liz says on the phone exactly what the
+     website says on screen — which matters most on the guarantee, where the
+     two tiers carry deliberately different promises. */
+  out.push({kind:"Say this", say:true, title:"What's actually at stake \u2014 the deposit numbers",
+    answer: (() => {
+      const money = v => "$" + v.toLocaleString("en-US");
+      const rows = RP_MSG.deposit.table.map(r => {
+        const range = r.low === r.high ? money(r.low) : money(r.low) + "\u2013" + money(r.high);
+        return `${r.beds}${r.beds === 4 ? "+" : ""} bed ${range}`;
+      }).join("  \u00b7  ");
+      return `Around here a deposit is about a month's rent \u2014 ${rows} \u2014 against $399\u2013$599 for the clean.`;
+    })(),
+    why: RP_MSG.deposit.note + " And never say they'll get it back: " + RP_MSG.guarantee.limit});
+  out.push({kind:"Policy", title:"Deposit or payment up front?", answer:`“${RP_MSG.payment.spoken}”`, why:"Easiest true close on the list. Lead with it any time they hesitate about committing."});
+  out.push({kind:"Policy", title:"Do they need to be home?", answer:`“${RP_MSG.access.notHome}”`, why:"Capture the access method in the notes right then."});
+  out.push({kind:"Policy", title:"Does the home need to be empty?", answer:`“${RP_MSG.access.empty}”`});
+  out.push({kind:"Policy", title:"Water and power", answer:RP_MSG.access.utilities});
+  out.push({kind:"Policy", title:"Licensed and insured?", answer:`“Yes — ${RP_MSG.trustSpoken()}.”`});
+  out.push({kind:"Policy", title:"If something gets missed", answer:`Inspection Ready: “${RP_MSG.guarantee.deposit()}”  ·  Everything else: “${RP_MSG.guarantee.satisfaction()}”`, why:RP_MSG.guarantee.limit});
+  out.push({kind:"Policy", title:"Service area", answer:`${RP_MSG.areaSentence()} are core. Further out, book it and note it — the office confirms coverage and travel before the date.`});
+  out.push({kind:"Policy", title:"Rescheduling", answer:`“${RP_MSG.scheduling.reschedule}”`, why:"Move dates slip constantly on a PCS. Book the date they think they need."});
+  out.push({kind:"Policy", title:"Arrival window", answer:RP_MSG.scheduling.window});
+  out.push({kind:"Price", title:"Is there anything over $599?", answer:`${RP_MSG.price.ceiling()} That's the top of the move-out ladder — a 4-bedroom and a 6-bedroom are the same number.`, why:"Worth saying out loud to anyone bracing for a big number."});
   out.push({kind:"Policy", title:"Water off, no A/C, mold or pests", answer:"The job can't be booked as normal. Take the name and number, log it as a callback, and do not say a price.", why:"A number said on the phone is the number they expect."});
   return out;
 }
@@ -1444,7 +1931,22 @@ document.addEventListener("keydown", e=>{
     if(e.key==="Enter" && e.target.tagName==="INPUT"){ e.preventDefault(); next(); }
     return;
   }
-  if(e.key==="Enter"){ e.preventDefault(); if(!el("goBtn").disabled) next(); return; }
+  /* A focused button owns its own Enter. Without this the global shortcut
+     runs instead, so tabbing to Back and pressing Enter moves the call
+     FORWARD, and tabbing to a step chip and pressing Enter advances rather
+     than jumping to that step. Pre-existing — reproduced identically on the
+     round-34 build — but round 35 put three more focusable buttons in the
+     rail, which makes it far easier to land on. The dock's Go button is
+     deliberately excluded: Enter advancing the call is its documented job,
+     and it carries the ⏎ badge that says so. */
+  const focusEl = document.activeElement;
+  const focusOwnsEnter = focusEl && focusEl !== el("goBtn") &&
+    (focusEl.tagName === "BUTTON" || focusEl.tagName === "SUMMARY" ||
+     focusEl.getAttribute("role") === "button");
+  if(e.key==="Enter"){
+    if(focusOwnsEnter) return;              // let the browser click it
+    e.preventDefault(); if(!el("goBtn").disabled) next(); return;
+  }
   if(e.key==="Backspace"){ e.preventDefault(); back(); return; }
   if(/^[1-9]$/.test(e.key)){
     const fn = KEYMAP[Number(e.key)-1];
@@ -1591,6 +2093,11 @@ function pickService(k){ markCallStart(); rpState.service=k;
   if(k!=="custom" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
 }
 function next(){
+  /* Round 36: the earliest safe moment to bank the lead. By the time she
+     leaves the caller screen the console holds a name and a number, which
+     is everything a callback needs. Everything after this is upside. */
+  rpSendCallPartialLead();
+
   if(rpState.bookingSubmitting || rpState.customLeadSaving) return;
   const f=flow(), i=stepIdx();
   if(rpState.step==="calendar"){ submitBooking(); return; }
@@ -1905,6 +2412,82 @@ async function submitBooking(){
   }
 }
 
+/* =========================================================================
+   PARTIAL LEAD CAPTURE (round 36)
+   =========================================================================
+   Measured before this existed: a caller gives a name and a number, hears
+   the price, and hangs up — and nothing reaches the CRM. logOutcome() was
+   the only capture path for a call that doesn't book, and it fires only
+   when Liz opens the End-call sheet and picks a disposition. A dropped
+   call, a closed tab, or a rushed "Start next call" lost the lead
+   completely.
+
+   /book has had the answer since the contact gate shipped: post a partial
+   the moment you have a name and a number, fire-and-forget, and let the
+   real booking or the disposition enrich it later. GHL matches on phone,
+   so the partial and whatever follows land on one contact. This is that,
+   for the phone.
+
+   Fires at most once per call. rpState.partialLeadSent persists with the
+   rest of the call state, so a refresh mid-call doesn't re-post. */
+function rpCallPartialPayload(reason){
+  return {
+    source:"RPC Call Console", booking_channel:"phone_csr",
+    lead_status:"phone_partial",
+    call_outcome:reason||"Partial — captured mid-call, call not yet resolved",
+    csr_name:rpState.csrName||"",
+    csr_lead_source:rpState.csrLeadSource||"N/A",
+    csr_call_notes:rpState.csrCallNotes||"",
+    full_name:rpState.fullName, phone:normalizePhone(rpState.phone), email:rpState.email||"",
+    service:rpState.service?((rpServices[rpState.service]||{}).name||"Not selected"):"Not selected",
+    quoted_price:(rpState.service && !rpIsCustomQuoteOnly() && rpFinalPrice()>0)
+      ? "$"+rpFinalPrice().toFixed(2) : "No quote given yet",
+    details:[
+      "PARTIAL LEAD FROM A LIVE CALL — the call had not finished when this was captured.",
+      "Treat as a callback unless a booking or an outcome follows on the same number.",
+      `Reached step: ${rpState.step}`,
+      rpState.service?`Service so far: ${(rpServices[rpState.service]||{}).name}`:"Service not chosen yet",
+      rpState.bedrooms?`Bedrooms: ${rpState.bedrooms}${rpState.bathrooms?` | Bathrooms: ${rpState.bathrooms}`:""}`:""
+    ].filter(Boolean).join("\n"),
+    submitted_at:new Date().toISOString()
+  };
+}
+
+/* Never let a capture attempt block or break the call. Everything here is
+   fire-and-forget; a failure is silent by design, because the End-call
+   sheet is still there as the deliberate path and it reports its own
+   errors loudly. */
+function rpSendCallPartialLead(reason){
+  if(rpState.partialLeadSent) return;
+  if(!rpState.fullName || rpState.fullName.trim().length<2) return;
+  if(!phoneOk(rpState.phone)) return;
+  rpState.partialLeadSent = true;
+  save();
+  try{
+    fetch(`${RP_BOOKING_API}/lead`,{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      keepalive:true, body:JSON.stringify(rpCallPartialPayload(reason))
+    }).catch(()=>{});
+  }catch(e){ /* offline, blocked, whatever — the End sheet still works */ }
+}
+
+/* The tab going away is the case the disposition sheet cannot cover, because
+   by definition nobody clicked anything. sendBeacon is the only request that
+   reliably survives it. */
+window.addEventListener("pagehide", function(){
+  if(rpState.partialLeadSent) return;
+  if(!rpState.fullName || rpState.fullName.trim().length<2) return;
+  if(!phoneOk(rpState.phone)) return;
+  if(rpState.step==="done") return;              // already booked or logged
+  try{
+    const body = JSON.stringify(rpCallPartialPayload("Partial — console closed before the call was resolved"));
+    if(navigator.sendBeacon){
+      navigator.sendBeacon(`${RP_BOOKING_API}/lead`, new Blob([body],{type:"application/json"}));
+      rpState.partialLeadSent = true; save();
+    }
+  }catch(e){}
+});
+
 /* ---------- Custom Quote fallback: no booking, just a logged lead ---------- */
 async function submitCustomLead(){
   if(rpState.customLeadSaving) return;
@@ -1973,12 +2556,9 @@ async function logOutcome(outcome){
   }
 }
 
-load(); render();
-if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
-
-
 /* ---------- Boot ---------- */
 load();
+cmpSyncTopVar();
 render();
 if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
 

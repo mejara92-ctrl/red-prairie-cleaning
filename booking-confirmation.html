@@ -219,8 +219,27 @@ h1 { font-size: clamp(28px, 7vw, 34px); margin-bottom: 10px; letter-spacing: -.0
   .steps { padding: 15px 14px 11px; }
 }
 </style>
+<style>
+/* Skip link: hidden until it takes focus, then pinned top-left.
+   #main-content already existed on most pages; this is the other half. */
+.rp-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2147483001;
+  background: #9f2027;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  font: 600 15px/1.2 Manrope, ui-sans-serif, system-ui, sans-serif;
+  text-decoration: none;
+}
+.rp-skip-link:focus { left: 0; }
+</style>
 </head>
 <body>
+<a class="rp-skip-link" href="#main-content">Skip to main content</a>
+
 <header class="rp-head">
   <a class="rp-wordmark" href="/" aria-label="Return to the Red Prairie Cleaning homepage">
     <img src="/images/logo/favicon.png" width="30" height="30" alt="">

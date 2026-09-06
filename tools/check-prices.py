@@ -109,22 +109,26 @@ def main():
 
     # A published dollar figure that must never appear unless it is current.
     # (stale_value, human_label, current_value)
+    top = p["inspection_ready"][-1]
     banned = [
-        (299, "Inspection Ready 1-2BR", p["inspection_ready"][0]),
-        (399, "Inspection Ready 3BR", p["inspection_ready"][1]),
-        (499, "Inspection Ready 4BR", p["inspection_ready"][2]),
-        (599, "Inspection Ready 5+BR", p["inspection_ready"][3]),
+        # Round 26/29 ladder, retired by round 32's $599 ceiling.
+        (459, "Inspection Ready 1-2BR (round 26)", p["inspection_ready"][0]),
+        (539, "Inspection Ready 3BR (round 26)", p["inspection_ready"][1]),
+        (619, "Inspection Ready 4BR (round 26)", top),
+        (699, "Inspection Ready 5+BR (round 26)", top),
+        (349, "Express 5+BR (retired bracket)", p["express"][-1]),
+        (240, "Detail Pass 5+BR (retired bracket)", p["detail_pass"][-1]),
+        # Round 25 ladder.
         (379, "Inspection Ready 1-2BR (round 25)", p["inspection_ready"][0]),
         (479, "Inspection Ready 3BR (round 25)", p["inspection_ready"][1]),
-        (589, "Inspection Ready 4BR (round 25)", p["inspection_ready"][2]),
+        (589, "Inspection Ready 4BR (round 25)", top),
+        # Pre-round-25.
         (179, "Express 1-2BR", p["express"][0]),
         (229, "Express 3BR", p["express"][1]),
         (279, "Express 4BR", p["express"][2]),
-        (329, "Express 5+BR", p["express"][3]),
         (149, "Basic Cleaning", p["basic"]),
-        (199, "Deep Cleaning (old 'starts at')", p["deep"]),
         (75, "Carpet per room", p["carpet"]),
-        (899, "old custom-quote ceiling", p["inspection_ready"][3]),
+        (899, "old custom-quote ceiling", top),
     ]
     # Numbers that are legitimately current elsewhere and must not be flagged
     # just because they collide with a retired price.
@@ -154,6 +158,59 @@ def main():
                             "%s:%d  $%d looks like a retired %s price (engine says $%d)\n      %s"
                             % (rel, line_no, amount, label, now, line.strip()[:140]))
                         break
+
+    # Round 32: the $599 ceiling is a promise now ("No move-out over $599"),
+    # so a published move-out figure above the engine's top tier is not just
+    # drift, it makes the promise a lie.
+    ceiling = p["inspection_ready"][-1]
+    for f in html_files():
+        rel = os.path.relpath(f, ROOT)
+        text = read(f)
+        for line_no, line in enumerate(text.splitlines(), 1):
+            if "move-out" not in line.lower() and "moveout" not in line.lower():
+                continue
+            for amount in set(int(x) for x in re.findall(r"\$(\d{3,4})\b", line)):
+                if amount > ceiling:
+                    problems.append(
+                        "%s:%d  publishes $%d on a move-out line, above the $%d ceiling\n      %s"
+                        % (rel, line_no, amount, ceiling, line.strip()[:140]))
+
+    # Round 32: claims the business makes about itself now live in
+    # js/rp-messages.js. A page that hardcodes a different review count is
+    # the exact bug that file was created to stop (/pricing said 57+ while
+    # every other page said 61+).
+    msg = read(os.path.join(ROOT, "js", "rp-messages.js"))
+    review_count = int(re.search(r"reviewCount:\s*(\d+)", msg).group(1))
+    declared_ceiling = int(re.search(r"priceCeiling:\s*(\d+)", msg).group(1))
+    if declared_ceiling != ceiling:
+        problems.append("js/rp-messages.js declares priceCeiling %d but the engine's top tier is %d"
+                        % (declared_ceiling, ceiling))
+    for f in html_files() + [os.path.join(ROOT, "book", "index.html"),
+                             os.path.join(ROOT, "call", "index.html")]:
+        rel = os.path.relpath(f, ROOT)
+        for line_no, line in enumerate(read(f).splitlines(), 1):
+            for found in re.findall(r"(\d{2,4})\+?\s*(?:five-star\s+)?(?:reviews|ratings)", line, re.I):
+                if int(found) != review_count:
+                    problems.append(
+                        "%s:%d  says %s reviews, rp-messages.js says %d\n      %s"
+                        % (rel, line_no, found, review_count, line.strip()[:140]))
+
+    # Round 34: the meta descriptions now lead with a real price, because a
+    # published number is this business's biggest differentiator in a SERP
+    # full of "call for a quote". That makes the description a drift surface:
+    # it is the one place a stale price is invisible on the page itself and
+    # visible to every searcher. Every dollar figure in a description must be
+    # a live engine number.
+    for f in html_files():
+        rel = os.path.relpath(f, ROOT)
+        for line_no, line in enumerate(read(f).splitlines(), 1):
+            if 'name="description"' not in line:
+                continue
+            for amount in set(int(x) for x in re.findall(r"\$(\d{2,4})\b", line)):
+                if amount not in current:
+                    problems.append(
+                        "%s:%d  meta description publishes $%d, which is not a live engine price\n      %s"
+                        % (rel, line_no, amount, line.strip()[:140]))
 
     # Copy claims that have to track a constant, not just a dollar figure.
     text_rules = [

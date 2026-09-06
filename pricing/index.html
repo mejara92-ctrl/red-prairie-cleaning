@@ -13,7 +13,7 @@
 <script src="/js/rp-link-attribution.js" defer></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Cleaning Prices in Lawton, OK | Red Prairie Cleaning</title>
-<meta content="Every Red Prairie Cleaning price, published up front. Move-out from $199, deep cleaning $300, carpet $50/room — Lawton, Fort Sill and Southwest Oklahoma." name="description"/>
+<meta content="Every Red Prairie Cleaning price, published up front. Move-out $199–$599, deep cleaning $300, carpet $50/room — Lawton, Fort Sill and Southwest Oklahoma." name="description"/>
 <link href="https://redprairiecleaning.com/pricing/" rel="canonical"/>
 <meta content="website" property="og:type"/>
 <meta content="Red Prairie Cleaning" property="og:site_name"/>
@@ -50,9 +50,30 @@
     "@type": "AggregateOffer",
     "priceCurrency": "USD",
     "lowPrice": "150",
-    "highPrice": "699",
+    "highPrice": "599",
     "offerCount": "6"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://redprairiecleaning.com/pricing/#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://redprairiecleaning.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Pricing",
+      "item": "https://redprairiecleaning.com/pricing/"
+    }
+  ]
 }
 </script>
 
@@ -168,8 +189,27 @@ footer a{color:var(--red);font-weight:700}
    site-wide rule added there skipped it -- its header and footer links,
    including the phone number, were 16px tall on a phone. */
 header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min-height:44px; }
-</style></head>
+</style><style>
+/* Skip link: hidden until it takes focus, then pinned top-left.
+   #main-content already existed on most pages; this is the other half. */
+.rp-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2147483001;
+  background: #9f2027;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  font: 600 15px/1.2 Manrope, ui-sans-serif, system-ui, sans-serif;
+  text-decoration: none;
+}
+.rp-skip-link:focus { left: 0; }
+</style>
+</head>
 <body>
+<a class="rp-skip-link" href="#main-content">Skip to main content</a>
+
 
 <header class="navbar">
 <div class="nav-container">
@@ -190,7 +230,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 </div>
 </header>
 
-<main>
+<main id="main-content">
 
 <section class="hero">
 <div class="wrap">
@@ -204,7 +244,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <li>Minimum charge $150 per visit — $115 on recurring plans</li>
 </ul>
 <a class="hero-cta" href="/book">Get my exact price</a>
-<p class="hero-note">★ 5.0 on Google · 57+ ratings · Licensed, insured &amp; veteran-owned</p>
+<p class="hero-note">★ 5.0 on Google · 61+ ratings · Licensed, insured &amp; veteran-owned</p>
 </div>
 </section>
 
@@ -217,10 +257,9 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <caption>Base price by bedroom count</caption>
 <thead><tr><th scope="col">Bedrooms</th><th scope="col" style="text-align:right">Move-Out Express</th><th scope="col" style="text-align:right">Inspection Ready</th></tr></thead>
 <tbody>
-<tr><td>1–2 bedrooms</td><td class="price">$199</td><td class="price">$459</td></tr>
-<tr><td>3 bedrooms</td><td class="price">$249</td><td class="price">$539</td></tr>
-<tr><td>4 bedrooms</td><td class="price">$299</td><td class="price">$619</td></tr>
-<tr><td>5+ bedrooms</td><td class="price">$349</td><td class="price">$699</td></tr>
+<tr><td>1–2 bedrooms</td><td class="price">$199</td><td class="price">$399</td></tr>
+<tr><td>3 bedrooms</td><td class="price">$249</td><td class="price">$499</td></tr>
+<tr><td>4+ bedrooms <span style="color:var(--ink-soft);font-weight:600">(four, five, six — same price)</span></td><td class="price">$299</td><td class="price">$599</td></tr>
 </tbody>
 </table>
 
@@ -232,8 +271,13 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 </ul>
 </div>
 
+<div class="worked" style="border-color:rgba(159,32,39,.3);background:rgba(159,32,39,.05)">
+<p style="margin:0 0 6px"><b>What's actually on the line.</b> Around Lawton a security deposit runs about a month's rent — roughly <b>$600</b> on a one-bedroom, <b>$850–$900</b> on a two, <b>$1,100–$1,200</b> on a three, and <b>$1,300–$1,400</b> on a four. Except on the smallest homes, Inspection Ready costs less than half of what you're trying to get back.</p>
+<p style="margin:0;font-size:13px;color:var(--ink-soft)">Deposits vary by landlord and lease — these are typical local figures, not a quote on yours. And to be plain about it: we re-clean what we missed. We don't decide whether a landlord returns a deposit, and we'd never promise that.</p>
+</div>
+
 <div class="worked">
-<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$539</b> for Inspection Ready, or <b>$249</b> for Express, bathroom count included at no extra charge either way. With the military discount, Inspection Ready runs <b>$514</b>. That's the number you pay — no walkthrough surprises.</p>
+<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$499</b> for Inspection Ready, or <b>$249</b> for Express, bathroom count included at no extra charge either way. With the military discount, Inspection Ready runs <b>$474</b>. That's the number you pay — no walkthrough surprises.</p>
 </div>
 
 <div class="callout" style="margin-top:22px">
@@ -267,7 +311,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <div class="ledger-row"><span>Bathrooms: toilet, tub/shower, sink, mirror</span><span>Included</span></div>
 <div class="ledger-row"><span>All floors vacuumed &amp; mopped</span><span>Included</span></div>
 <div class="ledger-row"><span>Trash out, light fixtures dusted, glass &amp; mirrors</span><span>Included</span></div>
-<div class="ledger-foot">Not part of the base Express price: oven interior, refrigerator interior, inside cabinets &amp; closets, and a Detail Pass covering baseboards, interior windows, walls, and ceiling fans/vents/light fixtures. Oven, fridge and cabinets are each a $50 add-on; the Detail Pass runs $150–$240 by home size (see Optional add-ons below). Inspection Ready includes all of it already.</div>
+<div class="ledger-foot">Not part of the base Express price: oven interior, refrigerator interior, inside cabinets &amp; closets, and a Detail Pass covering baseboards, interior windows, walls, and ceiling fans/vents/light fixtures. Oven, fridge and cabinets are each a $50 add-on; the Detail Pass runs $150–$210 by home size (see Optional add-ons below). Inspection Ready includes all of it already.</div>
 </div>
 
 <div class="callout">
@@ -346,7 +390,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <tr><td>Refrigerator interior <span style="color:var(--ink-soft);font-weight:600">(already included on Inspection Ready; add-on for Express)</span></td><td class="price">$50</td></tr>
 <tr><td>Oven interior <span style="color:var(--ink-soft);font-weight:600">(already included on Inspection Ready; add-on for Express)</span></td><td class="price">$50</td></tr>
 <tr><td>Inside cabinets &amp; closets <span style="color:var(--ink-soft);font-weight:600">(already included on Inspection Ready; add-on for Express)</span></td><td class="price">$50</td></tr>
-<tr><td>Detail Pass — baseboards, interior windows, walls, ceiling fans, vents &amp; light fixtures <span style="color:var(--ink-soft);font-weight:600">(already included on Inspection Ready; add-on for Express, by bedroom count)</span></td><td class="price">$150–$240</td></tr>
+<tr><td>Detail Pass — baseboards, interior windows, walls, ceiling fans, vents &amp; light fixtures <span style="color:var(--ink-soft);font-weight:600">(already included on Inspection Ready; add-on for Express, by bedroom count)</span></td><td class="price">$150–$210</td></tr>
 <tr><td>Carpet cleaning <span style="color:var(--ink-soft);font-weight:600">(added to any other cleaning)</span></td><td class="price">$50 / room</td></tr>
 <tr><td>Carpet pet enzyme treatment <span style="color:var(--ink-soft);font-weight:600">(with carpet cleaning)</span></td><td class="price">$25 / room</td></tr>
 <tr><td>Junk hauling</td><td class="price">Quoted separately</td></tr>

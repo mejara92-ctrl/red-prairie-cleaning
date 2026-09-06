@@ -16,7 +16,7 @@
 <script src="/js/rp-link-attribution.js" defer></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Move-Out Resource Center | Red Prairie Cleaning</title>
-<meta content="Red Prairie Cleaning's Move-Out Resource Center for renters, military families, homeowners, landlords, and property managers in Lawton, Fort Sill, Cache, Elgin, and Southwest Oklahoma." name="description"/>
+<meta content="Guides for renters and PCS families in Lawton and Fort Sill: what landlords check at move-out, how to protect your deposit, and what a clean costs." name="description"/>
 <link href="https://redprairiecleaning.com/move-out-resource-center/" rel="canonical"/>
 <link href="/favicon.png" rel="icon" type="image/png"/>
 <meta content="#9f2027" name="theme-color"/>
@@ -37,7 +37,6 @@
 <link as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="preload"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" media="print" onload="this.media='all'" rel="stylesheet"/>
 <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/></noscript>
-<link as="style" crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/>
 <link as="image" href="/images/hero/hero-cleaning-team.webp" rel="preload"/>
 <script type="application/ld+json">
   {
@@ -50,7 +49,14 @@
         "url": "https://redprairiecleaning.com/",
         "telephone": "+15802150915",
         "email": "admin@redprairiecleaning.com",
-        "areaServed": ["Lawton, OK", "Fort Sill, OK", "Cache, OK", "Elgin, OK", "Medicine Park, OK", "Southwest Oklahoma"],
+        "areaServed": [
+          "Lawton, OK",
+          "Fort Sill, OK",
+          "Cache, OK",
+          "Elgin, OK",
+          "Medicine Park, OK",
+          "Southwest Oklahoma"
+        ],
         "image": "https://redprairiecleaning.com/images/social/red-prairie-og.jpg"
       },
       {
@@ -58,8 +64,28 @@
         "@id": "https://redprairiecleaning.com/move-out-resource-center/#collection",
         "name": "Move-Out Resource Center",
         "description": "A collection of move-out cleaning guides, PCS cleaning resources, deposit preparation tips, and inspection-ready checklists for Lawton and Fort Sill.",
-        "publisher": { "@id": "https://redprairiecleaning.com/#localbusiness" },
+        "publisher": {
+          "@id": "https://redprairiecleaning.com/#localbusiness"
+        },
         "mainEntityOfPage": "https://redprairiecleaning.com/move-out-resource-center/"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://redprairiecleaning.com/move-out-resource-center/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://redprairiecleaning.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Move-Out Resource Center",
+            "item": "https://redprairiecleaning.com/move-out-resource-center/"
+          }
+        ]
       }
     ]
   }
@@ -78,7 +104,7 @@
     .footer{background:#101010;color:#fff;text-align:center;padding:34px 18px}.footer img{width:150px;margin:0 auto 12px}.footer p{color:#ddd;margin:6px 0;font-size:14px}
     @media(min-width:760px){.hero-buttons{display:flex}.hero-buttons a{width:auto}.trust-bar{grid-template-columns:repeat(4,1fr)}.guide-grid{grid-template-columns:repeat(3,1fr)}.category-list{grid-template-columns:repeat(3,1fr)}}
   </style>
-<noscript data-rp="async-css-fallback"><link href="../css/style.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/></noscript><link href="/css/rp-legacy-theme.css" rel="stylesheet"/>
+<noscript data-rp="async-css-fallback"><link href="../css/style.css" rel="stylesheet"/></noscript><link href="/css/rp-legacy-theme.css" rel="stylesheet"/>
 
 <style id="rp-footer-links">
 /* Round 29: crawlable internal-link block for the four pages whose footer
@@ -96,8 +122,27 @@
 .rp-footer-links [aria-current=page]{opacity:.55;font-weight:700}
 @media (max-width:600px){.rp-footer-links{padding-inline:14px}.rp-footer-links ul{gap:4px 14px}}
 </style>
+<style>
+/* Skip link: hidden until it takes focus, then pinned top-left.
+   #main-content already existed on most pages; this is the other half. */
+.rp-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2147483001;
+  background: #9f2027;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  font: 600 15px/1.2 Manrope, ui-sans-serif, system-ui, sans-serif;
+  text-decoration: none;
+}
+.rp-skip-link:focus { left: 0; }
+</style>
 </head>
 <body>
+<a class="rp-skip-link" href="#main-content">Skip to main content</a>
+
 <header class="navbar">
 <div class="nav-container">
 <a class="logo rp-site-wordmark" href="/" aria-label="Red Prairie Cleaning home">
@@ -114,7 +159,7 @@
 
 <main id="main-content"><section class="hero">
 <div class="hero-overlay">
-<span class="eyebrow"><i class="fa-solid fa-book-open"></i>  Red Prairie Cleaning Guides</span>
+<span class="eyebrow"><i class="fa-solid fa-book-open" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.8C10.3 5.3 7.9 4.6 5 4.6H2.8v13H5c2.9 0 5.3.7 7 2.2"/><path d="M12 6.8c1.7-1.5 4.1-2.2 7-2.2h2.2v13H19c-2.9 0-5.3.7-7 2.2"/><path d="M12 6.8v13"/></g></svg></i>  Red Prairie Cleaning Guides</span>
 <h1>Move-Out Resource Center</h1>
 <p>Practical cleaning guides for renters, military families, homeowners, landlords, and property managers preparing homes for their next chapter in Lawton, Fort Sill, and Southwest Oklahoma.</p>
 <div class="hero-buttons">
@@ -123,10 +168,10 @@
 </div>
 </div>
 </section><div class="trust-bar">
-<div class="trust-card"><i class="fa-solid fa-house-circle-check"></i><b>Inspection Ready</b><p>Move-out focused</p></div>
-<div class="trust-card"><i class="fa-solid fa-key"></i><b>Key Return</b><p>Inspection preparation</p></div>
-<div class="trust-card"><i class="fa-solid fa-person-military-rifle"></i><b>Fort Sill PCS</b><p>Military move support</p></div>
-<div class="trust-card"><i class="fa-solid fa-calendar-check"></i><b>Book Online</b><p>Estimate and reserve</p></div>
+<div class="trust-card"><i class="fa-solid fa-house-circle-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.2L12 4l8.5 7.2"/><path d="M6 9.7V20h12V9.7"/><path d="M9.2 14.6l2.2 2.2 4.2-4.4"/></g></svg></i><b>Inspection Ready</b><p>Move-out focused</p></div>
+<div class="trust-card"><i class="fa-solid fa-key" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="16.5" r="4.2"/><path d="M10.6 13.6L20.5 3.7"/><path d="M16.4 7.8l2.4 2.4M14.2 10l1.9 1.9"/></g></svg></i><b>Key Return</b><p>Inspection preparation</p></div>
+<div class="trust-card"><i class="fa-solid fa-person-military-rifle" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.6 7.4h12.8"/><path d="M8.6 7.4C8.6 5.5 10 4.2 12 4.2s3.4 1.3 3.4 3.2"/><circle cx="12" cy="12.1" r="2.9"/><path d="M5.9 21.2v-.9c0-2.9 2.7-4.7 6.1-4.7s6.1 1.8 6.1 4.7v.9"/></g></svg></i><b>Fort Sill PCS</b><p>Military move support</p></div>
+<div class="trust-card"><i class="fa-solid fa-calendar-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8.8 15.2l2.2 2.2 4.2-4.4"/></g></svg></i><b>Book Online</b><p>Estimate and reserve</p></div>
 </div><section id="guides">
 <div class="wrap">
 <div class="section-kicker">Start here</div>
@@ -144,12 +189,12 @@
 <h2>What this hub will cover</h2>
 <p class="section-text">This is not a random blog. It is a focused library around move-outs, inspections, turnovers, PCS moves, carpets, and preparing homes for their next chapter.</p>
 <div class="category-list">
-<div class="category-card"><i class="fa-solid fa-building"></i><h3>Renters</h3><p>Apartment move-out cleaning, deposit preparation, returning keys, and common move-out mistakes.</p></div>
-<div class="category-card"><i class="fa-solid fa-person-military-pointing"></i><h3>Military</h3><p>Fort Sill PCS cleaning timelines, military housing expectations, and move-out scheduling tips.</p></div>
-<div class="category-card"><i class="fa-solid fa-house"></i><h3>Homeowners</h3><p>Move-in cleaning, preparing a house to sell, deep cleaning before listings, and open-house prep.</p></div>
-<div class="category-card"><i class="fa-solid fa-clipboard-check"></i><h3>Property Managers</h3><p>Turnover cleaning standards, inspection-ready homes, vendor preparation, and faster make-readies.</p></div>
-<div class="category-card"><i class="fa-solid fa-rug"></i><h3>Carpet Cleaning</h3><p>Carpet extraction cleaning before move-out, pet hair, odors, traffic lanes, and lease requirements.</p></div>
-<div class="category-card"><i class="fa-solid fa-circle-question"></i><h3>FAQ Library</h3><p>Short answers to common questions about pricing, timing, scope, add-ons, garages, windows, and carpets.</p></div>
+<div class="category-card"><i class="fa-solid fa-building" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><rect x="5" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="6.5" width="2.4" height="2.4" fill="currentColor"/><rect x="8" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="13.6" y="11.3" width="2.4" height="2.4" fill="currentColor"/><rect x="9.5" y="16.3" width="5" height="4.7" fill="currentColor"/></svg></i><h3>Renters</h3><p>Apartment move-out cleaning, deposit preparation, returning keys, and common move-out mistakes.</p></div>
+<div class="category-card"><i class="fa-solid fa-person-military-pointing" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.6 7.4h12.8"/><path d="M8.6 7.4C8.6 5.5 10 4.2 12 4.2s3.4 1.3 3.4 3.2"/><circle cx="12" cy="12.1" r="2.9"/><path d="M5.9 21.2v-.9c0-2.9 2.7-4.7 6.1-4.7s6.1 1.8 6.1 4.7v.9"/></g></svg></i><h3>Military</h3><p>Fort Sill PCS cleaning timelines, military housing expectations, and move-out scheduling tips.</p></div>
+<div class="category-card"><i class="fa-solid fa-house" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.2L12 4l8.5 7.2"/><path d="M6 9.7V20.3h12V9.7"/><path d="M10.1 20.3v-5.1h3.8v5.1"/></g></svg></i><h3>Homeowners</h3><p>Move-in cleaning, preparing a house to sell, deep cleaning before listings, and open-house prep.</p></div>
+<div class="category-card"><i class="fa-solid fa-clipboard-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="2.3" width="6" height="3.6" rx="1.2"/><path d="M9.2 13.6l2.2 2.2 4.2-4.4"/></g></svg></i><h3>Property Managers</h3><p>Turnover cleaning standards, inspection-ready homes, vendor preparation, and faster make-readies.</p></div>
+<div class="category-card"><i class="fa-solid fa-rug" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.6" y="6.4" width="16.8" height="11.2" rx="2"/><path d="M12 9.1l3.1 2.9-3.1 2.9-3.1-2.9z" stroke-width="1.6"/></g><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6.2 17.6v2.1M9.4 17.6v2.1M12 17.6v2.1M14.6 17.6v2.1M17.8 17.6v2.1"/></g></svg></i><h3>Carpet Cleaning</h3><p>Carpet extraction cleaning before move-out, pet hair, odors, traffic lanes, and lease requirements.</p></div>
+<div class="category-card"><i class="fa-solid fa-circle-question" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.2 3.1c-.8.3-1.1.9-1.1 1.7"/></g><circle cx="11.8" cy="17.2" r="1.15" fill="currentColor"/></svg></i><h3>FAQ Library</h3><p>Short answers to common questions about pricing, timing, scope, add-ons, garages, windows, and carpets.</p></div>
 </div>
 </div>
 </section><section>

@@ -602,6 +602,33 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
   margin-top: 7px; font-size: 11.5px; font-weight: 700; color: var(--muted);
 }
 .rp-tier-quote figcaption span { color: #c8901f; letter-spacing: .06em; }
+/* The price ceiling, stated on the tier screen. Deliberately quiet — it is
+   reassurance for someone bracing for a big number, not a promotion. */
+.rp-ceiling-note {
+  margin: 0 0 4px; padding: 8px 12px; border-radius: 12px;
+  background: rgba(24,107,77,.07); border: 1px solid rgba(24,107,77,.26);
+  font-size: 13px; font-weight: 700; color: #145c42; text-align: center; line-height: 1.4;
+}
+/* Round 33: what's actually on the line. Given the page's most emphatic
+   quiet treatment — bordered, centred, above the cards — because it is the
+   one sentence most likely to decide which tier gets chosen. */
+.rp-deposit-note {
+  margin: 2px 0 6px; padding: 11px 13px; border-radius: 14px;
+  background: rgba(159,32,39,.055); border: 1px solid rgba(159,32,39,.26);
+  text-align: center;
+}
+.rp-deposit-note strong {
+  display: block; font-size: 14.5px; font-weight: 800;
+  line-height: 1.42; color: var(--red-dark);
+}
+.rp-deposit-note small {
+  display: block; margin-top: 5px; font-size: 11.5px; font-weight: 600;
+  line-height: 1.4; color: var(--muted);
+}
+.rp-deposit-inline {
+  margin: 8px 0 0; text-align: center;
+  font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--red-dark);
+}
 
 /* Round 31: what the price buys, and the two things that lower the cost of
    saying yes. */
@@ -1113,6 +1140,30 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 
 /* ============ LEAD FORM ============ */
 .rp-lead-form { display: grid; gap: 9px; }
+
+.rp-gate-preview{
+  margin:2px auto 14px; max-width:420px; padding:14px 16px; border-radius:14px;
+  background:#fff8f0; border:1px solid #f0d9c0; text-align:center;
+}
+.rp-gate-price{margin:0; font-size:17px; line-height:1.5; color:#151515}
+.rp-gate-price b{font-weight:800; white-space:nowrap}
+.rp-gate-after{margin:6px 0 0; font-size:13.5px; line-height:1.45; color:#666}
+.rp-lead-known{
+  display:flex; align-items:center; gap:12px; justify-content:space-between;
+  padding:12px 14px; margin-bottom:12px; border-radius:12px;
+  background:#f7f7f7; border:1px solid #e6e6e6; text-align:left;
+}
+.rp-lead-known b{font-weight:800}
+.rp-lead-known-k{
+  display:block; font-size:10.5px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:#777; margin-bottom:3px;
+}
+.rp-lead-change{
+  flex:0 0 auto; min-height:44px; padding:0 14px; border-radius:9px; cursor:pointer;
+  background:#fff; border:1px solid #ccc; color:#151515; font:700 14px/1 inherit;
+}
+.rp-lead-change:hover{border-color:#9f2027; color:#9f2027}
+
 .rp-lead-field label {
   display: block;
   font-size: 12.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
@@ -1143,6 +1194,11 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
 }
 .rp-lead-field textarea { min-height: 54px; resize: vertical; }
 .rp-lead-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 9px; }
+/* An author `display` rule outranks the UA stylesheet's [hidden] rule, so
+   without this the collapsed contact row stayed on screen with the
+   attribute set — which the round-36 test caught by counting what was
+   actually visible rather than trusting the attribute. */
+.rp-lead-row[hidden] { display: none; }
 .rp-lead-row-contact { grid-template-columns: 1fr 1.05fr; }
 .rp-error {
   display: none;
@@ -2768,14 +2824,15 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
       <details class="rp-animated-details"><summary>How should I prepare?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Remove personal items, important documents, and loose trash unless junk hauling was selected. Water and electricity must be available.</p></div></div></details>
       <details class="rp-animated-details"><summary>What do the optional add-ons cover?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Tap any add-on for its exact scope and price. Garage floor washing requires an empty garage; exterior window washing has a basic and a premium (screens included) option; and junk or trash hauling is quoted separately based on volume rather than a flat price, since a truckload can vary so much.</p></div></div></details>
       <details class="rp-animated-details"><summary>How long will the cleaning take?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>Your estimate shows the expected time and team size. Actual time varies with the home, access, and condition.</p></div></div></details>
-      <details class="rp-animated-details"><summary>What if something is missed?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>If we miss something in the selected scope, contact us within 48 hours and we'll return to fix it, free — that's Defend Your Deposit™ on Inspection Ready Move-Out, or our Satisfaction Guarantee on every other service, including Move-Out Express.</p></div></div></details>
-      <p class="rp-faq-footnote">Serving Lawton, Fort Sill, Cache, Elgin, Medicine Park, Duncan, and surrounding Southwest Oklahoma communities. Military and first responders save 10% (up to $25).</p>
+      <details class="rp-animated-details"><summary>What if something is missed?</summary><div class="rp-details-animate-wrap"><div class="rp-details-animate-inner"><p>If we miss something in the selected scope, contact us within 48 hours and we come back and fix it, free — that's Defend Your Deposit™ on Inspection Ready, and our Satisfaction Guarantee on everything else, Move-Out Express included.</p></div></div></details>
+      <p class="rp-faq-footnote" data-rp-msg="areaFootnote"></p>
 
       <button class="rp-primary rp-faq-return" type="button" onclick="rpCloseFaq()">Return to Booking</button>
     </div>
   </section>
 </div>
 
+<script src="../js/rp-messages.js"></script>
 <script src="../js/rp-pricing-engine.js"></script>
 <script>
 /* =========================================================================
@@ -3178,7 +3235,7 @@ function rpScreenHtml() {
         <h1>From move-out to move-in, we've got your home covered.</h1>
         <p class="rp-hero-onphoto-sub">We stand behind every clean, and we always do right by you.</p>
         <div class="rp-trust">
-          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} 5.0 Google Rating · 61+ Reviews</a>
+          <a href="https://maps.app.goo.gl/BrREqvo79hKp2TtM8" target="_blank" rel="noopener" onclick="rpTrack('reviews_tap')">${rpIcon("star","rp-ic rp-ic-sm amber")} ${RP_MSG.facts.rating} Google Rating · ${RP_MSG.facts.reviewCount}+ Reviews</a>
           <span>${rpIcon("shield","rp-ic rp-ic-sm")} Transparent Pricing</span>
           <span>${rpIcon("clock","rp-ic rp-ic-sm")} Same-Day Availability</span>
         </div>
@@ -3187,7 +3244,7 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices for your home, in about a minute.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:`Two real prices in about a minute. ${RP_MSG.price.ceiling()}`, featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
@@ -3358,8 +3415,8 @@ function rpScreenHtml() {
       const crew = featured ? 3 : 2;
       const alreadyChosen = rpState.moveoutTierChosen && rpState.service === service;
       const guaranteeLine = featured
-        ? `<b>Protects your security deposit</b> <span class="rp-tier-guarantee-brand">(Defend Your Deposit™)</span>`
-        : "Satisfaction Guaranteed";
+        ? `<b>${RP_MSG.guarantee.depositShort}</b> <span class="rp-tier-guarantee-brand">(${RP_MSG.guarantee.depositName})</span>`
+        : RP_MSG.guarantee.satisfactionShort;
       return `
         <div class="rp-tier-card ${featured ? "is-featured" : ""} ${alreadyChosen ? "is-chosen" : ""}">
           ${featured ? `<span class="rp-tier-badge">Most Popular</span>` : ""}
@@ -3392,6 +3449,29 @@ function rpScreenHtml() {
       ${eyebrow}
       <h2>Here's what fits your home</h2>
       <p class="rp-sub">Two ways to do it. Pick the one you actually need.</p>
+      ${/* Round 32: the $599 cap is the most sellable thing about the new
+           ladder, and this is the screen where someone is bracing for a
+           number. Reads the ceiling from the message library, which reads
+           it from the engine's top tier — so it can never promise a cap
+           the price list doesn't keep. */""}
+      ${/* Round 33: the deposit anchor REPLACES the "$599 ceiling" line that
+           was here. Both are good, but this screen's job is choosing
+           between a guaranteed clean and a cheaper one, and the honest
+           argument for the guaranteed one was never "ours is better" — it
+           is what's sitting on the other side of the walkthrough. The
+           ceiling reassures about the size of a number; this answers the
+           question actually being asked. Stacking both would have put two
+           coloured boxes above the cards, so the ceiling stays on the
+           service list and /pricing instead.
+
+           Figures come from RP_MSG.deposit — per bedroom count, hedged,
+           and the "less than half" half of the claim only appears at
+           sizes where it is arithmetically true. Renders nothing at all
+           until we know the bedroom count. */""}
+      ${(() => {
+        const line = RP_MSG.deposit.line(rpState.bedrooms, rpMoveoutTierBasePrice("moveout"));
+        return line ? `<p class="rp-deposit-note"><strong>${line}</strong><small>${RP_MSG.deposit.note}</small></p>` : "";
+      })()}
       <div class="rp-tier-grid">
         ${tierCard("moveout")}
         ${tierCard("moveoutrefresh")}
@@ -3446,7 +3526,7 @@ function rpScreenHtml() {
             buy Express add-ons before they had chosen Express. The scope
             table above already shows every one of those four rows with
             its real price, which is the part that helps them decide. */""}
-      <p class="rp-fineprint">Not sure? If a landlord, property manager, or housing office will inspect the home after you leave \u2014 or you're listing it for sale \u2014 Inspection Ready is the one that protects your security deposit if anything gets missed.</p>
+      <p class="rp-fineprint">Not sure? ${RP_MSG.tiers.chooser}</p>
     </div>` };
   }
 
@@ -3874,14 +3954,22 @@ function rpEstimateScreen(eyebrow) {
              shows, so it can't drift from what was promised there. */""}
         ${(() => {
           if (!["moveout", "moveoutrefresh"].includes(rpState.service) || noGuaranteedPrice) return "";
-          const crew = rpState.service === "moveout" ? 3 : 2;
-          const hrs = (rpMoveoutTierHours(rpState.service).match(/\d+/g) || []).map(Number);
-          if (hrs.length < 2) return "";
-          return `<p class="rp-price-math">${crew} cleaners on site for ${hrs[0]}\u2013${hrs[1]} hours \u2014 <strong>${crew*hrs[0]}\u2013${crew*hrs[1]} hours of work</strong></p>`;
+          const m = RP_MSG.crewMath(rpState.service);
+          return m ? `<p class="rp-price-math">${m.full}</p>` : "";
+        })()}
+        ${/* Round 33: on Inspection Ready only \u2014 reinforcement for a
+             decision already made, not a second upsell. Express's estimate
+             screen deliberately doesn't get this: it already carries the
+             switch link, and round 31 removed a duplicate of that upsell
+             from exactly this spot. */""}
+        ${(() => {
+          if (rpState.service !== "moveout" || noGuaranteedPrice) return "";
+          const line = RP_MSG.deposit.line(rpState.bedrooms, rpFinalPrice());
+          return line ? `<p class="rp-deposit-inline">${line}</p>` : "";
         })()}
         ${(() => {
           const gtype = rpGuaranteeType();
-          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>We guarantee this clean.</strong> This is a full reset of the home, done by a real crew, however long it takes to get there. If your landlord flags something we missed, tell us within 48 hours and we'll come back and make it right, free. That's Defend Your Deposit\u2122.</span></div>`;
+          if (gtype === "deposit") return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>We guarantee this clean.</strong> A full reset of the home, done by a real crew. ${RP_MSG.guarantee.deposit()}</span></div>`;
           if (gtype === "satisfaction") {
             /* Round 31: this used to append "Need it guaranteed to pass a
                landlord or PM inspection? Switch to Inspection Ready before
@@ -3891,7 +3979,7 @@ function rpEstimateScreen(eyebrow) {
                single largest block on the screen a paragraph about why the
                thing they just chose might be wrong. The link stays; the
                duplicate sentence goes. */
-            return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>Satisfaction Guaranteed.</strong> Not happy with something we cleaned? Tell us within 48 hours and we'll come back and make it right, free.</span></div>`;
+            return `<div class="rp-guarantee-light">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>${RP_MSG.guarantee.satisfactionShort}.</strong> ${RP_MSG.guarantee.satisfaction()}</span></div>`;
           }
           return `<div class="rp-guarantee-light">${rpIcon("clock","rp-ic rp-ic-sm")}<span>You're booking <strong>${rpState.hourCount || HOURLY_MIN_HOURS} hours</strong> of our time on your priority list, in the order you set it. It's not a finished checklist. Because you're setting the scope, the Defend Your Deposit guarantee doesn't apply here. Moving out? A Move-Out Clean is the one that's inspection-backed.</span></div>`;
         })()}
@@ -3913,11 +4001,11 @@ function rpEstimateScreen(eyebrow) {
               })()
             : ""}
         ${rpState.addonDropNotice ? `<p class="rp-addon-drop-notice">Removed from your estimate: <strong>${rpState.addonDropNotice}</strong> — already included in this tier.</p>` : ""}
-        <div class="rp-trust-signal"><strong>★ 5.0</strong> · 61+ reviews · Veteran-owned & insured</div>
+        <div class="rp-trust-signal">${RP_MSG.trust()}</div>
         ${!noGuaranteedPrice ? `
         <label class="rp-discount-inline is-offer">
           <input type="checkbox" ${rpState.militaryDiscount ? "checked" : ""} onchange="rpToggleMilitaryDiscount(this.checked)">
-          <span><strong>Military or first responder? Take 10% off.</strong><small>Up to $25 off, as a thank-you for your service. Just tick the box — no ID needed to book. Can't be combined with other promotional offers.</small></span>
+          <span><strong>${RP_MSG.military().offer}</strong><small>${RP_MSG.military().detail} Just tick the box — no ID needed to book.</small></span>
         </label>` : ""}
       </div>
       ${rpTimeEstimate() ? `<div class="rp-mini-row"><span>Estimated Time</span><strong>${rpTimeEstimate()}</strong></div>` : ""}
@@ -3968,10 +4056,10 @@ function rpEstimateScreen(eyebrow) {
          spouse. They were leaving with nothing; now they leave with the
          quote in their hand and we get a flagged, callable lead instead
          of a silent bounce. */""}
-    <p class="rp-reassure">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>No deposit. Nothing due today.</strong> You pay after the clean is done and you've seen it.</span></p>
+    <p class="rp-reassure">${rpIcon("shield","rp-ic rp-ic-sm")}<span><strong>${RP_MSG.payment.short}</strong> You pay after the clean is done and you've seen it.</span></p>
     <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>
     ${noGuaranteedPrice ? "" : `<button type="button" class="rp-soft-cta" id="rpTextQuoteBtn" onclick="rpTextMeThisQuote()">Not ready? Text me this price instead</button>`}
-    <p class="rp-notice rp-dock-notice">Price may change only for severe buildup, heavy trash, access issues, biohazards, or work outside the selected scope. Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>` };
+    <p class="rp-notice rp-dock-notice">${RP_MSG.price.exception} Questions? <a href="sms:5802150915" style="color:var(--red);font-weight:800" onclick="rpTrack('text_tap',{placement:'estimate_screen'})">Text us</a>.</p>` };
 }
 
 /* =========================================================================
@@ -4054,6 +4142,38 @@ function rpLeadFieldFocus(element) {
    step afterwards, prefilled from here. Framed as "where do we send it"
    rather than "give us your number", because the price genuinely does
    get texted and people abandon a form that reads like a paywall. */
+/* What this screen is allowed to promise, computed from the engine rather
+   than written on the screen. Returns null whenever there is no honest
+   number yet — a blocked home, a custom-quote home, or a service whose
+   price depends on answers we haven't asked for. Never guesses. */
+function rpGatePricePreview() {
+  if (rpMoveoutBlocked && rpMoveoutBlocked()) return null;
+  if (rpIsCustomQuoteOnly()) return null;
+
+  if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
+    if (!rpState.bedrooms) return null;
+    const ir = rpMoveoutTierBasePrice("moveout");
+    const ex = rpMoveoutTierBasePrice("moveoutrefresh");
+    if (ir === null || ex === null || !(ir > 0) || !(ex > 0)) return null;
+    const beds = Number(rpState.bedrooms);
+    const home = beds >= 5 ? "home this size" : `${beds}-bedroom`;
+    return {
+      figure: `$${ex} or $${ir}`,
+      line: `Your ${home} comes to <b>$${ex}</b> or <b>$${ir}</b>, depending on which of the two you pick.`,
+      after: "Both are on the very next screen, with what each one covers."
+    };
+  }
+
+  const base = rpDisplayBasePrice();
+  if (!(base > 0)) return null;
+  const name = (rpServices[rpState.service] || {}).name || "your clean";
+  return {
+    figure: `$${base}`,
+    line: `${name} starts at <b>$${base}</b> for your home.`,
+    after: "Add-ons and the full total are on the next screen."
+  };
+}
+
 function rpContactGateScreen(eyebrow) {
   /* Round 23 (sales-review fix): this screen asks for name and phone
      BEFORE showing any price, and Clarity already flagged it as the
@@ -4062,10 +4182,22 @@ function rpContactGateScreen(eyebrow) {
      and the estimate screen both have one). Reinforcing trust is worth
      the most exactly where the ask feels biggest, not on the screens
      where there's nothing to be nervous about. */
+  /* Round 36: measured at 7 taps in, with the first price 4 taps further
+     on. The gate stays -- it banks a partial lead, which is the whole
+     reason it exists -- but it no longer asks for something and offers
+     nothing back. It now shows the REAL engine numbers for the home just
+     described, so the ask reads as "here's your price, where do we send
+     it" instead of "pay a toll and find out". Falls back to the old copy
+     whenever rpGatePricePreview() has nothing honest to say. */
+  const preview = rpGatePricePreview();
   return { scroll: `<div class="rp-center">
     ${eyebrow}
-    <h2>Almost there</h2>
-    <p class="rp-sub">Just a name and number, then your price is right here.</p>
+    <h2>${preview ? "Your price is ready" : "Almost there"}</h2>
+    ${preview
+      ? `<div class="rp-gate-preview"><p class="rp-gate-price">${preview.line}</p>
+         <p class="rp-gate-after">${preview.after}</p></div>
+         <p class="rp-sub">Name and number, and it's yours.</p>`
+      : `<p class="rp-sub">Just a name and number, then your price is right here.</p>`}
     <div class="rp-trust-signal" style="margin-bottom:14px"><strong>\u2605 5.0</strong> \u00b7 61+ reviews \u00b7 Veteran-owned & insured</div>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
@@ -4073,7 +4205,14 @@ function rpContactGateScreen(eyebrow) {
       <div class="rp-error" id="rpGateError" style="display:none"></div>
       <p class="rp-fineprint">If something seems unusual about your quote, we'll reach out before you book. No spam, no pressure otherwise.</p>
     </div>
-  </div>`, footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">Show My Price</button>` };
+  </div>`, /* "Show My Price" was right when the screen showed no price. Now that it
+     does, the button promises what actually comes next: the two tiers and
+     what each covers. Falls back to the original wording on the screens
+     where no preview could be shown. */
+    footer: `<button class="rp-primary" onclick="rpSubmitContactGate()">${
+      preview
+        ? (["moveout","moveoutrefresh"].includes(rpState.service) ? "See Both Options" : "See The Full Price")
+        : "Show My Price"}</button>` };
 }
 
 /* Posts a real PARTIAL lead to the Worker's /lead endpoint. This is the
@@ -4189,15 +4328,55 @@ function rpSubmitContactGate() {
   rpAdvance();
 }
 
+/* The contact gate already took a name and a phone number, four steps back.
+   Re-rendering them here as two more required fields on a seven-field form
+   added work and read as "didn't I just tell you this?" — so when they're
+   already captured and valid, they collapse to one confirmable line.
+
+   The inputs stay in the DOM regardless. rpSubmitLeadAndShowCalendar()
+   validates by getElementById, and a hidden-but-present field keeps that
+   working with no change to the validation path; rpRevealLeadContact()
+   below re-opens the block if anything about them ever fails, so an error
+   can never be reported against a field the customer cannot see. */
+function rpLeadContactHasValidCapture() {
+  return String(rpState.fullName || "").trim().length >= 2
+      && String(rpState.phone || "").replace(/\D/g, "").length >= 10;
+}
+function rpLeadContactBlock() {
+  const collapsed = rpLeadContactHasValidCapture();
+  const inputs = `<div class="rp-lead-row rp-lead-row-contact" id="rpLeadContactRow"${collapsed ? " hidden" : ""}>
+        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
+      </div>`;
+  if (!collapsed) return inputs;
+  return `<div class="rp-lead-known" id="rpLeadKnown">
+        <div><span class="rp-lead-known-k">Booking for</span>
+          <b>${rpEscapeAttr(rpState.fullName)}</b> &middot; ${rpEscapeAttr(rpFormatPhoneDisplay(rpState.phone))}</div>
+        <button type="button" class="rp-lead-change" onclick="rpRevealLeadContact()">Change</button>
+      </div>${inputs}`;
+}
+function rpRevealLeadContact() {
+  const row = document.getElementById("rpLeadContactRow");
+  const known = document.getElementById("rpLeadKnown");
+  if (row) row.hidden = false;
+  if (known) known.remove();
+  const name = document.getElementById("rpFullName");
+  if (name) name.focus();
+}
+/* Display-only. Never used for anything that gets sent — the payload keeps
+   using rpState.phone as entered. */
+function rpFormatPhoneDisplay(v) {
+  const d = String(v || "").replace(/\D/g, "").slice(0, 10);
+  if (d.length !== 10) return String(v || "");
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
 function rpLeadScreen(eyebrow) {
   return { scroll: `<div class="rp-center">
     ${eyebrow}
     <h2>Almost done</h2>
     <div class="rp-lead-form">
-      <div class="rp-lead-row rp-lead-row-contact">
-        <div class="rp-lead-field"><label for="rpFullName">Full Name *</label><input id="rpFullName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
-        <div class="rp-lead-field"><label for="rpPhone">Phone Number *</label><input id="rpPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
-      </div>
+      ${rpLeadContactBlock()}
       <div class="rp-lead-field"><label for="rpEmail">Email Address *</label><input id="rpEmail" type="email" autocomplete="email" inputmode="email" value="${rpEscapeAttr(rpState.email)}" placeholder="you@email.com" oninput="rpCaptureLeadField('email',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpAddress1">Street Address *</label><input id="rpAddress1" type="text" autocomplete="address-line1" value="${rpEscapeAttr(rpState.address1)}" placeholder="123 Main St" oninput="rpCaptureLeadField('address1',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-row">
@@ -4979,6 +5158,13 @@ function rpSubmitLeadAndShowCalendar() {
   const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   const postalLooksValid = /^\d{5}(-\d{4})?$/.test(postalCode);
 
+  /* Round 36: name and phone can be inside the collapsed "Booking for"
+     block. An error must never be reported against a field the customer
+     cannot see, so open it first if either one is going to fail. */
+  if (fullName.length < 2 || phoneDigits.length < 10) {
+    if (typeof rpRevealLeadContact === "function") rpRevealLeadContact();
+  }
+
   const checks = [
     { field: fields.rpFullName, valid: fullName.length >= 2, message: "Please enter your full name." },
     { field: fields.rpPhone, valid: phoneDigits.length >= 10, message: "Please enter a valid 10-digit phone number." },
@@ -5284,6 +5470,10 @@ if (rpHistoryNavAvailable) {
     }
   } catch (e) { /* ignore — funnel still works without history sync */ }
 }
+/* Round 32: fill any static markup carrying data-rp-msg from the shared
+   message library, so a claim sitting in plain HTML (the FAQ panel's
+   service-area footnote) is still written in exactly one place. */
+rpHydrateMessages();
 rpRender();
 rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : (rpResumedSession ? "resumed_session" : "direct"), preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
 </script>

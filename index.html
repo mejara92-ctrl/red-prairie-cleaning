@@ -1505,7 +1505,7 @@ window.__rpScheduleDeferred(function(){
             "@type": "Offer",
             "name": "Move-Out Cleaning: Inspection Ready (Starting At)",
             "priceCurrency": "USD",
-            "price": "459",
+            "price": "399",
             "availability": "https://schema.org/InStock",
             "itemOffered": {
               "@type": "Service",
@@ -2228,8 +2228,27 @@ window.__rpScheduleDeferred(function(){
 </style>
 <link href="/favicon.png" rel="icon" type="image/png"/>
 <link href="/css/rp-legacy-theme.css" rel="stylesheet"/>
+<style>
+/* Skip link: hidden until it takes focus, then pinned top-left.
+   #main-content already existed on most pages; this is the other half. */
+.rp-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2147483001;
+  background: #9f2027;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  font: 600 15px/1.2 Manrope, ui-sans-serif, system-ui, sans-serif;
+  text-decoration: none;
+}
+.rp-skip-link:focus { left: 0; }
+</style>
 </head>
 <body>
+<a class="rp-skip-link" href="#main-content">Skip to main content</a>
+
 <header class="navbar">
 <div class="nav-container">
 <a class="logo rp-site-wordmark" href="/" aria-label="Red Prairie Cleaning home">
@@ -2355,8 +2374,61 @@ window.__rpScheduleDeferred(function(){
 </div>
 <div aria-hidden="true" class="image-lightbox" id="imageLightbox">
 <button aria-label="Close image preview" type="button">×</button>
-<img alt="Cleaning result preview" decoding="async" loading="lazy" src=""/>
+<img alt="" decoding="async"/>
 </div>
+<script>
+/* Before/after gallery lightbox.
+
+   The .image-lightbox overlay and the zoom-in cursor on .gallery-item have
+   shipped since the gallery was added, but nothing ever opened it — the
+   photos looked clickable and did nothing. This is the missing half. */
+(function () {
+  var box = document.getElementById("imageLightbox");
+  if (!box) return;
+  var img = box.querySelector("img");
+  var closeBtn = box.querySelector("button");
+  var lastFocus = null;
+
+  function open(src, alt) {
+    if (!src) return;
+    img.src = src;
+    img.alt = alt || "Cleaning result, enlarged";
+    box.classList.add("is-open");
+    box.setAttribute("aria-hidden", "false");
+    lastFocus = document.activeElement;
+    if (closeBtn) closeBtn.focus();
+    document.body.style.overflow = "hidden";
+  }
+
+  function close() {
+    box.classList.remove("is-open");
+    box.setAttribute("aria-hidden", "true");
+    img.removeAttribute("src");
+    document.body.style.overflow = "";
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    lastFocus = null;
+  }
+
+  document.querySelectorAll(".gallery-item").forEach(function (item) {
+    var thumb = item.querySelector("img");
+    if (!thumb) return;
+    item.setAttribute("role", "button");
+    item.setAttribute("tabindex", "0");
+    item.setAttribute("aria-label", "Enlarge photo: " + (thumb.alt || "cleaning result"));
+    item.addEventListener("click", function () { open(thumb.currentSrc || thumb.src, thumb.alt); });
+    item.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(thumb.currentSrc || thumb.src, thumb.alt); }
+    });
+  });
+
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  box.addEventListener("click", function (e) { if (e.target === box) close(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && box.classList.contains("is-open")) close();
+  });
+})();
+</script>
+
 
 <script>
 /*
