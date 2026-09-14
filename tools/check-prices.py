@@ -116,12 +116,29 @@ def main():
         (539, "Inspection Ready 3BR (round 26)", p["inspection_ready"][1]),
         (619, "Inspection Ready 4BR (round 26)", top),
         (699, "Inspection Ready 5+BR (round 26)", top),
-        (349, "Express 5+BR (retired bracket)", p["express"][-1]),
         (240, "Detail Pass 5+BR (retired bracket)", p["detail_pass"][-1]),
-        # Round 25 ladder.
-        (379, "Inspection Ready 1-2BR (round 25)", p["inspection_ready"][0]),
+        # Round 38 re-priced Detail Pass off the actual crew-hours
+        # ($150/$180/$210 -> $90/$130/$170). 180 and 210 are bannable; 150
+        # is deliberately NOT, because it is still live as the one-time
+        # minimum and as Basic Cleaning's flat price.
+        (180, "Detail Pass 3BR (round 32)", p["detail_pass"][1]),
+        (210, "Detail Pass 4+BR (round 32)", p["detail_pass"][2]),
+        # Round 32 ladder, retired by round 41's 5% cut.
+        (399, "Inspection Ready 1-2BR (round 32)", p["inspection_ready"][0]),
+        (499, "Inspection Ready 3BR (round 32)", p["inspection_ready"][1]),
+        (599, "Inspection Ready 4BR (round 32)", top),
+        # Round 25 ladder. 379 was on this list until round 41 put it back
+        # into service as the live 1-2BR price -- it is dropped rather than
+        # left here, because the `current` set is checked first and a banned
+        # entry that can never fire is just a thing to misread later.
         (479, "Inspection Ready 3BR (round 25)", p["inspection_ready"][1]),
         (589, "Inspection Ready 4BR (round 25)", top),
+        # Round 41 ladder (379/474/569), retired by round 45's cut to
+        # 349/429/499. 499 is dropped rather than banned here -- it was
+        # already the live 4BR price as of round 44 and still is, so it
+        # belongs in `current`, not `banned`.
+        (379, "Inspection Ready 1-2BR (round 41)", p["inspection_ready"][0]),
+        (474, "Inspection Ready 3BR (round 41)", p["inspection_ready"][1]),
         # Pre-round-25.
         (179, "Express 1-2BR", p["express"][0]),
         (229, "Express 3BR", p["express"][1]),

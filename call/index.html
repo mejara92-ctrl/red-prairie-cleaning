@@ -127,12 +127,16 @@ button,input,select,textarea{font:inherit; color:inherit}
   background:transparent; border:1px solid var(--line-2); color:var(--muted);
   font-size:11.5px; font-weight:700; letter-spacing:.01em; min-height:34px;
 }
-.chip.done{color:var(--ink-2); border-color:var(--line-2); background:var(--panel)}
+/* Round 40c: "done" meant white-on-transparent, which is not a difference
+   anyone reads at a glance mid-call. The chips are the map of the call now,
+   so filled-in has to look filled-in. */
+.chip.done{color:var(--green); border-color:var(--green); background:var(--green-wash)}
+.chip.done::before{content:"✓ "; font-weight:800}
 .chip.now{background:var(--red); border-color:var(--red); color:#fff}
 
 /* ── Zone 2: the line. The one thing she reads. ─────────────────────── */
 .wrap{max-width:1180px; margin:0 auto; padding:16px 14px calc(var(--dock-h) + 26px)}
-@media (min-width:1000px){ .wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; align-items:start} }
+@media (min-width:1000px){ .wrap{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:18px; align-items:start} }
 .col-main{min-width:0}
 
 .say{
@@ -260,7 +264,24 @@ button,input,select,textarea{font:inherit; color:inherit}
 
 /* ── Side panel (desktop) / stacked (mobile): live recap only. ───────── */
 .side{display:flex; flex-direction:column; gap:12px}
+/* Round 40c: .side became a fixed-height scroll container in round 35 and
+   is a flex column, so its children shrank to fit instead of the column
+   scrolling -- and .recap has overflow:hidden, so it cut itself off mid-row
+   with no scrollbar to suggest anything was missing. */
+.side > *{flex:0 0 auto}
 @media (max-width:999px){ .side{margin-top:12px} }
+/* Round 40d: console 1.0 died of 541 words above the fold. On a phone the
+   SAY block is the biggest single consumer of that budget, and at
+   clamp()'s 20px floor with 1.38 line-height a four-sentence line ran eight
+   lines deep before she could reach a single control. Same words, less air —
+   still the largest thing on the screen, still the first thing read. */
+@media (max-width:999px){
+  .say{padding:13px 15px; margin-bottom:10px}
+  .say p{font-size:18.5px; line-height:1.34}
+  .doline{padding:10px 14px; margin:-2px 0 10px}
+  .doline p{font-size:14px; line-height:1.45}
+  .nudge{padding:11px 13px}
+}
 .recap{background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow)}
 .recap-h{
   padding:9px 14px; background:var(--sunk); border-bottom:1px solid var(--line);
@@ -271,6 +292,52 @@ button,input,select,textarea{font:inherit; color:inherit}
 .recap-row span{color:var(--muted)}
 .recap-row b{font-weight:700; text-align:right; font-variant-numeric:tabular-nums}
 .recap-row.neg b{color:var(--green)}
+
+/* ── Round 39: DO — what to physically do, next to what to say. ───── */
+.doline{
+  display:flex; gap:12px; align-items:flex-start;
+  background:var(--panel-2); border:1px solid var(--line); border-left:4px solid var(--blue);
+  border-radius:12px; padding:12px 16px; margin:-4px 0 14px;
+}
+.doline .k{
+  flex:0 0 auto; margin-top:2px;
+  font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--blue);
+}
+.doline p{margin:0; font-size:15px; line-height:1.5; color:var(--ink-2)}
+
+/* The locked door. Deliberately the loudest thing on the screen -- it only
+   appears when a price must not be said, and it carries the whole correct
+   response as one button. */
+.blocked-do{
+  background:var(--red-wash); border:2px solid var(--red); border-radius:14px;
+  padding:16px 18px; margin:0 0 14px;
+}
+.blocked-do-h{
+  font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--red-ink); margin-bottom:10px;
+}
+/* Round 40e: why this job stopped, immediately above what to do about it. */
+.blocked-why{
+  background:var(--panel); border:1px solid var(--red); border-radius:9px;
+  padding:11px 13px; margin-bottom:13px; font-size:13.5px; line-height:1.5;
+}
+.blocked-why b{display:block; margin-bottom:3px; font-size:13px; font-weight:800; color:var(--red-ink)}
+.blocked-do-steps{margin:0 0 14px; padding-left:20px}
+.blocked-do-steps li{margin-bottom:8px; font-size:15px; line-height:1.5; color:var(--ink)}
+.blocked-do-steps li:last-child{margin-bottom:0}
+.blocked-do-steps i{font-family:Newsreader,Georgia,serif; font-style:italic}
+.blocked-do-btn{
+  width:100%; min-height:52px; border:0; border-radius:11px; cursor:pointer;
+  background:var(--red); color:#fff; font:800 16px/1.2 "Public Sans",sans-serif;
+}
+.blocked-do-btn:hover{filter:brightness(1.06)}
+/* The dock button when the job can't be booked: obviously dead, and it
+   points at the thing that CAN be pressed rather than just greying out. */
+.dock .go.is-stopped{
+  background:var(--sunk); color:var(--muted); box-shadow:none;
+  font-size:14px; letter-spacing:0;
+}
+.dock .go.is-stopped kbd{display:none}
 
 /* ── Compare rail (round 35): the desktop column, earning its space. ──
    Sticky, because it is reference read WHILE talking — a rail that
@@ -289,7 +356,102 @@ button,input,select,textarea{font:inherit; color:inherit}
 }
 /* More room on a real monitor. 300px cannot hold two price columns and a
    label without wrapping every row. */
-@media (min-width:1280px){ .wrap{grid-template-columns:minmax(0,1fr) 372px} }
+@media (min-width:1280px){ .wrap{grid-template-columns:minmax(0,1fr) 400px} }
+
+/* =====================================================================
+   ROUND 40 - SECTIONS
+   =====================================================================
+   The unit of the console is no longer a screen, it is a section: a thing
+   about this job that can be known or not known, filled in whenever the
+   caller happens to mention it. Same markup in both shells; only which ones
+   are expanded differs.
+   ===================================================================== */
+.sec{
+  background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  box-shadow:var(--shadow); margin-bottom:10px; overflow:hidden;
+}
+.sec.focus{border-color:var(--red)}
+.sec-h{
+  display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+  padding:11px 14px; min-height:56px; cursor:pointer;
+  background:transparent; border:0; color:inherit;
+}
+.sec-h:hover{background:var(--panel-2)}
+.sec.open .sec-h{border-bottom:1px solid var(--line)}
+.sec-n{
+  flex:0 0 auto; width:24px; height:24px; border-radius:50%; display:grid; place-items:center;
+  background:var(--sunk); border:1px solid var(--line-2); color:var(--muted);
+  font-size:11px; font-weight:800; font-variant-numeric:tabular-nums;
+}
+.sec.ok .sec-n{background:var(--green-wash); border-color:var(--green); color:var(--green)}
+.sec.focus .sec-n{background:var(--red); border-color:var(--red); color:#fff}
+.sec-t{min-width:0; flex:1 1 auto}
+.sec-t b{display:block; font-size:15px; font-weight:800; letter-spacing:-.01em; line-height:1.25}
+.sec-t span{
+  display:block; font-size:12.5px; color:var(--muted); line-height:1.35;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sec.ok .sec-t span{color:var(--ink-2)}
+.sec-chev{flex:0 0 auto; color:var(--muted); font-size:15px; font-weight:800; line-height:1}
+.sec-b{padding:13px 14px 15px}
+.locked-note{
+  margin:0; font-size:14px; line-height:1.55; color:var(--ink-2);
+  background:var(--red-wash); border:1px solid var(--red); border-radius:9px; padding:11px 13px;
+}
+
+/* The guided path, for someone who has done this four times. One thing,
+   never a list -- a list of next steps is just the wizard again. */
+.nudge{
+  display:flex; align-items:flex-start; gap:11px;
+  background:var(--blue-wash); border:1px solid var(--blue); border-radius:12px;
+  padding:12px 14px;
+}
+.nudge .k{
+  flex:0 0 auto; margin-top:2px; font-size:10px; font-weight:800; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--blue);
+}
+.nudge div{min-width:0; flex:1}
+.nudge b{display:block; font-size:14.5px; font-weight:800; line-height:1.35; color:var(--ink)}
+.nudge p{margin:3px 0 0; font-size:12.5px; color:var(--ink-2); line-height:1.45}
+.nudge button{
+  margin-top:9px; min-height:38px; padding:0 14px; border-radius:9px; cursor:pointer;
+  background:var(--blue); border:0; color:#fff; font-size:13px; font-weight:800;
+}
+.nudge.ready{background:var(--green-wash); border-color:var(--green)}
+.nudge.ready .k{color:var(--green)}
+.nudge.ready button{background:var(--green)}
+
+/* Phone quick bar: the two jobs that are not a whole call. */
+.qbar{display:flex; gap:8px; margin:0 0 12px}
+.qbar button{
+  flex:1; min-height:48px; border-radius:10px; cursor:pointer;
+  background:var(--panel); border:1.5px solid var(--line-2); color:var(--ink);
+  font-size:13.5px; font-weight:800; padding:0 10px;
+}
+.qbar button:hover{background:var(--panel-2)}
+.qbar button.primary{background:var(--blue-wash); border-color:var(--blue); color:var(--blue)}
+
+/* The tier explainer. Reachable on every screen, in both shells, for the
+   whole call -- it is the single question this business gets asked most. */
+.tier-say{
+  background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--red);
+  border-radius:12px; padding:14px 16px; margin-bottom:12px;
+}
+.tier-say .k{
+  display:block; font-size:10px; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--red-ink); margin-bottom:7px;
+}
+.tier-say p{
+  margin:0 0 9px; font-family:Newsreader,Georgia,serif; font-size:19px; line-height:1.42; color:var(--ink);
+}
+.tier-say p:last-child{margin-bottom:0}
+.tier-say .ask{font-weight:600}
+.never{
+  background:var(--amber-wash); border:1px solid var(--amber); border-radius:10px;
+  padding:11px 13px; font-size:13.5px; line-height:1.5; margin-bottom:12px;
+}
+.never b{display:block; color:var(--amber); font-size:12px; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:3px}
 
 .cmp{background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow)}
 .cmp-h{
@@ -523,6 +685,12 @@ button.cmp-h:hover{color:var(--ink-2)}
   <div class="top-actions">
     <span class="clock" id="clock" title="Time on this call">0:00</span>
     <div class="money" id="money"><b>—</b><small>Total</small></div>
+    <button class="tbtn" type="button" id="tierBtn" hidden onclick="openSheet('tierSheet')" aria-label="Explain the difference between the tiers">
+      <span aria-hidden="true">⚖️</span><span class="lbl">Explain</span>
+    </button>
+    <button class="tbtn" type="button" id="stuckBtn" onclick="openSheet('stuckSheet')" aria-label="I'm stuck">
+      <span aria-hidden="true">✋</span><span class="lbl">Stuck?</span>
+    </button>
     <button class="tbtn" type="button" id="lookupBtn" onclick="openLookup()" aria-label="Look something up">
       <span aria-hidden="true">🔍</span><span class="lbl">Look up</span><kbd>/</kbd>
     </button>
@@ -549,6 +717,51 @@ button.cmp-h:hover{color:var(--ink-2)}
     <button class="tbtn" type="button" onclick="closeSheet('lookupSheet')">Close</button>
   </div>
   <div class="sheet-body"><div id="lookupResults"></div></div>
+</section>
+
+<!-- Round 40: the tier explainer, one tap away for the whole call on any
+     screen size. Body is rendered live from rp-messages.js and the engine,
+     so it cannot describe the products differently from the website the
+     caller very likely has open while they talk. -->
+<section class="sheet" id="tierSheet" hidden aria-label="Inspection Ready vs Move-Out Express">
+  <div class="sheet-top">
+    <div class="who" style="flex:1"><b>Inspection Ready vs Move-Out Express</b><span>Say the first line, then ask the question</span></div>
+    <button class="tbtn" type="button" onclick="closeSheet('tierSheet')">Close</button>
+  </div>
+  <div class="sheet-body"><div id="tierSheetBody"></div></div>
+</section>
+
+<section class="sheet" id="stuckSheet" hidden aria-label="If you don't know what to say">
+  <div class="sheet-top">
+    <div class="who" style="flex:1"><b>If you don't know what to say</b><span>Nothing here can go wrong</span></div>
+    <button class="tbtn" type="button" onclick="closeSheet('stuckSheet')">Close</button>
+  </div>
+  <div class="sheet-body">
+    <div class="hit"><span class="hit-k say">Say this first</span>
+      <h3>Buy yourself a few seconds</h3>
+      <p>“That's a good question — let me make sure I give you the right answer rather than guess.”</p>
+      <p>Then look it up. Nobody minds a short pause on the phone. Guessing is the only wrong move.</p>
+    </div>
+    <div class="hit"><span class="hit-k say">If you still don't know</span>
+      <h3>Take a number and call them back</h3>
+      <p>“Let me check that properly and call you right back — what's the best number for you?”</p>
+      <p>This is always allowed and it is never the wrong answer. Put what they asked into the notes when you end the call, so whoever rings back knows what it's about.</p>
+    </div>
+    <div class="hit"><span class="hit-k">Never do these three</span>
+      <h3>The ones that cost money</h3>
+      <p><b>Never guess a price.</b> Whatever you say out loud is what they will expect to pay, and we have to honour it.</p>
+      <p><b>Never promise they'll get their deposit back.</b> We come back and re-clean if something was missed. Whether a landlord returns a deposit is not ours to promise.</p>
+      <p><b>Never push past a red box.</b> If the screen has flagged the job, take a name and number and let the office sort it out.</p>
+    </div>
+    <div class="hit"><span class="hit-k">Still stuck</span>
+      <h3>Hand it over, warmly</h3>
+      <p>Take the name, the number, and what they asked. End the call kindly and pass it on. A lead called back within the hour is a good outcome. A confident wrong answer is not.</p>
+    </div>
+    <div class="hit"><span class="hit-k">Reminder</span>
+      <h3>You cannot break this</h3>
+      <p>Back works at any point, every answer can be changed, and the price recalculates itself. Nothing reaches the office until you book the job or log the call at the end.</p>
+    </div>
+  </div>
 </section>
 
 <section class="sheet" id="endSheet" hidden aria-label="End the call">
@@ -585,6 +798,9 @@ const rpState = {
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
   garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, handymanInterest:false, addonDropNotice:"",
   militaryDiscount:false, militaryVerified:false,
+  /* Round 40: add-ons stopped being a step you walk through and became a
+     section that is either done or not. This is what "done" means for it. */
+  addonsAsked:false,
   noAC:false, moldConcern:false, petWasteConcern:false, hazardConcern:false,
   heavySoil:false, petOdor:false,
   /* Below: fields the shared engine (rp-pricing-engine.js) reads that
@@ -606,7 +822,10 @@ const rpState = {
   bookingSubmitting:false, bookingError:"", customLeadSaving:false, customLeadError:"",
   /* Round 36: true once a partial lead has been posted for THIS call, so a
      re-render, a step back, or a mid-call refresh can't post a second. */
-  partialLeadSent:false
+  partialLeadSent:false,
+  /* Round 39: set when a stop-guardrail sends her back for a name and
+     number, so the caller screen can say why she's there. */
+  blockedNeedsContact:false
 };
 
 
@@ -756,10 +975,15 @@ function quoteSayLine(){
   const val = (typeof rawVal === "function" ? rawVal() : rawVal) || RP_MSG.price.promiseSpoken;
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
 }
+/* Round 40d: this used to append angle().addon to the spoken line. That
+   string is COACHING -- "Landlords often check carpets and windows
+   specifically at move-out, so those are worth asking about by name" is
+   written to the person holding the phone, not to the caller, and it was
+   landing inside the quotation marks of the box captioned "Say". A new
+   operator reads what is in that box out loud; that is the whole point of
+   it. The coaching goes to the coach note with the rest of the coaching. */
 function addonsSayLine(){
-  const base = "\u201cCouple things people often add \u2014 any carpet that needs professional cleaning? Junk or old furniture to haul off? Exterior windows washed? Garage floor?\u201d";
-  const a = angle().addon;
-  return a ? `${base} ${a}` : base;
+  return "\u201cCouple things people often add \u2014 any carpet that needs professional cleaning? Junk or old furniture to haul off? Exterior windows washed? Garage floor?\u201d";
 }
 function calendarSayLine(){
   const days=availableDateKeys();
@@ -808,18 +1032,22 @@ function doneSayLine(){
    ========================================================================= */
 const LINES = {
   service:{
+    act:"Click what they're asking for. Not sure? Ask them to describe the job in their own words first — you can always change this.",
     say:()=>`“Thanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} — what can we help you with today?”`,
     coach:"Let them describe it in their own words first — people move for all kinds of reasons, so don't assume military and don't assume not. <b>If it's a move-out, ask now, before anything else: is a landlord, property manager or inspector going to walk through and check the place against a list?</b> You're noting the lean, not picking a tier — real numbers come three screens from now."
   },
   caller:{
+    act:"Type their name and number as they say them. Don't worry about spelling; the number is the part that matters.",
     say:"“Happy to help with that — let me grab your name and a good number in case we get cut off.”",
     coach:"The most important screen in the console. If the call drops after this you still have a lead you can call back. If it drops before, you have nothing."
   },
   home:{
+    act:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Then answer the three checks honestly. If you're unsure about any of them, say no.",
     say:"“Let me get a couple of quick details on the place — how many bedrooms, and how many full bathrooms?”",
     coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the three checks: water, A/C, mold or pests. If any of them fail, the job can't be booked as normal and you do not quote a price."
   },
   tiers:{
+    act:"Read out both prices, then stop and let them pick. Don't steer them to the cheaper one to be kind — ask the inspection question instead.",
     say:()=>{
       const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
       const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
@@ -837,38 +1065,47 @@ const LINES = {
     }
   },
   addons:{
+    act:"Ask about carpet, windows and the garage <b>by name</b> — people almost never bring them up. Then ask the military question <em>before</em> you say the total.",
     say:addonsSayLine,
-    coach:()=>`Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. <b>Then ask the military question, before you say the price, not after they push back on it:</b> “${RP_MSG.military().spoken}” This is Lawton; a large share qualify, it caps at $${RP_MSG.military().cap}, and offered up front it's a reason to book. Held back until they complain it only buys a save. Pet odour is a crew-prep flag, not a price change.`
+    coach:()=>`${angle().addon?angle().addon+" ":""}Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. <b>Then ask the military question, before you say the price, not after they push back on it:</b> “${RP_MSG.military().spoken}” This is Lawton; a large share qualify, it caps at $${RP_MSG.military().cap}, and offered up front it's a reason to book. Held back until they complain it only buys a save. Pet odour is a crew-prep flag, not a price change.`
   },
   frequency:{
+    act:"Offer the every-other-week price once. If they hesitate at all, choose One-Time and move on — they can switch later.",
     say:"“Would you want this one-time, or set up on a regular schedule?”",
     coach:"Recurring is worth far more long-term, but if they hesitate, book One-Time. They can switch later; a lost booking can't."
   },
   rooms:{
+    act:"Count rooms, not square feet. Two-room minimum — say that now, not after they've told you it's one room.",
     say:"“How many carpeted rooms are we cleaning?”",
     coach:"Count rooms, not square footage. Two-room minimum — say that up front, not after they've told you it's one room."
   },
   hourly:{
+    act:"Two cleaners is the normal answer. More hands is <em>faster</em>, not cheaper — make sure they hear it's per cleaner, per hour.",
     say:"“How many cleaners, and roughly how many hours do you think you'll need?”",
     coach:"Two cleaners is the normal default. More hands is <em>faster</em>, not cheaper — make sure they hear it's per cleaner, per hour. If they don't know how long, ask what they want done and estimate it for them rather than making them guess."
   },
   customDetails:{
+    act:"Type what they need in their own words. Do not guess a price, not even a rough one.",
     say:"“That's a bit outside our standard services, so let me get some details and we'll follow up with a firm quote.”",
     coach:"Get what, where, how big, and anything unusual. Set the expectation now that this needs a look or some photos first — and do not guess a price out loud, not even a rough one."
   },
   quote:{
+    act:"Say the number once, plainly, then stop talking. Count to three in your head before you say anything else.",
     say:quoteSayLine,
     coach:"Give the number once, plainly, then stop talking. Pause two or three seconds. If they don't come back with a question, that's your cue — go straight into “Perfect, let me grab the address.” Don't sit in silence waiting for them to raise booking; you lead into it."
   },
   contact:{
+    act:"Read the address back to them one digit at a time on the house number, then tick the box.",
     say:"“Perfect — let me grab the address and get you on the schedule.”",
     coach:"Read the address back out loud, digit by digit on the house number. A wrong address is the number one cause of a wasted crew trip and a lost day."
   },
   calendar:{
+    act:"Pick the time they asked for. If nothing fits, take a number rather than promising a date we might not have.",
     say:calendarSayLine,
     coach:calendarWatchLine
   },
   done:{
+    act:"Tell them a confirmation text is coming, and check they've got it before you hang up.",
     say:doneSayLine,
     coach:"Repeat the date and time one more time before you hang up, and confirm they got the text."
   }
@@ -883,7 +1120,8 @@ function lineFor(step){
   if(!e) return null;
   const out = {
     say: typeof e.say==="function" ? e.say() : e.say,
-    coach: typeof e.coach==="function" ? e.coach() : e.coach
+    coach: typeof e.coach==="function" ? e.coach() : e.coach,
+    act: typeof e.act==="function" ? e.act() : e.act
   };
   const a = angle();
   if(rpState.service==="hourly"){
@@ -987,9 +1225,9 @@ const OBJECTIONS = [
   {q:"\u201cWill I get my deposit back?\u201d",
    a:depositAnswer,
    n:"NEVER promise a deposit back \u2014 the landlord decides, not us. But this is also a real moment to sell: if they're on Express and clearly worried about an inspection, that's the caller Inspection Ready was built for \u2014 offer the switch, don't just reassure and move on."},
-  {q:"\u201cWhy does it take three people / two people?\u201d",
-   a:"\u201cMore hands means we're in and done in one visit instead of stretching it out \u2014 Inspection Ready runs three cleaners so the full interior reset gets finished same-day, Express runs two since it's a lighter scope. Either way it's the same crew, same insurance, just sized to the job.\u201d",
-   n:"Comes up right after they hear the crew size on the tiers screen. Frame it as speed and thoroughness, not extra cost tacked on \u2014 it isn't; the price already reflects it."},
+  {q:"\u201cWhy does it take two people / how long does it take?\u201d",
+   a:"\u201cTwo cleaners either way \u2014 what changes is how long they're there. Express is four to five hours. Inspection Ready is eight to ten, because it's genuinely double the work: every interior surface instead of the main ones. That's the whole reason one is double the price of the other.\u201d",
+   n:"The cleanest answer on the list, because the arithmetic backs it exactly: 2 cleaners for 4\u20135 hours is 8\u201310 hours of work, 2 for 8\u201310 is 16\u201320. Double at both ends of the range, and double the price at every size. Nothing to hedge."},
   {q:"\u201cWhat's actually different between the two options?\u201d",
    a:"\u201cInspection Ready is the full interior reset \u2014 inside the oven, fridge, cabinets, baseboards, windows, everything \u2014 and it's the one that protects your deposit if a landlord flags something. Express covers the kitchen, bathrooms, floors and surfaces, which is plenty if nobody's inspecting the place, and you can still add the oven, fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d",
    n:"Same pitch as the tiers screen, for whenever the question resurfaces later \u2014 on addons, or even at the price. Keep leading with whichever tier matches what they've told you about an inspection, not the bigger number."},
@@ -1064,8 +1302,11 @@ const OUTCOMES = [
 /* =========================================================================
    GUARDRAILS — the dummy-proofing layer. "stop" blocks the Next button.
    ========================================================================= */
-function guardrails(){
-  const g=[], s=rpState.step;
+/* Round 40: takes the section it is being asked about, because the board
+   renders several at once and allGuards() below unions them. Called with no
+   argument it behaves exactly as before. */
+function guardrails(forStep){
+  const g=[], s=(forStep===undefined ? rpState.step : forStep);
   if(rpIsCustomQuoteOnly() && ["quote","contact","calendar"].includes(s))
     g.push({level:"stop",title:"Do not quote a price",
       body:"This job is custom-quote only. Book the visit, tell them the office confirms pricing before the cleaning date, and do NOT say a dollar amount out loud \u2014 even a rough one. A number said on the phone is the number they expect."});
@@ -1121,15 +1362,46 @@ function guardrails(){
 }
 function hasBlockingGuard(){ return guardrails().some(x=>x.level==="stop"); }
 
+/* =========================================================================
+   ROUND 40 - GUARDRAILS ACROSS THE WHOLE CALL, NOT THE CURRENT SCREEN
+   =========================================================================
+   The wizard could scope a stop to a step because a step was the only thing
+   on screen. A board shows everything at once, so a guardrail scoped to one
+   section is a guardrail you can dodge by scrolling. Every section's
+   guardrails are unioned, deduped by title, and that union is what the stop
+   logic reads.
+   ========================================================================= */
+function allGuards(){
+  const seen = new Set(), out = [];
+  const keys = flow().concat(["quote","contact","calendar"]);
+  keys.forEach(k=>{
+    guardrails(k).forEach(g=>{
+      if(seen.has(g.title)) return;
+      seen.add(g.title); out.push(g);
+    });
+  });
+  return out;
+}
+
+/* The single test for "no dollar amount may appear anywhere". Deliberately
+   independent of which section is focused: on a board, focus is not a safety
+   property. rpIsCustomQuoteOnly() already folds in rpMoveoutBlocked(). */
+function priceLocked(){
+  return rpIsCustomQuoteOnly() || isCustomService();
+}
+
 /* ---------- Validation ---------- */
 function normalizePhone(v){ return String(v||"").replace(/\D/g,"").slice(0,10); }
 function phoneOk(v){ return normalizePhone(v).length===10; }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim()); }
 
 
-/* ---------- Validation (merged steps) ---------- */
-function stepValid(){
-  switch(rpState.step){
+/* ---------- Validation, per section ----------
+   Round 40: takes a key. Nothing GATES on this any more -- it decides
+   whether a section shows as finished, whether it folds itself away on the
+   board, and what the one "next thing" nudge points at. */
+function sectionValid(key){
+  switch(key===undefined ? rpState.step : key){
     case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone);
     case "service":   return !!rpState.service;
     case "home":      return !!rpState.bedrooms && !!rpState.bathrooms
@@ -1138,16 +1410,24 @@ function stepValid(){
     case "frequency": return !!rpState.frequency;
     case "rooms":     return Number(rpState.carpetRooms)>0;
     case "hourly":    return !!rpState.cleanerCount && !!rpState.hourCount;
-    case "addons":    return true;
+    /* Round 40: was `true` unconditionally -- a leftover from the wizard,
+       where the add-ons step existed whether or not she used it. On a board
+       that made the section fold shut the moment it rendered and kept the
+       nudge from ever pointing at it, which is the wrong place to lose a
+       prompt: carpet, windows and the garage are the easiest money on the
+       call and customers never raise them unprompted. */
+    case "addons":    return !!rpState.addonsAsked || rpAddonLineItems().length > 0;
     case "quote":     return rpState.quotedAloud;
     case "contact":   return rpState.address1.trim().length>2 && rpState.city.trim().length>1
                         && /^\d{5}$/.test(rpState.postalCode.trim())
                         && (rpState.email==="" || emailOk(rpState.email))
                         && rpState.addressReadBack;
     case "calendar":  return !!rpState.selectedStartTime;
+    case "customDetails": return String(rpState.customNotes||"").trim().length>3;
     default:          return true;
   }
 }
+function stepValid(){ return sectionValid(rpState.step); }
 
 /* =========================================================================
    VIEW
@@ -1162,9 +1442,14 @@ function fmtPhone(v){
 /* Every tappable option also registers a number key. Liz on a laptop never
    has to reach for the mouse; Liz on a phone never sees the numbers. */
 let KEYMAP = [];
+/* Round 40: both shells render more than one section at a time, so the
+   number keys have to belong to exactly one of them or 1-9 becomes a
+   lottery. KEYS_ON is true only while the FOCUSED section's body is being
+   built; every other section renders its options unnumbered. */
+let KEYS_ON = true;
 function opt(label, onclick, selected, sub, amount){
-  const n = KEYMAP.length + 1;
-  if(n<=9) KEYMAP.push(onclick);
+  const n = KEYS_ON ? KEYMAP.length + 1 : 99;
+  if(KEYS_ON && n<=9) KEYMAP.push(onclick);
   return `<button type="button" class="o ${selected?"on":""}" onclick="${onclick}" aria-pressed="${selected?"true":"false"}">
     ${n<=9?`<span class="key" aria-hidden="true">${n}</span>`:""}
     <span class="txt">${label}${sub?`<small>${sub}</small>`:""}</span>
@@ -1196,8 +1481,17 @@ const SHORT = {
   quote:"Quote", contact:"Address", calendar:"Calendar", done:"Done"
 };
 
-function screenHtml(){
-  const s=rpState.step;
+/* Round 40: was screenHtml(), which read rpState.step. Takes the section key
+   now, because both shells render several sections at once and the old
+   signature made that impossible. Every body below is unchanged.
+
+   GUARDRAIL 1 lives on the first line. On the wizard, a blocked job simply
+   never reached the tier or add-on screens, so their prices were never
+   rendered -- the ordering did the protecting. A board has no ordering, so
+   the protection has to be explicit, and it is: the three price-bearing
+   sections render no body at all when the job may not be quoted. */
+function sectionBody(s){
+  if(priceLocked() && ["tiers","addons","quote"].includes(s)) return lockedBody();
 
   if(s==="service"){
     const items = Object.entries(rpServices).filter(([k])=>k!=="moveoutrefresh").map(([k,v])=>
@@ -1315,6 +1609,9 @@ function screenHtml(){
       ${chk("militaryDiscount",`Military or first responder`,`${RP_MSG.military().pct}% off, max $${RP_MSG.military().cap} — offer it, don't wait to be asked`)}
       ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed it"):""}
     </div></div>`;
+    h+=`<div class="grp"><div class="opts">
+      ${chk("addonsAsked","I asked about all of these by name","Customers almost never bring these up themselves")}
+    </div></div>`;
     return h;
   }
 
@@ -1362,6 +1659,13 @@ function screenHtml(){
   return "";
 }
 
+function lockedBody(){
+  return `<p class="locked-note">No pricing on this job — not even a rough number.
+    Take their name and number and log it as a callback; the red box above has the words.</p>`;
+}
+/* Kept so anything still calling the old name gets the focused section. */
+function screenHtml(){ return sectionBody(rpState.step); }
+
 function fmtTierPrice(svc){
   const p = rpMoveoutTierBasePrice(svc);
   return p===null ? "Custom" : `$${p.toFixed(0)}`;
@@ -1392,53 +1696,401 @@ function toggleCoach(){
   render();
 }
 
+/* =========================================================================
+   ROUND 40 - THE SECTION MODEL
+   =========================================================================
+   rpState.step used to be a gate: it decided what rendered, whether Next
+   worked, and where in the call she was allowed to be. It is now a FOCUS --
+   the section she happens to be looking at, and nothing more. Every section
+   is live, editable and reachable at every moment of the call.
+
+   That is the whole point. A caller's first sentence is usually "how much
+   for a three bedroom", which under the old model was question four of six,
+   and the console spent the rest of the call being wrong about where it was.
+   ========================================================================= */
+function sectionKeys(){ return flow().filter(k => k !== "done"); }
+
+/* Manual open/close overrides. Focus always wins over these, so a section
+   can never be folded away while she is typing in it. */
+let secOpen = {};
+/* Under a stop, the only sections that still mean anything are who is
+   calling and what is wrong with the property. An open address form and a
+   month grid on a job that cannot be booked are an invitation to book it. */
+const BLOCKED_OPEN = ["service","caller","home"];
+function sectionExpanded(k){
+  if(rpState.step === k) return true;
+  if(hasStopGuard()) return BLOCKED_OPEN.includes(k) && !sectionValid(k);
+  if(k in secOpen) return secOpen[k];
+  /* Phone: one at a time, there is no room for more. Desktop: everything
+     unfinished stays open, finished folds to a line, so the board shortens
+     itself as the call progresses instead of growing. */
+  if(isPhoneLayout()) return false;
+  /* "Unfinished stays open" is right until the unfinished thing is a month
+     grid that also goes and fetches availability. The calendar opens when
+     it is the next thing, or when she goes to it. */
+  if(HEAVY_SECTIONS.includes(k)) return nextThing() === k;
+  return !sectionValid(k);
+}
+const HEAVY_SECTIONS = ["calendar"];
+function toggleSection(k){
+  if(rpState.step === k){ secOpen[k] = false; rpState.step = null; render(); return; }
+  focusSection(k);
+}
+function focusSection(k){
+  if(!sectionKeys().includes(k) && k !== "done") return;
+  rpState.step = k;
+  delete secOpen[k];
+  /* GUARDRAIL 2. The bank used to fire from next(); nobody has to press
+     Next any more, so it fires on movement instead. */
+  rpSendCallPartialLead();
+  render();
+  if(k === "calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+  const node = el("sec-" + k);
+  if(node && node.scrollIntoView) node.scrollIntoView({block:"nearest", behavior:"smooth"});
+}
+
+/* One line of what has actually been captured, shown on a folded section so
+   she never has to open one to check what is in it. Money is suppressed
+   under the price lock along with everything else. */
+function sectionSummary(k){
+  const P = n => priceLocked() ? "" : n;
+  switch(k){
+    case "service":  return rpState.service ? (isCustomService()?"Custom quote — no price on this call":(rpServices[rpState.service]||{}).name) : "";
+    case "caller":   return [rpState.fullName, phoneOk(rpState.phone)?fmtPhone(rpState.phone):""].filter(Boolean).join(" · ");
+    case "home": {
+      const bits=[];
+      if(rpState.bedrooms) bits.push(rpState.bedrooms+" bed");
+      if(rpState.bathrooms) bits.push(rpState.bathrooms+" bath");
+      if(["moveout","moveoutrefresh"].includes(rpState.service) && rpMoveoutQuestionnaireAnswered())
+        bits.push(rpMoveoutBlocked() ? rpMoveoutBlockReasons().join(", ") : "checks clear");
+      return bits.join(" · ");
+    }
+    case "tiers":    return rpState.moveoutTierChosen
+                       ? ((rpServices[rpState.service]||{}).name||"") + P(" — " + fmtTierPrice(rpState.service)) : "";
+    case "addons": {
+      const items = rpAddonLineItems();
+      if(!items.length && !rpState.militaryDiscount) return "None";
+      const names = items.map(i=>i.label);
+      if(rpState.militaryDiscount) names.push("Military discount");
+      return names.join(", ");
+    }
+    case "frequency":return rpState.frequency||"";
+    case "rooms":    return Number(rpState.carpetRooms)>0 ? rpState.carpetRooms+" rooms" : "";
+    case "hourly":   return (rpState.cleanerCount&&rpState.hourCount) ? `${rpState.cleanerCount} cleaners · ${rpState.hourCount} hours` : "";
+    case "customDetails": return String(rpState.customNotes||"").slice(0,60);
+    case "quote":    return rpState.quotedAloud ? "Quoted out loud" : "";
+    case "contact":  return [rpState.address1, rpState.city].filter(Boolean).join(", ");
+    case "calendar": return rpState.bookedAt || (rpState.selectedStartTime ? fmtTime(rpState.selectedStartTime) : "");
+    default:         return "";
+  }
+}
+
+/* The guided path, for someone who has done this four times: exactly one
+   thing, never a list. A list of next steps is the wizard wearing a hat. */
+const NUDGE = {
+  service:      ["Pick what they're calling about","You can change it later — nothing resets until you do."],
+  caller:       ["Get their name and number","If the call drops after this you still have a lead."],
+  home:         ["Bedrooms, bathrooms, and the three checks","Water, A/C, mold or pests. Unsure? Answer no."],
+  tiers:        ["Read out both prices and let them pick","Ask if anyone's inspecting — that's what decides it."],
+  addons:       ["Ask about carpet, windows and the garage by name","Then the military question, before you say the total."],
+  frequency:    ["One-time or on a schedule?","If they hesitate at all, book one-time."],
+  rooms:        ["How many carpeted rooms?","Two-room minimum — say it now."],
+  hourly:       ["How many cleaners, and how long?","Two cleaners is the normal answer."],
+  customDetails:["Type what they need, in their words","Don't guess a price. Not even a rough one."],
+  quote:        ["Say the price out loud, then tick the box","Say it once, then stop talking for three seconds."],
+  contact:      ["Get the address and read it back","Digit by digit on the house number."],
+  calendar:     ["Pick a time","Offer your two soonest real openings."]
+};
+const NUDGE_SHORT = {
+  service:"pick the service", caller:"name and number", home:"about the home",
+  tiers:"show both prices", addons:"ask about add-ons", frequency:"one-time or recurring",
+  rooms:"how many rooms", hourly:"cleaners and hours", customDetails:"what they need",
+  quote:"give the quote", contact:"the address", calendar:"pick a time"
+};
+/* The first unfinished section anywhere -- "what still needs an answer".
+   Drives the rail nudge. */
+function nextThing(){
+  if(hasStopGuard()) return null;
+  const keys = sectionKeys();
+  for(const k of keys) if(!sectionValid(k)) return k;
+  return null;
+}
+/* The first unfinished section AFTER the one she's in -- "move me forward".
+   Drives the dock. Separate from nextThing() on purpose: a Next button that
+   sends you where you already are is the thing that made the old wizard feel
+   like it was arguing with the call. */
+function forwardTarget(){
+  if(hasStopGuard()) return null;
+  const keys = sectionKeys(), i = keys.indexOf(rpState.step);
+  for(let n = i + 1; n < keys.length; n++) if(!sectionValid(keys[n])) return keys[n];
+  for(let n = 0; n < keys.length && n <= i; n++) if(!sectionValid(keys[n])) return keys[n];
+  return null;
+}
+
+/* What the one big button does right now. Never "advance a step" -- either
+   it points at the one unfinished thing, or the call is ready to close and
+   it closes it. */
+function primaryAction(){
+  if(hasStopGuard())              return {label:"Can't book this one — see the red box above", dead:true};
+  if(rpState.bookingSubmitting)   return {label:"Booking…", dead:true};
+  if(rpState.customLeadSaving)    return {label:"Saving…", dead:true};
+  if(nextThing() === null){
+    if(isCustomService())         return {label:"Submit request", run:submitCustomLead};
+    return {label:"Confirm booking", run:submitBooking};
+  }
+  const k = forwardTarget();
+  if(k) return {label:`Next: ${NUDGE_SHORT[k]||k}`, key:k};
+  /* Only reachable when the single unfinished thing is the one she's in. */
+  return {label:"Finish this section", key:rpState.step, dead:true};
+}
+
+function isPhoneLayout(){
+  try{ return !window.matchMedia("(min-width:1000px)").matches; }
+  catch(e){ return false; }
+}
+
+function sectionCard(k, n){
+  const t    = TITLES[k] || ["",""];
+  const open = sectionExpanded(k);
+  const ok   = sectionValid(k);
+  const sum  = sectionSummary(k);
+  /* Only the focused section owns the number keys. */
+  KEYS_ON = (rpState.step === k);
+  const body = open ? sectionBody(k) : "";
+  KEYS_ON = false;
+  const guards = open
+    ? guardrails(k).filter(g=>g.level!=="stop")   // stops live in the blocked card, once
+    : [];
+  return `<section class="sec ${open?"open":""} ${rpState.step===k?"focus":""} ${ok?"ok":""}" id="sec-${k}">
+    <button class="sec-h" type="button" aria-expanded="${open}" onclick="toggleSection('${k}')">
+      <span class="sec-n" aria-hidden="true">${ok?"✓":n}</span>
+      <span class="sec-t"><b>${esc(t[0])}</b>${sum?`<span>${esc(sum)}</span>`:(t[1]?`<span>${esc(t[1])}</span>`:"")}</span>
+      <span class="sec-chev" aria-hidden="true">${open?"−":"+"}</span>
+    </button>
+    ${open?`<div class="sec-b">${body}
+      ${guards.map(g=>`<div class="guard ${g.level}"><span class="ic">${g.level==="warn"?"▲":"•"}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
+    </div>`:""}
+  </section>`;
+}
+
+/* =========================================================================
+   ROUND 40b - FOCUS FOLLOWS THE HANDS
+   =========================================================================
+   On a wizard, "where she is" and "what is on screen" were the same fact.
+   On a board they are not, and the SAY line -- the one thing she reads out
+   loud -- is driven by focus. So clicking anything inside a section has to
+   move focus there BEFORE that click's own handler re-renders, or the words
+   on screen describe a different part of the call than the one she is in.
+
+   Capture phase does exactly that: it runs on the way down, before the
+   button's own onclick, so the render that handler triggers already has the
+   right focus. One render, not two, and no flicker.
+
+   Text fields are the exception -- repainting #main while a cursor is in an
+   input destroys the caret and the composition. Those repaint the SAY zone
+   alone.
+   ========================================================================= */
+function sectionOfNode(node){
+  const sec = node && node.closest ? node.closest(".sec") : null;
+  if(!sec || !sec.id || sec.id.indexOf("sec-") !== 0) return null;
+  const k = sec.id.slice(4);
+  return sectionKeys().includes(k) ? k : null;
+}
+function wireFocusFollow(){
+  const main = el("main");
+  if(!main || main.dataset.rpFocusWired) return;
+  main.dataset.rpFocusWired = "1";
+  main.addEventListener("click", e => {
+    if(e.target.closest && e.target.closest(".sec-h")) return;   // the header toggles; it handles itself
+    const k = sectionOfNode(e.target);
+    if(k && rpState.step !== k) rpState.step = k;                // no render -- the click's own will do it
+  }, true);
+  main.addEventListener("focusin", e => {
+    const k = sectionOfNode(e.target);
+    if(!k || rpState.step === k) return;
+    rpState.step = k;
+    renderSayZone(); renderStrip(); renderDock(); renderSide();  // never #main: the caret lives there
+  });
+}
+function renderSayZone(){
+  const z = el("sayZone");
+  if(z) z.innerHTML = sayBlock();
+}
+
+function sayBlock(){
+  /* Round 40c. The blocked board hid every price correctly and then left the
+     largest text on the screen -- the line she reads out loud -- offering the
+     caller a choice between two tiers "at a custom quote". Nobody should be
+     offered a pick between two things we have just decided we cannot sell
+     them. Under a stop there is exactly one thing to say, and it is the same
+     sentence the red card gives her, so she hears it twice and says it once. */
+  /* Round 40f: renders nothing under a stop. blockedActionCard() already
+     carries this exact sentence as step 2 and has since round 39, so 40c's
+     replacement say-line was the same words a second time -- and on a 390px
+     screen those two hundred pixels pushed the one button she needs behind
+     the sticky dock. The card is the script on a blocked call. */
+  if(hasStopGuard()) return "";
+  const line = lineFor(rpState.step);
+  if(!line) return "";
+  return `<div class="say">
+      <div class="say-label"><span>Say</span><span class="spacer"></span>
+        <button class="coach-btn" type="button" aria-expanded="${coachOpen}" onclick="toggleCoach()">More detail</button></div>
+      <p>${line.say}</p>
+      <div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>
+    </div>
+    ${line.act ? `<div class="doline"><span class="k">Do</span><p>${line.act}</p></div>` : ""}`;
+}
+
+function errorBlocks(){
+  return `${rpState.bookingError?`<div class="guard stop"><span class="ic">■</span><div><b>Booking didn't go through</b>${esc(rpState.bookingError)}</div></div>`:""}
+    ${rpState.customLeadError?`<div class="guard stop"><span class="ic">■</span><div><b>Couldn't save</b>${esc(rpState.customLeadError)}</div></div>`:""}
+    ${rpState.slotsError?`<div class="guard warn"><span class="ic">▲</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}</div></div>`:""}`;
+}
+
+function doneScreen(){
+  const t = TITLES.done;
+  KEYS_ON = true;
+  return `${sayBlock()}<div class="card"><h2>${t[0]}</h2>${sectionBody("done")}</div>`;
+}
+
+/* ---- the two shells ---------------------------------------------------
+   Identical section list, identical brain. The difference is how much of it
+   fits, and what she can reach with a thumb. */
+function renderBoard(){
+  const keys = sectionKeys();
+  /* Under a stop the card leads: it is the only thing on screen that matters
+     and it carries the words to say. */
+  const stopped = hasStopGuard();
+  el("main").innerHTML = `
+    ${stopped?blockedActionCard():""}
+    <div id="sayZone">${sayBlock()}</div>
+    ${stopped?"":blockedActionCard()}
+    ${errorBlocks()}
+    ${keys.map((k,i)=>sectionCard(k,i+1)).join("")}`;
+  wireFocusFollow();
+}
+
+function renderPhone(){
+  const keys = sectionKeys();
+  const stopped = hasStopGuard();
+  el("main").innerHTML = `
+    ${stopped?blockedActionCard():""}
+    <div id="sayZone">${sayBlock()}</div>
+    ${stopped?"":blockedActionCard()}
+    ${stopped?"":quickBar()}
+    ${nudgeCard()}
+    ${errorBlocks()}
+    <div style="margin-top:12px">${keys.map((k,i)=>sectionCard(k,i+1)).join("")}</div>`;
+  wireFocusFollow();
+}
+
+/* The two jobs that are not a whole call: quote somebody a number and send
+   it, or take a lead in twenty seconds and get off the phone. Both were
+   possible before and neither was reachable without walking the wizard. */
+function quickBar(){
+  const canText  = phoneOk(rpState.phone) && !priceLocked() && rpFinalPrice() > 0;
+  const canLead  = String(rpState.fullName||"").trim().length > 1 && phoneOk(rpState.phone);
+  if(!canText && !canLead) return "";
+  return `<div class="qbar">
+    ${canText?`<button type="button" class="primary" onclick="textThisPrice()">Text them this price</button>`:""}
+    ${canLead?`<button type="button" onclick="openSheet('endSheet')">Save lead &amp; end</button>`:""}
+  </div>`;
+}
+function rpCallQuoteSms(){
+  const price = rpFormatMoneyDisplay(rpFinalPriceCents());
+  const name  = (rpServices[rpState.service]||{}).name || "cleaning";
+  const who   = rpState.csrName ? ` — ${rpState.csrName}` : "";
+  return `Red Prairie Cleaning: ${name} for your place comes to ${price}. `
+       + `That price is good as quoted. Reply or call 580-583-4444 to lock in a time${who}.`;
+}
+function textThisPrice(){
+  if(priceLocked() || !phoneOk(rpState.phone)) return;
+  rpSendCallPartialLead("Partial — price texted to the caller");
+  const to = normalizePhone(rpState.phone);
+  window.location.href = `sms:${to}?&body=${encodeURIComponent(rpCallQuoteSms())}`;
+}
+
+function nudgeCard(){
+  if(hasStopGuard()) return "";
+  const k = nextThing();
+  if(!k){
+    const a = primaryAction();
+    return `<div class="nudge ready"><span class="k">Ready</span><div>
+      <b>Everything's filled in</b><p>Nothing left to ask. ${esc(a.label)} when they're ready.</p>
+      ${a.run?`<button type="button" onclick="next()">${esc(a.label)}</button>`:""}
+    </div></div>`;
+  }
+  const [title, why] = NUDGE[k] || [k, ""];
+  /* Round 40c: when the outstanding thing is the thing she's standing in,
+     the DO line already says it in the same words two inches away. Say she's
+     on it and name what comes after instead. */
+  if(rpState.step === k){
+    /* On a phone the DO line two inches above says this in the same words,
+       and a duplicated instruction costs a whole thumb-scroll before the
+       first control. On the desktop rail it costs nothing -- that column
+       would otherwise be empty -- so it stays there. */
+    if(isPhoneLayout()) return "";
+    const after = forwardTarget();
+    return `<div class="nudge"><span class="k">You're here</span><div>
+      <b>${esc(title)}</b>
+      <p>${after ? "Then: " + esc((NUDGE[after]||[after])[0]) : "Then you're ready to book."}</p>
+    </div></div>`;
+  }
+  return `<div class="nudge"><span class="k">Next</span><div>
+    <b>${esc(title)}</b>${why?`<p>${esc(why)}</p>`:""}
+    <button type="button" onclick="focusSection('${k}')">Take me there</button>
+  </div></div>`;
+}
+
 function render(){
   if(!isAuthed()){ renderAuthGate(); return; }
   if(!rpState.csrName){ renderSetup(); return; }
-  KEYMAP = [];
+  KEYMAP = []; KEYS_ON = false;
 
-  const t = TITLES[rpState.step]||["",""];
-  const line = lineFor(rpState.step);
-  const guards = guardrails();
-  const body = screenHtml();          // must run before the dock so KEYMAP is filled
+  if(rpState.step === "done"){ el("main").innerHTML = doneScreen(); }
+  else if(isPhoneLayout()) renderPhone();
+  else renderBoard();
 
-  el("main").innerHTML = `
-    ${line?`<div class="say">
-      <div class="say-label"><span>Say</span><span class="spacer"></span>
-        <button class="coach-btn" type="button" aria-expanded="${coachOpen}" onclick="toggleCoach()">Coach</button></div>
-      <p>${line.say}</p>
-      <div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>
-    </div>`:""}
-    <div class="card">
-      <h2>${t[0]}</h2>${t[1]?`<p class="sub">${t[1]}</p>`:""}
-      ${body}
-      ${guards.map(g=>`<div class="guard ${g.level==="stop"?"stop":g.level}"><span class="ic">${g.level==="stop"?"■":g.level==="warn"?"▲":"•"}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
-      ${rpState.bookingError?`<div class="guard stop"><span class="ic">■</span><div><b>Booking didn't go through</b>${esc(rpState.bookingError)}</div></div>`:""}
-      ${rpState.customLeadError?`<div class="guard stop"><span class="ic">■</span><div><b>Couldn't save</b>${esc(rpState.customLeadError)}</div></div>`:""}
-      ${rpState.slotsError&&rpState.step==="calendar"?`<div class="guard warn"><span class="ic">▲</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}</div></div>`:""}
-    </div>`;
-
-  renderStrip(); renderSide(); renderTop(); renderDock();
+  renderStrip(); renderSide(); renderTop(); renderDock(); renderTierSheet();
   save();
 }
+
+/* A shell change is a re-render, not a reflow: the two layouts do not
+   render the same DOM, so CSS alone cannot switch between them. */
+try{
+  const mq = window.matchMedia("(min-width:1000px)");
+  const onShell = () => { try{ render(); }catch(e){} };
+  if(mq.addEventListener) mq.addEventListener("change", onShell);
+  else if(mq.addListener) mq.addListener(onShell);
+}catch(e){}
 
 function renderTop(){
   el("whoName").textContent = rpState.fullName || "Call Console";
   el("whoSub").textContent = rpState.fullName
     ? (phoneOk(rpState.phone) ? fmtPhone(rpState.phone) : "no number yet")
     : "Internal tool";
-  const custom = rpIsCustomQuoteOnly() || isCustomService();
+  /* GUARDRAIL 1, in the one place she looks most. priceLocked() is the same
+     test the section bodies use, so the header and the board cannot disagree
+     about whether this job has a price. */
+  const custom = priceLocked();
   const m = el("money");
   m.classList.toggle("is-custom", custom);
   m.innerHTML = custom
     ? `<b>Custom</b><small>Don't quote</small>`
     : `<b>${rpFinalPrice()>0?rpFormatMoneyDisplay(rpFinalPriceCents()):"—"}</b><small>Total</small>`;
+  /* GUARDRAIL 3: the tier explainer is reachable for the whole call, in both
+     shells, from the moment the call is known to be a move-out. */
+  const tb = el("tierBtn");
+  if(tb) tb.hidden = !["moveout","moveoutrefresh"].includes(rpState.service);
 }
 
+/* Round 40: the chips used to mean POSITION -- done behind you, pending
+   ahead. On a board there is no behind or ahead, so they mean STATE: filled
+   in or not, and every one of them is live at every moment. */
 function renderStrip(){
-  const f=flow(), i=stepIdx();
-  el("strip").innerHTML = f.map((s,n)=>
-    `<button type="button" class="chip ${n===i?"now":n<i?"done":""}" onclick="jumpToStep('${s}')">${SHORT[s]||s}</button>`
+  const keys = sectionKeys();
+  el("strip").innerHTML = keys.map(k=>
+    `<button type="button" class="chip ${rpState.step===k?"now":sectionValid(k)?"done":""}" onclick="focusSection('${k}')">${SHORT[k]||k}</button>`
   ).join("");
   const now = el("strip").querySelector(".now");
   if(now) now.scrollIntoView({inline:"center", block:"nearest"});
@@ -1462,9 +2114,15 @@ function renderSide(){
   if(rpState.bedrooms) rows.push(["Bedrooms", rpState.bedrooms]);
   if(rpState.bathrooms) rows.push(["Bathrooms", rpState.bathrooms]);
   if(rpState.frequency) rows.push(["Frequency", rpState.frequency]);
-  if(rpState.service && !rpIsCustomQuoteOnly() && rpDisplayBasePrice()>0) rows.push(["Base", rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice()))]);
-  rpAddonLineItems().forEach(r=>rows.push([r.label, r.quoted?"quoted":`+$${r.price.toFixed(0)}`]));
-  if(rpState.militaryDiscount && rpMilitaryDiscountAmount()>0) rows.push(["Military discount", "−"+rpFormatMoneyDisplay(rpMilitaryDiscountCents()), true]);
+  /* GUARDRAIL 1 again: the recap is a price breakdown, so under the lock it
+     shows what the job IS and never what it would cost. */
+  if(!priceLocked()){
+    if(rpState.service && rpDisplayBasePrice()>0) rows.push(["Base", rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice()))]);
+    rpAddonLineItems().forEach(r=>rows.push([r.label, r.quoted?"quoted":`+$${r.price.toFixed(0)}`]));
+    if(rpState.militaryDiscount && rpMilitaryDiscountAmount()>0) rows.push(["Military discount", "−"+rpFormatMoneyDisplay(rpMilitaryDiscountCents()), true]);
+  } else {
+    rpAddonLineItems().forEach(r=>rows.push([r.label, "—"]));
+  }
   if(rpState.bookedAt) rows.push(["Scheduled", rpState.bookedAt]);
 
   const area = rpServiceAreaStatus();
@@ -1476,12 +2134,13 @@ function renderSide(){
         : `${esc(area.area)} — extra drive time. Fine to book; the office sees the flag.`}</div></div>`;
 
   el("side").innerHTML = `
+    ${isPhoneLayout()?"":nudgeCard()}
     ${rows.length?`<div class="recap">
       <div class="recap-h">On this call</div>
       ${rows.map(r=>`<div class="recap-row ${r[2]?"neg":""}"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("")}
     </div>`:""}
     ${areaCard}
-    ${comparePanels()}`;
+    ${priceLocked()?"":comparePanels()}`;
 }
 
 /* =========================================================================
@@ -1961,28 +2620,130 @@ window.addEventListener("resize", function(){
   cmpResizeTimer = setTimeout(function(){ cmpSyncTopVar(); renderSide(); }, 160);
 });
 
+/* =========================================================================
+   HARD STOPS (round 39)
+   =========================================================================
+   Everything here exists because the console changed hands. Liz could read
+   a red warning and know what it meant. Someone on her first week needs
+   the mistake to be unavailable, not discouraged.
+
+   A stop-level guardrail means one thing: do not say a price. Water off,
+   no A/C, mold or pests, a home too big to price off the ladder, or a
+   service that was never quotable. In every one of those cases the correct
+   call is identical -- take the name and number, log it as a callback, end
+   the call warmly -- so that is now a single button rather than a
+   procedure she has to remember. */
+function hasStopGuard(){
+  /* Round 40: was guardrails() -- the CURRENT step's only. See allGuards(). */
+  return allGuards().some(g => g.level === "stop");
+}
+
+let blockedFlash = 0;
+function flashBlocked(){
+  blockedFlash = Date.now();
+  render();
+  /* Round 40e: was ".guard.stop", which stop guardrails no longer render as
+     -- so pressing the dead button scrolled nowhere. */
+  const el0 = document.querySelector(".blocked-do") || document.querySelector(".guard.stop");
+  if(el0 && el0.scrollIntoView) el0.scrollIntoView({block:"center", behavior:"smooth"});
+}
+
+/* The whole correct response to a stop, as one action. Reuses the same
+   /lead path the End-call sheet uses, so the office sees it in exactly the
+   shape it already knows. */
+async function logCallbackAndFinish(){
+  const nameOk = String(rpState.fullName||"").trim().length > 1;
+  const phoneOk_ = phoneOk(rpState.phone);
+  if(!nameOk || !phoneOk_){
+    rpState.step = "caller";
+    rpState.blockedNeedsContact = true;
+    render();
+    return;
+  }
+  rpState.blockedNeedsContact = false;
+  await logOutcome("Callback needed — job can't be priced on the phone");
+}
+
+function blockedActionCard(){
+  if(!hasStopGuard()) return "";
+  const have = String(rpState.fullName||"").trim().length > 1 && phoneOk(rpState.phone);
+  /* Round 40e: the reason lives here now. sectionCard() filters stop-level
+     guardrails out of the sections so a single stop can't print once per open
+     section on a board -- correct, but it left the card saying "don't quote
+     this" without ever saying what was wrong with the house, which is the
+     next thing the caller asks. Reason first, then the response. */
+  const why = allGuards().filter(g=>g.level==="stop");
+  return `<div class="blocked-do">
+    ${why.map(g=>`<div class="blocked-why"><b>${g.title}</b>${g.body}</div>`).join("")}
+    <div class="blocked-do-h">What to do right now</div>
+    <ol class="blocked-do-steps">
+      <li><b>Don't say a price.</b> Not even a rough one. A number said on the phone is the number they'll expect.</li>
+      <li>Say: <i>“I want to get this right for you rather than guess — let me take your details and we'll call you straight back.”</i></li>
+      <li>${have
+            ? `You already have their name and number. Press the button below.`
+            : `Get their <b>name and phone number</b> — the button below takes you back to do that.`}</li>
+    </ol>
+    <button class="blocked-do-btn" type="button" onclick="logCallbackAndFinish()">
+      ${have ? "Log this as a callback and finish" : "Go back and get their name and number"}
+    </button>
+  </div>`;
+}
+
+/* Round 40: the dock no longer advances anything. It shows the ONE thing
+   still outstanding, or -- when nothing is -- it closes the call. Back
+   becomes "collapse this and step back to the previous section", which is
+   still useful on a phone and harmless on a board. */
 function renderDock(){
   const d = el("dock");
   if(rpState.step==="done"){ d.hidden = true; return; }
   d.hidden = false;
-  const i = stepIdx();
-  el("backBtn").style.visibility = i>0 ? "visible" : "hidden";
-  const busy = rpState.bookingSubmitting || rpState.customLeadSaving;
-  const label = rpState.step==="calendar"
-      ? (rpState.bookingSubmitting?"Booking…":"Confirm booking")
-    : (rpState.step==="contact" && isCustomService())
-      ? (rpState.customLeadSaving?"Saving…":"Submit request")
-    : stepValid() ? "Next" : "Next — skip for now";
-  el("goLabel").textContent = label;
-  el("goBtn").disabled = !!busy;
+  const keys = sectionKeys(), i = keys.indexOf(rpState.step);
+  el("backBtn").style.visibility = i > 0 ? "visible" : "hidden";
+  const a = primaryAction();
+  const stopped = !!a.dead && hasStopGuard();
+  el("goLabel").textContent = a.label;
+  el("goBtn").disabled = !!a.dead;
+  el("goBtn").classList.toggle("is-stopped", stopped);
 }
 
 /* Jumping around is normal on a real call — a caller volunteers the address
    before you've asked for it. Any step in the current flow, one tap. */
-function jumpToStep(step){
-  if(!flow().includes(step)) return;
-  rpState.step=step; render();
-  if(step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
+/* Kept as the old name; focusSection is the real one now. */
+function jumpToStep(step){ focusSection(step); }
+
+/* =========================================================================
+   GUARDRAIL 3 + 4 - the tier explainer
+   =========================================================================
+   "What's the difference?" is the most-asked question on a move-out call and
+   the one where a wrong answer costs the most: describe Express as protecting
+   a deposit and we owe a free re-clean on a job that was never priced for it.
+
+   Every word below comes from rp-messages.js or the engine. Nothing here is
+   written down twice, so the phone and the website cannot describe the same
+   two products differently -- and RP_MSG.guarantee.limit, the sentence that
+   stops anyone promising a deposit back, is carried verbatim.
+   ========================================================================= */
+function renderTierSheet(){
+  const host = el("tierSheetBody");
+  if(!host) return;
+  if(!["moveout","moveoutrefresh"].includes(rpState.service)){ host.innerHTML = ""; return; }
+  const ratio = RP_MSG.tiers.workRatio();
+  host.innerHTML = `
+    <div class="tier-say">
+      <span class="k">Say this</span>
+      <p>“${esc(RP_MSG.tiers.spoken)}”</p>
+      <p class="ask">“${esc(RP_MSG.tiers.spokenAsk)}”</p>
+      ${ratio?`<p>“${esc(ratio)}”</p>`:""}
+    </div>
+    <div class="never">
+      <b>Never say</b>${esc(RP_MSG.guarantee.limit)}
+    </div>
+    <div class="never" style="background:var(--blue-wash);border-color:var(--blue)">
+      <b style="color:var(--blue)">The guarantee, exactly</b>
+      <div style="margin-bottom:6px"><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.inspectionName)}:</b> ${esc(RP_MSG.guarantee.deposit())}</div>
+      <div><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.expressName)}:</b> ${esc(RP_MSG.guarantee.satisfaction())}</div>
+    </div>
+    ${priceLocked() ? `<p class="locked-note">This job can't be priced on the phone, so the numbers are hidden. The wording above still applies.</p>` : cmpTiers()}`;
 }
 
 /* =========================================================================
@@ -2049,7 +2810,12 @@ function lookupIndex(){
         const range = r.low === r.high ? money(r.low) : money(r.low) + "\u2013" + money(r.high);
         return `${r.beds}${r.beds === 4 ? "+" : ""} bed ${range}`;
       }).join("  \u00b7  ");
-      return `Around here a deposit is about a month's rent \u2014 ${rows} \u2014 against $399\u2013$599 for the clean.`;
+      /* Round 41: was a hardcoded "$399-$599". The ladder moved 5% and this
+         line didn't, which is exactly the drift rp-pricing-engine.js exists
+         to prevent. Reads the live ladder now. */
+      const ladder = RP_MOVEOUT_BEDROOM_TIERS;
+      const span = `$${ladder[0].base}\u2013$${ladder[ladder.length - 1].base}`;
+      return `Around here a deposit is about a month's rent \u2014 ${rows} \u2014 against ${span} for the clean.`;
     })(),
     why: RP_MSG.deposit.note + " And never say they'll get it back: " + RP_MSG.guarantee.limit});
   out.push({kind:"Policy", title:"Deposit or payment up front?", answer:`“${RP_MSG.payment.spoken}”`, why:"Easiest true close on the list. Lead with it any time they hesitate about committing."});
@@ -2122,12 +2888,18 @@ function typingInAField(t){
 document.addEventListener("keydown", e=>{
   const lookupOpen = !el("lookupSheet").hidden;
   const endOpen = !el("endSheet").hidden;
+  /* Round 39: the Stuck sheet is a third overlay and has to obey the same
+     two rules as the other two -- Escape closes it, and while it is open
+     no step shortcut fires underneath it. Missing that would have made
+     number keys silently change the call behind an open sheet. */
+  const stuckOpen = !el("stuckSheet").hidden;
   if(e.key==="Escape"){
     if(lookupOpen) return closeSheet("lookupSheet");
+    if(stuckOpen) return closeSheet("stuckSheet");
     if(endOpen) return closeSheet("endSheet");
     return;
   }
-  if(lookupOpen || endOpen) return;
+  if(lookupOpen || endOpen || stuckOpen) return;
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   if(e.key==="/" && !typingInAField(e.target)){ e.preventDefault(); return openLookup(); }
   if(e.key==="?" && !typingInAField(e.target)){ e.preventDefault(); return toggleCoach(); }
@@ -2185,9 +2957,10 @@ setInterval(()=>{
 function renderSetup(){
   el("main").innerHTML=`<div class="setup-wrap"><div class="card">
     <h2>Who's taking calls?</h2>
-    <p class="sub">Used in your greeting and attached to every lead you log. Saved on this device.</p>
-    <div class="f"><input id="csrName" placeholder="Liz" autocomplete="off" onkeydown="if(event.key==='Enter')finishSetup()"></div>
+    <p class="sub">Your first name — it goes in the greeting you read out, and it's saved against every call you take. Saved on this computer, so you only do this once.</p>
+    <div class="f"><input id="csrName" placeholder="Your first name" autocomplete="off" onkeydown="if(event.key==='Enter')finishSetup()"></div>
     <button class="o center on" type="button" style="justify-content:center" onclick="finishSetup()">Start taking calls</button>
+    <p class="note" style="margin-top:14px;line-height:1.55">This walks you through a call one question at a time and works out the price for you. You can't break it — nothing is sent anywhere until you book the job or log the call at the end. If you get stuck mid-call, the <b>Stuck?</b> button at the top always has something safe to say.</p>
   </div></div>`;
   el("side").innerHTML=""; el("strip").innerHTML=""; el("dock").hidden=true;
   setTimeout(()=>{ const i=el("csrName"); if(i) i.focus(); },30);
@@ -2237,7 +3010,10 @@ function checkAuth(){
 /* ---------- Interaction ---------- */
 function set(f,v){
   rpState[f]=v; save();
-  try{ renderSide(); renderTop(); renderDock(); }catch(e){}
+  /* Typing must not re-render the field being typed in (it would lose the
+     caret), so this stays a partial update -- but the dock label and the
+     rail nudge both depend on completeness now, so they refresh here too. */
+  try{ renderSide(); renderTop(); renderDock(); renderStrip(); }catch(e){}
 }
 function pick(f,v){ rpState[f]=v; render(); }
 function toggle(f){ rpState[f]=!rpState[f];
@@ -2272,7 +3048,11 @@ function switchMoveoutTier(k){
 function chooseMoveoutTier(k){
   rpState.service=k;
   rpState.moveoutTierChosen=true;
-  next();
+  /* Round 40: this used to call next(), which yanked the screen to the
+     following step the instant she tapped a tier. On a board that is exactly
+     the "forcing the conversation" behaviour being removed -- a caller often
+     picks a tier and immediately asks something else. Just record it. */
+  render();
 }
 function pickService(k){ markCallStart(); rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
@@ -2289,34 +3069,38 @@ function pickService(k){ markCallStart(); rpState.service=k;
   rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.handymanInterest=false; rpState.cleanerCount=null; rpState.addonDropNotice=""; rpState.moveoutTierChosen=false;
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
+  rpState.addonsAsked=false;
   rpState.noAC=false; rpState.moldConcern=false; rpState.petWasteConcern=false; rpState.hazardConcern=false;
   rpState.moveoutWaterOn=null; rpState.moveoutAcOn=null; rpState.moveoutMoldPests=null;
   rpState.moveoutRentalOrSelling=null; rpState.moveoutPmOrRealtor="";
+  /* Round 40: a different service is a different set of sections, so the
+     manual fold overrides from the previous one are meaningless. */
+  secOpen = {};
   render();
   // Fetch availability in the background now, not when she reaches the
   // calendar step — by the time she's at the price, real slot counts are
   // already loaded and ready for an honest urgency line, not a guess.
   if(k!=="custom" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
 }
-function next(){
-  /* Round 36: the earliest safe moment to bank the lead. By the time she
-     leaves the caller screen the console holds a name and a number, which
-     is everything a callback needs. Everything after this is upside. */
-  rpSendCallPartialLead();
+/* Round 40: next() is the primary action, not a step advance. It either
+   takes her to the one thing still missing, or -- when nothing is missing --
+   books the job. It never walks a sequence, and it is never the only way
+   forward: every section is reachable directly at all times.
 
+   Round 36's lead bank and round 39's locked door both still fire here. */
+function next(){
+  rpSendCallPartialLead();
   if(rpState.bookingSubmitting || rpState.customLeadSaving) return;
-  const f=flow(), i=stepIdx();
-  if(rpState.step==="calendar"){ submitBooking(); return; }
-  if(rpState.step==="contact" && isCustomService()){ submitCustomLead(); return; }
-  if(i<f.length-1){
-    rpState.step=f[i+1];
-    window.scrollTo({top:0,behavior:"smooth"});
-    render();
-    if(rpState.step==="calendar" && !Object.keys(rpState.availableSlots||{}).length) loadSlots();
-  }
+  if(hasStopGuard()){ flashBlocked(); return; }
+  const a = primaryAction();
+  if(a.dead) return;
+  if(a.run){ a.run(); return; }
+  if(a.key){ focusSection(a.key); return; }
 }
-function back(){ const f=flow(), i=stepIdx();
-  if(i>0){ rpState.step=f[i-1]; window.scrollTo({top:0,behavior:"smooth"}); render(); } }
+function back(){
+  const keys = sectionKeys(), i = keys.indexOf(rpState.step);
+  if(i > 0) focusSection(keys[i-1]);
+}
 
 
 /* ---------- Persistence (survives an accidental refresh mid-call) ---------- */
@@ -2337,6 +3121,22 @@ function setCsrIdentity(name){
   save();
 }
 function resetCall(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} clearCallStart(); window.location.reload(); }
+
+/* Round 42: the crew is paid a share of the ticket, so payroll needs that
+   number per job and it must come from the same place the price does. A
+   human recomputing 40% by hand at the end of a week is the exact drift
+   rp-pricing-engine.js exists to stop. Rendered into the office note and
+   sent as its own field. */
+function crewPaySummary(){
+  const e = (typeof rpCurrentJobEconomics === "function") ? rpCurrentJobEconomics() : null;
+  if(!e) return "";
+  const money = n => "$" + Number(n).toFixed(2);
+  const floorNote = e.onFloor
+    ? ` — ON THE MINIMUM WAGE FLOOR at ${e.crewHours} crew-hours; 40% would have been ${money(rpCrewGrossPay(e.ticket))}`
+    : ` (40% of ${money(e.ticket)}; minimum wage would take over past ${e.floorTripHours.toFixed(1)} crew-hours)`;
+  return `Crew pay: ${money(e.crewPay)} split across the crew${floorNote}. `
+       + `Budgeted ${e.crewHours} crew-hours — RECORD ACTUAL HOURS WORKED.`;
+}
 
 /* ---------- Office/crew summary ---------- */
 function jobDetails(){
@@ -2376,6 +3176,10 @@ function jobDetails(){
     rpState.handymanInterest?"Additional service request: Make-ready repairs \u2014 quoted separately, not included.":"",
     `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
+    /* Round 42: pay is a share of this ticket, so it belongs next to the
+       ticket -- not buried in the crew-prep warnings, where it first landed
+       and read as if something were wrong with the job. */
+    crewPaySummary(),
     (()=>{const a=rpServiceAreaStatus();return a.status==="core"?`Service area: ${a.area}`:a.status==="unknown"?"":`\u26a0 SERVICE AREA: ${a.label}${a.area?` (${a.area})`:""}`;})(),
     `Lead source: ${rpState.csrLeadSource||"N/A"}`,
     rpState.csrCallNotes?`Call notes: ${rpState.csrCallNotes}`:"",

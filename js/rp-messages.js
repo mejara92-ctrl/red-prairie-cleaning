@@ -50,7 +50,7 @@ const RP_MSG = {
      tools/check-prices.py will fail the build if a page hardcodes a
      different one. */
   facts: {
-    reviewCount: 61,
+    reviewCount: 65,
     rating: "5.0",
     phone: "(580) 215-0915",
     phoneDigits: "5802150915"
@@ -145,7 +145,66 @@ const RP_MSG = {
     spoken: "Inspection Ready is the full reset — inside the oven, the fridge, cabinets, baseboards, the works — and it's the one we stand behind if your landlord flags something. Express is kitchen, bathrooms, floors and surfaces. Clean, just not built for an inspection.",
     /* The question that actually decides it. Not a preference question —
        a fact about their situation, which is why it closes cleanly. */
-    spokenAsk: "Is anyone walking through and checking the place after you're out?"
+    spokenAsk: "Is anyone walking through and checking the place after you're out?",
+    /* Round 38: the sentence that makes the ladder self-explanatory. Built
+       from the engine's crew and hours rather than written down, so it can
+       never claim a ratio the numbers don't support -- and it renders
+       nothing at all if they ever stop being a clean multiple. */
+    workRatio() {
+      const ir = RP_MSG.crewMath("moveout"), ex = RP_MSG.crewMath("moveoutrefresh");
+      if (!ir || !ex || !ex.lo || !ex.hi) return "";
+      /* Compare the midpoints of the two crew-hour ranges. 4–6 against 8–10
+         is exactly 2x at the bottom and 1.67x at the top, so neither end on
+         its own is the honest number -- the midpoints (10 against 18) give
+         1.8x, which is "about double" and not "double".
+
+         Hedged deliberately. The whole point of this line is that the price
+         is explained by the work, and a claim a customer could check and
+         find slightly off would undo that faster than saying nothing. If the
+         ranges ever become a clean multiple it says so without the hedge,
+         and if they drift far from one it renders nothing at all. */
+      const irMid = (ir.lo + ir.hi) / 2, exMid = (ex.lo + ex.hi) / 2;
+      if (!exMid) return "";
+      const r = irMid / exMid;
+      if (r < 1.7 || r > 2.3) return "";
+      const exact = Math.abs(ir.lo - ex.lo * 2) < 0.01 && Math.abs(ir.hi - ex.hi * 2) < 0.01;
+      const phrase = exact ? "double" : "about double";
+      /* Round 41. This used to end "...so it's double the price", derived
+         from the HOURS alone. Round 41 took 5% off Inspection Ready without
+         touching Express, so the hours stayed exactly 2x and the prices
+         became 1.90x -- and the sentence would have gone on claiming double
+         the price while a customer looking at $199 and $379 could see it
+         wasn't. Checked against the live ladder now. */
+      const pr = RP_MSG.tiers.priceRatio();
+      let priceClause = "";
+      if (pr !== null) {
+        if (pr >= 1.97 && pr <= 2.03)      priceClause = `, so it's ${phrase} the price`;
+        else if (pr >= 1.60 && pr < 1.97)  priceClause = `, and still less than ${phrase} the price`;
+        /* Above 2.03 it says nothing about price at all: "more than double"
+           is true but there is no version of it worth saying out loud. */
+      }
+      return `Same crew both ways — ${ex.crew} cleaners. Inspection Ready is ${phrase} the hours${priceClause}.`;
+    },
+    /* What the ladder actually charges, Inspection Ready against Express,
+       read live off the engine. Returns null rather than a number whenever
+       the answer would be misleading: no engine on this page, the two
+       tables don't line up, or the rungs disagree with each other by enough
+       that no single ratio describes the ladder. workRatio() above says
+       nothing about price when this is null, which is the safe direction. */
+    priceRatio() {
+      if (typeof RP_MOVEOUT_BEDROOM_TIERS === "undefined") return null;
+      if (typeof RP_MOVEOUT_REFRESH_BEDROOM_TIERS === "undefined") return null;
+      const ir = RP_MOVEOUT_BEDROOM_TIERS, ex = RP_MOVEOUT_REFRESH_BEDROOM_TIERS;
+      if (!ir.length || ir.length !== ex.length) return null;
+      const ratios = [];
+      for (let i = 0; i < ir.length; i++) {
+        if (!ex[i] || !ex[i].base || !ir[i] || !ir[i].base) return null;
+        ratios.push(ir[i].base / ex[i].base);
+      }
+      const lo = Math.min.apply(null, ratios), hi = Math.max.apply(null, ratios);
+      if (hi - lo > 0.06) return null;      /* not one ladder, several */
+      return (lo + hi) / 2;
+    }
   },
 
   /* ── Basic vs Deep, said out loud ───────────────────────────────────
@@ -163,9 +222,11 @@ const RP_MSG = {
 
   /* ── What's actually at risk ─────────────────────────────────────────
      The strongest argument this business has, and until now it was
-     nowhere in the funnel: a customer comparing $499 against a cheaper
-     cleaner is answering the wrong question. The real comparison is $499
-     against the deposit they're trying to get back.
+     nowhere in the funnel: a customer comparing our 3-bedroom price against
+     a cheaper cleaner is answering the wrong question. The real comparison
+     is that price against the deposit they're trying to get back. (Figures
+     named in this comment used to be $499; they move, the argument doesn't,
+     so the live number comes from the engine at call time.)
 
      Figures are Lawton-area house rents with a deposit at roughly one
      month's rent, which is the local norm. They are ESTIMATES ABOUT THE
@@ -175,7 +236,7 @@ const RP_MSG = {
      call and RP_MSG.guarantee.limit is what we say about it.
 
      Ranges are per BEDROOM COUNT, not per price tier, because a
-     1-bedroom and a 2-bedroom pay the same $399 but have very different
+     1-bedroom and a 2-bedroom pay the same 1-2 bedroom price but have very different
      amounts on the line — and quoting a 2-bedroom's deposit to someone
      in a 1-bedroom would be the kind of small dishonesty that costs more
      than it earns. */
@@ -234,7 +295,10 @@ const RP_MSG = {
      promise a crew or a duration the price wasn't built on. Returns "" if
      the engine can't answer, rather than guessing. */
   crewMath(service) {
-    const crew = service === "moveout" ? 3 : 2;
+    /* Round 38: read from the engine, not restated here, so the spoken
+       line and the screen can never disagree about how many people turn up. */
+    const crew = (typeof rpMoveoutCrewSize === "function") ? rpMoveoutCrewSize(service) : 2;
+    if (!crew) return "";
     const hrs = (typeof rpMoveoutTierHours === "function"
       ? (rpMoveoutTierHours(service).match(/\d+(?:\.\d+)?/g) || []).map(Number) : []);
     if (hrs.length < 2) return "";

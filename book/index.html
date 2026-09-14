@@ -625,6 +625,11 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 
 /* Round 31: what the price buys, and the two things that lower the cost of
    saying yes. */
+.rp-work-ratio {
+  margin: 2px auto 14px; max-width: 460px; text-align: center;
+  font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted);
+}
+
 .rp-price-math {
   margin: 6px 0 0; text-align: center;
   font-size: 13px; font-weight: 600; color: var(--muted); line-height: 1.45;
@@ -3237,7 +3242,7 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices in about a minute, no callback.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
+          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices in about a minute. Want to talk it through? Call us.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
           ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
           ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
@@ -3405,7 +3410,11 @@ function rpScreenHtml() {
       const inc = rpIncludes[service];
       const price = rpMoveoutTierBasePrice(service);
       const featured = service === "moveout";
-      const crew = featured ? 3 : 2;
+      /* Round 38: was `featured ? 3 : 2` -- a hardcoded copy that never
+         read the engine. It kept printing "3-cleaner crew" after the engine
+         moved to 2, and fed the wrong number into the hours-of-work line
+         directly below. Reads the single source now. */
+      const crew = rpMoveoutCrewSize(service);
       const alreadyChosen = rpState.moveoutTierChosen && rpState.service === service;
       const guaranteeLine = featured
         ? `<b>${RP_MSG.guarantee.depositShort}</b> <span class="rp-tier-guarantee-brand">(${RP_MSG.guarantee.depositName})</span>`
@@ -3447,6 +3456,12 @@ function rpScreenHtml() {
            number. Reads the ceiling from the message library, which reads
            it from the engine's top tier — so it can never promise a cap
            the price list doesn't keep. */""}
+      ${/* Round 38: one line that makes the two prices explain themselves.
+           Reads the ratio out of the engine (see RP_MSG.tiers.workRatio) and
+           renders nothing if crew and hours ever stop being a clean
+           multiple, rather than asserting a relationship that has quietly
+           stopped being true. */""}
+      ${(() => { const w = RP_MSG.tiers.workRatio(); return w ? `<p class="rp-work-ratio">${w}</p>` : ""; })()}
       ${/* Round 33: the deposit anchor REPLACES the "$599 ceiling" line that
            was here. Both are good, but this screen's job is choosing
            between a guaranteed clean and a cheaper one, and the honest
@@ -4224,7 +4239,7 @@ function rpContactGateScreen(eyebrow) {
          <p class="rp-gate-after">${preview.after}</p></div>
          <p class="rp-sub">Name and number, and it's yours.</p>`
       : `<p class="rp-sub">Just a name and number, then your price is right here.</p>`}
-    <div class="rp-trust-signal" style="margin-bottom:14px"><strong>\u2605 5.0</strong> \u00b7 61+ reviews \u00b7 Veteran-owned & insured</div>
+    <div class="rp-trust-signal" style="margin-bottom:14px"><strong>\u2605 ${RP_MSG.facts.rating}</strong> \u00b7 ${RP_MSG.facts.reviewCount}+ reviews \u00b7 Veteran-owned & insured</div>
     <div class="rp-lead-form">
       <div class="rp-lead-field"><label for="rpGateName">Full Name *</label><input id="rpGateName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
       <div class="rp-lead-field"><label for="rpGatePhone">Phone Number *</label><input id="rpGatePhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)" onfocus="rpLeadFieldFocus(this)"></div>
@@ -5115,7 +5130,6 @@ function rpGetEstimatePayload() {
     bedrooms: rpState.bedrooms || "N/A", bathrooms: rpState.bathrooms || "N/A",
     carpet_rooms: rpState.carpetRooms || rpState.addonCarpetRooms || "0",
     exterior_windows: rpState.windowsTier ? "Yes" : "No",
-    upholstery_type: "N/A", upholstery_item: "N/A", upholstery_price: "0",
     junk_size: rpState.junkSize || "N/A",
     laundry_loads: rpState.laundryLoads || "0",
     helpers_count: rpState.cleanerCount || "N/A", hours_count: rpState.hourCount || "N/A",

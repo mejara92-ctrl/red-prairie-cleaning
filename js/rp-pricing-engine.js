@@ -83,6 +83,152 @@ const rpServices = {
        guarantee. Priced at roughly 60% of the matching Inspection Ready
        tier, rounded to a clean number, reflecting the shorter job (about
        half the crew-hours) rather than a discount off the same work. */
+/* =========================================================================
+   ROUND 42 — HOW A JOB ACTUALLY COSTS, AS OF THE NEW PAY MODEL
+   =========================================================================
+   DIRECT INSTRUCTION: "I changed labor to 40% of the job or min wage
+   whatever is higher." 40% of the whole ticket, add-ons included, split
+   across the crew, W2 with employer payroll taxes on top.
+
+   READ THIS BEFORE READING ANY COST MATH BELOW. Every round comment from
+   here down derives its prices from labor as an HOURLY cost:
+
+       labor(hrs) = hrs x crew x $17.50/hr x 1.12 burden
+
+   That is retired. It is kept because it is the honest record of how these
+   numbers were arrived at, and the prices it produced are still the prices
+   we charge — but it is NOT how a job costs any more, and re-deriving a
+   price from it would produce a number unrelated to what the business pays.
+
+   The live model is rpJobEconomics() below. In words:
+
+       crew gross = max( 40% of the ticket , $7.25 x crew-hours )
+       labor      = crew gross x 1.12
+       cost       = labor + $15 supplies + $25 overhead
+                    + 8% of the ticket on Inspection Ready (guarantee reserve)
+       profit     = ticket - cost
+
+   WHAT CHANGED, IN ONE TABLE. Same prices, real costs:
+
+                        round 41 claimed      actually
+       IR 1-2 bed          -1.4%               36.6%
+       IR 3 bed             9.9%               38.8%
+       IR 4+ bed           17.5%               40.2%
+       Express (all)     ~1-8%                35-42%
+
+   Round 41 shipped the 1-2 bedroom at $379 against a modelled $384.35 cost
+   and flagged it as a deliberate ~$5 loss per job. Under the real pay model
+   it returns $138.89. That flag is void.
+
+   TWO STRUCTURAL CONSEQUENCES.
+
+   (a) COST-PLUS NO LONGER SETS A PRICE. Labor scales with the ticket, so
+       solving for the 20% target leaves only the fixed costs:
+
+           price = $40 / (1 - 0.20 - 0.448 - 0.08) = $147.06
+
+       Every published price clears that several times over. The target
+       margin has stopped being the binding constraint.
+
+   (b) THE MINIMUM WAGE FLOOR IS THE BINDING CONSTRAINT NOW. It takes over
+       whenever the job runs long enough that 40% falls below minimum wage:
+
+           ticket < $18.13 x crew-hours
+
+       All current prices clear it, but Move-Out Express on a 1-2 bedroom is
+       the tight one: $199 against 10 budgeted crew-hours trips at 11.0. Half
+       an hour over per cleaner and that job is on minimum wage.
+
+       That ratio is what should gate any future price cut.
+       tools/check-prices.py cannot see it — r42test.js asserts it.
+
+   AND THE THING THAT IS EASY TO MISS. A piece rate moves overrun risk onto
+   the cleaner: a 16-crew-hour job that takes 20 still pays $151.60, so the
+   effective rate falls from $9.48 to $7.58. The floor is what stops that
+   going somewhere bad, and it only works if actual hours are recorded —
+   under FLSA a piece-rate W2 employee's hours must be tracked to prove the
+   floor was met. "Log real hours" has been the open item since round 34. It
+   did not go away with the hourly cost model; it stopped being a margin
+   question and became a payroll-compliance one.
+   ========================================================================= */
+const RP_LABOR_SHARE       = 0.40;   /* of the whole ticket, split across the crew */
+const RP_LABOR_BURDEN      = 1.12;   /* employer FICA, unemployment, workers' comp */
+const RP_MIN_WAGE          = 7.25;   /* Oklahoma follows the federal rate. SQ 832,
+                                        which would have taken it to $15, was
+                                        rejected by voters in June 2026. */
+const RP_SUPPLIES_PER_JOB  = 15;
+const RP_OVERHEAD_PER_JOB  = 25;
+const RP_GUARANTEE_RESERVE = 0.08;   /* Inspection Ready only */
+const RP_TARGET_MARGIN     = 0.20;
+
+/* What the crew splits before the floor is considered. */
+function rpCrewGrossPay(ticket) {
+  return Math.max(0, Number(ticket) || 0) * RP_LABOR_SHARE;
+}
+/* What they must be paid regardless, for the hours actually worked. */
+function rpMinWageFloorPay(crewHours) {
+  return Math.max(0, Number(crewHours) || 0) * RP_MIN_WAGE;
+}
+/* The instruction, in one line: whichever is higher. */
+function rpCrewPay(ticket, crewHours) {
+  return Math.max(rpCrewGrossPay(ticket), rpMinWageFloorPay(crewHours));
+}
+/* The crew-hours at which the floor takes over for a given ticket. Below
+   this the crew is on the 40%; above it they are on minimum wage and the
+   company absorbs the overrun. */
+function rpFloorTripHours(ticket) {
+  return (Math.max(0, Number(ticket) || 0) * RP_LABOR_SHARE) / RP_MIN_WAGE;
+}
+/* Everything about one job's money, in the shape a human would ask for it. */
+function rpJobEconomics(ticket, crewHours, hasGuarantee) {
+  const t     = Math.max(0, Number(ticket) || 0);
+  const hrs   = Math.max(0, Number(crewHours) || 0);
+  const gross = rpCrewPay(t, hrs);
+  const labor = gross * RP_LABOR_BURDEN;
+  const fixed = RP_SUPPLIES_PER_JOB + RP_OVERHEAD_PER_JOB;
+  const res   = hasGuarantee ? t * RP_GUARANTEE_RESERVE : 0;
+  const cost  = labor + fixed + res;
+  return {
+    ticket: t, crewHours: hrs,
+    crewPay: gross, laborCost: labor, fixed: fixed, reserve: res,
+    cost: cost, profit: t - cost, margin: t > 0 ? (t - cost) / t : 0,
+    onFloor: rpMinWageFloorPay(hrs) > rpCrewGrossPay(t),
+    floorTripHours: rpFloorTripHours(t),
+    /* Crew-hours at which this job stops making money at all. Every current
+       price survives 2-3x its budget before reaching this. */
+    breakEvenHours: (t - fixed - res) / (RP_MIN_WAGE * RP_LABOR_BURDEN),
+    effectiveHourly: hrs > 0 ? gross / hrs : 0
+  };
+}
+/* Crew-hours this job is BUDGETED at — the conservative end of whatever the
+   customer was told, times the crew size. Used for the floor check, so it
+   deliberately takes the long end of a range: the question being asked is
+   "could this job land on minimum wage", and the pessimistic case is the
+   one worth knowing. */
+function rpBudgetedCrewHours(service = rpState.service) {
+  const crew = rpMoveoutCrewSize(service) || 2;
+  if (service === "moveout" || service === "moveoutrefresh") {
+    const txt = RP_MOVEOUT_TIER_HOURS[service] || "";
+    const nums = (txt.match(/\d+(\.\d+)?/g) || []).map(Number);
+    if (!nums.length) return 0;
+    return Math.max.apply(null, nums) * crew;
+  }
+  if (service === "deep")        return (RP_DEEP_ANCHOR_HOURS  + Number(rpState.addonExtraHours || 0)) * crew;
+  if (service === "maintenance") return (RP_BASIC_ANCHOR_HOURS + Number(rpState.addonExtraHours || 0)) * crew;
+  if (service === "hourly")      return Number(rpState.hourCount || HOURLY_MIN_HOURS) * Number(rpState.cleanerCount || 1);
+  if (service === "carpet")      return RP_BASIC_ANCHOR_HOURS * crew;
+  return 0;
+}
+/* The economics of the call currently in rpState. Returns null when there is
+   no real number to reason about — a custom quote, or a job we have decided
+   not to price. */
+function rpCurrentJobEconomics() {
+  if (typeof rpIsCustomQuoteOnly === "function" && rpIsCustomQuoteOnly()) return null;
+  const ticket = typeof rpFinalPrice === "function" ? rpFinalPrice() : 0;
+  if (!(ticket > 0)) return null;
+  return rpJobEconomics(ticket, rpBudgetedCrewHours(), rpState.service === "moveout");
+}
+
 /* ROUND 25 (direct instruction) re-priced BOTH tiers from the Deposit
    Math worksheet's own formula, replacing numbers that were carried over
    unchanged from before the guarantee split existed:
@@ -173,10 +319,61 @@ const rpServices = {
    costs $554.78 and returns 7.4% at $599. Rare in this market, and
    rpMoveoutLargeHome() below marks it on the crew sheet so it can be
    measured rather than guessed at. */
+/* ROUND 41 (direct instruction: "reduce inspection ready move out by 5%").
+   Exactly 5% off every rung. Express is untouched.
+
+       1-2 bedrooms   $399 -> $379
+       3 bedrooms     $499 -> $474
+       4+ bedrooms    $599 -> $569
+
+   WHAT IT COSTS, from this file's own formula at round 38's modelled hours
+   (2 cleaners; 8 / 9 / 10 hours on site by tier):
+
+                        cost      was          now          profit/job
+       1-2 bedrooms    $384.35   $399  3.7%   $379  -1.4%     -$5.35
+       3 bedrooms      $426.96   $499 14.4%   $474   9.9%    +$47.09
+       4+ bedrooms     $469.57   $599 21.6%   $569  17.5%    +$99.48
+
+   THE 1-2 BEDROOM ROW NOW PRICES BELOW COST -- SUPERSEDED BY ROUND 42, AND
+   LEFT HERE ONLY SO THE REASONING IS TRACEABLE. That conclusion was drawn
+   from the hourly labor model (16 crew-hours at $17.50 + burden = $384.35
+   against a $379 price). Labor is now 40% of the ticket or minimum wage,
+   whichever is higher, and the same job returns $138.89 at a 36.6% margin.
+   See the round 42 block at the top of this file. Nothing was wrong with
+   the arithmetic; the pay model underneath it changed.
+
+   The a-la-carte invariant (see RP_DETAIL_PASS_PRICES below) not only holds
+   but gains room, because the tier gap shrank while the buy-backs did not:
+   cushions go from +$40/+$30/+$20 to +$60/+$55/+$50.
+
+   One thing this breaks on purpose: round 38 set the ladder at exactly 2x
+   Express at every size and RP_MSG.tiers.workRatio() said "double the hours,
+   so double the price" out loud. The real ratio is now 1.90x. That function
+   checks the prices as well as the hours as of this round, and says "less
+   than double the price" instead -- which is both true and a better line. */
+/* ROUND 44 (direct instruction: "reduce pricing to drive sales"): the 4+
+   bedroom Inspection Ready tier dropped $569 -> $499.
+
+   ROUND 45 (direct instruction, after a competitor pricing review against
+   earldeans.com: "Apply all recommended pricing changes, I need more
+   customer volume" — with $499 confirmed as a hard ceiling on the 4+
+   tier): 1-2 bed and 3 bed cut too, landing the whole ladder at
+   $349 / $429 / $499. Rationale discussed with Mike: bookings dropped
+   after this month's price raise, and 1-2 bed is both the most-searched
+   size and the number shown first on the site, so it carries the most
+   weight for recovering volume. Margins hold up at every size (35.7% /
+   37.9% / 39.2%) and crew pay stays clear of the $7.25 floor (worst case
+   $8.58/hr on the 3-bed tier, at the flat 20-crew-hour budget). Still
+   comfortably more expensive than Earl Dean's single move-out tier
+   (+59% / +56% at the sizes they publish) -- the guarantee tier was never
+   meant to compete on price with a non-guaranteed competitor product,
+   only Express does that job. See tools/check-prices.py's banned list,
+   updated this round so 379 and 474 are now flagged as stale if they
+   resurface anywhere. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 399, includedBathrooms: 1, label: "1–2 bedrooms" },
-  { min: 3, max: 3, base: 499, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 999, base: 599, includedBathrooms: 3, label: "4+ bedrooms" }
+  { min: 1, max: 2, base: 349, includedBathrooms: 1, label: "1–2 bedrooms" },
+  { min: 3, max: 3, base: 429, includedBathrooms: 2, label: "3 bedrooms" },
+  { min: 4, max: 999, base: 499, includedBathrooms: 3, label: "4+ bedrooms" }
 ];
 /* Move-Out Express -- same bedroom brackets and included-bathroom
    convention as Inspection Ready above so the two stay directly
@@ -253,10 +450,37 @@ function rpMoveoutBedroomTier(beds, service = rpState.service) {
 
    Every cushion GREW. Lowering Inspection Ready narrows the tier gap, which
    makes switching the better deal by more, not less. Nothing here moved. */
+/* Round 38 (direct instruction: "the baseboards costing $210 or something
+   looks crazy ... balance out the price of the addons to make it make
+   sense"). It did look crazy, and the reason is that this table was never
+   priced off the work -- every previous round solved it BACKWARDS from the
+   invariant below, which is how a whole-house detail pass ended up at two
+   hundred and ten dollars.
+
+   Priced off the time it actually takes instead: roughly 2, 2.5 and 3
+   crew-hours of baseboards, interior windows, wall spot-cleaning, ceiling
+   fans, vents and light fixtures.
+
+       1-2 bed   ~2 crew-hours    $90
+       3 bed     ~2.5 crew-hours  $130
+       4+ bed    ~3 crew-hours    $170
+
+   The invariant it used to be solved for still has to hold -- buying every
+   excluded item a la carte must never be cheaper than just paying the tier
+   gap, or the cheapest route to the full checklist is the one that isn't
+   guaranteed. Re-checked at the new numbers, with the three flat $50 items:
+
+       1-2 bed   $150 + $90  = $240  vs gap $399-$199 = $200   +$40
+       3 bed     $150 + $130 = $280  vs gap $499-$249 = $250   +$30
+       4+ bed    $150 + $170 = $320  vs gap $599-$299 = $300   +$20
+
+   Holds at every size, with room to spare, and now the number a customer
+   sees also corresponds to something. tools/check-prices.py bans the old
+   figures so they can't come back by accident. */
 const RP_DETAIL_PASS_PRICES = [
-  { min: 1, max: 2, price: 150 },
-  { min: 3, max: 3, price: 180 },
-  { min: 4, max: 999, price: 210 }
+  { min: 1, max: 2, price: 90 },
+  { min: 3, max: 3, price: 130 },
+  { min: 4, max: 999, price: 170 }
 ];
 /* =========================================================================
    EXPRESS BUY-BACKS — the scope Inspection Ready includes and Express sells
@@ -1063,7 +1287,64 @@ function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
    Express untouched. The crew-hours line on the tier card and the estimate
    screen both multiply out from this, so changing it changes those too —
    which is the point of it living in one place. */
-const RP_MOVEOUT_TIER_HOURS = { moveout: "4–7 hours", moveoutrefresh: "3–5 hours" };
+/* Round 38 (direct instruction): both tiers run TWO cleaners now, and the
+   hours are set so the difference between them is exactly double the work.
+
+       Move-Out Express    2 cleaners, 4-5 hours    =  8-10 crew-hours
+       Inspection Ready    2 cleaners, 8-10 hours   = 16-20 crew-hours
+
+   Round 38b: Express published as 4-6 for one round, which made the ratio
+   2.00x at the bottom of the range and 1.67x at the top -- so the screen
+   had to hedge to "about double". Shown the arithmetic, the call was to
+   tighten Express to 4-5 rather than stretch Inspection Ready to 8-12.
+
+   That was also the only one of the two that helped the margins. Holding
+   Inspection Ready at 8-10 and pulling Express in costs nothing and lifts
+   Express's average margin from 4.8% to 11.8% (a 4+ bed Express goes from
+   8.0% to 21.1%); stretching Inspection Ready to 8-12 instead would have
+   dropped ITS average from 13.2% to 5.7%. Same headline either way, very
+   different economics underneath.
+
+   The hours are now an exact multiple at both ends, so RP_MSG.tiers
+   .workRatio() drops the hedge on its own and says "double" flat.
+
+   Which is the point: the ladder already prices Inspection Ready at
+   double Express at every size ($199/$399, $249/$499, $299/$599), and
+   until now nothing about the crew or the hours explained why. Three
+   cleaners for 4-7 hours against two for 3-5 is 12-21 crew-hours against
+   6-10 -- not double, not a ratio, not an explanation. Now the hours,
+   the crew-hours and the price all say the same thing.
+
+   See the margin note in _WHAT-CHANGED-ROUND-38: these hours are a much
+   bigger job than the model previously assumed and the prices did not
+   move, so the margins are materially thinner. That is flagged, not
+   silently absorbed. */
+const RP_MOVEOUT_TIER_HOURS = { moveout: "8–10 hours", moveoutrefresh: "4–5 hours" };
+/* Crew size for the move-out tiers, in ONE place.
+   Round 38 found /book rendering `const crew = featured ? 3 : 2` on the tier
+   card -- a hardcoded copy that had never read the engine, so it kept saying
+   3 cleaners after the engine said 2, and its "that's N hours of work" line
+   was computed from the wrong number. Exactly the drift class rpAddonLineItems
+   and rp-messages.js exist to prevent, in the one place nobody had covered.
+
+   ROUND 43 (direct instruction): the 1-2 bedroom bracket is actually a
+   1-cleaner job, not a 2-cleaner crew working the same advertised hours
+   between them. That was the whole cause of round 42's crew-rate finding --
+   the flat RP_MOVEOUT_TIER_HOURS ("8-10 hours" / "4-5 hours") never changed
+   with home size, but budgeting it against a phantom second cleaner made
+   the 1-2 bed tier's real per-person pay look far worse than it is. 3
+   bedrooms and 4+ still send 2. This reads the SAME bracket
+   rpMoveoutBedroomTier() uses for price, so crew size and price tier can
+   never disagree about which bracket a home falls in. Advertised on-site
+   hours are unchanged -- only whose hours they are changes. */
+const RP_MOVEOUT_CREW = 2;
+const RP_MOVEOUT_CREW_SMALL = 1;   /* 1-2 bedroom bracket only */
+function rpMoveoutCrewSize(service, beds = rpState.bedrooms) {
+  if (!["moveout", "moveoutrefresh"].includes(service)) return 0;
+  const tier = rpMoveoutBedroomTier(beds, service);
+  if (tier && tier.min === 1 && tier.max === 2) return RP_MOVEOUT_CREW_SMALL;
+  return RP_MOVEOUT_CREW;
+}
 
 /* Round 32: the $599 ceiling folds every home of 4 bedrooms or more into
    one price. Most of those are 4-bedrooms and price correctly; a genuine
@@ -1091,11 +1372,15 @@ function rpTimeEstimate() {
   return "";
 }
 function rpTeamSize() {
-  /* Round 26: Inspection Ready moved to a 3-cleaner crew; Express is
-     still 2. Was one shared line for both -- split so this doesn't go
-     stale the next time only one tier's crew size changes. */
-  if (rpState.service === "moveout") return "3 cleaners";
-  if (rpState.service === "moveoutrefresh") return "2 cleaners";
+  /* Round 38 (direct instruction): every move-out is a 2-cleaner crew.
+     Round 26 had moved Inspection Ready to 3; the two tiers now differ by
+     hours alone, which is what makes "double the work" true rather than
+     just said. Kept as two lines rather than one so a future change to
+     only one tier stays a one-line change. */
+  if (["moveout", "moveoutrefresh"].includes(rpState.service)) {
+    const n = rpMoveoutCrewSize(rpState.service);
+    return `${n} cleaner${n === 1 ? "" : "s"}`;
+  }
   if (rpState.service === "deep" || rpState.service === "maintenance") return "1 cleaner";
   if (rpState.service === "hourly") return rpState.cleanerCount ? `${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}` : "You choose";
   if (rpState.service === "airbnb") return "1–2 cleaners";
