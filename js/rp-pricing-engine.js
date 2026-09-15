@@ -208,10 +208,11 @@ function rpJobEconomics(ticket, crewHours, hasGuarantee) {
 function rpBudgetedCrewHours(service = rpState.service) {
   const crew = rpMoveoutCrewSize(service) || 2;
   if (service === "moveout" || service === "moveoutrefresh") {
-    const txt = RP_MOVEOUT_TIER_HOURS[service] || "";
-    const nums = (txt.match(/\d+(\.\d+)?/g) || []).map(Number);
-    if (!nums.length) return 0;
-    return Math.max.apply(null, nums) * crew;
+    /* Round 51: was parsing the top of a flat "8-10 hours" string and
+       multiplying by crew, which is how a 3-bedroom ended up budgeted at
+       20 crew-hours. Reads the tier row now -- one number, per size, the
+       same one the card shows the customer. */
+    return rpMoveoutCrewHours(service);
   }
   if (service === "deep")        return (RP_DEEP_ANCHOR_HOURS  + Number(rpState.addonExtraHours || 0)) * crew;
   if (service === "maintenance") return (RP_BASIC_ANCHOR_HOURS + Number(rpState.addonExtraHours || 0)) * crew;
@@ -264,8 +265,8 @@ function rpCurrentJobEconomics() {
    "5-8 hours" replaces the old 6-10 display range; assumed per-tier
    hours are the four whole numbers in that range, one per bedroom tier
    (5/6/7/8), the same even one-hour-per-tier step pattern the old
-   6/8/10/12 assumption used (see RP_MOVEOUT_TIER_HOURS below for the
-   display string these feed). That gives $453.80/$533.70/$613.59/
+   6/8/10/12 assumption used (round 51 replaced the flat display
+   string these fed with per-bracket onSiteHours on the tier rows). That gives $453.80/$533.70/$613.59/
    $693.48 -- rounded up to the nearest ends-in-9 number at or above,
    same convention as round 25: $459/$539/$619/$699. The 5+ bedroom
    price barely moves ($699 unchanged) because 3 crew x 8 hours is the
@@ -370,10 +371,57 @@ function rpCurrentJobEconomics() {
    only Express does that job. See tools/check-prices.py's banned list,
    updated this round so 379 and 474 are now flagged as stale if they
    resurface anywhere. */
+/* ROUND 51 — crew and on-site hours moved ONTO the tier rows, and a
+   5-bedroom bracket added.
+
+   WHY THE ROWS CHANGED SHAPE. Until now, hours lived in a flat per-service
+   constant (RP_MOVEOUT_TIER_HOURS, "8-10 hours" for every Inspection Ready
+   job regardless of size) and crew lived in a two-value step function. A
+   1-bedroom apartment and a 4-bedroom house were both budgeted at 8-10
+   hours; the only thing size changed was whether a second cleaner came.
+   That produced a cliff at 3 bedrooms -- crew doubled while on-site hours
+   stayed flat, so budgeted crew-hours jumped 10 -> 20 for a 23% price
+   step, and the 3-bed tier fell to $21.45/crew-hour and $8.58/hr of crew
+   pay. It was a modelling artifact, not a real job.
+
+   Mike's actual figures, which these rows now carry:
+     Inspection Ready   1-2 bed  8 crew-hrs (1 cleaner, 8h on site)
+                        3   bed 12 crew-hrs (2 cleaners, 6h)
+                        4   bed 16 crew-hrs (2 cleaners, 8h)
+                        5   bed 20 crew-hrs (2 cleaners, 10h)
+     Express            1-2 bed  4 crew-hrs (1 cleaner, 4h)
+                        3   bed  6 crew-hrs (1 cleaner, 6h)
+                        4   bed  8 crew-hrs (1 cleaner, 8h)
+                        5   bed 10 crew-hrs (2 cleaners, 5h)
+   These are the baseline for a home that matches what was described on
+   booking. Anything flagged on the arrival walkthrough is a re-quote, not
+   a silent overrun -- that SOP is still unbuilt and is the reason these
+   numbers can be stated this precisely to a customer at all.
+
+   WHY 5 BEDROOMS IS ITS OWN ROW. The old top row was `min: 4, max: 999`,
+   so a five-bedroom house cost exactly what a four-bedroom did -- $499 for
+   20 crew-hours, $24.95/crew-hour. That was the only cell in the whole
+   business priced below the rate Mike's own $499 ceiling implies
+   ($499 / 16 crew-hrs = $31.19). $629 at 20 crew-hours restores it to
+   $31.45 and leaves the 4-bedroom anchor untouched.
+
+   WHY NOTHING ELSE MOVED. Direct instruction: "Inspection Ready 4 bed
+   2 bath no more than $499." That caps the top and therefore sets the
+   floor rate for everything else. Checked against it, 1-2 bed ($43.63),
+   3 bed ($35.75) and 4 bed ($31.19) all already clear it, so no other
+   price changed. Flattening the ladder to an even rate would have meant
+   cutting 1-2 bed to $249 -- $50 from Express for double the work, which
+   would cannibalise the tier. Yield consistency isn't the goal; profit is,
+   and fixed cost per job ($40) genuinely does amortise better over a
+   16-hour job than an 8-hour one.
+
+   6+ BEDROOMS is a custom quote (rpMoveoutIsOversizeHome) rather than a
+   row here -- past five bedrooms the spread is too wide to publish. */
 const RP_MOVEOUT_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 349, includedBathrooms: 1, label: "1–2 bedrooms" },
-  { min: 3, max: 3, base: 429, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 999, base: 499, includedBathrooms: 3, label: "4+ bedrooms" }
+  { min: 1, max: 2, base: 349, includedBathrooms: 1, crew: 1, onSiteHours: 8,  label: "1–2 bedrooms" },
+  { min: 3, max: 3, base: 429, includedBathrooms: 2, crew: 2, onSiteHours: 6,  label: "3 bedrooms" },
+  { min: 4, max: 4, base: 499, includedBathrooms: 3, crew: 2, onSiteHours: 8,  label: "4 bedrooms" },
+  { min: 5, max: 5, base: 629, includedBathrooms: 3, crew: 2, onSiteHours: 10, label: "5 bedrooms" }
 ];
 /* Move-Out Express -- same bedroom brackets and included-bathroom
    convention as Inspection Ready above so the two stay directly
@@ -385,10 +433,23 @@ const RP_MOVEOUT_BEDROOM_TIERS = [
    size that still exists — it was already at ~21% margin on its own
    2-cleaner hours and nothing about it needed to move. The old 5+ row
    ($349) is gone only because the bracket it belonged to is gone. */
+/* Round 51: same four brackets as Inspection Ready above so the two stay
+   directly comparable size for size, now carrying crew and on-site hours
+   per row for the same reasons documented there. Crew-hours come out at
+   exactly HALF Inspection Ready at every single size (4/8, 6/12, 8/16,
+   10/20) -- which is what finally makes RP_MSG.tiers.workRatio() able to
+   say "double the hours" flat instead of hedging to "about double".
+
+   Express stays 1 cleaner through 4 bedrooms (direct instruction: a
+   4-bedroom Express is one person for 8 hours, not two for four) and goes
+   to 2 at five, where a single 10-hour day isn't a reasonable shift.
+   Prices 1-2 / 3 / 4 are unchanged; 5 bed is the new row, at $379 for
+   10 crew-hours = $37.90/crew-hour, in line with the 4-bed's $37.38. */
 const RP_MOVEOUT_REFRESH_BEDROOM_TIERS = [
-  { min: 1, max: 2, base: 199, includedBathrooms: 1, label: "1–2 bedrooms" },
-  { min: 3, max: 3, base: 249, includedBathrooms: 2, label: "3 bedrooms" },
-  { min: 4, max: 999, base: 299, includedBathrooms: 3, label: "4+ bedrooms" }
+  { min: 1, max: 2, base: 199, includedBathrooms: 1, crew: 1, onSiteHours: 4, label: "1–2 bedrooms" },
+  { min: 3, max: 3, base: 249, includedBathrooms: 2, crew: 1, onSiteHours: 6, label: "3 bedrooms" },
+  { min: 4, max: 4, base: 299, includedBathrooms: 3, crew: 1, onSiteHours: 8, label: "4 bedrooms" },
+  { min: 5, max: 5, base: 379, includedBathrooms: 3, crew: 2, onSiteHours: 5, label: "5 bedrooms" }
 ];
 function rpMoveoutTierTable(service) {
   return service === "moveoutrefresh" ? RP_MOVEOUT_REFRESH_BEDROOM_TIERS : RP_MOVEOUT_BEDROOM_TIERS;
@@ -480,7 +541,14 @@ function rpMoveoutBedroomTier(beds, service = rpState.service) {
 const RP_DETAIL_PASS_PRICES = [
   { min: 1, max: 2, price: 90 },
   { min: 3, max: 3, price: 130 },
-  { min: 4, max: 999, price: 170 }
+  { min: 4, max: 4, price: 170 },
+  /* Round 51: fourth rung for the new 5-bedroom bracket, same $40 step.
+     The invariant this table exists to protect still holds there: buying
+     oven + fridge + cabinets + Detail Pass a la carte on Express is
+     $150 + $210 = $360 against a tier gap of $629 - $379 = $250, so
+     switching to Inspection Ready outright is still the cheaper way to
+     get the full checklist at every size. */
+  { min: 5, max: 999, price: 210 }
 ];
 /* =========================================================================
    EXPRESS BUY-BACKS — the scope Inspection Ready includes and Express sells
@@ -1267,90 +1335,85 @@ function rpCurrentFlow() {
 }
 function rpStepIndex() { return rpCurrentFlow().indexOf(rpState.step); }
 
-/* Round 20: pulled out of rpTimeEstimate() so the tier comparison screen
-   can show BOTH tiers' hours side by side without touching rpState —
-   same reason rpMoveoutTierBasePrice() exists for the prices. The hours
-   are the clearest justification for the gap between the two numbers,
-   and they weren't stated anywhere on that screen. */
-/* Round 26: Inspection Ready's range dropped from "6-10" to "5-8" to
-   match the new 3-cleaner crew (see RP_MOVEOUT_BEDROOM_TIERS above) --
-   more hands, less time on site for the same job. Express untouched. */
-/* Round 32: Inspection Ready's displayed range follows the new planning
-   hours (4 / 5.5 / 6.5 with 3 cleaners) instead of round 26's 5 / 6 / 7.
-   Express untouched. The crew-hours line on the tier card and the estimate
-   screen both multiply out from this, so changing it changes those too —
-   which is the point of it living in one place. */
-/* Round 38 (direct instruction): both tiers run TWO cleaners now, and the
-   hours are set so the difference between them is exactly double the work.
+/* ---------------------------------------------------------------------
+   MOVE-OUT CREW & HOURS — history, condensed (round 51)
 
-       Move-Out Express    2 cleaners, 4-5 hours    =  8-10 crew-hours
-       Inspection Ready    2 cleaners, 8-10 hours   = 16-20 crew-hours
+   Rounds 20-43 kept accumulating notes here about a flat, per-service
+   hours range ("6-10" -> "5-8" -> "4-5 / 8-10") and a crew number that
+   went 2 -> 3 -> 2 -> "2 except the small bracket". Every one of those
+   numbers is gone: hours and crew are per-bedroom-bracket fields on the
+   tier rows now (see RP_MOVEOUT_BEDROOM_TIERS), so none of that history
+   describes live behaviour any more and leaving it in full was actively
+   misleading -- it named crew sizes and ranges a reader could no longer
+   find anywhere in the file.
 
-   Round 38b: Express published as 4-6 for one round, which made the ratio
-   2.00x at the bottom of the range and 1.67x at the top -- so the screen
-   had to hedge to "about double". Shown the arithmetic, the call was to
-   tighten Express to 4-5 rather than stretch Inspection Ready to 8-12.
+   The one thing worth carrying forward: the reason these live in the
+   engine at all is that the comparison screen shows BOTH tiers' hours
+   side by side without touching rpState, the same reason
+   rpMoveoutTierBasePrice() exists for prices. The hours are the honest
+   justification for the gap between the two numbers.
+   --------------------------------------------------------------------- */
 
-   That was also the only one of the two that helped the margins. Holding
-   Inspection Ready at 8-10 and pulling Express in costs nothing and lifts
-   Express's average margin from 4.8% to 11.8% (a 4+ bed Express goes from
-   8.0% to 21.1%); stretching Inspection Ready to 8-12 instead would have
-   dropped ITS average from 13.2% to 5.7%. Same headline either way, very
-   different economics underneath.
+/* ROUND 51: RP_MOVEOUT_TIER_HOURS and the RP_MOVEOUT_CREW / _CREW_SMALL
+   constants are GONE. Both were flat per-service values that couldn't vary
+   with home size -- the whole problem documented on RP_MOVEOUT_BEDROOM_TIERS
+   above. Crew and on-site hours now live on the tier rows, so there is
+   exactly one place that knows what a given size costs, how long it takes,
+   and how many people go. The four accessors below are the only way to read
+   them; nothing should reach into a tier row directly. */
 
-   The hours are now an exact multiple at both ends, so RP_MSG.tiers
-   .workRatio() drops the hedge on its own and says "double" flat.
-
-   Which is the point: the ladder already prices Inspection Ready at
-   double Express at every size ($199/$399, $249/$499, $299/$599), and
-   until now nothing about the crew or the hours explained why. Three
-   cleaners for 4-7 hours against two for 3-5 is 12-21 crew-hours against
-   6-10 -- not double, not a ratio, not an explanation. Now the hours,
-   the crew-hours and the price all say the same thing.
-
-   See the margin note in _WHAT-CHANGED-ROUND-38: these hours are a much
-   bigger job than the model previously assumed and the prices did not
-   move, so the margins are materially thinner. That is flagged, not
-   silently absorbed. */
-const RP_MOVEOUT_TIER_HOURS = { moveout: "8–10 hours", moveoutrefresh: "4–5 hours" };
-/* Crew size for the move-out tiers, in ONE place.
-   Round 38 found /book rendering `const crew = featured ? 3 : 2` on the tier
-   card -- a hardcoded copy that had never read the engine, so it kept saying
-   3 cleaners after the engine said 2, and its "that's N hours of work" line
-   was computed from the wrong number. Exactly the drift class rpAddonLineItems
-   and rp-messages.js exist to prevent, in the one place nobody had covered.
-
-   ROUND 43 (direct instruction): the 1-2 bedroom bracket is actually a
-   1-cleaner job, not a 2-cleaner crew working the same advertised hours
-   between them. That was the whole cause of round 42's crew-rate finding --
-   the flat RP_MOVEOUT_TIER_HOURS ("8-10 hours" / "4-5 hours") never changed
-   with home size, but budgeting it against a phantom second cleaner made
-   the 1-2 bed tier's real per-person pay look far worse than it is. 3
-   bedrooms and 4+ still send 2. This reads the SAME bracket
-   rpMoveoutBedroomTier() uses for price, so crew size and price tier can
-   never disagree about which bracket a home falls in. Advertised on-site
-   hours are unchanged -- only whose hours they are changes. */
-const RP_MOVEOUT_CREW = 2;
-const RP_MOVEOUT_CREW_SMALL = 1;   /* 1-2 bedroom bracket only */
+/* How many cleaners go, for a home of this size on this tier. */
 function rpMoveoutCrewSize(service, beds = rpState.bedrooms) {
   if (!["moveout", "moveoutrefresh"].includes(service)) return 0;
   const tier = rpMoveoutBedroomTier(beds, service);
-  if (tier && tier.min === 1 && tier.max === 2) return RP_MOVEOUT_CREW_SMALL;
-  return RP_MOVEOUT_CREW;
+  return tier ? tier.crew : 0;
 }
 
-/* Round 32: the $599 ceiling folds every home of 4 bedrooms or more into
-   one price. Most of those are 4-bedrooms and price correctly; a genuine
-   5+ is the edge the cap creates. This flags it for the crew sheet so the
-   office can see how often it actually happens instead of guessing. */
-function rpMoveoutLargeHome() {
-  return ["moveout", "moveoutrefresh"].includes(rpState.service) && Number(rpState.bedrooms || 0) >= 5;
+/* Hours the crew is physically in the home (wall-clock, not person-hours). */
+function rpMoveoutOnSiteHours(service, beds = rpState.bedrooms) {
+  const tier = rpMoveoutBedroomTier(beds, service);
+  return tier ? tier.onSiteHours : 0;
 }
-function rpMoveoutTierHours(service) { return RP_MOVEOUT_TIER_HOURS[service] || ""; }
+
+/* Total paid labour: crew x on-site hours. This is the number the job
+   economics and the crew sheet care about, and the one the customer never
+   sees directly. */
+function rpMoveoutCrewHours(service, beds = rpState.bedrooms) {
+  return rpMoveoutCrewSize(service, beds) * rpMoveoutOnSiteHours(service, beds);
+}
+
+/* The customer-facing duration string, e.g. "8 hours". Returns "" when the
+   bedroom count isn't known yet rather than guessing a size -- every caller
+   already handles an empty string, and a wrong duration on a booking screen
+   is a promise, not a placeholder. */
+function rpMoveoutTierHours(service, beds = rpState.bedrooms) {
+  const h = rpMoveoutOnSiteHours(service, beds);
+  return h ? `${h} hour${h === 1 ? "" : "s"}` : "";
+}
+
+/* Round 51: past five bedrooms the spread on a move-out is too wide to
+   publish a number for, so 6+ routes to a real quote instead of falling
+   into the 5-bedroom bracket the way it used to fall into the old 4+ one.
+   Feeds rpIsCustomQuoteOnly(). */
+function rpMoveoutIsOversizeHome(beds = rpState.bedrooms) {
+  return ["moveout", "moveoutrefresh"].includes(rpState.service) && Number(beds || 0) > RP_MOVEOUT_MAX_PRICED_BEDROOMS;
+}
+const RP_MOVEOUT_MAX_PRICED_BEDROOMS = 5;
 
 function rpTimeEstimate() {
-  if (rpState.service === "moveout") return RP_MOVEOUT_TIER_HOURS.moveout;
-  if (rpState.service === "moveoutrefresh") return RP_MOVEOUT_TIER_HOURS.moveoutrefresh;
+  /* Round 51: per-bedroom-bracket, read off the tier row. Falls back to a
+     range across the whole ladder when the size isn't known yet, rather
+     than naming one size's hours as if they applied to all of them. */
+  if (rpState.service === "moveout" || rpState.service === "moveoutrefresh") {
+    /* A 6+ bedroom home is quoted, not priced, so it gets no hours figure
+       either -- the published ladder tops out at five and naming its range
+       here would understate a home bigger than anything in the table. */
+    if (rpMoveoutIsOversizeHome()) return "Confirmed with your quote";
+    const exact = rpMoveoutTierHours(rpState.service);
+    if (exact) return exact;
+    const table = rpMoveoutTierTable(rpState.service);
+    return `${table[0].onSiteHours}\u2013${table[table.length - 1].onSiteHours} hours depending on size`;
+  }
   if (rpState.service === "deep") {
     const extra = Number(rpState.addonExtraHours || 0);
     return extra > 0 ? `${RP_DEEP_ANCHOR_HOURS + extra} hours (${RP_DEEP_ANCHOR_HOURS} + ${extra} extra)` : `${RP_DEEP_ANCHOR_HOURS} hours`;
@@ -1457,6 +1520,7 @@ function rpIsSpecialtyCondition() {
 }
 function rpIsCustomQuoteOnly() {
   return rpState.service === "airbnb"
+    || rpMoveoutIsOversizeHome()
     || rpMoveoutIsCustomSqft()
     || rpIsSpecialtyCondition()
     || rpMoveoutBlocked();
@@ -1512,7 +1576,11 @@ function rpServiceBasePrice() {
    comparison screen shows "Custom Quote" / routes to a callback instead
    of a misleading $0 on either card. */
 function rpMoveoutTierBasePrice(service) {
-  if (rpMoveoutIsCustomSqft() || rpMoveoutBlocked()) return null;
+  /* Round 51: oversize (6+ bedroom) homes join the custom-quote cases here.
+     Without this the tier cards would fall through to rpServiceBasePrice(),
+     which returns 0 when no bracket matches — printing "$0" on the compare
+     screen instead of "Custom". */
+  if (rpMoveoutIsOversizeHome() || rpMoveoutIsCustomSqft() || rpMoveoutBlocked()) return null;
   const prevService = rpState.service;
   rpState.service = service;
   const price = rpServiceBasePrice();

@@ -40,7 +40,7 @@ function gtag_report_conversion(url) {
 <script src="/js/rp-link-attribution.js?v=d263d8a8" defer></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Cleaning Prices in Lawton, OK | Red Prairie Cleaning</title>
-<meta content="Every Red Prairie Cleaning price, published up front. Move-out $199–$499, deep cleaning $300, carpet $50/room — Lawton, Fort Sill and Southwest Oklahoma." name="description"/>
+<meta content="Every Red Prairie Cleaning price, published up front. Move-out $199–$629, deep cleaning $300, carpet $50/room — Lawton, Fort Sill and Southwest Oklahoma." name="description"/>
 <link href="https://redprairiecleaning.com/pricing/" rel="canonical"/>
 <meta content="website" property="og:type"/>
 <meta content="Red Prairie Cleaning" property="og:site_name"/>
@@ -257,7 +257,13 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <section>
 <div class="wrap">
 <h2>Move-Out Cleaning</h2>
-<p class="sect-intro">Two real options, not one product with fine print. <b>Inspection Ready</b> is the full checklist backed by Defend Your Deposit™ — the one most PCS families book, worked by a <b>3</b>-cleaner crew. <b>Move-Out Express</b> is a faster, lighter clean for anyone not facing a landlord or PM walkthrough, worked by <b>2</b>.</p>
+<!-- Round 51: this sentence claimed a "3-cleaner crew" for Inspection Ready
+     and "2" for Express. Round 38 moved both to 2 and round 43 moved the
+     small bracket to 1, but this page was never updated and check-prices.py
+     only watches dollar figures, so it went three rounds saying a number
+     nobody had believed since August. Crew is per-bedroom-bracket now and
+     is published in its own table below rather than asserted in prose. -->
+<p class="sect-intro">Two real options, not one product with fine print. <b>Inspection Ready</b> is the full checklist backed by Defend Your Deposit™ — the one most PCS families book. <b>Move-Out Express</b> is a faster, lighter clean for anyone not facing a landlord or PM walkthrough. Crew size and time on site are published below, per home size.</p>
 
 <div class="tbl-wrap"><table class="tbl">
 <caption>Base price by bedroom count</caption>
@@ -265,15 +271,35 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <tbody>
 <tr><td>1–2 bedrooms</td><td class="price">$199</td><td class="price">$349</td></tr>
 <tr><td>3 bedrooms</td><td class="price">$249</td><td class="price">$429</td></tr>
-<tr><td>4+ bedrooms <span style="color:var(--ink-soft);font-weight:600">(four, five, six — same price)</span></td><td class="price">$299</td><td class="price">$499</td></tr>
+<tr><td>4 bedrooms</td><td class="price">$299</td><td class="price">$499</td></tr>
+<tr><td>5 bedrooms</td><td class="price">$379</td><td class="price">$629</td></tr>
+<tr><td>6+ bedrooms</td><td class="price" colspan="2" style="text-align:right;font-weight:700">Quoted — call or text us</td></tr>
 </tbody>
 </table></div>
+
+<!-- Round 51: new. The hours and crew behind each price were nowhere on
+     this page, and the one place they appeared (the sentence above) was
+     wrong. Publishing them is the point of the round: it's the honest
+     answer to "why does Inspection Ready cost more", and it's checkable
+     against the booking screen, which reads the same tier rows. -->
+<div class="tbl-wrap"><table class="tbl">
+<caption>Crew and time on site</caption>
+<thead><tr><th scope="col">Bedrooms</th><th scope="col" style="text-align:right">Move-Out Express</th><th scope="col" style="text-align:right">Inspection Ready</th></tr></thead>
+<tbody>
+<tr><td>1–2 bedrooms</td><td class="price">1 cleaner · 4 hrs</td><td class="price">1 cleaner · 8 hrs</td></tr>
+<tr><td>3 bedrooms</td><td class="price">1 cleaner · 6 hrs</td><td class="price">2 cleaners · 6 hrs</td></tr>
+<tr><td>4 bedrooms</td><td class="price">1 cleaner · 8 hrs</td><td class="price">2 cleaners · 8 hrs</td></tr>
+<tr><td>5 bedrooms</td><td class="price">2 cleaners · 5 hrs</td><td class="price">2 cleaners · 10 hrs</td></tr>
+</tbody>
+</table></div>
+<p class="hero-note" style="margin-top:10px">Inspection Ready is exactly double the labour of Express at every size — that is the whole reason it costs more. Times assume the home matches what you told us when you booked; if the crew finds something different on arrival, we call you before starting rather than adding to the bill afterward.</p>
 
 <div class="adders">
 <strong>Adjustments</strong>
 <ul>
 <li>Bathroom count doesn't change the price, just tell us how many so we bring the right crew and supplies</li>
 <li>Flat price by bedroom count, any home size — no square-footage lookup, no surcharge to guess at online</li>
+<li>Homes over 5 bedrooms are quoted directly rather than priced from this table — the spread is too wide to publish honestly</li>
 </ul>
 </div>
 
@@ -283,7 +309,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 </div>
 
 <div class="worked">
-<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$429</b> for Inspection Ready, or <b>$249</b> for Express, bathroom count included at no extra charge either way. That's the number you pay — no walkthrough surprises.</p>
+<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$429</b> for Inspection Ready — two cleaners for six hours — or <b>$249</b> for Express, one cleaner for six hours. Bathroom count is included at no extra charge either way. That's the number you pay — no walkthrough surprises.</p>
 </div>
 
 <div class="callout" style="margin-top:22px">

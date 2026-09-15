@@ -42,6 +42,263 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="robots" content="index,follow"/>
 <link rel="canonical" href="https://redprairiecleaning.com/book/"/>
+<!-- Round 50: /book had NO structured data at all. That was survivable
+     while the homepage redirect exempted crawlers, because "/" was the page
+     Google indexed and "/" carries the #business entity. Round 49 removed
+     that exemption (correctly -- it was cloaking), so every visitor
+     INCLUDING Googlebot is now redirected here, and Google is likely to
+     treat "/" as a redirect and consolidate it into this URL. Without this
+     block that consolidation would drop the business entity, the 5.0/65
+     aggregate rating and the offer catalog off the destination page.
+
+     Same @id as the homepage node on purpose: identical @ids merge rather
+     than compete, which is the same convention the 14 landing pages
+     already follow. Prices, rating and review count come from the homepage
+     node -- if you change one, change both (check-prices.py watches the
+     price figures; tools/stamp-assets.py does not touch this). -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "CleaningService",
+   "@id": "https://redprairiecleaning.com/#business",
+   "name": "Red Prairie Cleaning",
+   "url": "https://redprairiecleaning.com/",
+   "telephone": "+1-580-215-0915",
+   "image": "https://redprairiecleaning.com/images/logo/logo-color.webp",
+   "logo": "https://redprairiecleaning.com/images/logo/logo-color.webp",
+   "description": "Professional house cleaning, move-out cleaning, and carpet cleaning across Southwest Oklahoma and North Texas.",
+   "priceRange": "$$",
+   "memberOf": {
+    "@type": "Organization",
+    "name": "Lawton Fort Sill Chamber of Commerce"
+   },
+   "areaServed": [
+    {
+     "@type": "City",
+     "name": "Lawton"
+    },
+    {
+     "@type": "Place",
+     "name": "Fort Sill"
+    },
+    {
+     "@type": "City",
+     "name": "Cache"
+    },
+    {
+     "@type": "City",
+     "name": "Elgin"
+    },
+    {
+     "@type": "City",
+     "name": "Medicine Park"
+    },
+    {
+     "@type": "City",
+     "name": "Duncan"
+    },
+    {
+     "@type": "City",
+     "name": "Wichita Falls"
+    },
+    {
+     "@type": "City",
+     "name": "Chickasha"
+    },
+    {
+     "@type": "City",
+     "name": "Fletcher"
+    },
+    {
+     "@type": "City",
+     "name": "Geronimo"
+    }
+   ],
+   "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "OK",
+    "addressCountry": "US",
+    "addressLocality": "Lawton"
+   },
+   "sameAs": [
+    "https://maps.app.goo.gl/BrREqvo79hKp2TtM8"
+   ],
+   "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Cleaning Services",
+    "itemListElement": [
+     {
+      "@type": "Offer",
+      "name": "Basic Cleaning (Starting At)",
+      "priceCurrency": "USD",
+      "price": "150",
+      "availability": "https://schema.org/InStock",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Basic Cleaning",
+       "serviceType": "House cleaning",
+       "areaServed": "Southwest Oklahoma"
+      }
+     },
+     {
+      "@type": "Offer",
+      "name": "Deep Cleaning (Starting At)",
+      "priceCurrency": "USD",
+      "price": "300",
+      "availability": "https://schema.org/InStock",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Deep Cleaning",
+       "serviceType": "Residential deep cleaning",
+       "areaServed": "Southwest Oklahoma"
+      }
+     },
+     {
+      "@type": "Offer",
+      "name": "Move-Out Cleaning: Inspection Ready (Starting At)",
+      "priceCurrency": "USD",
+      "price": "349",
+      "availability": "https://schema.org/InStock",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Move-Out Cleaning: Inspection Ready",
+       "serviceType": "Move-out cleaning",
+       "areaServed": "Southwest Oklahoma"
+      }
+     },
+     {
+      "@type": "Offer",
+      "name": "Move-Out Cleaning: Express (Starting At)",
+      "priceCurrency": "USD",
+      "price": "199",
+      "availability": "https://schema.org/InStock",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Move-Out Cleaning: Express",
+       "serviceType": "Move-out cleaning",
+       "areaServed": "Southwest Oklahoma"
+      }
+     },
+     {
+      "@type": "Offer",
+      "name": "Carpet Cleaning (Starting At)",
+      "priceCurrency": "USD",
+      "price": "150",
+      "availability": "https://schema.org/InStock",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Carpet Cleaning",
+       "serviceType": "Hot water extraction carpet cleaning",
+       "areaServed": "Southwest Oklahoma"
+      }
+     }
+    ]
+   },
+   "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "65"
+   },
+   "review": [
+    {
+     "@type": "Review",
+     "author": {
+      "@type": "Person",
+      "name": "Corey M."
+     },
+     "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "5",
+      "bestRating": "5"
+     },
+     "reviewBody": "Christa and her team were excellent for my move-out clean. They were professional, responsive, and did a fantastic job. The house looked great, and the entire process was smooth and stress-free."
+    },
+    {
+     "@type": "Review",
+     "author": {
+      "@type": "Person",
+      "name": "Nina O."
+     },
+     "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "5",
+      "bestRating": "5"
+     },
+     "reviewBody": "Christa was professional, detail-oriented, and did an excellent job. We were very happy with the results and would definitely recommend them."
+    },
+    {
+     "@type": "Review",
+     "author": {
+      "@type": "Person",
+      "name": "Ava C."
+     },
+     "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "5",
+      "bestRating": "5"
+     },
+     "reviewBody": "The BEST cleaning I've ever had in my house before. The staff was AMAZING, efficient and super detailed."
+    },
+    {
+     "@type": "Review",
+     "author": {
+      "@type": "Person",
+      "name": "Tyler A."
+     },
+     "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "5",
+      "bestRating": "5"
+     },
+     "reviewBody": "I contacted Red Prairie Cleaning and was able to get on the schedule right away. They were very polite and professional. I will definitely be looking forward to seeing them again soon."
+    }
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://redprairiecleaning.com/#website",
+   "url": "https://redprairiecleaning.com/",
+   "name": "Red Prairie Cleaning",
+   "publisher": {
+    "@id": "https://redprairiecleaning.com/#business"
+   }
+  },
+  {
+   "@type": "WebPage",
+   "@id": "https://redprairiecleaning.com/book/#webpage",
+   "url": "https://redprairiecleaning.com/book/",
+   "name": "Book Your Cleaning — Red Prairie Cleaning",
+   "description": "Get an instant price on move-out, deep, recurring and carpet cleaning in about a minute — Lawton, Fort Sill, Cache, Elgin, Medicine Park and Duncan.",
+   "isPartOf": {
+    "@id": "https://redprairiecleaning.com/#website"
+   },
+   "about": {
+    "@id": "https://redprairiecleaning.com/#business"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://redprairiecleaning.com/book/#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://redprairiecleaning.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Book a Cleaning",
+     "item": "https://redprairiecleaning.com/book/"
+    }
+   ]
+  }
+ ]
+}
+</script>
 <meta content="website" property="og:type"/>
 <meta content="Red Prairie Cleaning" property="og:site_name"/>
 <meta content="Book a Cleaning in Lawton &amp; Fort Sill | Red Prairie" property="og:title"/>
@@ -641,12 +898,9 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 }
 
 /* Round 31: what the price buys, and the two things that lower the cost of
-   saying yes. */
-.rp-work-ratio {
-  margin: 2px auto 14px; max-width: 460px; text-align: center;
-  font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted);
-}
-
+   saying yes. Round 50 removed .rp-work-ratio from here -- the sentence it
+   styled came off the tiers screen as the third telling of the crew/hours
+   fact. RP_MSG.tiers.workRatio() itself is still live for /call. */
 .rp-price-math {
   margin: 6px 0 0; text-align: center;
   font-size: 13px; font-weight: 600; color: var(--muted); line-height: 1.45;
@@ -729,12 +983,10 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 .rp-scope-yes { color: var(--sage); display: inline-flex; }
 .rp-scope-no { color: rgba(17,17,17,.26); font-weight: 800; }
 .rp-scope-addon { color: var(--red); font-size: 11px; font-weight: 800; white-space: nowrap; }
-.rp-scope-foot { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); text-align: center; }
 @media (max-width: 380px) {
   .rp-scope-head, .rp-scope-row { grid-template-columns: 1fr 58px 58px; padding-left: 10px; padding-right: 10px; }
   .rp-scope-row { font-size: 11.5px; }
 }
-.rp-tier-card .rp-tier-hours { font-size: 12px; font-weight: 800; color: var(--ink); margin: -2px 0 4px; letter-spacing: -.01em; }
 .rp-addon-drop-notice { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); text-align: center; }
 .rp-addon-drop-notice strong { color: var(--ink); }
 .rp-tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; margin-top: 6px; }
@@ -2823,8 +3075,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=b07a70c5"></script>
-<script src="../js/rp-pricing-engine.js?v=5397a545"></script>
+<script src="../js/rp-messages.js?v=5a71fc3a"></script>
+<script src="../js/rp-pricing-engine.js?v=404f28cc"></script>
 <script>
 /* =========================================================================
    BOOKING STATE & UI — customer-facing (/book). Pricing math itself now
@@ -3199,9 +3451,39 @@ function rpBack() {
 /* =========================================================================
    SCREENS — one screen, one decision, vertically balanced.
    ========================================================================= */
-function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, selected = false }) {
+/* Round 50: arriving from a service landing page (or an ad) used to skip
+   the service list entirely — see rpSuggestedService in the boot section.
+   The list always shows now, and the row matching where they came from is
+   only SUGGESTED: highlighted, labelled "Suggested", and one tap away from
+   being changed. Nothing is written to rpState until the customer picks.
+   The label is deliberately neutral -- the same param now arrives from a
+   Google Ads click as from a landing-page CTA, and "where you came from"
+   would be wrong for one of them.
+
+   Returns the row's options untouched for every other service, so a direct
+   visitor to /book sees exactly what they saw before. Move-Out keeps its
+   own "Most Popular" badge rather than having it overwritten — that one is
+   a claim about the product, not about where this visitor came from. */
+function rpRowHint(service, opts) {
+  /* rpSuggestedService is a const declared down in the boot section. Safe
+     to read here because nothing calls this before rpRender(), which is
+     the last line of the file. */
+  if (service !== rpSuggestedService) return opts;
+  /* `suggested`, deliberately NOT `selected` -- see rpRowBtn. A suggestion
+     must not report itself as pressed; that is the lock-in this round is
+     removing, just spoken to a screen-reader user instead of drawn. */
+  return Object.assign({}, opts, { suggested: true, badge: opts.badge || "Suggested" });
+}
+
+function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, selected = false, suggested = false }) {
+  /* `selected` = the customer picked this. `suggested` = round 50's hint
+     based on where they came from. They share the highlight so the hint is
+     visible, but only a real selection sets aria-pressed -- otherwise the
+     row announces as "pressed" before anyone has chosen anything. The
+     "Suggested" badge sits inside the button, so a screen reader reads the
+     hint as part of the row's own label. */
   return `
-    <button type="button" class="rp-row ${featured ? "is-featured" : ""} ${selected ? "is-selected" : ""}" aria-pressed="${selected ? "true" : "false"}" onclick="${onclick}">
+    <button type="button" class="rp-row ${featured ? "is-featured" : ""} ${selected || suggested ? "is-selected" : ""}" aria-pressed="${selected ? "true" : "false"}" onclick="${onclick}">
       ${badge ? `<span class="badge">${badge}</span>` : ""}
       ${icon ? rpChip(icon) : ""}
       <span class="rp-row-main">
@@ -3234,11 +3516,11 @@ function rpScreenHtml() {
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
         <div class="rp-rows">
-          ${rpRowBtn({ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices in about a minute. Want to talk it through? Call us.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` })}
-          ${rpRowBtn({ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` })}
-          ${rpRowBtn({ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` })}
-          ${rpRowBtn({ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" })}
-          ${rpServiceIsPublic('hourly') ? rpRowBtn({ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Cleaning and organizing, just the areas you choose.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" }) : ""}
+          ${rpRowBtn(rpRowHint('moveout',{ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Two real prices in about a minute. Want to talk it through? Call us.", featured:true, badge:"Most Popular", val:`From $${RP_MOVEOUT_REFRESH_BEDROOM_TIERS[0].base}` }))}
+          ${rpRowBtn(rpRowHint('deep',{ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"6 hours of detailed cleaning, top to bottom. Add time for a bigger home.", val:`$${RP_DEEP_ANCHOR_PRICE}` }))}
+          ${rpRowBtn(rpRowHint('maintenance',{ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"A light refresh for an already-tidy home. 3 hours, no contract.", val:`$${RP_BASIC_ANCHOR_PRICE}` }))}
+          ${rpRowBtn(rpRowHint('carpet',{ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Professional hot-water extraction cleaning.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" }))}
+          ${rpServiceIsPublic('hourly') ? rpRowBtn(rpRowHint('hourly',{ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"Cleaning and organizing, just the areas you choose.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" })) : ""}
         </div>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a>, or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
@@ -3288,13 +3570,20 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center">
       ${eyebrow}
       <h2>Tell us about the home</h2>
-      <p class="rp-sub">${tier
-        ? `${tier.includedBathrooms} bathroom${tier.includedBathrooms > 1 ? "s" : ""} included at this size — extra bathrooms don't cost more.`
-        : "Two quick taps. Bathrooms never add to your price."}</p>
+      ${/* Round 51: the bedroom pills used to top out at "5+", and the tier
+           table's last row was `min: 4, max: 999` — so a five-, six- or
+           eight-bedroom house all priced as a four-bedroom. Five is now its
+           own priced bracket and anything above it is a real quote, so the
+           picker has to be able to say "6+" and mean it. */""}
+      <p class="rp-sub">${rpState.bedrooms > RP_MOVEOUT_MAX_PRICED_BEDROOMS
+        ? "A home this size is worth a quick call — we'll price it properly rather than guess."
+        : tier
+          ? `${tier.includedBathrooms} bathroom${tier.includedBathrooms > 1 ? "s" : ""} included at this size — extra bathrooms don't cost more.`
+          : "Two quick taps. Bathrooms never add to your price."}</p>
       <div class="rp-size-group">
         <span class="rp-size-label">Bedrooms</span>
         <div class="rp-pill-grid">
-          ${[1,2,3,4,5].map(n => `<button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" aria-pressed="${rpState.bedrooms === n}" onclick="rpSelectBedrooms(${n}, this)">${n}${n===5?"+":""}</button>`).join("")}
+          ${[1,2,3,4,5,6].map(n => `<button type="button" class="rp-pill ${rpState.bedrooms === n ? "is-selected" : ""}" aria-pressed="${rpState.bedrooms === n}" onclick="rpSelectBedrooms(${n}, this)">${n}${n===6?"+":""}</button>`).join("")}
         </div>
       </div>
       <div class="rp-size-group">
@@ -3399,7 +3688,8 @@ function rpScreenHtml() {
        words: protects your security deposit if something gets missed. */
     const tierCard = (service) => {
       const svc = rpServices[service];
-      const inc = rpIncludes[service];
+      /* Round 50: `const inc = rpIncludes[service]` sat here unread since
+         round 31 moved the scope bullets off the card and into the table. */
       const price = rpMoveoutTierBasePrice(service);
       const featured = service === "moveout";
       /* Round 38: was `featured ? 3 : 2` -- a hardcoded copy that never
@@ -3414,19 +3704,37 @@ function rpScreenHtml() {
       return `
         <div class="rp-tier-card ${featured ? "is-featured" : ""} ${alreadyChosen ? "is-chosen" : ""}">
           ${featured ? `<span class="rp-tier-badge">Most Popular</span>` : ""}
-          <div class="rp-tier-crew">${crew}-cleaner crew</div>
+          ${/* Round 50: this was three stacked lines about labour \u2014
+               "2-cleaner crew", "8\u201310 hours on site", and "That's 16\u201320
+               hours of work", the third being the first two multiplied.
+               Crew and duration are now one line; the crew-hours line
+               (round 31 \u2014 the strongest honest answer to "why does this
+               cost that") stays, because it's the only one of the three
+               that isn't just restating the other two. Both still compute
+               off rpMoveoutCrewSize/rpMoveoutTierHours, so neither can
+               drift from the engine. Round 51: both are per-bedroom-bracket
+               now, so this card finally says how long THIS home takes
+               rather than a range covering every size. */""}
+          ${/* Round 51: a 6+ bedroom home has no bracket, so crew and hours
+               come back 0 and "" and this line rendered "0 cleaners \u00b7  on
+               site". Nothing is known about a home that size until someone
+               has looked at it, which is exactly what the card should say. */""}
+          <div class="rp-tier-crew">${crew && rpMoveoutTierHours(service)
+            ? `${crew} cleaner${crew === 1 ? "" : "s"} &middot; ${rpMoveoutTierHours(service)} on site`
+            : "Crew and time confirmed with your quote"}</div>
           <h3>${svc.name}</h3>
           <div class="rp-tier-price">${price === null ? "Custom" : `$${price.toFixed(0)}`}${price === null ? "" : "<small>starting price</small>"}</div>
-          <div class="rp-tier-hours">${rpMoveoutTierHours(service)} on site</div>
-          ${/* Round 31: the strongest honest answer to "why does this cost
-               that" is the crew-hours it buys, and it was nowhere in the
-               funnel. Computed from the same crew size and hour range the
-               card already shows, so it can't drift. */""}
-          <div class="rp-tier-math">${(() => {
-            const hrs = (rpMoveoutTierHours(service).match(/\d+/g) || []).map(Number);
-            if (hrs.length < 2) return "";
-            return `That's ${crew * hrs[0]}\u2013${crew * hrs[1]} hours of work`;
-          })()}</div>
+          ${(() => {
+            /* Round 50: renders nothing on a 1-cleaner crew. Crew-hours only
+               tells you something when there's more than one pair of hands \u2014
+               at crew 1 it printed the same number twice, once as "on site"
+               and once as "of work", and most of the ladder is 1-cleaner.
+               Round 51: reads rpMoveoutCrewHours() rather than parsing a
+               range out of the display string. */
+            const total = rpMoveoutCrewHours(service);
+            if (crew < 2 || !total) return "";
+            return `<div class="rp-tier-math">That's ${total} hours of work</div>`;
+          })()}
           <div class="rp-tier-guarantee">${guaranteeLine}</div>
           ${/* Round 31: the four highlight bullets and Express's exclusion
                paragraph used to live here. They said, in prose, exactly what
@@ -3442,18 +3750,29 @@ function rpScreenHtml() {
     return { scroll: `<div class="rp-center" style="max-width:560px">
       ${eyebrow}
       <h2>Here's what fits your home</h2>
-      <p class="rp-sub">Two ways to do it. Pick the one you actually need.</p>
-      ${/* Round 32: the $599 cap is the most sellable thing about the new
-           ladder, and this is the screen where someone is bracing for a
-           number. Reads the ceiling from the message library, which reads
-           it from the engine's top tier — so it can never promise a cap
-           the price list doesn't keep. */""}
-      ${/* Round 38: one line that makes the two prices explain themselves.
-           Reads the ratio out of the engine (see RP_MSG.tiers.workRatio) and
-           renders nothing if crew and hours ever stop being a clean
-           multiple, rather than asserting a relationship that has quietly
-           stopped being true. */""}
-      ${(() => { const w = RP_MSG.tiers.workRatio(); return w ? `<p class="rp-work-ratio">${w}</p>` : ""; })()}
+      ${/* Round 50 (direct instruction: "way too busy, remove redundant text
+           so it's more simple and focused"). Three things came off this
+           screen, all of them second and third statements of something the
+           screen already said:
+
+           1. The sub-line "Two ways to do it. Pick the one you actually
+              need." The fineprint at the bottom already asks the one
+              question that decides it (RP_MSG.tiers.chooser), and the h2 +
+              two cards make "two ways, pick one" self-evident.
+           2. RP_MSG.tiers.workRatio() — "Same crew both ways — 2 cleaners.
+              Inspection Ready is double the hours." Both cards already
+              carry a crew line, an hours line AND a crew-hours line. This
+              was the third telling, above the fold, of the same fact. It
+              stays in the library because /call still speaks it.
+           3. The rp-scope-foot paragraph under the table ("Same insurance,
+              same standards either way — the real difference is how far
+              into the home we go, and how many hands it takes"): "how many
+              hands" is the crew line again and "how far into the home"
+              is what the seven table rows are.
+
+           What's left is the decision and nothing else: the deposit anchor
+           (the reason to care), two cards (the choice), the scope table
+           (the detail), one testimonial, and the question that settles it. */""}
       ${/* Round 33: the deposit anchor REPLACES the "$599 ceiling" line that
            was here. Both are good, but this screen's job is choosing
            between a guaranteed clean and a cheaper one, and the honest
@@ -3509,7 +3828,6 @@ function rpScreenHtml() {
           </div>
           ${scope.map(([label, ir, rf]) => `<div class="rp-scope-row"><span>${label}</span>${mark(ir)}${mark(rf)}</div>`).join("")}
         </div>
-        <p class="rp-scope-foot">Same insurance, same standards either way — the real difference is how far into the home we go, and how many hands it takes to do it in one visit.</p>
         <figure class="rp-tier-quote">
           <blockquote>“Christa and her team were excellent for my move-out clean. The house looked great, and the entire process was smooth and stress-free.”</blockquote>
           <figcaption>Corey M. · move-out customer · <span>★★★★★</span></figcaption>
@@ -5423,33 +5741,40 @@ function rpAttributionSummary() {
   return keys.map((k) => `${k}=${rpAttribution[k]}`).join(", ");
 }
 
-/* URL-based service preselect — e.g. /book?service=moveout skips the picker
-   screen and opens straight into that service's flow. Used by Google Ads
-   final URLs and landing-page CTAs that already know the visitor's intent.
+/* URL-based service HINT — e.g. /book?service=moveout.
    "movein" is aliased to "moveout" since Move-In and Move-Out share one
-   flow/card in this funnel. */
+   flow/card in this funnel.
+
+   Round 50 (direct instruction: "when a customer hits book now through a
+   website service page, allow them to see all the services like on /book
+   — don't lock them into the choice"). This used to set rpState.service
+   and jump rpState.step straight past the picker, so somebody who clicked
+   "Book Now" on the deep-cleaning page landed mid-flow with no way to see
+   that move-out or carpet existed short of hitting back. Anyone who
+   arrived on the wrong page, or who was browsing rather than decided, was
+   stuck in a funnel they hadn't chosen.
+
+   The param is now presentation only: everybody starts on the service
+   list, the matching row is marked as a suggestion, and one tap changes
+   it. Nothing is committed to rpState until the customer actually picks.
+   Applies to ad clicks too (direct instruction) — one behaviour, no
+   second code path to keep in sync. The intent signal isn't lost: it
+   still rides along to GHL via rpTrack's preselected_service, and it
+   still skips the intro splash below so the list is the first thing on
+   screen. */
 const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", hourly: "hourly" };
-const rpPreselectedService = (function rpApplyServicePreselect() {
+const rpSuggestedService = (function rpReadServiceHint() {
   const params = new URLSearchParams(window.location.search);
   const requested = (params.get("service") || "").trim().toLowerCase();
   const resolved = rpServiceAliases[requested];
-  if (resolved && rpFlows[resolved]) {
-    rpState.service = resolved;
-    /* MUST be rpCurrentFlow(), not rpFlows[resolved] -- see the comment
-       on rpFlows itself and on rpSelectService above. rpState is fresh
-       off boot here (no bedrooms/questionnaire answers yet), so
-       rpMoveoutBlocked() is safely false for Move-Out. */
-    rpState.step = rpCurrentFlow()[0] || "service";
-    return resolved;
-  }
-  return null;
+  return (resolved && rpFlows[resolved]) ? resolved : null;
 })();
 
 /* Boot */
 /* An explicit ?service= URL param (ad click, landing-page CTA) always wins
    over a resumed session — someone deliberately starting a specific flow
    shouldn't get pulled back into an old, possibly abandoned one. */
-const rpResumedSession = rpPreselectedService ? false : rpLoadPersistedState();
+const rpResumedSession = rpSuggestedService ? false : rpLoadPersistedState();
 if (rpHistoryNavAvailable) {
   try {
     /* MUST be rpCurrentFlow(), not rpFlows[...] — rpFlows is the raw
@@ -5489,8 +5814,16 @@ if (rpHistoryNavAvailable) {
    message library, so a claim sitting in plain HTML (the FAQ panel's
    service-area footnote) is still written in exactly one place. */
 rpHydrateMessages();
+/* Round 50: somebody who clicked "Book Now" on a service page has already
+   made the decision the intro splash exists to prompt. Making them tap
+   "Get My 60-Second Price" before the service list appears would trade the
+   step this round just removed for a different one. Open straight onto the
+   list — with their service highlighted by rpRowHint() — so all five
+   options are the first thing on screen. A cold visitor to /book still
+   gets the splash. */
+if (rpSuggestedService) rpServiceIntroRevealed = true;
 rpRender();
-rpTrack("booking_funnel_start", { source: rpPreselectedService ? "url_param" : (rpResumedSession ? "resumed_session" : "direct"), preselected_service: rpPreselectedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
+rpTrack("booking_funnel_start", { source: rpSuggestedService ? "url_param" : (rpResumedSession ? "resumed_session" : "direct"), suggested_service: rpSuggestedService || "none", has_ad_attribution: Object.keys(rpAttribution).length > 0 });
 </script>
 </body>
 </html>

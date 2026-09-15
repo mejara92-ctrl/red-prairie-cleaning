@@ -190,8 +190,13 @@ button,input,select,textarea{font:inherit; color:inherit}
    the touch minimum, and it keeps the merged "About the home" screen down to
    one thumb-scroll instead of four rows of near-empty buttons. */
 .opts.five{grid-template-columns:repeat(5,1fr)}
-.opts.five .o{justify-content:center; text-align:center; padding-inline:6px; font-size:16px}
-.opts.five .o .key{display:none}
+/* Round 51: bedrooms went to six options. Same centred, keyless treatment
+   as .five -- selectors share a rule rather than duplicating it so a tweak
+   to one can't drift from the other. */
+.opts.six{grid-template-columns:repeat(6,1fr)}
+.opts.five .o, .opts.six .o{justify-content:center; text-align:center; padding-inline:6px; font-size:16px}
+.opts.six .o{padding-inline:3px; font-size:15px}
+.opts.five .o .key, .opts.six .o .key{display:none}
 @media (max-width:330px){ .opts.five{grid-template-columns:repeat(4,1fr)} }
 .o{
   position:relative; display:flex; align-items:center; gap:9px; text-align:left; cursor:pointer;
@@ -786,8 +791,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js?v=b07a70c5"></script>
-<script src="../js/rp-pricing-engine.js?v=5397a545"></script>
+<script src="../js/rp-messages.js?v=5a71fc3a"></script>
+<script src="../js/rp-pricing-engine.js?v=404f28cc"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -1317,6 +1322,13 @@ function guardrails(forStep){
   if(rpIsCustomQuoteOnly() && ["quote","contact","calendar"].includes(s))
     g.push({level:"stop",title:"Do not quote a price",
       body:"This job is custom-quote only. Book the visit, tell them the office confirms pricing before the cleaning date, and do NOT say a dollar amount out loud \u2014 even a rough one. A number said on the phone is the number they expect."});
+  /* Round 51: the published ladder stops at five bedrooms. rpIsCustomQuoteOnly()
+     already catches this at the quote step, but that's three screens too
+     late -- Liz needs to know the moment she taps 6+, before she has talked
+     her way toward a number she can't give. */
+  if(["home","tiers","addons","quote"].includes(s) && rpMoveoutIsOversizeHome())
+    g.push({level:"warn",title:"Too big for the price list",
+      body:`Over ${RP_MOVEOUT_MAX_PRICED_BEDROOMS} bedrooms we quote rather than price off the table. Keep going and take every detail — then tell them the office confirms the exact number before the date. Don't extrapolate from the ${RP_MOVEOUT_MAX_PRICED_BEDROOMS}-bedroom row.`});
   if(["home","tiers","addons","quote"].includes(s) && rpMoveoutBlocked())
     g.push({level:"stop",title:"Do not give a price on this call",
       body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
@@ -1533,8 +1545,11 @@ function sectionBody(s){
           ${opt("No",`pick('${field}',false)`,rpState[field]===false)}
         </div></div>`;
     return `
+      ${/* Round 51: was 1-5 with 5 meaning "5 or more". Five bedrooms is its
+           own priced bracket now and 6+ is a real quote, so the picker has
+           to be able to say that. */""}
       <div class="grp"><div class="grp-h">Bedrooms</div>
-        <div class="opts five">${[1,2,3,4,5].map(n=>opt(`${n}${n===5?"+":""}`,`pick('bedrooms',${n})`,rpState.bedrooms===n,null,null)).join("")}</div></div>
+        <div class="opts six">${[1,2,3,4,5,6].map(n=>opt(`${n}${n===6?"+":""}`,`pick('bedrooms',${n})`,rpState.bedrooms===n,null,null)).join("")}</div></div>
       <div class="grp"><div class="grp-h">Full bathrooms</div>
         <div class="opts five">${[1,2,3,4].map(n=>opt(`${n}${n===4?"+":""}`,`pick('bathrooms',${n})`,rpState.bathrooms===n)).join("")}</div></div>
       ${isMoveout ? `
@@ -2012,8 +2027,12 @@ function rpCallQuoteSms(){
   const price = rpFormatMoneyDisplay(rpFinalPriceCents());
   const name  = (rpServices[rpState.service]||{}).name || "cleaning";
   const who   = rpState.csrName ? ` — ${rpState.csrName}` : "";
+  /* Round 50: this said "call 580-583-4444" -- a number that appears
+     nowhere else on the site and was the ONLY phone number in this file.
+     Every caller Liz quoted got texted the wrong number. Reads the one
+     constant now (RP_MSG.facts.phone), so it can't drift again. */
   return `Red Prairie Cleaning: ${name} for your place comes to ${price}. `
-       + `That price is good as quoted. Reply or call 580-583-4444 to lock in a time${who}.`;
+       + `That price is good as quoted. Reply or call ${RP_MSG.facts.phone} to lock in a time${who}.`;
 }
 function textThisPrice(){
   if(priceLocked() || !phoneOk(rpState.phone)) return;
@@ -2308,11 +2327,21 @@ function cmpTiers(){
       const e = RP_MOVEOUT_REFRESH_BEDROOM_TIERS[i];
       nums += cmpRow(t.label, cmpMoney(t.base), cmpMoney(e?e.base:null));
     });
+    /* Round 51: the ladder stops at five bedrooms. Saying so on the sheet
+       stops Liz quoting the top rung at someone with a six-bedroom house. */
+    nums += cmpRow(`${RP_MOVEOUT_MAX_PRICED_BEDROOMS + 1}+ bedrooms`, "Quote it", "Quote it");
   }
-  nums += cmpRow("Cleaners", String(irMath.crew||3), String(exMath.crew||2));
-  nums += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
-  if(irMath.lo && exMath.lo){
-    nums += cmpRow("Hours of work", `${irMath.lo}–${irMath.hi}`, `${exMath.lo}–${exMath.hi}`);
+  /* Round 51: crew and hours are per-bedroom-bracket now, so these three
+     rows only have an answer once Liz has asked the size. Before, they
+     printed a flat "8-10 hours / 4-5 hours" for every home on the call and
+     a crew number that fell back to a hardcoded 3/2 -- both wrong often
+     enough that she'd have been reading them out to callers. With the size
+     unknown the rows are simply left off and the ladder above already shows
+     what changes with size. */
+  if(known && irMath.crew && exMath.crew){
+    nums += cmpRow("Cleaners", String(irMath.crew), String(exMath.crew));
+    nums += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
+    nums += cmpRow("Hours of work", `${irMath.lo}`, `${exMath.lo}`);
   }
   nums += cmpRow("Deposit backed", "Yes", "No", {pick});
   nums += `<div class="cmp-line">Both come back free within ${esc(RP_MSG.guarantee.window)}. Only Inspection Ready is sold as protecting a deposit — ${esc(RP_MSG.guarantee.depositName)}.</div>`;
@@ -2437,7 +2466,9 @@ function cmpServices(){
   let h = cmpRow("", "MOVE-OUT", "DEEP", {head:true});
   h += cmpRow("Price", `${cmpMoney(irLo)}–${cmpMoney(irHi)}`, cmpMoney(RP_DEEP_ANCHOR_PRICE));
   h += cmpRow("Home", "Empty", "Lived in");
-  h += cmpRow("Time", rpMoveoutTierHours("moveout"), `${RP_DEEP_ANCHOR_HOURS}h`);
+  /* Round 51: rpMoveoutTierHours() needs a bedroom count now; with none it
+     returns "" and this row would read blank against the deep figure. */
+  h += cmpRow("Time", rpMoveoutTierHours("moveout") || "By size", `${RP_DEEP_ANCHOR_HOURS}h`);
   h += cmpRow("Deposit backed", "Yes", "No");
   h += `<div class="cmp-line">Deep is a flat ${cmpMoney(RP_DEEP_ANCHOR_PRICE)} whatever the size; move-out is priced by bedrooms. Basic is ${cmpMoney(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours and is for an already-tidy home.</div>`;
   h += cmpSay("Before I price it — is a landlord, property manager or housing office going to walk through and check the place after you're out?");

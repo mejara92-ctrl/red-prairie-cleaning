@@ -152,29 +152,17 @@ const RP_MSG = {
        nothing at all if they ever stop being a clean multiple. */
     workRatio() {
       const ir = RP_MSG.crewMath("moveout"), ex = RP_MSG.crewMath("moveoutrefresh");
-      if (!ir || !ex || !ex.lo || !ex.hi) return "";
-      /* Compare the midpoints of the two crew-hour ranges. 4–6 against 8–10
-         is exactly 2x at the bottom and 1.67x at the top, so neither end on
-         its own is the honest number -- the midpoints (10 against 18) give
-         1.8x, which is "about double" and not "double".
-
-         Hedged deliberately. The whole point of this line is that the price
-         is explained by the work, and a claim a customer could check and
-         find slightly off would undo that faster than saying nothing. If the
-         ranges ever become a clean multiple it says so without the hedge,
-         and if they drift far from one it renders nothing at all. */
-      const irMid = (ir.lo + ir.hi) / 2, exMid = (ex.lo + ex.hi) / 2;
-      if (!exMid) return "";
-      const r = irMid / exMid;
+      if (!ir || !ex || !ex.lo) return "";
+      /* Round 51: these are exact per-bedroom-bracket figures now, not
+         ranges, so the old midpoint-of-a-range arithmetic is gone. The
+         ladder is built so Inspection Ready is exactly twice the crew-hours
+         of Express at every size (8/4, 12/6, 16/8, 20/10) — but this still
+         CHECKS rather than asserts it, because the whole value of the line
+         is that a customer can verify it against the two cards next to it. */
+      const r = ir.lo / ex.lo;
       if (r < 1.7 || r > 2.3) return "";
-      const exact = Math.abs(ir.lo - ex.lo * 2) < 0.01 && Math.abs(ir.hi - ex.hi * 2) < 0.01;
-      const phrase = exact ? "double" : "about double";
-      /* Round 41. This used to end "...so it's double the price", derived
-         from the HOURS alone. Round 41 took 5% off Inspection Ready without
-         touching Express, so the hours stayed exactly 2x and the prices
-         became 1.90x -- and the sentence would have gone on claiming double
-         the price while a customer looking at $199 and $379 could see it
-         wasn't. Checked against the live ladder now. */
+      const phrase = Math.abs(r - 2) < 0.01 ? "double" : "about double";
+
       const pr = RP_MSG.tiers.priceRatio();
       let priceClause = "";
       if (pr !== null) {
@@ -183,17 +171,36 @@ const RP_MSG = {
         /* Above 2.03 it says nothing about price at all: "more than double"
            is true but there is no version of it worth saying out loud. */
       }
-      return `Same crew both ways — ${ex.crew} cleaners. Inspection Ready is ${phrase} the hours${priceClause}.`;
+
+      /* Round 51: the two tiers no longer always send the same crew. At 3
+         and 4 bedrooms Inspection Ready sends two cleaners and Express
+         sends one; at 1–2 and 5 they match. The old line opened "Same crew
+         both ways" unconditionally, which became false at exactly the two
+         middle sizes — and Liz says this out loud. Two shapes now, picked
+         off the real numbers. */
+      if (ir.crew === ex.crew) {
+        const who = ir.crew === 1 ? "one cleaner" : `${ir.crew} cleaners`;
+        return `Same crew both ways — ${who}. Inspection Ready is ${phrase} the hours${priceClause}.`;
+      }
+      const said = (n, h) => `${n} cleaner${n === 1 ? "" : "s"} for ${h} hour${h === 1 ? "" : "s"}`;
+      return `Inspection Ready is ${said(ir.crew, ir.onSite)}; Express is ${said(ex.crew, ex.onSite)}. ${phrase === "double" ? "Double" : "About double"} the work${priceClause}.`;
     },
-    /* What the ladder actually charges, Inspection Ready against Express,
-       read live off the engine. Returns null rather than a number whenever
-       the answer would be misleading: no engine on this page, the two
-       tables don't line up, or the rungs disagree with each other by enough
-       that no single ratio describes the ladder. workRatio() above says
-       nothing about price when this is null, which is the safe direction. */
-    priceRatio() {
+    priceRatio(beds = (typeof rpState !== "undefined" ? rpState.bedrooms : null)) {
       if (typeof RP_MOVEOUT_BEDROOM_TIERS === "undefined") return null;
       if (typeof RP_MOVEOUT_REFRESH_BEDROOM_TIERS === "undefined") return null;
+      /* Round 51: when the bedroom count is known, answer for THAT rung
+         rather than for the ladder as a whole. The four rungs now run
+         1.75 / 1.72 / 1.67 / 1.66, a spread of 0.09 — wide enough that the
+         uniformity check below (correctly) refuses to name one number for
+         all of them, which would have silently dropped the price half of
+         workRatio()'s sentence on every screen. On a screen that knows the
+         home's size there is an exact right answer, so use it. */
+      if (Number(beds) > 0 && typeof rpMoveoutBedroomTier === "function") {
+        const irT = rpMoveoutBedroomTier(beds, "moveout");
+        const exT = rpMoveoutBedroomTier(beds, "moveoutrefresh");
+        if (irT && exT && irT.base && exT.base) return irT.base / exT.base;
+        return null;
+      }
       const ir = RP_MOVEOUT_BEDROOM_TIERS, ex = RP_MOVEOUT_REFRESH_BEDROOM_TIERS;
       if (!ir.length || ir.length !== ex.length) return null;
       const ratios = [];
@@ -296,16 +303,35 @@ const RP_MSG = {
      the engine can't answer, rather than guessing. */
   crewMath(service) {
     /* Round 38: read from the engine, not restated here, so the spoken
-       line and the screen can never disagree about how many people turn up. */
-    const crew = (typeof rpMoveoutCrewSize === "function") ? rpMoveoutCrewSize(service) : 2;
-    if (!crew) return "";
-    const hrs = (typeof rpMoveoutTierHours === "function"
-      ? (rpMoveoutTierHours(service).match(/\d+(?:\.\d+)?/g) || []).map(Number) : []);
-    if (hrs.length < 2) return "";
-    const lo = Math.round(crew * hrs[0]), hi = Math.round(crew * hrs[1]);
-    return { crew, lo, hi, hours: rpMoveoutTierHours(service),
-      short: `${lo}–${hi} hours of work`,
-      full: `${crew} cleaners on site for ${rpMoveoutTierHours(service)} — ${lo}–${hi} hours of work` };
+       line and the screen can never disagree about how many people turn up.
+
+       Round 51: hours became a single per-bedroom-bracket number instead of
+       a flat "8-10 hours" range, so this no longer parses two figures out
+       of a string -- it asks the engine for crew, on-site hours and total
+       crew-hours directly. `lo`/`hi` are kept on the returned object (both
+       set to the same exact figure) because workRatio() and /call's
+       comparison table still read them, and an exact number is just a
+       range that happens to be closed.
+
+       Returns "" until the bedroom count is known: every caller already
+       renders nothing on a falsy return, and a crew or a duration quoted
+       before we know the size of the home would be a made-up promise. */
+    if (typeof rpMoveoutCrewSize !== "function" || typeof rpMoveoutOnSiteHours !== "function") return "";
+    const crew = rpMoveoutCrewSize(service);
+    const onSite = rpMoveoutOnSiteHours(service);
+    if (!crew || !onSite) return "";
+    const total = crew * onSite;
+    const people = `${crew} cleaner${crew === 1 ? "" : "s"}`;
+    const hoursSaid = `${onSite} hour${onSite === 1 ? "" : "s"}`;
+    /* On a 1-cleaner job crew-hours and on-site hours are the same number,
+       so the trailing "— 8 hours of work" was printing "8 hours" twice in
+       one sentence. It only tells the customer something when more than one
+       pair of hands is on the job. */
+    return { crew, onSite, lo: total, hi: total, hours: rpMoveoutTierHours(service),
+      short: `${total} hours of work`,
+      full: crew > 1
+        ? `${people} on site for ${hoursSaid} — ${total} hours of work`
+        : `${people} on site for ${hoursSaid}` };
   },
 
   /* ── Access & preparation ────────────────────────────────────────────
