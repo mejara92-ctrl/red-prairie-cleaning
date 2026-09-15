@@ -1,0 +1,23 @@
+/* Round 29: real starting prices on the landing pages. These pages ranked
+   for cost-intent queries and published no number, so the visitor's actual
+   question went unanswered until after they committed to the estimator. */
+.rp-price-band{background:var(--light);padding:44px 16px}
+.rp-price-band-wrap{max-width:1000px;margin:0 auto;text-align:center}
+.rp-price-band-wrap h2{margin:0 0 10px}
+.rp-price-band-lead{max-width:640px;margin:0 auto 26px;color:var(--muted);font-size:15px;line-height:1.6}
+.rp-price-band-grid{display:grid;grid-template-columns:1fr;gap:16px;text-align:left}
+@media(min-width:760px){.rp-price-band-grid{grid-template-columns:1fr 1fr}}
+.rp-price-card{position:relative;background:#fffdf9;border:1px solid #e6d9c6;border-radius:18px;
+  padding:22px 20px;box-shadow:0 8px 22px rgba(0,0,0,.05)}
+.rp-price-card.is-featured{border-color:var(--red);border-width:2px}
+.rp-price-card-tag{position:absolute;top:-11px;left:20px;background:var(--red);color:#fff;
+  border-radius:99px;padding:4px 12px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.rp-price-card > b{display:block;font-size:19px;font-weight:800;margin-bottom:2px}
+.rp-price-card-amt{margin:0 0 10px;font-size:34px;font-weight:800;color:var(--red);line-height:1.1}
+.rp-price-card-note{margin:0 0 14px;font-size:14px;line-height:1.6;color:var(--muted)}
+.rp-price-card-tiers{list-style:none;margin:0;padding:0;border-top:1px solid #eee2d1}
+.rp-price-card-tiers li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;
+  border-bottom:1px solid #f1e8db;font-size:14.5px}
+.rp-price-card-tiers li b{font-weight:800}
+.rp-price-band-fine{margin:22px auto 18px;max-width:640px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.rp-price-band-fine a{font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;min-height:44px}

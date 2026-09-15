@@ -42,6 +42,26 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENGINE = os.path.join(ROOT, "js", "rp-pricing-engine.js")
 
 
+
+
+def _blank(m):
+    """Replace a comment with the same number of newlines, so line numbers
+    reported to the user still match the real file."""
+    return "\n" * m.group(0).count("\n")
+
+
+def strip_comments(html):
+    """Round 49: the round-48 run reported book/index.html as claiming "61
+    reviews". It does not -- the number appears in a /* ... */ note in the
+    stylesheet explaining what the strip USED to say. A guard that cries wolf
+    gets ignored, so comments come out before anything is matched. Line
+    numbers are preserved so the reported location is still useful."""
+    html = re.sub(r"<!--.*?-->", _blank, html, flags=re.S)     # HTML comments
+    html = re.sub(r"/\*.*?\*/", _blank, html, flags=re.S)      # CSS/JS block comments
+    html = re.sub(r"(?m)^\s*//.*$", "", html)                  # JS line comments
+    return html
+
+
 def read(path):
     with io.open(path, encoding="utf-8") as fh:
         return fh.read()
@@ -158,7 +178,7 @@ def main():
     problems = []
     for f in html_files():
         rel = os.path.relpath(f, ROOT)
-        text = read(f)
+        text = strip_comments(read(f))
         for line_no, line in enumerate(text.splitlines(), 1):
             for amount in set(int(x) for x in re.findall(r"\$(\d{2,4})\b", line)):
                 if amount in current:
@@ -187,7 +207,7 @@ def main():
     ceiling = p["inspection_ready"][-1]
     for f in html_files():
         rel = os.path.relpath(f, ROOT)
-        text = read(f)
+        text = strip_comments(read(f))
         for line_no, line in enumerate(text.splitlines(), 1):
             if "move-out" not in line.lower() and "moveout" not in line.lower():
                 continue
@@ -208,7 +228,7 @@ def main():
     for f in html_files() + [os.path.join(ROOT, "book", "index.html"),
                              os.path.join(ROOT, "call", "index.html")]:
         rel = os.path.relpath(f, ROOT)
-        for line_no, line in enumerate(read(f).splitlines(), 1):
+        for line_no, line in enumerate(strip_comments(read(f)).splitlines(), 1):
             for found in re.findall(r"(\d{2,4})\+?\s*(?:five-star\s+)?(?:reviews|ratings)", line, re.I):
                 if int(found) != review_count:
                     problems.append(
@@ -223,7 +243,7 @@ def main():
     # a live engine number.
     for f in html_files():
         rel = os.path.relpath(f, ROOT)
-        for line_no, line in enumerate(read(f).splitlines(), 1):
+        for line_no, line in enumerate(strip_comments(read(f)).splitlines(), 1):
             if 'name="description"' not in line:
                 continue
             for amount in set(int(x) for x in re.findall(r"\$(\d{2,4})\b", line)):
@@ -239,7 +259,7 @@ def main():
     ]
     for f in html_files() + [os.path.join(ROOT, "call", "index.html")]:
         rel = os.path.relpath(f, ROOT)
-        text = read(f)
+        text = strip_comments(read(f))
         for line_no, line in enumerate(text.splitlines(), 1):
             for pattern, expected, label in text_rules:
                 for found in re.findall(pattern, line):

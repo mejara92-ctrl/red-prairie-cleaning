@@ -40,7 +40,22 @@
 </script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="robots" content="noindex,follow"/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://redprairiecleaning.com/book/"/>
+<meta content="website" property="og:type"/>
+<meta content="Red Prairie Cleaning" property="og:site_name"/>
+<meta content="Book a Cleaning in Lawton &amp; Fort Sill | Red Prairie" property="og:title"/>
+<meta content="Get an instant price on move-out, deep, recurring and carpet cleaning in about a minute. 5.0 on Google, veteran-owned." property="og:description"/>
+<meta content="https://redprairiecleaning.com/book/" property="og:url"/>
+<meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="Red Prairie Cleaning serving Lawton and surrounding communities" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Book a Cleaning in Lawton &amp; Fort Sill | Red Prairie" name="twitter:title"/>
+<meta content="Instant price on move-out, deep, recurring and carpet cleaning across Lawton, Fort Sill and Southwest Oklahoma." name="twitter:description"/>
+<meta content="https://redprairiecleaning.com/images/social/red-prairie-og.jpg" name="twitter:image"/>
+
 <meta name="theme-color" content="#f7f1e7" id="rpThemeColor"/>
 <title>Book Your Cleaning — Red Prairie Cleaning</title>
 <meta name="description" content="Get an instant price and book your professional cleaning in about a minute. Serving Lawton, Fort Sill &amp; Southwest Oklahoma."/>
@@ -75,9 +90,9 @@ window.__rpScheduleDeferred(function(){
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap"></noscript>
 <style>
 :root {
   --red: #9f2027;
@@ -2763,7 +2778,26 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
     </div>
   </header>
   <div class="rp-progress"><div class="rp-progress-fill" id="rpProgressFill"></div></div>
-  <main class="rp-screens" id="rpScreens" aria-live="polite"></main>
+  <style>
+/* Round 49: the pre-render/no-JS view of the static hero. rpScreenHtml()
+   replaces this on first paint, so this only ever shows to a crawler that
+   doesn't run JS, or for the instant before the app boots on a slow phone.
+   Unstyled it rendered as edge-to-edge naked text. */
+.rp-static-hero{max-width:640px;margin:0 auto;padding:40px 22px;font-family:Manrope,system-ui,sans-serif}
+.rp-static-hero h1{font-family:"DM Serif Display",Georgia,serif;font-size:34px;line-height:1.14;margin:0 0 14px;color:#1a1a1a}
+.rp-static-hero p{font-size:16px;line-height:1.6;color:#444;margin:0 0 14px}
+.rp-static-hero a{color:#9d1822;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+</style>
+<main class="rp-screens" id="rpScreens" aria-live="polite">
+<!-- Round 49: static hero so the delivered HTML carries an H1 and the page's
+     core copy. rpScreenHtml() replaces this on first paint; it exists for
+     crawlers and for the no-JS case. -->
+<div class="rp-static-hero">
+<h1>Book a cleaning in Lawton &amp; Fort Sill</h1>
+<p>Get an instant price on move-out, deep, recurring and carpet cleaning in about a minute &mdash; Lawton, Fort Sill, Cache, Elgin, Medicine Park and Duncan. 5.0 on Google, licensed, insured and veteran-owned.</p>
+<p><a href="tel:5802150915" onclick="return gtag_report_conversion('tel:5802150915');">Call (580) 215-0915</a> &middot; <a href="sms:5802150915">Text us</a> &middot; <a href="/pricing/">See every price</a></p>
+</div>
+</main>
   <section class="rp-faq-page" id="rpFaqPage" hidden aria-hidden="true" aria-label="Frequently asked questions">
     <header class="rp-faq-head">
       <button class="rp-faq-back" type="button" onclick="rpCloseFaq()" aria-label="Return to booking">←</button>
@@ -2789,8 +2823,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js"></script>
-<script src="../js/rp-pricing-engine.js"></script>
+<script src="../js/rp-messages.js?v=b07a70c5"></script>
+<script src="../js/rp-pricing-engine.js?v=5397a545"></script>
 <script>
 /* =========================================================================
    BOOKING STATE & UI — customer-facing (/book). Pricing math itself now
@@ -3767,7 +3801,7 @@ function rpAddonsScreen(eyebrow) {
     }
     if (key === "detailPass") {
       return `
-        <p class="rp-tap-note">Baseboards &amp; trim, interior windows &amp; tracks, wall spot-cleaning, and ceiling fans, vents &amp; light fixtures — bundled as one pass.</p>
+        <p class="rp-tap-note">Baseboards & trim, interior windows & tracks, wall spot-cleaning, and ceiling fans, vents & light fixtures — bundled as one pass.</p>
         <div class="rp-choice-grid">
           <button class="rp-pill ${rpState.detailPassAddon ? "is-selected" : ""}" onclick="rpSelectDetailPass(true)">Yes<br><small>$${rpDetailPassPrice()}</small></button>
           <button class="rp-pill ${!rpState.detailPassAddon ? "is-selected" : ""}" onclick="rpSelectDetailPass(false)">No</button>
@@ -4115,7 +4149,7 @@ function rpTextMeThisQuote() {
 
 function rpEscapeAttr(value) {
   return String(value ?? "")
-    .replace(/&/g, "&amp;")
+    .replace(/&/g, "&")
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
@@ -4423,7 +4457,7 @@ function rpLeadScreen(eyebrow) {
     <p class="rp-privacy-note">${rpIcon("lock","rp-ic rp-ic-sm")} <span>Used only to confirm your booking. No spam.</span></p>
   </div>`, footer: `
     <div class="rp-live-chip"><span>Your estimate</span><strong>${rpPriceLabel()}</strong></div>
-    <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose My Date &amp; Time</button>
+    <button id="rpReserveBtn" class="rp-primary" onclick="rpSubmitLeadAndShowCalendar()">Choose My Date & Time</button>
     <p class="rp-footer-note">Confirmation sends only after your appointment time is booked.</p>
   ` };
 }

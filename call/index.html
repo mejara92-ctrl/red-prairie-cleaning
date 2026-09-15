@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Public+Sans:wght@400;500;600;700;800&amp;display=swap">
 <style>
 /* ==========================================================================
    RPC CALL CONSOLE 2.0
@@ -786,8 +786,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js"></script>
-<script src="../js/rp-pricing-engine.js"></script>
+<script src="../js/rp-messages.js?v=b07a70c5"></script>
+<script src="../js/rp-pricing-engine.js?v=5397a545"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -1437,7 +1437,7 @@ function stepValid(){ return sectionValid(rpState.step); }
    VIEW
    ========================================================================= */
 const el = id => document.getElementById(id);
-const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function fmtPhone(v){
   const d=normalizePhone(v);
   return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : v;
@@ -2005,7 +2005,7 @@ function quickBar(){
   if(!canText && !canLead) return "";
   return `<div class="qbar">
     ${canText?`<button type="button" class="primary" onclick="textThisPrice()">Text them this price</button>`:""}
-    ${canLead?`<button type="button" onclick="openSheet('endSheet')">Save lead &amp; end</button>`:""}
+    ${canLead?`<button type="button" onclick="openSheet('endSheet')">Save lead & end</button>`:""}
   </div>`;
 }
 function rpCallQuoteSms(){
@@ -2616,7 +2616,7 @@ function comparePanels(){
   if(!cards) return "";
   const desktop = !window.matchMedia || window.matchMedia("(min-width:1000px)").matches;
   return desktop ? cards
-    : `<details class="cmp-mobile"><summary>Compare &amp; reference</summary>${cards}</details>`;
+    : `<details class="cmp-mobile"><summary>Compare & reference</summary>${cards}</details>`;
 }
 
 /* The sticky offset has to clear the real header, which changes height with

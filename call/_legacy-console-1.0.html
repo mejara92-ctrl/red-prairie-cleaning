@@ -31,7 +31,7 @@
 <link rel="icon" type="image/png" href="/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 
 <style>
 :root{
@@ -240,7 +240,7 @@ input,select,textarea{font-family:inherit;font-size:15px}
   </div>
 </div>
 
-<script src="../js/rp-pricing-engine.js"></script>
+<script src="../js/rp-pricing-engine.js?v=5397a545"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -850,7 +850,7 @@ function stepValid(){
 
 /* ---------- Render ---------- */
 const el = id => document.getElementById(id);
-const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = v => String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function opt(label,onclick,selected,sub){
   return `<button type="button" class="opt${selected?" on":""}" onclick="${onclick}"><span>${label}${sub?`<small>${sub}</small>`:""}</span><span class="chk">\u2714</span></button>`;
 }

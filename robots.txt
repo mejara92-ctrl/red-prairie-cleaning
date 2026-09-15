@@ -1,10 +1,19 @@
 User-agent: *
 Allow: /
 
-# The booking funnel and the internal CSR tool are application screens,
-# not landing pages. /book already sends noindex,follow in its own head;
-# this keeps crawl budget on the pages that can actually rank.
+# The internal CSR tool is an application screen, not a landing page.
+# (Round 49: /book used to be noindex and was described here as such. It is
+# indexable now -- the homepage redirects every visitor to it, so it has to
+# be the page that can rank and be shared. Its own head carries index,follow
+# plus a self-canonical.)
 Disallow: /call
 Disallow: /call/
+
+# Internal ops/build files that live in the repo and therefore get served.
+# The real fix is keeping them out of the deploy; this at least keeps them
+# out of the index. See _headers for the matching X-Robots-Tag.
+Disallow: /tools/
+Disallow: /workers/
+Disallow: /WEBHOOK-MAPPING-V28.txt
 
 Sitemap: https://redprairiecleaning.com/sitemap.xml
