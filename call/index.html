@@ -208,6 +208,14 @@ button,input,select,textarea{font:inherit; color:inherit}
 }
 .o.on .key{background:var(--red); border-color:var(--red); color:#fff}
 @media (max-width:560px){ .o .key{display:none} .o{padding-left:12px} }
+/* Round 48: confirmation-checkbox glyph, always visible (unlike .key) so a
+   chk() reads as "confirm this" and not "pick this like every other .o". */
+.o .chkbox{
+  flex:0 0 auto; width:20px; height:20px; border-radius:5px; display:grid; place-items:center;
+  background:var(--panel); border:1.5px solid var(--line-2); color:#fff;
+  font-size:13px; font-weight:800; line-height:1;
+}
+.o.on .chkbox{background:var(--red); border-color:var(--red)}
 .o .txt{min-width:0}
 .o .txt small{display:block; margin-top:2px; font-size:12.5px; font-weight:500; color:var(--muted); line-height:1.4}
 .o.on .txt small{color:var(--red-ink); opacity:.85}
@@ -797,7 +805,6 @@ const rpState = {
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
   garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, handymanInterest:false, addonDropNotice:"",
-  militaryDiscount:false, militaryVerified:false,
   /* Round 40: add-ons stopped being a step you walk through and became a
      section that is either done or not. This is what "done" means for it. */
   addonsAsked:false,
@@ -1065,9 +1072,9 @@ const LINES = {
     }
   },
   addons:{
-    act:"Ask about carpet, windows and the garage <b>by name</b> — people almost never bring them up. Then ask the military question <em>before</em> you say the total.",
+    act:"Ask about carpet, windows and the garage <b>by name</b> — people almost never bring them up.",
     say:addonsSayLine,
-    coach:()=>`${angle().addon?angle().addon+" ":""}Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. <b>Then ask the military question, before you say the price, not after they push back on it:</b> “${RP_MSG.military().spoken}” This is Lawton; a large share qualify, it caps at $${RP_MSG.military().cap}, and offered up front it's a reason to book. Held back until they complain it only buys a save. Pet odour is a crew-prep flag, not a price change.`
+    coach:()=>`${angle().addon?angle().addon+" ":""}Ask carpet, windows and garage <b>by name</b> — customers almost never raise them, and they're the easiest revenue on the call. Pet odour is a crew-prep flag, not a price change.`
   },
   frequency:{
     act:"Offer the every-other-week price once. If they hesitate at all, choose One-Time and move on — they can switch later.",
@@ -1170,7 +1177,7 @@ function removableAddonLabel(){
 function doBetterPriceAnswer(){
   const removable = removableAddonLabel();
   const removeLine = removable ? ` Or if you'd rather handle ${removable} yourself, I can take that off the total.` : "";
-  return `\u201cI can't move the base price, but if you're military or first responder that's 10% off.${removeLine}\u201d`;
+  return `\u201cI can't move the base price \u2014 it's already the full number, nothing gets added once we're there.${removeLine}\u201d`;
 }
 /* Round 28 (direct instruction: "make /call an absolute weapon... handle
    rejections"). Tier-aware deposit answer -- the old line was the same
@@ -1218,7 +1225,7 @@ const OBJECTIONS = [
    n:"Never bad-mouth a competitor by name. For a move-out caller, this is a real second at-bat, not just a defense \u2014 if what they describe genuinely has no inspection coming, pivoting to Express can win the call on a truthful, lower number instead of just holding the line on Inspection Ready."},
   {q:"\u201cCan you do better on price?\u201d",
    a:doBetterPriceAnswer,
-   n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, it just offers the military/first responder discount instead of naming something that was never there."},
+   n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, there's nothing to offer; hold the price."},
   {q:"\u201cI need to think about it / talk to my spouse.\u201d",
    a:"\u201cTotally fair \u2014 we can at least get you on the calendar. No deposit required, and you can let us know if anything changes.\u201d",
    n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
@@ -1313,9 +1320,6 @@ function guardrails(forStep){
   if(["home","tiers","addons","quote"].includes(s) && rpMoveoutBlocked())
     g.push({level:"stop",title:"Do not give a price on this call",
       body:`${rpMoveoutBlockReasons().join(", ")}. Tell the customer we need to sort this out before we can book \u2014 take their name and number, log the call as a custom quote / callback needed, and have the office follow up. Do not continue toward a quote.`});
-  if(rpState.militaryDiscount && !rpState.militaryVerified)
-    g.push({level:"warn",title:"Military discount not confirmed",
-      body:"Ask: \u201cAre you active duty, retired, or a first responder?\u201d then tick the confirm box. Don't apply it just because they're calling from Lawton."});
   if(s==="contact" && rpState.address1 && !rpState.addressReadBack)
     g.push({level:"warn",title:"Read the address back",
       body:"Say the full address out loud and have them confirm before continuing. Wrong address is the #1 cause of a wasted crew trip."});
@@ -1447,17 +1451,23 @@ let KEYMAP = [];
    lottery. KEYS_ON is true only while the FOCUSED section's body is being
    built; every other section renders its options unnumbered. */
 let KEYS_ON = true;
-function opt(label, onclick, selected, sub, amount){
+function opt(label, onclick, selected, sub, amount, isCheck){
   const n = KEYS_ON ? KEYMAP.length + 1 : 99;
   if(KEYS_ON && n<=9) KEYMAP.push(onclick);
+  /* Round 48: isCheck marks a confirmation checkbox (chk()) rather than a
+     choice among options (opt()) -- before this they rendered as identical
+     buttons, so "I asked about all of these by name" looked exactly like
+     picking a price option. The checkbox glyph always shows (unlike .key,
+     which is a desktop keyboard hint hidden on mobile), so it's the one
+     reliable visual tell that this is a yes/no confirmation, not a choice. */
   return `<button type="button" class="o ${selected?"on":""}" onclick="${onclick}" aria-pressed="${selected?"true":"false"}">
-    ${n<=9?`<span class="key" aria-hidden="true">${n}</span>`:""}
+    ${isCheck?`<span class="chkbox" aria-hidden="true">${selected?"✓":""}</span>`:(n<=9?`<span class="key" aria-hidden="true">${n}</span>`:"")}
     <span class="txt">${label}${sub?`<small>${sub}</small>`:""}</span>
     ${amount?`<span class="amt">${amount}</span>`:""}
   </button>`;
 }
 function chk(field,label,sub){
-  return opt(label, `toggle('${field}')`, !!rpState[field], sub);
+  return opt(label, `toggle('${field}')`, !!rpState[field], sub, null, true);
 }
 
 const TITLES = {
@@ -1528,8 +1538,7 @@ function sectionBody(s){
       <div class="grp"><div class="grp-h">Full bathrooms</div>
         <div class="opts five">${[1,2,3,4].map(n=>opt(`${n}${n===4?"+":""}`,`pick('bathrooms',${n})`,rpState.bathrooms===n)).join("")}</div></div>
       ${isMoveout ? `
-      <div class="grp"><div class="grp-h">Quick checks <em>— any “no” and you don't quote</em></div></div>
-      ${yn("moveoutWaterOn","Is the water on?")}
+      ${yn("moveoutWaterOn","Is the water on? <em>— any “no” below and you don't quote</em>")}
       ${yn("moveoutAcOn","Is the air conditioning working?")}
       ${yn("moveoutMoldPests","Any signs of mold or pests?")}` : ""}`;
   }
@@ -1598,17 +1607,13 @@ function sectionBody(s){
     if(list.includes("cabinets")) rows.push(opt("Inside cabinets & closets",`toggle('cabinetsAddon')`,rpState.cabinetsAddon,null,`+$${rpAddonCatalog.cabinets.price}`));
     if(list.includes("detailPass")) rows.push(opt("Detail Pass",`toggle('detailPassAddon')`,rpState.detailPassAddon,"Baseboards, windows, walls, fans, vents, lights",`+$${rpDetailPassPrice()}`));
     if(list.includes("secondCleaner")) rows.push(opt("Additional cleaner",`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner,`For the full ${rpSecondCleanerHours()}hrs booked`,`+$${rpSecondCleanerPrice()}`));
-    if(rows.length) h+=`<div class="grp"><div class="opts">${rows.join("")}</div></div>`;
+    if(rows.length) h+=`<div class="grp"><div class="grp-h">Also available</div><div class="opts">${rows.join("")}</div></div>`;
 
     const quoted=[];
-    if(list.includes("junk")) quoted.push(opt("Junk or trash to haul away",`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes","Quoted separately — not in the total"));
-    quoted.push(opt("Small handyman repairs",`toggle('handymanInterest')`,rpState.handymanInterest,"Quoted separately — not in the total"));
-    h+=`<div class="grp"><div class="grp-h">Quoted separately</div><div class="opts">${quoted.join("")}</div></div>`;
+    if(list.includes("junk")) quoted.push(opt("Junk or trash to haul away",`pick('junkSize', rpState.junkSize==='yes'?null:'yes')`,rpState.junkSize==="yes"));
+    quoted.push(opt("Small handyman repairs",`toggle('handymanInterest')`,rpState.handymanInterest));
+    h+=`<div class="grp"><div class="grp-h">Quoted separately <em>— not in the total</em></div><div class="opts">${quoted.join("")}</div></div>`;
 
-    h+=`<div class="grp"><div class="grp-h">Ask before you say the price</div><div class="opts">
-      ${chk("militaryDiscount",`Military or first responder`,`${RP_MSG.military().pct}% off, max $${RP_MSG.military().cap} — offer it, don't wait to be asked`)}
-      ${rpState.militaryDiscount?chk("militaryVerified","I asked and they confirmed it"):""}
-    </div></div>`;
     h+=`<div class="grp"><div class="opts">
       ${chk("addonsAsked","I asked about all of these by name","Customers almost never bring these up themselves")}
     </div></div>`;
@@ -1625,7 +1630,7 @@ function sectionBody(s){
           rpState.service==="moveout" ? "Drops the deposit guarantee" : "Adds Defend Your Deposit",
           fmtTierPrice(switchTo))}</div>` : "";
     const dropNotice = rpState.addonDropNotice
-      ? `<div class="guard info"><span class="ic">•</span><div><b>Removed — already in this tier</b>${esc(rpState.addonDropNotice)}</div></div>` : "";
+      ? `<div class="guard info"><span class="ic">${guardIcon("info")}</span><div><b>Removed — already in this tier</b>${esc(rpState.addonDropNotice)}</div></div>` : "";
     return `${tierSwitch}${dropNotice}
       ${custom?"":closersHtml()}
       <div class="opts" style="margin-top:12px">${chk("quotedAloud","I gave them this quote and they're ready to book")}</div>`;
@@ -1675,10 +1680,18 @@ function fmtTierPrice(svc){
    which is roughly 200 words she has to read past while a customer waits on
    the other end of a silence she is supposed to be holding. Those live in
    Lookup now — one keypress, searchable, all sixteen of them. */
+/* Round 48: one icon per guardrail severity, used everywhere a .guard box
+   is built. Before this, "stop" guards rendered as a solid square in most
+   places but a bare bullet from the guardrails() renderer, and "warn"
+   was a triangle everywhere except the scarcity closer, which used a
+   clock icon -- undercutting the whole point of color+icon being an
+   instant severity read in the middle of a live call. */
+function guardIcon(level){ return level==="stop" ? "■" : level==="warn" ? "▲" : "•"; }
+
 function closersHtml(){
   const urgency = quoteUrgencyLine();
   return `
-    ${urgency?`<div class="guard warn"><span class="ic">◷</span><div><b>Real scarcity — say it</b>${urgency}</div></div>`:""}
+    ${urgency?`<div class="guard warn"><span class="ic">${guardIcon("warn")}</span><div><b>Real scarcity — say it</b>${urgency}</div></div>`:""}
     <div class="grp" style="margin-top:12px"><div class="grp-h">Then close</div>
       ${QUOTE_CLOSERS.map(c=>`<p style="margin:0 0 7px;font-family:Newsreader,Georgia,serif;font-size:17px;line-height:1.4">${c}</p>`).join("")}
     </div>
@@ -1769,9 +1782,8 @@ function sectionSummary(k){
                        ? ((rpServices[rpState.service]||{}).name||"") + P(" — " + fmtTierPrice(rpState.service)) : "";
     case "addons": {
       const items = rpAddonLineItems();
-      if(!items.length && !rpState.militaryDiscount) return "None";
+      if(!items.length) return "None";
       const names = items.map(i=>i.label);
-      if(rpState.militaryDiscount) names.push("Military discount");
       return names.join(", ");
     }
     case "frequency":return rpState.frequency||"";
@@ -1792,7 +1804,7 @@ const NUDGE = {
   caller:       ["Get their name and number","If the call drops after this you still have a lead."],
   home:         ["Bedrooms, bathrooms, and the three checks","Water, A/C, mold or pests. Unsure? Answer no."],
   tiers:        ["Read out both prices and let them pick","Ask if anyone's inspecting — that's what decides it."],
-  addons:       ["Ask about carpet, windows and the garage by name","Then the military question, before you say the total."],
+  addons:       ["Ask about carpet, windows and the garage by name","Customers almost never bring these up themselves."],
   frequency:    ["One-time or on a schedule?","If they hesitate at all, book one-time."],
   rooms:        ["How many carpeted rooms?","Two-room minimum — say it now."],
   hourly:       ["How many cleaners, and how long?","Two cleaners is the normal answer."],
@@ -1868,7 +1880,7 @@ function sectionCard(k, n){
       <span class="sec-chev" aria-hidden="true">${open?"−":"+"}</span>
     </button>
     ${open?`<div class="sec-b">${body}
-      ${guards.map(g=>`<div class="guard ${g.level}"><span class="ic">${g.level==="warn"?"▲":"•"}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
+      ${guards.map(g=>`<div class="guard ${g.level}"><span class="ic">${guardIcon(g.level)}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
     </div>`:""}
   </section>`;
 }
@@ -1942,9 +1954,9 @@ function sayBlock(){
 }
 
 function errorBlocks(){
-  return `${rpState.bookingError?`<div class="guard stop"><span class="ic">■</span><div><b>Booking didn't go through</b>${esc(rpState.bookingError)}</div></div>`:""}
-    ${rpState.customLeadError?`<div class="guard stop"><span class="ic">■</span><div><b>Couldn't save</b>${esc(rpState.customLeadError)}</div></div>`:""}
-    ${rpState.slotsError?`<div class="guard warn"><span class="ic">▲</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}</div></div>`:""}`;
+  return `${rpState.bookingError?`<div class="guard stop"><span class="ic">${guardIcon("stop")}</span><div><b>Booking didn't go through</b>${esc(rpState.bookingError)}</div></div>`:""}
+    ${rpState.customLeadError?`<div class="guard stop"><span class="ic">${guardIcon("stop")}</span><div><b>Couldn't save</b>${esc(rpState.customLeadError)}</div></div>`:""}
+    ${rpState.slotsError?`<div class="guard warn"><span class="ic">${guardIcon("warn")}</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}</div></div>`:""}`;
 }
 
 function doneScreen(){
@@ -2119,7 +2131,6 @@ function renderSide(){
   if(!priceLocked()){
     if(rpState.service && rpDisplayBasePrice()>0) rows.push(["Base", rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice()))]);
     rpAddonLineItems().forEach(r=>rows.push([r.label, r.quoted?"quoted":`+$${r.price.toFixed(0)}`]));
-    if(rpState.militaryDiscount && rpMilitaryDiscountAmount()>0) rows.push(["Military discount", "−"+rpFormatMoneyDisplay(rpMilitaryDiscountCents()), true]);
   } else {
     rpAddonLineItems().forEach(r=>rows.push([r.label, "—"]));
   }
@@ -2127,7 +2138,7 @@ function renderSide(){
 
   const area = rpServiceAreaStatus();
   const areaCard = (area.status==="core"||area.status==="unknown") ? "" : `
-    <div class="guard ${area.status==="outside"?"stop":"warn"}"><span class="ic">▲</span><div>
+    <div class="guard ${area.status==="outside"?"stop":"warn"}"><span class="ic">${guardIcon(area.status==="outside"?"stop":"warn")}</span><div>
       <b>${area.status==="outside"?"Outside the service area":"Edge of the service area"}</b>
       ${area.status==="outside"
         ? "Book it, but tell them the office confirms coverage and any travel before the date. Note it."
@@ -2738,11 +2749,11 @@ function renderTierSheet(){
     <div class="never">
       <b>Never say</b>${esc(RP_MSG.guarantee.limit)}
     </div>
-    <div class="never" style="background:var(--blue-wash);border-color:var(--blue)">
-      <b style="color:var(--blue)">The guarantee, exactly</b>
+    <div class="guard info" style="margin-top:0; margin-bottom:12px"><span class="ic">${guardIcon("info")}</span><div>
+      <b>The guarantee, exactly</b>
       <div style="margin-bottom:6px"><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.inspectionName)}:</b> ${esc(RP_MSG.guarantee.deposit())}</div>
       <div><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.expressName)}:</b> ${esc(RP_MSG.guarantee.satisfaction())}</div>
-    </div>
+    </div></div>
     ${priceLocked() ? `<p class="locked-note">This job can't be priced on the phone, so the numbers are hidden. The wording above still applies.</p>` : cmpTiers()}`;
 }
 
@@ -2796,7 +2807,6 @@ function lookupIndex(){
     answer:`Windows ${money(rpAddonCatalog.windows.basic)} basic or ${money(rpAddonCatalog.windows.premium)} premium (screens included). Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
   out.push({kind:"Price", title:"Junk hauling", answer:"Quoted separately — volume varies too much for a flat number. Never goes in the booked total without their say-so."});
   out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit one-time, ${money(RP_RECURRING_MIN_PER_VISIT)} per visit on a recurring plan.`});
-  out.push({kind:"Price", title:"Military and first responder discount", answer:`${RP_MSG.military().offer} ${RP_MSG.military().detail} Offer it BEFORE the price, don't wait to be asked.`});
 
   /* Round 32: every one of these used to be a second, hand-typed copy of a
      claim /book also made, in /book's own different words. They now read
@@ -3016,8 +3026,7 @@ function set(f,v){
   try{ renderSide(); renderTop(); renderDock(); renderStrip(); }catch(e){}
 }
 function pick(f,v){ rpState[f]=v; render(); }
-function toggle(f){ rpState[f]=!rpState[f];
-  if(f==="militaryDiscount"&&!rpState.militaryDiscount) rpState.militaryVerified=false; render(); }
+function toggle(f){ rpState[f]=!rpState[f]; render(); }
 /* Swap Move-Out tier without resetting size/addon state -- unlike
    pickService(), which is a genuine service change. See the comment on
    moveoutTierToggle above. */
@@ -3174,7 +3183,6 @@ function jobDetails(){
     `Add-ons: ${rpAddonSummaryText()}${rpAddonsTotal()>0?` | Add-ons total: $${rpAddonsTotal().toFixed(2)}`:""}`,
     rpHasQuotedAddon()?`\u26a0 Junk haul selected — office must quote it separately; it is NOT in the total above.`:"",
     rpState.handymanInterest?"Additional service request: Make-ready repairs \u2014 quoted separately, not included.":"",
-    `Military discount: ${rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (NOT confirmed \u2014 verify)"):"No"}`,
     `Quote: ${rpIsCustomQuoteOnly()?"CUSTOM \u2014 not quoted on the call":"$"+rpFinalPrice().toFixed(2)}`,
     /* Round 42: pay is a share of this ticket, so it belongs next to the
        ticket -- not buried in the crew-prep warnings, where it first landed
@@ -3256,8 +3264,8 @@ function calendarGridHtml(monthKey){
 }
 function calendarHtml(){
   if(rpState.slotsLoading) return `<p class="sub">Loading availability\u2026</p>`;
-  if(rpState.slotsError) return `<div class="guard warn"><b>Availability unavailable</b>${esc(rpState.slotsError)}
-    <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div>`;
+  if(rpState.slotsError) return `<div class="guard warn"><span class="ic">${guardIcon("warn")}</span><div><b>Availability unavailable</b>${esc(rpState.slotsError)}
+    <div style="margin-top:8px"><button class="btn" onclick="loadSlots()">Try again</button></div></div></div>`;
   if(!Object.keys(rpState.availableSlots||{}).length) return `<p class="sub">No open slots returned.</p><button class="btn" onclick="loadSlots()">Reload</button>`;
 
   const monthKey=clampCalendarMonth(rpState.calendarMonth||monthKeyFromDateKey(centralDateKey()));
@@ -3278,7 +3286,7 @@ function calendarHtml(){
     ${sel ? `<p class="sub" style="margin-top:2px"><b>${fmtDay(sel)}</b> \u2014 tap a time:</p>
       <div class="slots">${slots.length?slots.map(t=>opt(fmtTime(t),`pickSlot('${t}')`,rpState.selectedStartTime===t)).join("")
         :`<p class="sub">Nothing open that day \u2014 offer another.</p>`}</div>` : ""}
-    ${rpState.bookingError?`<div class="guard stop" style="margin-top:10px"><b>Booking failed</b>${esc(rpState.bookingError)}</div>`:""}
+    ${rpState.bookingError?`<div class="guard stop" style="margin-top:10px"><span class="ic">${guardIcon("stop")}</span><div><b>Booking failed</b>${esc(rpState.bookingError)}</div></div>`:""}
     ${rpState.bookingSubmitting?`<p class="sub" style="margin-top:10px">Booking\u2026</p>`:""}`;
 }
 function fmtDay(d){ return new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"numeric",day:"numeric"}); }
@@ -3400,11 +3408,6 @@ async function submitBooking(){
              GHL at all. Same field name as /book's payload so nothing
              downstream needs a second branch to read it. */
           handyman_interest:rpState.handymanInterest?"Yes":"No",
-          /* Overrides the shared "Yes"/"No" with the CSR-verified state —
-             Liz ticking "I asked and they confirmed" is a different fact
-             from the website's self-serve checkbox. */
-          military_discount:rpState.militaryDiscount?(rpState.militaryVerified?"Yes (confirmed)":"Yes (unconfirmed)"):"No",
-          military_discount_verified:rpState.militaryVerified?"Yes":"No",
           special_instructions:rpState.specialInstructions||"",
           submitted_at:new Date().toISOString(),
           job_details:jobDetails()

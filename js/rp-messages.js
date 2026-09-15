@@ -327,26 +327,12 @@ const RP_MSG = {
     window: "We use a 30-minute arrival window so the crew can finish the job before yours properly and get to you safely."
   },
 
-  /* ── The military discount ───────────────────────────────────────────
-     Rate and cap come from the pricing engine, never retyped. */
-  military() {
-    const pct = Math.round((typeof MILITARY_DISCOUNT_RATE !== "undefined" ? MILITARY_DISCOUNT_RATE : 0.10) * 100);
-    const cap = (typeof MILITARY_DISCOUNT_CAP !== "undefined" ? MILITARY_DISCOUNT_CAP : 25);
-    return {
-      pct, cap,
-      offer: `Military or first responder? Take ${pct}% off.`,
-      detail: `Up to $${cap} off, as a thank-you for your service. Can't be combined with other promotional offers.`,
-      spoken: `And are you or your spouse military or a first responder? I can take ${pct}% off if so.`
-    };
-  },
-
   /* ── Service area ────────────────────────────────────────────────────
      One list. It was written out longhand in eleven places, and two of
      them had a different set of towns. */
   areaTowns: ["Lawton", "Fort Sill", "Cache", "Elgin", "Medicine Park", "Duncan"],
   areaFootnote() {
-    const m = RP_MSG.military();
-    return `Serving ${RP_MSG.areaSentence()} and the surrounding Southwest Oklahoma communities. Military and first responders save ${m.pct}%, up to $${m.cap}.`;
+    return `Serving ${RP_MSG.areaSentence()} and the surrounding Southwest Oklahoma communities.`;
   },
   area() { return RP_MSG.areaTowns.join(" · "); },
   areaSentence() {

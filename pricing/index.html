@@ -123,7 +123,9 @@ h2{font-size:clamp(26px,4.6vw,36px)}
 .sect-intro{color:var(--ink-soft);max-width:62ch;margin:12px 0 0}
 
 /* tables */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tbl{width:100%;border-collapse:collapse;margin-top:26px;font-size:15px}
+@media(max-width:480px){.tbl{font-size:13.5px}.tbl th,.tbl td{padding:11px 9px}}
 .tbl caption{text-align:left;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);padding-bottom:10px}
 .tbl th,.tbl td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line)}
 .tbl thead th{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);font-weight:800;border-bottom:2px solid var(--ink)}
@@ -253,7 +255,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <h2>Move-Out Cleaning</h2>
 <p class="sect-intro">Two real options, not one product with fine print. <b>Inspection Ready</b> is the full checklist backed by Defend Your Deposit™ — the one most PCS families book, worked by a <b>3</b>-cleaner crew. <b>Move-Out Express</b> is a faster, lighter clean for anyone not facing a landlord or PM walkthrough, worked by <b>2</b>.</p>
 
-<table class="tbl">
+<div class="tbl-wrap"><table class="tbl">
 <caption>Base price by bedroom count</caption>
 <thead><tr><th scope="col">Bedrooms</th><th scope="col" style="text-align:right">Move-Out Express</th><th scope="col" style="text-align:right">Inspection Ready</th></tr></thead>
 <tbody>
@@ -261,7 +263,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <tr><td>3 bedrooms</td><td class="price">$249</td><td class="price">$429</td></tr>
 <tr><td>4+ bedrooms <span style="color:var(--ink-soft);font-weight:600">(four, five, six — same price)</span></td><td class="price">$299</td><td class="price">$499</td></tr>
 </tbody>
-</table>
+</table></div>
 
 <div class="adders">
 <strong>Adjustments</strong>
@@ -271,13 +273,13 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 </ul>
 </div>
 
-<div class="worked" style="border-color:rgba(159,32,39,.3);background:rgba(159,32,39,.05)">
+<div class="worked" style="border-color:rgba(208,0,0,.3);background:rgba(208,0,0,.05)">
 <p style="margin:0 0 6px"><b>What's actually on the line.</b> Around Lawton a security deposit runs about a month's rent — roughly <b>$600</b> on a one-bedroom, <b>$850–$900</b> on a two, <b>$1,100–$1,200</b> on a three, and <b>$1,300–$1,400</b> on a four. Except on the smallest homes, Inspection Ready costs less than half of what you're trying to get back.</p>
 <p style="margin:0;font-size:13px;color:var(--ink-soft)">Deposits vary by landlord and lease — these are typical local figures, not a quote on yours. And to be plain about it: we re-clean what we missed. We don't decide whether a landlord returns a deposit, and we'd never promise that.</p>
 </div>
 
 <div class="worked">
-<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$429</b> for Inspection Ready, or <b>$249</b> for Express, bathroom count included at no extra charge either way. With the military discount, Inspection Ready runs <b>$404</b>. That's the number you pay — no walkthrough surprises.</p>
+<p style="margin:0"><b>Worked example.</b> A 3-bedroom home: <b>$429</b> for Inspection Ready, or <b>$249</b> for Express, bathroom count included at no extra charge either way. That's the number you pay — no walkthrough surprises.</p>
 </div>
 
 <div class="callout" style="margin-top:22px">
@@ -355,7 +357,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <li>Extra time: <b>$50/hour</b>, added at booking based on what you describe</li>
 <li>Weekly: <b>20% off</b> every visit · Biweekly: <b>15% off</b> · Monthly: <b>10% off</b></li>
 <li>Recurring plans begin with one Deep Clean, then run at the rate above</li>
-<li>Satisfaction Guaranteed — not happy with something we cleaned, tell us within 48 hours and we'll make it right, free</li>
+<li>Satisfaction Guaranteed — same 48-hour make-it-right promise as every service on this page</li>
 </ul>
 </div>
 </div>
@@ -364,6 +366,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <section>
 <div class="wrap">
 <h2>Carpet &amp; Hourly Cleaning</h2>
+<p class="sect-intro">Two flat-rate options for jobs that don't fit the packages above — carpet care on its own or added to any cleaning, and hourly time when you just need certain areas done.</p>
 <div class="grid2">
 <div class="card">
 <h3>Carpet Cleaning</h3>
@@ -383,7 +386,7 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <div class="wrap">
 <h2>Optional add-ons</h2>
 <p class="sect-intro">Genuinely optional extras. Nothing here is quietly required to finish the job you booked, and none of it appears on your invoice unless you chose it.</p>
-<table class="tbl">
+<div class="tbl-wrap"><table class="tbl">
 <thead><tr><th scope="col">Add-on</th><th scope="col" style="text-align:right">Price</th></tr></thead>
 <tbody>
 <tr><td>Extra time on Deep or Basic Cleaning <span style="color:var(--ink-soft);font-weight:600">(bigger or messier home)</span></td><td class="price">$50 / hour</td></tr>
@@ -399,18 +402,17 @@ header a, footer a, .wrap > p > a { display:inline-flex; align-items:center; min
 <tr><td>Laundry service</td><td class="price">$35 / load</td></tr>
 <tr><td>Additional cleaner on Deep Cleaning</td><td class="price">$50 / hour</td></tr>
 </tbody>
-</table>
+</table></div>
 <p class="fine">Exterior window washing does not include screen removal. The garage must be empty before a floor wash. Junk hauling is the one thing on this page we can't price online — volume varies too much for a flat number to be fair either way. We'll call with a price before your cleaning date, and it never appears in your booked total without your say-so.</p>
 </div>
 </section>
 
 <section>
 <div class="wrap">
-<h2>Military &amp; first responder discount</h2>
-<p class="sect-intro">10% off your base price, up to $25. Applied automatically in the estimator — just tick the box, no paperwork, no phone call. It comes off the base price rather than add-ons, and it doesn't stack with promotional codes.</p>
-<div class="callout">
-<h3>Built around the PCS calendar</h3>
-<p>Most of our move-out customers are Fort Sill families on orders. We hold same-day and next-day slots for exactly that reason, we can work from a lockbox if you're already on the road, and we'll coordinate directly with your property manager. Prices above include tax-exclusive figures; Oklahoma sales tax is added at checkout.</p>
+<h2>Built around the PCS calendar</h2>
+<div class="callout" style="margin-top:22px">
+<h3>Same-day and next-day, lockbox-friendly</h3>
+<p>Most of our move-out customers are Fort Sill families on orders. We hold same-day and next-day slots for exactly that reason, we can work from a lockbox if you're already on the road, and we'll coordinate directly with your property manager.</p>
 </div>
 </div>
 </section>

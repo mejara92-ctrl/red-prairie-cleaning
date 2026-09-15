@@ -158,8 +158,12 @@ body {
     max-width: 30px !important;
     max-height: 30px !important;
   }
-  .navbar .rp-site-wordmark-copy strong { font-size: 10px; }
-  .navbar .rp-site-wordmark-copy small { font-size: 10px; }
+  /* Round 48: was a flat 10px here (down from 16px at the 520px breakpoint
+     just above) -- legible on a big phone, a genuine squint on a small one.
+     clamp() keeps a 11px floor no matter how narrow the screen gets, instead
+     of one more fixed step down. */
+  .navbar .rp-site-wordmark-copy strong { font-size: clamp(11px, 3.2vw, 13px); }
+  .navbar .rp-site-wordmark-copy small { font-size: clamp(11px, 3.2vw, 13px); }
   .navbar .book-btn { padding-inline: 8px; font-size: 12px; }
 }
 

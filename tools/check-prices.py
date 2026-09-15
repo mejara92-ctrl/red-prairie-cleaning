@@ -79,7 +79,6 @@ def engine_prices():
     out["recurring_min"] = scalar("RP_RECURRING_MIN_PER_VISIT")
     out["extra_hour"] = scalar("RP_EXTRA_HOUR_RATE")
     out["pet_enzyme"] = scalar("RP_PET_ENZYME_RATE")
-    out["military_cap"] = scalar("MILITARY_DISCOUNT_CAP")
     out["carpet"] = int(re.search(r"carpet:\s*\{[^}]*bundlePrice:\s*(\d+)", src).group(1))
     out["fridge"] = int(re.search(r"fridge:\s*\{[^}]*price:\s*(\d+)", src).group(1))
     out["oven"] = int(re.search(r"oven:\s*\{[^}]*price:\s*(\d+)", src).group(1))
@@ -153,7 +152,7 @@ def main():
         p["deep"], p["basic"], p["carpet"], p["fridge"], p["oven"], p["cabinets"],
         p["garage"], p["laundry"], p["windows_basic"], p["windows_premium"],
         p["one_time_min"], p["recurring_min"], p["extra_hour"], p["pet_enzyme"],
-        p["military_cap"], p["hourly_rate"],
+        p["hourly_rate"],
     ])
 
     problems = []

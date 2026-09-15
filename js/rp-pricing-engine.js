@@ -10,7 +10,7 @@
    RULES FOR EDITING THIS FILE:
    - Every function here reads/writes the global `rpState` object. Both
      /book and /call define their own `rpState` (same core fields — sqft,
-     bedrooms, bathrooms, condition, addons, military flag, etc. — plus
+     bedrooms, bathrooms, condition, addons, etc. — plus
      whatever page-specific extras they need) BEFORE this script runs any
      of its functions. Load order of the <script> tags doesn't matter
      since nothing here executes at parse time against rpState — only
@@ -744,13 +744,6 @@ const rpConditionCopy = {
 const RP_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
 
 
-/* Military / First Responder discount — 10%, capped at $25. Cannot stack
-   with promotional coupon codes. */
-const MILITARY_DISCOUNT_RATE = 0.10;
-const MILITARY_DISCOUNT_CAP = 25;
-
-
-
 /* Recurring maintenance plans — industry-standard discount bands for a
    no-contract, cancel-anytime recurring cleaning service. Discount applies
    to the per-visit price; visitsPerMonth is used to show the total monthly
@@ -1472,7 +1465,7 @@ function rpIsCustomQuoteOnly() {
 /* Base price for Move-Out or Deep Cleaning — both are sq-ft bracket +
    bedroom/bathroom adders (same included-2-bed/1-bath convention and
    $45/$35 rates for both), then the Heavy/Extreme condition multiplier
-   applied automatically, before add-ons and military discount. No manual
+   applied automatically, before add-ons. No manual
    credits for either service; Standard is always the lowest advertised
    price. */
 function rpServiceBasePrice() {
@@ -1543,11 +1536,11 @@ function rpToCents(dollars) { return Math.round(Number(dollars || 0) * 100); }
 function rpCentsToDollars(cents) { return Number((cents / 100).toFixed(2)); }
 function rpFormatMoney(cents) { return `$${(Math.abs(cents) / 100).toFixed(2)}`; }
 
-/* Per-visit / per-job subtotal BEFORE military discount and BEFORE add-ons.
+/* Per-visit / per-job subtotal BEFORE add-ons.
    For Deep Cleaning this is base price + condition adjustment.
    For Maintenance this is the frequency-discounted per-visit price.
    For Carpet this is the room-based price. Add-ons are always excluded —
-   they're fixed price and never touched by condition or military discount. */
+   they're fixed price and never touched by condition adjustments. */
 function rpPreDiscountSubtotalCents() {
   if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
   if (rpState.service === "carpet") {
@@ -1588,17 +1581,6 @@ function rpPreDiscountSubtotalCents() {
   }
   return 0;
 }
-
-/* Military / First Responder discount — 10% of the pre-add-on subtotal
-   (after condition adjustment), capped at MILITARY_DISCOUNT_CAP. Never
-   applied to add-ons, and never stacks with promotional coupon codes. */
-function rpMilitaryDiscountCents() {
-  if (!rpState.militaryDiscount || rpIsCustomQuoteOnly()) return 0;
-  const subtotal = rpPreDiscountSubtotalCents();
-  if (subtotal <= 0) return 0;
-  return Math.min(Math.round(subtotal * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP));
-}
-function rpMilitaryDiscountAmount() { return rpCentsToDollars(rpMilitaryDiscountCents()); }
 
 /* Single source of truth for "what would N rooms of standalone Carpet
    Cleaning cost" — used by the room-count picker on /book so its preview
@@ -1656,15 +1638,14 @@ function rpAddonsTotal() {
   return total;
 }
 function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }
-/* Add-ons are fixed price and are never discounted by the military offer. */
+/* Add-ons are always fixed price. */
 function rpAddonsOnceCharge() { return rpAddonsTotal(); }
 
 /* ---------------------------------------------------------------------
    MINIMUM CHARGE
    A crew still burns drive time, setup and supplies on a small job, so
    below a certain ticket the trip loses money once acquisition cost is
-   counted. Enforced AFTER the military discount — applied before it, the
-   discount punches straight through the floor.
+   counted.
 
    Two floors on purpose. For a ONE-TIME job the visit is the whole
    relationship, so it has to stand on its own. For a RECURRING plan the
@@ -1688,16 +1669,16 @@ function rpServiceFloorCents() {
   if (rpIsCustomQuoteOnly()) return 0;
   return rpToCents(rpIsRecurringBooking() ? RP_RECURRING_MIN_PER_VISIT : RP_ONE_TIME_MIN);
 }
-/* Service subtotal after military discount, raised to the floor. */
+/* Service subtotal, raised to the floor. */
 function rpNetServiceCents() {
   const subtotal = rpPreDiscountSubtotalCents();
   if (subtotal <= 0) return 0;
-  return Math.max(subtotal - rpMilitaryDiscountCents(), rpServiceFloorCents());
+  return Math.max(subtotal, rpServiceFloorCents());
 }
 function rpFloorApplied() {
   const subtotal = rpPreDiscountSubtotalCents();
   if (subtotal <= 0 || rpIsCustomQuoteOnly()) return false;
-  return (subtotal - rpMilitaryDiscountCents()) < rpServiceFloorCents();
+  return subtotal < rpServiceFloorCents();
 }
 
 function rpFinalPriceCents() {
@@ -1706,13 +1687,6 @@ function rpFinalPriceCents() {
   const addons = rpAddonsCents();
   if (subtotal <= 0 && addons <= 0) return 0;
   return rpNetServiceCents() + addons;
-}
-
-/* Pre-discount subtotal INCLUDING add-ons — used only where the code needs
-   "what it would cost with no military discount applied." */
-function rpCalculatePrice() {
-  if (!rpState.service || rpIsCustomQuoteOnly()) return 0;
-  return rpCentsToDollars(rpPreDiscountSubtotalCents() + rpAddonsCents());
 }
 
 function rpFinalPrice() {
@@ -1727,8 +1701,8 @@ function rpFinalPrice() {
    confident "$539" read like an invoice line, and made the CSR script
    literally say "five hundred thirty-nine dollars and zero cents" out
    loud. Cents are still rendered by rpFormatMoney() wherever a real
-   fractional amount can occur (the military discount line, recurring
-   per-visit math), so nothing is lost where it matters. */
+   fractional amount can occur (recurring per-visit math), so nothing is
+   lost where it matters. */
 function rpFormatMoneyDisplay(cents) {
   const abs = Math.abs(cents);
   return abs % 100 === 0 ? `$${Math.round(abs / 100)}` : rpFormatMoney(cents);
@@ -1790,16 +1764,12 @@ function rpRecurringDeepFirstPrice() {
 }
 
 /* What the customer actually pays on booking day: the required Deep plus
-   any add-ons, with the military discount applied to the Deep. The
-   recurring per-visit rate starts from visit two. */
+   any add-ons. The recurring per-visit rate starts from visit two. */
 function rpFirstVisitTotalCents() {
   if (!rpRecurringNeedsDeepFirst()) return rpFinalPriceCents();
   const deep = rpRecurringDeepFirstCents();
   if (deep <= 0) return rpFinalPriceCents();
-  const discount = rpState.militaryDiscount
-    ? Math.min(Math.round(deep * MILITARY_DISCOUNT_RATE), rpToCents(MILITARY_DISCOUNT_CAP))
-    : 0;
-  return Math.max(deep - discount, rpToCents(RP_ONE_TIME_MIN)) + rpAddonsCents();
+  return Math.max(deep, rpToCents(RP_ONE_TIME_MIN)) + rpAddonsCents();
 }
 function rpFirstVisitTotal() { return rpCentsToDollars(rpFirstVisitTotalCents()); }
 
@@ -1879,8 +1849,6 @@ function rpBuildSharedDetails() {
        could see "Junk Haul" but not what it was worth. */
     addons: rpAddonSummaryText(),
     addons_quoted_separately: rpHasQuotedAddon() ? "Yes" : "No",
-    military_discount: rpState.militaryDiscount ? "Yes" : "No",
-    discount_amount: rpMilitaryDiscountAmount().toFixed(2),
     estimated_price_number: custom ? "N/A" : rpFirstVisitTotal(),
     estimated_price: custom ? "Custom Quote" : `$${rpFirstVisitTotal().toFixed(2)}`,
 
