@@ -1,0 +1,87 @@
+RED PRAIRIE CLEANING — ROUND 53
+THE ESTIMATE SCREEN, REBUILT
+=========================================================================
+
+Instruction, looking at the live screen: "the button is weird, there's
+too much text, different fonts, make it simple."
+
+PRICES ARE UNCHANGED. Move-Out $199 / $299 / $399 / $499, Basic $120,
+Deep $240, Hourly and Extra Time $40/hr. This round is the screen only.
+
+
+THE WEIRD BUTTON
+----------------
+"Not ready? Send this quote to my phone" was styled as a full-width 46px
+box with a 1.5px grey border and muted grey text on a cream card. That is
+not what a button looks like on this site — it is what a TEXT INPUT looks
+like. Sitting directly under a heavy gradient CTA, the pair read as "big
+red button, then an empty form field."
+
+It is a plain underlined link now, which is what a secondary action
+should be. Its confirmed state is a line of text rather than a filled
+green box, for the same reason.
+
+
+TOO MUCH TEXT
+-------------
+The screen carried eleven separate pieces of copy, and several said the
+same thing twice:
+
+  - "Base Service $399" sat under a $399 headline
+  - "Estimated Time 8 hours" sat under "2 cleaners on site for 8 hours"
+  - Bedrooms and Bathrooms rows repeated what the person had answered
+    two screens earlier
+  - the guarantee ran five sentences
+
+Those four duplicated blocks are one line now:
+
+    4 bed · 2 bath · 2 cleaners · 8 hours
+
+and the guarantee is one sentence. The deposit comparison survived,
+compressed from three sentences to one, because it reframes the price
+rather than defending it — but it moved inside the guarantee panel
+instead of floating under it as a second block.
+
+The price breakdown only renders when there is something to break down.
+With no add-ons the headline price is the whole story, and a one-row
+"breakdown" of it is noise.
+
+
+DIFFERENT FONTS
+---------------
+Not a bug. `button { font: inherit }` is set, the family is Manrope
+throughout, and DM Serif Display is on the price only. It read as
+inconsistent because the screen used about nine distinct type styles and
+three separately tinted boxes — red guarantee, green payment panel, grey
+detail rows — stacked down one column.
+
+Now: three type sizes, one accent colour, one tinted panel. The serif
+appears exactly once, on the number. Every additional serif would cost
+that number some of its weight. The green payment box became a plain
+sentence, which removes the third colour from the screen.
+
+
+WHAT THIS SCREEN IS FOR
+-----------------------
+The rule the rebuild follows, worth writing down because it is what
+stops the eleven blocks growing back: this screen confirms the price and
+books the job. It is not the place to re-sell the service — that
+argument was already won on the way here. Anything that is not the
+number, what the number buys, or the way to proceed was cut.
+
+
+CHECKED
+-------
+Four suites, all green, from the repo root:
+
+  python3 tools/check-prices.py     published prices + asset stamps
+  node tools/r52-test.js            the ladder, margins, floors
+  node tools/funnel-test.js         every service reaches a price
+  node tools/undefined-refs.js      every function called exists
+
+Plus the estimate screen rendered in a browser at phone width for every
+variant it has: move-out with and without add-ons, Deep with a second
+cleaner, Basic, recurring weekly with its required first Deep, carpet,
+hourly, a 6-bedroom custom quote and an Airbnb custom quote. No JS
+errors, no horizontal overflow, no "undefined" or "NaN" reaching the
+page in any of them.

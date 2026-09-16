@@ -1,0 +1,111 @@
+RED PRAIRIE CLEANING — ROUND 55
+FINAL PASS ON /book AND /call
+=========================================================================
+
+Instruction: analyse both surfaces fresh and make common-sense changes to
+flow, wording and design.
+
+PRICES UNCHANGED. Nothing here touches a number.
+
+METHOD: walked every screen of both surfaces in a real browser at phone
+and desktop width, exercised the states that don't come up in normal
+clicking (empty and partial form submits, blocked jobs, calendar loading
+and error, back navigation from every step), and measured every tap
+target against the 44px minimum.
+
+WHAT WAS ALREADY RIGHT, checked rather than assumed: contact-gate
+validation (rejects a one-letter name and a short phone, accepts a
+first name only and a formatted number), lead-form validation (names the
+first bad field and scrolls to it), the calendar's loading and error
+states, back navigation on every step, and the blocked-job path on both
+surfaces. None of it needed changing.
+
+
+THE FOUR REAL FINDINGS
+----------------------
+
+1. THE ADD-ONS SCREEN HID EVERY PRICE.  ← the big one
+   Carpet, exterior windows and the garage floor each showed a title, a
+   description and a chevron. No number. The customer had to tap into
+   each card to find out what it cost.
+
+   This is the one screen in the funnel whose entire job is selling more,
+   and it was the only screen not leading with a number — the service
+   list, the contact gate and the estimate all do. Nobody taps an
+   unpriced item on a booking page; they assume it's expensive and scroll
+   past.
+
+   /call has shown these prices all along ("CARPET CLEANING — +$50/room"),
+   so the two surfaces were also describing the same add-ons differently.
+   Prices now render on the cards, read from the catalog rather than
+   typed in — the round-29 review found $100/$200/$150 hardcoded into
+   this file once already.
+
+2. THE SERVICE PICKER HAD BECOME A WALL OF TEXT.
+   Round 54 made every description carry its own "at $40/hr", which was
+   accurate and turned each card into four or five wrapped lines. Only
+   three of five services fit above the fold, and the featured Move-Out
+   card was the most cramped of all — its wide "From $199" pill squeezed
+   the title into two lines and the description into a four-line column.
+
+   Every description is one line now, the featured card's pill matches
+   the others ($199 / and up), and the shared rate is stated once beneath
+   the list instead of three times inside it:
+
+     "Deep, Basic and Hourly are all $40 an hour with one cleaner —
+      you're choosing how many hours. Move-Out is priced for the whole
+      home instead."
+
+   One fact, one sentence, explaining all three at once. All five
+   services now fit on one screen.
+
+3. TAP TARGETS UNDER 44px.
+   The questionnaire's Yes/No pills measured 41px and "Text me this quote
+   instead" measured 28px. The pills are where a whole quote gets decided
+   and they sit in pairs, so a mis-tap picks the opposite answer; the text
+   link sits directly under the primary CTA, where a mis-tap books a
+   cleaning nobody meant to book. Both are over 44px now. The
+   questionnaire went from ten failing targets to two — and those two are
+   the fixed header chrome at 42px, which is close enough to leave alone.
+
+4. /call's QUOTE SCRIPT DIDN'T CARRY THE CONDITION CAVEAT.
+   Round 54 put the heavy-condition disclosure in a coaching note on the
+   home step. But the quote is the moment a caller commits a figure to
+   memory — if the only time they hear "this covers a standard clean" is
+   two screens earlier while they were describing their kitchen, they did
+   not hear it, and a crew asking for more on arrival is the first they
+   knew of it.
+
+   When the caller has said the home is heavy, the spoken quote line now
+   carries the caveat in the same breath as the number, and the coach
+   note tells Liz not to skip it. That is the difference between a
+   disclosed term and an ambush.
+
+
+SMALLER COPY FIXES
+------------------
+  - add-on descriptions cut to one line each
+  - "Have Trash or Junk to Haul Away?" → "Trash or junk to haul away?"
+    and "Need Small Handyman Repairs?" → "Small handyman repairs?" —
+    both titles wrapped to two lines and both descriptions ran three,
+    for the two lowest-intent items on the screen
+
+
+ON /call
+--------
+It came out of this audit in good shape and mostly untouched. The step
+rail, the say/do split, the "DON'T QUOTE" state on a blocked job, the
+objection chips and the live totals all hold up. The one change is
+finding 4 above.
+
+
+CHECKED
+-------
+  python3 tools/check-prices.py     no drift, stamps current
+  node tools/r52-test.js            ladder, margins, floors
+  node tools/funnel-test.js         every service reaches a price
+  node tools/undefined-refs.js      every function called exists
+
+Plus both surfaces re-walked after the changes, every estimate variant
+re-rendered, and the form-validation and tap-target measurements re-run
+to confirm the fixes landed. No JS errors, no horizontal overflow.

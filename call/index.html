@@ -793,8 +793,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js?v=8b3a9885"></script>
-<script src="../js/rp-pricing-engine.js?v=cf3fedea"></script>
+<script src="../js/rp-messages.js?v=57c88f8f"></script>
+<script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -824,7 +824,7 @@ const rpState = {
      check, which would have silently treated an unanswered questionnaire
      as complete. Declaring them explicitly as null/0/false closes that. */
   addonExtraHours:0, addonSecondCleaner:false, addonPetEnzyme:false,
-  moveoutWaterOn:null, moveoutAcOn:null, moveoutMoldPests:null,
+  moveoutWaterOn:null, moveoutAcOn:null, moveoutMoldPests:null, moveoutHeavyCondition:null,
   moveoutRentalOrSelling:null, moveoutPmOrRealtor:"",
   fullName:"", phone:"", email:"", address1:"", city:"", state:"OK", postalCode:"",
   specialInstructions:"", addressReadBack:false,
@@ -981,7 +981,20 @@ function quoteSayLine(){
   const price = rpIsCustomQuoteOnly() ? "a custom quote \u2014 I'll have the office confirm the exact number before your date" : rpFormatMoneyDisplay(rpFinalPriceCents());
   const rawVal = angle().value;
   const val = (typeof rawVal === "function" ? rawVal() : rawVal) || RP_MSG.price.promiseSpoken;
-  return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.\u201d`;
+  /* Round 55: when the caller has already told us the home is heavier than
+     a standard clean, the condition caveat gets said HERE, attached to the
+     number, not left in a coaching note further up the screen.
+
+     The quote is the moment the caller commits a figure to memory. If the
+     only time they hear "this covers a standard clean" is two screens
+     earlier while they were still describing their kitchen, they did not
+     hear it -- and a crew asking for more money on arrival becomes the
+     first they knew of it. Saying it in the same breath as the price is
+     the difference between a disclosed term and an ambush. */
+  const heavy = (rpState.service === "moveout" && rpState.moveoutHeavyCondition === true && !rpIsCustomQuoteOnly())
+    ? " And just so it's said up front \u2014 that covers a standard clean. With the extra buildup you mentioned, the crew will look it over when they arrive and agree anything on top with you before they start. Nothing gets added after."
+    : "";
+  return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.${heavy}\u201d`;
 }
 /* Round 40d: this used to append angle().addon to the spoken line. That
    string is COACHING -- "Landlords often check carpets and windows
@@ -1052,7 +1065,7 @@ const LINES = {
   home:{
     act:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Then answer the three checks honestly. If you're unsure about any of them, say no.",
     say:"“Let me get a couple of quick details on the place — how many bedrooms, and how many full bathrooms?”",
-    coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the three checks: water, A/C, mold or pests. If any of them fail, the job can't be booked as normal and you do not quote a price. <b>Bedrooms set the price on their own</b> — one, two, three or four-plus — so once this screen is answered you have a real number."
+    coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the checks: water, A/C, mold or pests. If any of those three fail, the job can't be booked as normal and you do not quote a price. <b>Bedrooms set the price on their own</b>, so once this screen is answered you have a real number.<br><br><b>The condition question is different</b> — it never blocks and never changes the quote. If they say it's heavy, say it out loud once: <b>“That price covers a standard clean. If it's heavier than that, the crew will look it over and agree anything extra with you before they start — you can say yes or reschedule. Nothing gets added after.”</b> Saying it on the call is the whole point; it's what stops a surcharge being an argument in a driveway."
   },
   addons:{
     act:"Ask about carpet, windows and the garage <b>by name</b> — people almost never bring them up.",
@@ -1082,7 +1095,12 @@ const LINES = {
   quote:{
     act:"Say the number once, plainly, then stop talking. Count to three in your head before you say anything else.",
     say:quoteSayLine,
-    coach:"Give the number once, plainly, then stop talking. Pause two or three seconds. If they don't come back with a question, that's your cue — go straight into “Perfect, let me grab the address.” Don't sit in silence waiting for them to raise booking; you lead into it."
+    coach:()=>{
+      const base = "Give the number once, plainly, then stop talking. Pause two or three seconds. If they don't come back with a question, that's your cue — go straight into “Perfect, let me grab the address.” Don't sit in silence waiting for them to raise booking; you lead into it.";
+      return (rpState.service === "moveout" && rpState.moveoutHeavyCondition === true)
+        ? base + " <b>This caller told you the home is heavy</b>, so the Say line above carries the condition caveat — read it, don't skip it. It is the only thing standing between us and an argument in a driveway."
+        : base;
+    }
   },
   contact:{
     act:"Read the address back to them one digit at a time on the house number, then tick the box.",
@@ -1214,6 +1232,9 @@ const OBJECTIONS = [
        : "\u201cIt depends on the size \u2014 a one or two bedroom is one cleaner for a full day, and three bedrooms up is two cleaners. It's the whole interior, so it genuinely takes that long.\u201d";
    },
    n:"Round 52: this used to compare Express's hours against Inspection Ready's. It reads the real crew and hours off the tier row for THIS home now, so it can't drift from what the crew sheet says. If bedrooms aren't entered yet it falls back to the shape of the ladder rather than naming one size's hours as if they applied to all of them."},
+  {q:"\u201cSo the price could go up when you get here?\u201d",
+   a:"\u201cOnly if the home's a long way from a standard clean \u2014 heavy trash, heavy grease, that kind of thing. And it's never a surprise on the bill: the crew looks it over before they start, tells you the number, and you decide then. Most homes are exactly the price I just gave you.\u201d",
+   n:"Round 54. Don't dodge this and don't over-promise \u2014 the honest answer sells better than a flat 'no'. The thing they're afraid of is a bigger bill AFTER the work, and we never do that. Lead with 'never a surprise on the bill', then the mechanism, then 'most homes are the price I gave you'. If they already told you it's heavy, you should have said this on the home screen; this is the version for when they raise it themselves."},
   {q:"\u201cIs there a cheaper option? / What's the basic version?\u201d",
    a:"\u201cThere isn't a lighter move-out any more \u2014 there's one Move-Out Cleaning and it's the whole interior: inside the oven, the fridge, cabinets and closets, baseboards, interior windows, the lot. That's the price you're hearing, and nothing on that list gets billed separately when we show up.\u201d",
    n:"Round 52 retired Move-Out Express. If a caller is quoting a lower number they saw before, they saw the old Express tier \u2014 don't apologise for it, just say the product changed and everything Express charged extra for is included now. If they genuinely want a light clean with no inspection behind it, an Hourly booking is the honest alternative, and say plainly that it has no deposit guarantee."},
@@ -1503,6 +1524,10 @@ function sectionBody(s){
       ${yn("moveoutWaterOn","Is the water on? <em>— any “no” below and you don't quote</em>")}
       ${yn("moveoutAcOn","Is the air conditioning working?")}
       ${yn("moveoutMoldPests","Any signs of mold or pests?")}
+      ${/* Round 54: same question /book asks. Does NOT change the price and
+           does NOT block the booking -- it sets the expectation on the call
+           so an arrival surcharge is never the first they hear of it. */""}
+      ${yn("moveoutHeavyCondition","Heavy trash or built-up grime? <em>\u2014 doesn't change this quote, but say the next line</em>")}
       ${/* Round 52: moved here from the deleted "tiers" screen. Neither
            field changes the price -- renting vs. selling used to decide
            which tier the CSR led with, and now just tells the crew and the
@@ -2611,8 +2636,10 @@ function lookupIndex(){
   out.push({kind:"Price", title:"Move-Out cleaning",
     answer: RP_MOVEOUT_BEDROOM_TIERS.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — everything inside the home, bathrooms included, no square-footage charge, deposit guarantee on every one.",
     why:"There is one move-out product as of round 52. If someone asks which tier, or what the cheaper option is, the answer is that there isn't one — the number they're hearing is the whole interior."});
-  out.push({kind:"Price", title:"Deep cleaning", answer:`Flat ${money(RP_DEEP_ANCHOR_PRICE)} for ${RP_DEEP_ANCHOR_HOURS} hours, one cleaner. A second cleaner doubles it to ${money(RP_DEEP_ANCHOR_PRICE*2)}. Extra time ${money(RP_EXTRA_HOUR_RATE)}/hour.`});
-  out.push({kind:"Price", title:"Basic cleaning", answer:`Flat ${money(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours, one cleaner. A second cleaner doubles it to ${money(RP_BASIC_ANCHOR_PRICE*2)}. No recurring discount — a repeat visit costs the same as a one-off.`});
+  out.push({kind:"Price", title:"Deep cleaning", answer:`${money(RP_DEEP_ANCHOR_PRICE)} for ${RP_DEEP_ANCHOR_HOURS} hours, one cleaner \u2014 that's ${money(RP_EXTRA_HOUR_RATE)}/hour, the same rate as hourly cleaning. A second cleaner doubles it to ${money(RP_DEEP_ANCHOR_PRICE*2)}. Extra time ${money(RP_EXTRA_HOUR_RATE)}/hour.`,
+    why:"Round 54: sell it as TIME, not as a finished house. \u201cSix hours of a cleaner's time, working the list you care about most.\u201d If they need a guaranteed finished interior, that's a move-out, not a deep clean."});
+  out.push({kind:"Price", title:"Basic cleaning", answer:`${money(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours, one cleaner \u2014 that's ${money(RP_EXTRA_HOUR_RATE)}/hour, the same rate as hourly cleaning. A second cleaner doubles it to ${money(RP_BASIC_ANCHOR_PRICE*2)}. No recurring discount \u2014 a repeat visit costs the same as a one-off.`,
+    why:"Round 54: three hours, sold as three hours. Do not describe it as a whole-house clean \u2014 it is upkeep for a home that is already tidy, and promising more is where the bad reviews come from."});
   out.push({kind:"Price", title:"Carpet cleaning", answer:`${money(rpAddonCatalog.carpet.bundlePrice)} per room, two-room minimum. Pet enzyme ${money(RP_PET_ENZYME_RATE)}/room.`});
   out.push({kind:"Price", title:"Hourly cleaning", answer:`${money(HOURLY_RATE_PER_CLEANER)} per cleaner per hour, ${HOURLY_MIN_HOURS}-hour minimum. Booking our time, not a finished checklist — the deposit guarantee doesn't apply.`});
   out.push({kind:"Price", title:"Oven, fridge, cabinets, baseboards, interior windows",
@@ -2956,7 +2983,7 @@ function jobDetails(){
     `Move-Out Cleaning: ${rpTeamSize()}, ${rpMoveoutTierHours("moveout")} on site (Defend Your Deposit)`,
     `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
     rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
-    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`
+    `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}, Heavy condition ${rpState.moveoutHeavyCondition?"YES \u2014 crew to re-quote on arrival":"No"}`
   ].filter(Boolean) : [];
   /* Round 21: one shared list (rpAddonSummaryText) with prices, replacing
      a partial hand-maintained copy that only ever mentioned three of the

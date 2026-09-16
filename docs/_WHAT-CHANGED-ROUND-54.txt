@@ -1,0 +1,147 @@
+RED PRAIRIE CLEANING — ROUND 54
+/book: WHAT EACH SERVICE ACTUALLY IS
+=========================================================================
+
+Three instructions, all about expectation-setting:
+
+  "This is an inspection-ready clean! Includes the full interior cleaning
+   of the home designed for inspections."
+  "Make sure customers understand deep or basic is just hourly."
+  "Make them understand if the house is non-standard or has heavy trash,
+   grime, an additional fee may be applied upon arrival."
+
+PRICES ARE UNCHANGED. $199 / $299 / $399 / $499, Basic $120, Deep $240,
+$40/hr. Nothing in this round touches a number.
+
+
+1. THE MOVE-OUT IS INSPECTION-READY, AND SAYS SO
+------------------------------------------------
+Round 52 collapsed the two tiers and kept the name "Move-Out Cleaning",
+which is what people search for. What got lost was the WHY — the old
+tier was literally called Inspection Ready and the name did the
+explaining by itself. "Everything inside the home" describes the scope
+accurately and says nothing about what it is FOR.
+
+The purpose is back without reviving the tier:
+
+  service list   "Inspection-ready. The full interior, cleaned to pass a
+                  walkthrough."
+  scope screen   "Inspection-ready, inside and out" + the full interior
+                  described against the standard a landlord checks
+  estimate       one line under the price saying the same thing
+
+One product, one price. It is now described by the standard it is built
+to meet.
+
+
+2. DEEP AND BASIC ARE HOURS, NOT OUTCOMES
+-----------------------------------------
+They always were — Deep is six hours at $40 and Basic is three at the
+same rate, the identical rate Hourly charges. But the copy sold them as
+outcomes: "a detailed, top-to-bottom clean of every room", "keep an
+already-tidy home fresh". That is a promise of COMPLETION, and three
+hours cannot finish a house that needs more than three hours.
+
+That gap is where bad reviews come from. The customer was told "top to
+bottom" and got three hours, and both of those are true.
+
+Now, on the service list and on the screen before the price:
+
+  Deep     "6 hours of cleaning at $40/hr."
+  Basic    "3 hours of cleaning at $40/hr."
+  Hourly   "Same $40/hr as Deep and Basic — you pick the hours."
+  both     "It's time, not a finished checklist."
+
+The screen heading changed too. "Here's what your Deep Cleaning
+includes" invited exactly the checklist reading the body was trying to
+correct; it reads "Here's what you're booking" on the three timed
+services. Move-out keeps a scope heading, because move-out genuinely is
+a fixed scope.
+
+This is not selling it smaller. Six hours of a professional working the
+list you care about is a good product — it just has to be the product
+the customer thinks they bought.
+
+
+3. THE ARRIVAL SURCHARGE, DISCLOSED BEFORE IT CAN HAPPEN
+--------------------------------------------------------
+A FOURTH QUESTION on the move-out questionnaire:
+
+    "Is the home free of heavy trash and built-up grime?"
+
+Round 24 cut this screen from five questions to three, so adding one
+back needs a reason. It is this: the surcharge applies ON ARRIVAL, which
+is the worst possible moment to introduce a number. A crew in a driveway
+asking for more money is an argument, a refund request and a review, and
+it happens precisely when nobody warned the customer it could.
+
+One tap buys three things — the customer is told the policy at the
+moment it could apply to them, they self-declare so any surcharge is
+something they already agreed to rather than something sprung on them,
+and the office is warned before dispatch instead of getting a call from
+the driveway.
+
+IT DOES NOT BLOCK AND IT DOES NOT PRICE. Unlike water/AC/mold, a dirty
+house is a job we want — it just may cost more than the ladder says.
+Answering "no, it's heavy" changes nothing about the quote. It shows a
+note on the spot, flags the booking, and repeats on the estimate.
+
+THE CONTRADICTION THIS CREATED, AND THE FIX. The site said, in four
+places, "the price you see is the price you pay — no upcharges at the
+door." That cannot coexist with an arrival surcharge, and the customer
+would have been right to be angry about it. The promise is now scoped
+everywhere it appears:
+
+    "Standard home in standard condition — the price you see is the
+     price you pay."
+
+plus, on the estimate: heavy trash, heavy grime or anything outside a
+normal clean "gets priced with you before the crew starts, never added
+afterward." That is a smaller claim and a much more defensible one — and
+still stronger than a competitor who won't publish a number at all.
+
+Changed on: the homepage promise strip, /pricing's promise list, meta
+description and worked example, and the estimate fine print. All of them
+read from RP_MSG.price so they cannot drift apart again.
+
+
+4. UX FIXES FOUND WHILE WALKING THE FUNNEL
+------------------------------------------
+THE CONTACT GATE contradicted itself. It printed the full price —
+"Your 4-bedroom move-out comes to $399" — and then said "Name and
+number, and it's yours." The thing being offered in exchange had already
+been handed over two lines above, which reads as a bait and invites a
+fake number. It asks "And where should we send it?" now, which is the
+actual job of that screen.
+
+THE QUESTIONNAIRE SUBHEADING said "Doesn't affect your price." Three of
+the four answers still don't — but the condition question can, and
+saying otherwise two taps before asking it would be exactly the bait the
+surcharge gets accused of being. It reads "So the crew arrives ready for
+the job, with the right number."
+
+SERVICE LIST now shows hours alongside the price on Deep and Basic
+($240 / 6 hrs), so the hourly rate is visible without arithmetic.
+
+
+5. THE PHONE MATCHES THE SITE
+-----------------------------
+/call asks the same condition question, and Liz has the words for it on
+the home screen plus a scripted answer for "so the price could go up
+when you get here?" — which does not dodge and does not over-promise.
+Her price lookup describes Deep and Basic as hours at $40 rather than as
+flat packages. The crew sheet and the webhook carry the condition flag
+(moveout_heavy_condition) so dispatch sees it before the van leaves.
+
+6. CHECKED
+----------
+  python3 tools/check-prices.py     no drift, stamps current
+  node tools/r52-test.js            ladder, margins, floors
+  node tools/funnel-test.js         every service reaches a price
+  node tools/undefined-refs.js      every function called exists
+
+Plus the funnel walked end to end in a browser at phone width, with the
+condition question answered both ways, and every estimate variant
+re-rendered: move-out with and without add-ons, Deep with a second
+cleaner, Basic, recurring, carpet, hourly, 6-bedroom and Airbnb custom
+quotes. No JS errors, no overflow.

@@ -74,11 +74,40 @@ const RP_MSG = {
      short one where you're selling, show the exact one where you're
      quoting. Never invent a third. */
   price: {
-    promise: "The price you see is the price you pay.",
-    promiseSpoken: "that's the full price — nothing gets added when we show up",
+    /* ROUND 54 — THE PROMISE IS NOW SCOPED, AND IT HAD TO BE.
+       It read "The price you see is the price you pay." Flat, unconditional,
+       and on the homepage as "no upcharges at the door". Meanwhile the
+       exception below has always said price can change for heavy buildup
+       and trash. Both were true of a normal house and only one of them was
+       true of a bad one, which is the version a customer remembers when a
+       crew asks for more money in their driveway.
+
+       Direct instruction: "make them understand if the house is
+       non-standard or has heavy trash, grime, an additional fee may be
+       applied upon arrival."
+
+       So the promise now carries its own condition. It is a smaller claim
+       and a much more defensible one: a standard home in standard
+       condition pays exactly what it was quoted, and anything else is a
+       conversation BEFORE work starts, never an invoice after. That is
+       still a stronger promise than a competitor who won't publish a
+       number at all, and it is one this business can keep. */
+    promise: "Standard home in standard condition — the price you see is the price you pay.",
+    promiseSpoken: "for a standard home that's the full price, nothing gets added when we show up",
     /* The honest exception. This is the ONLY place the carve-outs are
        listed; if they ever change, they change once. */
-    exception: "Price only changes for severe buildup, heavy trash, access problems, biohazards, or work outside what you picked — and we call you first, before the crew starts."
+    exception: "Price only changes for severe buildup, heavy trash, access problems, biohazards, or work outside what you picked — and we call you first, before the crew starts.",
+    /* The same fact in the two other lengths the funnel needs it in. Kept
+       here rather than written into a screen so the booking page, the
+       estimate, the CSR script and the landing pages cannot end up
+       describing this policy differently. */
+    conditionShort: "Heavier than a standard clean? We price it with you before we start.",
+    /* The estimate screen's fine print. One sentence, because it sits under
+       a CTA and nobody reads three. It has to carry both halves: what the
+       quote covers, and that anything beyond it is agreed BEFORE work, not
+       billed after. */
+    fineprint: "Standard home, standard condition — that's the price. Heavy trash, heavy grime or anything outside a normal clean gets priced with you before the crew starts, never added afterward.",
+    conditionFull: "Our prices assume a standard home in standard condition. If the crew arrives to heavy trash, heavy grease or grime, pet mess, or anything outside a normal clean, they'll stop and quote the difference with you before any work starts — you can approve it or reschedule. Nothing is ever added to your bill afterward."
     /* Round 37 (direct instruction): the price-ceiling claim is gone. The
        top of the move-out ladder is still the top of the ladder — we just
        don't make a promise out of it any more. Deleted rather than left
@@ -100,6 +129,62 @@ const RP_MSG = {
      protection on the tier that doesn't carry it is the one mistake that
      costs real money. Both are stated from the same shared 48-hour
      mechanic so they can never drift apart on the timing. */
+  /* ROUND 54 — WHAT THE MOVE-OUT ACTUALLY IS.
+     Direct instruction: "This is an inspection-ready clean! Includes the
+     full interior cleaning of the home designed for inspections."
+
+     Round 52 collapsed the two tiers and named the survivor "Move-Out
+     Cleaning", which is what people search for and is right as a product
+     name. What got lost in the collapse was the WHY: the old tier was
+     called Inspection Ready and the name did the explaining by itself.
+     "Everything inside the home" describes the scope accurately and says
+     nothing about what it is FOR.
+
+     These lines put the purpose back without reviving the tier. The
+     product is still one Move-Out Cleaning at one price; it is simply
+     described by the standard it is built to meet. */
+  moveout: {
+    /* The one-liner, for the service list. */
+    short: "Inspection-ready. The full interior, cleaned to pass a walkthrough.",
+    /* The fuller version, for the screens that have room. */
+    long: "This is an inspection-ready clean: the full interior of the home, cleaned to the standard a landlord, property manager or housing office checks against at move-out.",
+    /* What "the full interior" actually means, said once. */
+    scope: "Inside the oven and refrigerator, inside cabinets and closets, bathrooms top to bottom, baseboards, doors and trim, interior windows, sills and tracks, ceiling fans, vents and light fixtures, and every floor.",
+    /* What it is not. Short, because all four are outside the home. */
+    excludes: "Exterior windows, the garage floor, carpet extraction and junk removal aren't included — add any of them while you book."
+  },
+
+  /* ROUND 54 — DEEP AND BASIC ARE BLOCKS OF TIME.
+     Direct instruction: "Make sure customers understand deep or basic is
+     just hourly."
+
+     They always were. RP_DEEP_ANCHOR_PRICE is six hours at $40 and
+     RP_BASIC_ANCHOR_PRICE is three at the same rate -- the identical rate
+     Hourly Cleaning charges. But the copy described them as outcomes
+     ("a detailed, top-to-bottom clean of every room", "keep an
+     already-tidy home fresh"), which is a promise of COMPLETION, and a
+     three-hour Basic cannot promise a finished house.
+
+     That gap is where bad reviews come from: the customer was told
+     "top to bottom" and got three hours. The fix is not to sell it
+     smaller, it is to sell the right thing -- hours of a professional's
+     time, spent where the customer says it matters most. That is a good
+     product and an easy one to be happy with, as long as nobody expected
+     something else. */
+  timed: {
+    /* Said the same way for both, with the hours swapped in, so the two
+       screens cannot drift apart. */
+    frame(hours, rate) {
+      return `${hours} hours of cleaning at $${rate} an hour, one cleaner. You tell us what matters most and we work down that list.`;
+    },
+    honest: "It's time, not a finished checklist — the same way our hourly cleaning works. If the home needs more than the hours booked, add time or a second cleaner.",
+    deepWhen: "Best when it's been a while, or nobody's deep-cleaned it yet.",
+    basicWhen: "Best for a home that's already tidy and just needs keeping that way.",
+    /* The line that steers someone to the right product. A move-out is
+       scope-priced and inspection-backed; these are not. */
+    notMoveout: "Moving out? A Move-Out Cleaning is the one priced for a full interior and backed for an inspection."
+  },
+
   guarantee: {
     window: "48 hours",
     depositName: "Defend Your Deposit™",

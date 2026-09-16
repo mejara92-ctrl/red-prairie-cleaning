@@ -885,9 +885,9 @@ const rpIncludes = {
      as a highlight -- it used to live on the comparison card, and that
      card is gone. */
   moveout: {
-    intro: "This isn't a checklist. It's a full interior reset: oven, fridge, cabinets, closets, bathrooms, baseboards, windows, and floors, all included and nothing billed separately.",
+    intro: "This is an inspection-ready clean: the full interior of the home, cleaned to the standard a landlord or housing office checks against. Oven, fridge, cabinets, closets, bathrooms, baseboards, windows and floors, all included and nothing billed separately.",
     highlights: [
-      ["home", "Every room, inside & out"],
+      ["home", "Built for an inspection"],
       ["check", "Oven, fridge & cabinets included"],
       ["check", "Baseboards, interior windows & fixtures included"],
       ["shield", "If something's missed, we come back free"]
@@ -908,24 +908,42 @@ const rpIncludes = {
     itemsLead: "Including the parts most companies bill as add-ons:",
     items: ["Inside & out: oven, fridge & all appliances", "Cabinets, drawers & closets, inside included", "Bathrooms, scrubbed top to bottom", "Interior windows, sills & tracks", "Baseboards, doors, fixtures & trim", "Ceiling fans, vents & light fixtures", "All floors throughout", "Every other room and surface inside the home"]
   },
+  /* ROUND 54: Deep and Basic are blocks of TIME, sold at the same $40/hr
+     as Hourly Cleaning, and the copy now says so before the price does.
+
+     They used to lead with an outcome -- "a detailed, top-to-bottom clean
+     of every room" -- which is a promise of COMPLETION that three or six
+     hours cannot keep on a house that needs more than that. The customer
+     who books three hours expecting a finished home is the customer who
+     leaves the review. Selling the hours honestly costs nothing: a
+     professional for six hours, working the list you care about, is a good
+     product. It just has to be the product they think they bought.
+
+     The item lists stay -- they are what the crew actually does, and /call
+     reads them as Liz's on-call reference -- but they are framed as where
+     the time goes rather than as a checklist that gets completed. */
   deep: {
-    intro: "A detailed, top-to-bottom clean of every room.",
+    intro: "Six hours of cleaning, priced by the hour — the same way our hourly service works.",
     highlights: [
       ["clock", "6 hours, 1 cleaner"],
-      ["zap", "Add time or a second cleaner"],
-      ["shield", "Satisfaction Guaranteed"]
+      [null, "$40 per hour"],
+      ["zap", "Add hours or a second cleaner"]
     ],
-    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll make it right, free.",
+    outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
+    fineprint: "Most homes this size get a full reset in six hours. If yours needs more, add time or a second cleaner while you book — or we'll tell you on the day what another visit would take. Moving out? A Move-Out Cleaning is priced for the whole interior instead.",
+    itemsLead: "Where the time usually goes:",
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
   maintenance: {
-    intro: "A routine clean to keep an already-tidy home fresh.",
+    intro: "Three hours of cleaning, priced by the hour — the same way our hourly service works.",
     highlights: [
       ["clock", "3 hours, 1 cleaner"],
-      ["zap", "Add time or a second cleaner"],
-      ["shield", "Satisfaction Guaranteed"]
+      [null, "$40 per hour"],
+      ["zap", "Add hours or a second cleaner"]
     ],
-    outcome: "You'll either love the clean or you won't. Tell us within 48 hours and we'll make it right, free.",
+    outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
+    fineprint: "Three hours suits a home that's already tidy and needs keeping that way. If it's been a while, Deep Cleaning buys six hours instead — or add hours here. Moving out? A Move-Out Cleaning is priced for the whole interior.",
+    itemsLead: "Where the time usually goes:",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
   },
   carpet: {
@@ -942,10 +960,11 @@ const rpIncludes = {
     items: ["Hot-water extraction cleaning", "Pre-treatment included", "Normal spot treatment", "For the rooms you select"]
   },
   hourly: {
-    /* Description now explicitly says "cleaning and organizing" so the
-       full scope of the service is stated plainly, not just implied by
-       the checklist underneath it. */
-    intro: "For when you only want certain areas cleaned and organized.",
+    /* Round 54: names the shared rate out loud. Deep and Basic are the
+       same $40 an hour in fixed blocks; this is the one where the customer
+       picks the block. Saying so stops Hourly reading as a different,
+       more expensive product. */
+    intro: "The same $40 an hour as Deep and Basic — you just pick the hours and the areas.",
     highlights: [
       ["clock", "3-hour minimum"],
       ["check", "You set the priorities"],
@@ -1247,9 +1266,38 @@ const RP_CONDITION_PRICED_SERVICES = [];
    path for that flag on Move-Out. Combining mold and pests into one
    question means the office note can no longer distinguish which one
    applies, just that one of them does. */
+/* ROUND 54 — A FOURTH QUESTION: what condition is the home in.
+
+   Direct instruction: "make them understand if the house is non-standard
+   or has heavy trash, grime, an additional fee may be applied upon
+   arrival."
+
+   Round 24 cut this screen from five questions to three, so adding one
+   back needs a reason. It is this: the surcharge is applied ON ARRIVAL,
+   which is the worst possible moment to introduce a number. A crew
+   standing in a driveway asking for more money is an argument, a refund
+   request and a review, and it happens precisely when nobody warned the
+   customer it could.
+
+   Asking costs one tap and buys three things: the customer is told the
+   policy at the moment it could apply to them, they self-declare so the
+   surcharge is something they already agreed to rather than something
+   sprung on them, and the office gets a heads-up before dispatch instead
+   of a phone call from the driveway.
+
+   IT DOES NOT BLOCK AND IT DOES NOT PRICE. Unlike water/AC/mold, a dirty
+   house is a job we want -- it is just a job that may cost more than the
+   ladder says. Answering "heavier than normal" changes nothing about the
+   quote; it sets the expectation and flags the booking. The number is
+   still agreed with a human, on site, before any work starts. */
 function rpMoveoutQuestionnaireAnswered() {
   return rpState.moveoutWaterOn !== null && rpState.moveoutAcOn !== null &&
-         rpState.moveoutMoldPests !== null;
+         rpState.moveoutMoldPests !== null && rpState.moveoutHeavyCondition !== null;
+}
+/* True when the customer has told us it is worse than a standard clean.
+   Read by the estimate screen, the crew sheet and the webhook. */
+function rpMoveoutHeavyConditionFlagged() {
+  return rpState.service === "moveout" && rpState.moveoutHeavyCondition === true;
 }
 function rpMoveoutBlocked() {
   if (!rpState.service === "moveout") return false;
@@ -1735,6 +1783,11 @@ function rpBuildSharedDetails() {
     moveout_water_on: isMoveout ? (rpState.moveoutWaterOn === true ? "Yes" : rpState.moveoutWaterOn === false ? "NO" : "Not asked") : "N/A",
     moveout_ac_on: isMoveout ? (rpState.moveoutAcOn === true ? "Yes" : rpState.moveoutAcOn === false ? "NO" : "Not asked") : "N/A",
     moveout_mold_pests: isMoveout ? (rpState.moveoutMoldPests === true ? "YES" : rpState.moveoutMoldPests === false ? "No" : "Not asked") : "N/A",
+    /* Round 54: the customer's own answer about condition. "YES" means
+       they told us up front it is heavier than a standard clean, so the
+       crew should arrive expecting to quote the difference and the office
+       should not be surprised by the call. */
+    moveout_heavy_condition: isMoveout ? (rpState.moveoutHeavyCondition === true ? "YES" : rpState.moveoutHeavyCondition === false ? "No" : "Not asked") : "N/A",
     moveout_blocked: (isMoveout && rpMoveoutBlocked()) ? "Yes" : "No",
     moveout_block_reasons: (isMoveout && rpMoveoutBlocked()) ? rpMoveoutBlockReasons().join(", ") : "None",
 
