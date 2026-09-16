@@ -1,0 +1,268 @@
+RED PRAIRIE CLEANING — ROUND 52
+ONE MOVE-OUT PRODUCT, AND ONE LABOUR RATE
+=========================================================================
+
+WHAT YOU ASKED FOR
+------------------
+  "Let's remove inspection ready vs express move-out. Just call it
+   Move-Out Cleaning. Make 4bed/2bath $399 and build everything else
+   around that ... 1/2 bed is $199 1 cleaner, 3 bed $299 2 cleaners,
+   4 bed $399. It includes a full cleaning of everything inside the home
+   assuming a standard home in standard condition. Change basic and deep
+   to $40 hour so basic is $120 deep is $240. 1 cleaner 3 or 6 hours.
+   They can add a second cleaner but it doubles the price for each."
+
+Plus the four answers you gave before I started:
+  - keep the existing crew and hours (8 / 6 / 8 on site)
+  - 5 bedrooms is a priced row at $499
+  - remove every recurring discount
+  - drop Hourly and Extra Time to $40/hr as well
+
+
+THE NEW PRICES
+--------------
+  MOVE-OUT CLEANING        price   crew   on site   crew-hrs   $/crew-hr
+    1-2 bedrooms           $199      1      8h          8       $24.88
+    3   bedrooms           $299      2      6h         12       $24.92
+    4   bedrooms           $399      2      8h         16       $24.94
+    5   bedrooms           $499      2     10h         20       $24.95
+    6+  bedrooms           quoted directly
+
+  BASIC CLEANING           $120   3 hours, 1 cleaner   ($240 with a 2nd)
+  DEEP CLEANING            $240   6 hours, 1 cleaner   ($480 with a 2nd)
+  HOURLY CLEANING          $40 per cleaner per hour, 3-hour minimum ($120)
+  EXTRA TIME               $40 per hour
+  SECOND CLEANER           $40 per hour — doubles either service exactly
+
+  Unchanged: carpet $50/room, pet enzyme $25/room, exterior windows
+  $100/$200, garage floor $150, laundry $35/load, junk hauling quoted.
+
+
+WHAT IT MAKES YOU, PER JOB
+--------------------------
+Run through the engine's own cost model — labour at 40% of the ticket or
+minimum wage whichever is higher, plus $15 supplies, $25 overhead, and the
+8% deposit-guarantee reserve which now applies to every move-out:
+
+    size       ticket    cost      profit    margin   crew pay
+    1-2 bed    $199     $145.07    $53.93    27.1%    $9.95/hr
+    3   bed    $299     $197.87   $101.13    33.8%    $9.97/hr
+    4   bed    $399     $250.67   $148.33    37.2%    $9.98/hr
+    5   bed    $499     $303.47   $195.53    39.2%    $9.98/hr
+    Basic      $120      $93.76    $26.24    21.9%
+    Deep       $240     $147.52    $92.48    38.5%
+
+Every row clears the 20% target. Two worth watching:
+
+  THE 1-2 BEDROOM MOVE-OUT is one cleaner alone in a house for a full
+  eight hours at $199. The minimum-wage floor trips at 11 crew-hours, so
+  three hours of overrun and you are absorbing the difference. It was
+  already the tightest row before this round; it is tighter now.
+
+  BASIC AT $120 is the thinnest priced job in the business at 21.9%,
+  because a three-hour ticket amortises the flat $40/job of supplies and
+  overhead worse than anything else. If that $40 is really $55, this job
+  is under target on its own.
+
+Also note the ladder is now a FLAT ~$24.90 per crew-hour at every size.
+No previous version was — round 51 ran $43.63 / $35.75 / $31.19, sloping
+down as homes got bigger. Building around the $399 anchor at fixed hours
+produced the flat line by itself. The practical effect is that the 1-2
+bedroom row took by far the biggest cut, -43%.
+
+
+WHAT GOT DELETED
+----------------
+Thirty rounds of two-tier machinery came out. Worth knowing it is gone,
+because some of it was load-bearing and you may notice its absence:
+
+  - The side-by-side tier comparison screen on /book, and the "tiers"
+    step on /call. Both funnels are one screen shorter.
+  - The Detail Pass ($90-$210 by bedroom count), and the oven ($50) and
+    inside-cabinets ($50) add-ons. All that scope is in the base price.
+    The fridge interior survives on Hourly bookings only.
+  - The invariant that stopped a customer assembling the full checklist
+    a la carte for less than the tier gap, and the CSR guardrail that
+    rendered it live. Nothing to assemble now.
+  - The tier-switch links on /book's estimate screen and /call's quote
+    screen, and the add-on-dropping logic behind them.
+  - Recurring discounts (weekly 20%, biweekly 15%, monthly 10%). The
+    frequency screen stays — it schedules the visits and decides whether
+    visit one is a Deep — it just no longer changes the price.
+
+THE MINIMUM CHARGE MOVED TO $120, and it had to. It was $150, and because
+the engine raises any service subtotal to the floor, a $120 Basic would
+have silently rendered as $150 everywhere — the change would have looked
+applied in the code and been invisible to every customer. Side effect
+worth knowing: a two-room carpet job now floors to $120 instead of $150.
+That is a real $30 cut to the smallest carpet ticket, arrived at as a
+consequence of the Basic price rather than as a decision about carpet.
+
+
+TWO THINGS I FOUND THAT YOU DIDN'T ASK ABOUT
+--------------------------------------------
+1. A LEAD-CAPTURE BUG, now fixed. "contactgate" — the name-and-number
+   screen — is inserted into every non-move-out funnel at runtime, but it
+   was missing from the step allowlist that /book's session-resume check
+   validates against. So a customer who reached that screen on a Deep
+   clean, left, and came back had their saved session REJECTED and
+   restarted at the service picker, losing every answer. It failed on the
+   one screen whose entire purpose is capturing a lead before the price
+   shows, and only for returning visitors, which is why nothing surfaced
+   it. Move-out was unaffected. Fixed in js/rp-pricing-engine.js.
+
+2. THE REPO CONTAINED A COPY OF ITSELF at red-prairie-cleaning-main/,
+   now deleted at your go-ahead. It was a previous delivery zip — one
+   that by its own note "contains ONLY the files that changed" —
+   unzipped one directory too deep instead of over the repo root, so it
+   created a second copy of the site one level down rather than
+   overwriting the files it was meant to replace.
+
+   It was old: its pricing engine still had the square-footage bracket
+   model retired in round 18, and its landing pages advertised Basic at
+   $149 and carpet at $75/room. Those pages were live at
+   /red-prairie-cleaning-main/... — real URLs, wrong prices, competing
+   with the genuine landing pages in search.
+
+   WHAT WAS KEPT: the only two files that existed nowhere else were its
+   two session change notes. Those are now in /docs/, alongside this one.
+   Everything else in that folder was an older copy of a file that still
+   exists at the top level — verified by diffing the two trees before
+   deleting anything, not assumed.
+
+   /docs/ is disallowed in robots.txt and carries X-Robots-Tag: noindex
+   in _headers, same treatment as /tools/ and /workers/ — they are repo
+   files that get served, not pages anyone should land on.
+
+   tools/check-prices.py still skips that path, now as a tripwire rather
+   than a workaround: if it ever has something to skip there again,
+   someone has extracted a delivery zip the wrong way and the folder
+   needs deleting, not excluding.
+
+
+ROUND 52a — THE BLANK BOOKING PAGE, AND WHY IT HAPPENED
+-------------------------------------------------------
+Shipping round 52 broke /book for some visitors: the page rendered its
+header and the static no-JS hero, then nothing. No service list, no
+button. This is that fix, and the cause was mine.
+
+WHAT HAPPENED. This page and js/rp-pricing-engine.js are two files that
+must be the same version of each other. The link between them is the ?v=
+content hash on the <script src> tag, maintained by tools/stamp-assets.py,
+whose own docstring says "RUN THIS AFTER EVERY EDIT TO ANYTHING IN /css OR
+/js." _headers caches /js/* as `immutable` for a year on the strength of
+that guarantee.
+
+I rewrote the engine and did not run the stamper. The URL stayed byte for
+byte identical while its contents changed completely, which unlinked the
+two halves and let any cache -- a browser, a CDN, a deploy still
+propagating -- serve mismatched ones:
+
+  old page + new engine  ->  the old page reads RP_MOVEOUT_REFRESH_BEDROOM_TIERS,
+                             a constant the new engine deleted. ReferenceError
+                             on the first render, so rpScreenHtml() never
+                             replaces the static hero. That is the blank page.
+  new page + old engine  ->  no error at all. It quietly quotes round 45's
+                             prices, which is the worse of the two.
+
+Reproduced both directions locally before changing anything, rather than
+guessing: serving the new page against the old engine and vice versa, and
+confirming the failing one matched the screenshot line for line.
+
+THE FIX, in three parts.
+
+  1. The stamper has been run. Every ?v= now matches its file's hash, so a
+     given page can only ever load the engine it was built against.
+
+  2. Both /book and /call now do a version handshake at boot. They check
+     that the engine exposes the symbols they need and, if not, reload once
+     with a cache-busting parameter -- which self-heals the common case of
+     a stale copy sitting in one browser. If the reload does not help,
+     /book shows a real fallback with the phone number rather than a blank
+     screen, and /call tells the CSR to take a callback instead of quoting.
+     A booking page that fails should still be able to sell a cleaning.
+
+  3. tools/check-prices.py now fails if any ?v= stamp disagrees with its
+     file's contents, or if a /js or /css reference carries no stamp at
+     all. This is the check that would have caught the outage. It is the
+     same class of drift the script already existed to catch; it just was
+     not a dollar figure, which is why nothing saw it.
+
+TWO BUGS IN THE FIX ITSELF, both caught by testing it rather than trusting
+it, and both worth recording because each would have been worse than the
+original:
+
+  - The first handshake cleared its "already reloaded" flag on every pass,
+     including failing ones, so a genuinely stale deploy reloaded forever.
+     Found by pointing the harness at a deliberately stale engine and
+     watching the browser spin.
+  - The first version tested `typeof window[name]`. Top-level `const` in a
+     classic script never becomes a property of `window`, so every constant
+     read as missing and a perfectly healthy deploy reloaded every visitor
+     once. Found by running the guard against a correct build and seeing it
+     fire anyway. The check now references each binding directly inside a
+     try/catch, which works for const, let, var and function alike.
+
+WHAT TO DO IF YOU SEE A BLANK BOOKING PAGE AGAIN. Open the browser console:
+the guard prints exactly which symbols are missing and tells you to run the
+stamper. Then run `python3 tools/check-prices.py` -- it will name the file
+and the stale hash.
+
+
+HOW IT WAS CHECKED
+------------------
+Four things now run, all from the repo root, all exit 0 clean:
+
+  python3 tools/check-prices.py     published prices vs the engine, and
+                                    ?v= asset stamps vs file contents
+  node tools/r52-test.js            the ladder, margins, crew pay, floors
+  node tools/funnel-test.js         every service walks to a real price
+  node tools/undefined-refs.js      every function called is defined
+
+The last two are new this round. check-prices.py also gained rules for
+claims no dollar-scan can catch — a page saying "Move-Out Express" or
+"saves 20%" is now drift even when every number on the line is current.
+
+Each guard was tested by breaking the code on purpose and confirming it
+failed. That matters for tools/undefined-refs.js in particular: partway
+through this round a deletion in /call took out four neighbouring
+functions along with its intended target. The file still parsed, the
+price guard still passed, and a grep for the deleted tier symbols found
+nothing — because the missing functions had nothing to do with tiers. It
+surfaced only when a browser rendered the CSR rail and threw
+"cmpObjections is not defined". That check exists so that class of
+mistake cannot reach you silently again.
+
+Beyond the suites: both funnels were driven end to end in a real browser
+at phone width, every service, including the three hard-stop answers that
+block a move-out. No JS errors, no horizontal overflow, and no retired
+tier name or stale price visible anywhere a customer or a CSR can read.
+
+
+ONE THING TO DO ON THE GHL SIDE
+-------------------------------
+The moveout_tier field still arrives on every booking — the field name is
+kept so nothing breaks — but its value is now always "Move-Out Cleaning"
+instead of "Inspection Ready" or "Express". If it is a dropdown there, add
+that option. And any workflow conditioned on the value being "Express" is
+now dead and should be retired: most importantly the confirmation SMS that
+was written NOT to promise the deposit guarantee. Every move-out carries
+the guarantee now.
+
+Three analytics events also stop firing, as expected rather than as a
+regression: moveout_tiers_viewed, moveout_tier_selected,
+moveout_tier_switched. Any report built on them will go quiet.
+
+The fields addon_oven_interior, addon_cabinets_closets and
+addon_detail_pass are hardcoded to "No" rather than removed, so anything
+keyed to them keeps working. Safe to delete once GHL no longer reads them.
+
+
+THE ASSUMPTION EVERYTHING RESTS ON
+----------------------------------
+"A standard home in standard condition" is now doing real work. Condition
+pricing was already gone from move-out, so what protects these margins is
+the arrival walkthrough: a home worse than described has to be a RE-QUOTE,
+not a silent overrun. That SOP is still unbuilt, and it is the single
+biggest open risk against this ladder. It mattered at $349. It matters
+more at $199.

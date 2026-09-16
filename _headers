@@ -40,3 +40,5 @@
   X-Robots-Tag: noindex
 /WEBHOOK-MAPPING-V28.txt
   X-Robots-Tag: noindex
+/docs/*
+  X-Robots-Tag: noindex

@@ -1,0 +1,77 @@
+RED PRAIRIE CLEANING — SESSION CHANGES
+=======================================
+This zip contains ONLY the files that changed. Unzip it over your repo
+root and let it overwrite matching paths. Folder structure is already
+correct — nothing needs to be moved by hand.
+
+Everything here was tested: all pages load with no JS errors and no
+horizontal overflow on mobile, and the /book pricing logic was verified
+end-to-end after each change.
+
+
+WHAT CHANGED
+------------
+
+1. NEW TEAM PHOTO ON /book
+   - images/hero/front-photo-fullbleed-648.webp  (replaces old sunset photo
+     as the /book background — cropped to 648x1146, compressed to ~77KB)
+   - images/hero/front-photo-team-full.webp      (NEW — full uncropped team
+     photo, currently unused; kept in case you want it elsewhere)
+
+2. /book FUNNEL  (book/index.html)
+   - Intro screen: photo shows first; big red "Get Instant Quote" button
+     anchored at the bottom. Tapping it reveals the service list.
+     Button scales cleanly from small phones to large, never wraps.
+   - Safari/Chrome address-bar tint turns red on the photo intro screen,
+     back to cream everywhere else.
+   - NEW "What's included" screen: right after a customer picks a service,
+     they now see a clean checklist of exactly what that cleaning covers
+     (derived from your existing includes copy), with a "Looks good —
+     continue" button. Confirmational, not homework — reduces the "what am
+     I actually paying for?" confusion. Per-service, so each cleaning type
+     shows its own list. The existing "What's included" accordion on the
+     estimate screen was kept as a reference-back.
+   - Condition step SIMPLIFIED: now three simple tap-tiles
+     ("Already mostly cleaned" / "Standard condition" / "Needs extra
+     attention") matching the bedroom/bathroom steps. No more paragraphs
+     or price badges. IMPORTANT: the underlying pricing/crew-note logic is
+     unchanged — only what the customer sees was simplified.
+
+   - "Maintenance Cleaning" service RENAMED to "Basic Cleaning" with a new
+     description ("A light refresh for an already-tidy home") to match what
+     it actually is — one-time light cleans. The internal service key was
+     left as "maintenance" so all pricing/flow logic is unaffected; only
+     the customer-facing name and description changed.
+
+3. HEADER WORDMARK  (book/index.html + css/rp-legacy-theme.css)
+   - Now reads "RED PRAIRIE CLEANING" inline (added "Cleaning").
+   - Text auto-shrinks on narrower phones so it never collides with the
+     FAQ / Text us buttons.
+
+4. REVIEW COUNT: 42 -> 46  (all 16 pages that show it)
+   - Updated visible badges AND the reviewCount in the structured data
+     (the schema.org block Google reads for star ratings in search).
+
+5. PERFORMANCE / STABILITY  (homepage + 14 landing pages)
+   - Removed the old rp-canonical-estimator.js script tag from every page.
+     It was a 40KB render-blocking script that (a) no longer does anything
+     now that all traffic goes to /book, and (b) was clobbering the
+     homepage's custom estimator. Removing it speeds up every page and
+     fixes that conflict. The dormant on-page estimator markup was LEFT in
+     place (safe to remove later, page by page, with live testing).
+
+
+NOT INCLUDED / LEFT ALONE
+-------------------------
+- The old inline booking widgets/estimators are still in the page markup
+  but no longer load the shared script. They're dormant, not deleted.
+- Unused .jpg originals in images/before-after/ were left as-is (the live
+  pages already serve .webp versions).
+
+
+DEPLOY
+------
+Unzip over repo root, commit, push. Then on the live site: load the
+homepage, click a couple "Book" buttons to confirm they reach /book, and
+walk through /book once (service -> bedrooms -> condition -> quote) to
+confirm it feels right on your actual phone.

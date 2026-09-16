@@ -15,5 +15,9 @@ Disallow: /call/
 Disallow: /tools/
 Disallow: /workers/
 Disallow: /WEBHOOK-MAPPING-V28.txt
+# Round 52: the session change notes moved into /docs/ and are covered by
+# the same reasoning as the two lines above -- they are repo files that get
+# served, not pages anyone should land on.
+Disallow: /docs/
 
 Sitemap: https://redprairiecleaning.com/sitemap.xml

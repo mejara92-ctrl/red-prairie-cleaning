@@ -793,8 +793,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js?v=5a71fc3a"></script>
-<script src="../js/rp-pricing-engine.js?v=404f28cc"></script>
+<script src="../js/rp-messages.js?v=8b3a9885"></script>
+<script src="../js/rp-pricing-engine.js?v=cf3fedea"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -3357,6 +3357,86 @@ async function logOutcome(outcome){
     st.style.color="var(--red)";
   }
 }
+
+/* ---------- Engine version handshake ----------
+   Same guard as /book, and the CSR console needs it more, not less: a
+   blank screen here happens with a customer already on the phone. See the
+   long note on /book for what went wrong in round 52 (the engine was
+   rewritten without re-running tools/stamp-assets.py, which unlinked the
+   page from its engine and let caches pair mismatched halves).
+
+   The console reads more of the engine than /book does -- crew, hours and
+   the message pack all feed the script Liz reads out -- so the list is
+   longer here. */
+/* HOW THE CHECK IS WRITTEN, because the obvious version is wrong.
+
+   The first attempt tested `typeof window[name] === "undefined"` with the
+   names as strings. That silently reports EVERY `const` in the engine as
+   missing: a top-level `const` in a classic script creates a binding in
+   script scope and never becomes a property of `window`. Only `function`
+   declarations and `var` do. So the guard fired on a perfectly matched
+   deploy and reloaded every visitor once -- a worse bug than the one it
+   was written to catch. Caught by running it against a correct build and
+   watching the reload happen anyway.
+
+   Each entry is therefore a thunk that REFERENCES the binding directly.
+   If the symbol is absent the reference throws ReferenceError, which the
+   catch turns into "missing"; if present, the thunk returns it. Works for
+   const, let, var and function alike. */
+const RP_ENGINE_REQUIRES = {
+  RP_MOVEOUT_BEDROOM_TIERS: function(){ return RP_MOVEOUT_BEDROOM_TIERS; },
+  RP_BASIC_ANCHOR_PRICE:    function(){ return RP_BASIC_ANCHOR_PRICE; },
+  RP_DEEP_ANCHOR_PRICE:     function(){ return RP_DEEP_ANCHOR_PRICE; },
+  RP_MSG:                   function(){ return RP_MSG; },
+  rpServiceBasePrice:       function(){ return rpServiceBasePrice; },
+  rpFinalPrice:             function(){ return rpFinalPrice; },
+  rpPriceLabel:             function(){ return rpPriceLabel; },
+  rpAddonLineItems:         function(){ return rpAddonLineItems; },
+  rpBuildSharedDetails:     function(){ return rpBuildSharedDetails; },
+  rpTeamSize:               function(){ return rpTeamSize; },
+  rpMoveoutCrewSize:        function(){ return rpMoveoutCrewSize; },
+  rpMoveoutTierHours:       function(){ return rpMoveoutTierHours; },
+  rpTimedServiceCrew:       function(){ return rpTimedServiceCrew; }
+};
+(function rpVerifyEngine(){
+  const missing = Object.keys(RP_ENGINE_REQUIRES).filter(function(n){
+    try { return typeof RP_ENGINE_REQUIRES[n]() === "undefined"; }
+    catch(e){ return true; }
+  });
+  if(!missing.length){
+    try { window.sessionStorage.removeItem("rpEngineReloadAttempted"); } catch(e){}
+    return;
+  }
+  const FLAG = "rpEngineReloadAttempted";
+  let tried = false;
+  try { tried = window.sessionStorage.getItem(FLAG) === "1"; } catch(e){}
+  if(window.console && console.error){
+    console.error("[Red Prairie] Pricing engine is out of date with this console. Missing: " +
+      missing.join(", ") + ". Run tools/stamp-assets.py and redeploy." +
+      (tried ? " Already reloaded once; not retrying." : " Reloading once with a cache-buster."));
+  }
+  /* A CSR mid-call must never be left staring at nothing with no
+     explanation, so if the reload has already been tried, say so on the
+     page rather than only in a console she will not have open. */
+  if(tried){
+    document.body.insertAdjacentHTML("afterbegin",
+      '<div style="position:fixed;inset:0;z-index:99999;background:#fff;padding:28px;' +
+      'font:16px/1.5 system-ui,sans-serif;color:#1a1a1a">' +
+      '<b style="display:block;font-size:19px;margin-bottom:10px">This console is out of date.</b>' +
+      'It loaded an old copy of the pricing file, so it cannot quote safely and has stopped ' +
+      'rather than show you a wrong number.<br><br>' +
+      '<b>Right now:</b> take the caller\'s name, number and what they need, and tell them ' +
+      'you will call straight back with the price.<br><br>' +
+      '<b>Then:</b> close this tab completely and reopen it. If it happens again, the site ' +
+      'needs redeploying &mdash; tools/stamp-assets.py was not run.' +
+      '</div>');
+    return;
+  }
+  try { window.sessionStorage.setItem(FLAG, "1"); } catch(e){}
+  const u = new URL(window.location.href);
+  u.searchParams.set("rpcb", String(Date.now()));
+  window.location.replace(u.toString());
+})();
 
 /* ---------- Boot ---------- */
 load();
