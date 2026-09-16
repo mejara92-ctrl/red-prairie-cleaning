@@ -120,97 +120,47 @@ const RP_MSG = {
     limit: "We re-clean — we don't decide whether a landlord returns a deposit, and we'd never promise that."
   },
 
-  /* ── The two move-out tiers, in one sentence each ────────────────────
-     Used on /book's tier cards, /call's tier script, and the objection
-     answer for "what's actually different between the two?". Was three
-     separately-maintained descriptions that had already drifted. */
+  /* ── What a Move-Out Cleaning is, in one sentence ───────────────────
+     Round 52 rewrote this whole block. It used to hold two product
+     descriptions (Inspection Ready and Move-Out Express), the honest
+     "which one do you need" chooser question, the spoken versions of
+     both, and two computed functions -- workRatio(), which built the
+     sentence "same crew both ways, double the hours, so double the price"
+     out of the engine's own crew and hours rather than asserting it, and
+     priceRatio(), which checked whether the ladder's four rungs were a
+     uniform enough multiple to be described with one number at all.
+
+     Both functions were careful and both are deleted, because they
+     answered a question about a second tier. What is left is the single
+     product, said once for the page and once for the phone. */
   tiers: {
-    inspectionName: "Inspection Ready",
-    expressName: "Move-Out Express",
-    inspection: "The full interior reset — oven, fridge, cabinets, closets, baseboards, interior windows, ceiling fans, vents and light fixtures. Backed by the deposit guarantee.",
-    express: "Kitchen, bathrooms, floors and surfaces. The right call when nobody is inspecting the place against a list.",
-    /* The honest way to tell someone which one they need. This is a
-       question about their situation, not an upsell. */
-    chooser: "If a landlord, property manager or housing office is going to walk through and check the place after you leave, Inspection Ready is the one that protects your deposit. If nobody's checking, Express gets it clean for less.",
-    expressAddable: "Oven, fridge, cabinets and a full Detail Pass can each be added to Express individually.",
-    /* ── The spoken versions ──────────────────────────────────────────
-       Round 37. The written copy above is for a screen someone reads at
-       their own pace. These are for a person saying it out loud while
-       somebody waits, which is a different job: shorter, no subordinate
-       clauses, and it has to survive being said in one breath.
-
-       Kept here rather than in /call so the CSR and the website can never
-       describe the same two products differently — the whole reason this
-       file exists. */
-    spoken: "Inspection Ready is the full reset — inside the oven, the fridge, cabinets, baseboards, the works — and it's the one we stand behind if your landlord flags something. Express is kitchen, bathrooms, floors and surfaces. Clean, just not built for an inspection.",
-    /* The question that actually decides it. Not a preference question —
-       a fact about their situation, which is why it closes cleanly. */
-    spokenAsk: "Is anyone walking through and checking the place after you're out?",
-    /* Round 38: the sentence that makes the ladder self-explanatory. Built
-       from the engine's crew and hours rather than written down, so it can
-       never claim a ratio the numbers don't support -- and it renders
-       nothing at all if they ever stop being a clean multiple. */
-    workRatio() {
-      const ir = RP_MSG.crewMath("moveout"), ex = RP_MSG.crewMath("moveoutrefresh");
-      if (!ir || !ex || !ex.lo) return "";
-      /* Round 51: these are exact per-bedroom-bracket figures now, not
-         ranges, so the old midpoint-of-a-range arithmetic is gone. The
-         ladder is built so Inspection Ready is exactly twice the crew-hours
-         of Express at every size (8/4, 12/6, 16/8, 20/10) — but this still
-         CHECKS rather than asserts it, because the whole value of the line
-         is that a customer can verify it against the two cards next to it. */
-      const r = ir.lo / ex.lo;
-      if (r < 1.7 || r > 2.3) return "";
-      const phrase = Math.abs(r - 2) < 0.01 ? "double" : "about double";
-
-      const pr = RP_MSG.tiers.priceRatio();
-      let priceClause = "";
-      if (pr !== null) {
-        if (pr >= 1.97 && pr <= 2.03)      priceClause = `, so it's ${phrase} the price`;
-        else if (pr >= 1.60 && pr < 1.97)  priceClause = `, and still less than ${phrase} the price`;
-        /* Above 2.03 it says nothing about price at all: "more than double"
-           is true but there is no version of it worth saying out loud. */
-      }
-
-      /* Round 51: the two tiers no longer always send the same crew. At 3
-         and 4 bedrooms Inspection Ready sends two cleaners and Express
-         sends one; at 1–2 and 5 they match. The old line opened "Same crew
-         both ways" unconditionally, which became false at exactly the two
-         middle sizes — and Liz says this out loud. Two shapes now, picked
-         off the real numbers. */
-      if (ir.crew === ex.crew) {
-        const who = ir.crew === 1 ? "one cleaner" : `${ir.crew} cleaners`;
-        return `Same crew both ways — ${who}. Inspection Ready is ${phrase} the hours${priceClause}.`;
-      }
-      const said = (n, h) => `${n} cleaner${n === 1 ? "" : "s"} for ${h} hour${h === 1 ? "" : "s"}`;
-      return `Inspection Ready is ${said(ir.crew, ir.onSite)}; Express is ${said(ex.crew, ex.onSite)}. ${phrase === "double" ? "Double" : "About double"} the work${priceClause}.`;
-    },
-    priceRatio(beds = (typeof rpState !== "undefined" ? rpState.bedrooms : null)) {
-      if (typeof RP_MOVEOUT_BEDROOM_TIERS === "undefined") return null;
-      if (typeof RP_MOVEOUT_REFRESH_BEDROOM_TIERS === "undefined") return null;
-      /* Round 51: when the bedroom count is known, answer for THAT rung
-         rather than for the ladder as a whole. The four rungs now run
-         1.75 / 1.72 / 1.67 / 1.66, a spread of 0.09 — wide enough that the
-         uniformity check below (correctly) refuses to name one number for
-         all of them, which would have silently dropped the price half of
-         workRatio()'s sentence on every screen. On a screen that knows the
-         home's size there is an exact right answer, so use it. */
-      if (Number(beds) > 0 && typeof rpMoveoutBedroomTier === "function") {
-        const irT = rpMoveoutBedroomTier(beds, "moveout");
-        const exT = rpMoveoutBedroomTier(beds, "moveoutrefresh");
-        if (irT && exT && irT.base && exT.base) return irT.base / exT.base;
-        return null;
-      }
-      const ir = RP_MOVEOUT_BEDROOM_TIERS, ex = RP_MOVEOUT_REFRESH_BEDROOM_TIERS;
-      if (!ir.length || ir.length !== ex.length) return null;
-      const ratios = [];
-      for (let i = 0; i < ir.length; i++) {
-        if (!ex[i] || !ex[i].base || !ir[i] || !ir[i].base) return null;
-        ratios.push(ir[i].base / ex[i].base);
-      }
-      const lo = Math.min.apply(null, ratios), hi = Math.max.apply(null, ratios);
-      if (hi - lo > 0.06) return null;      /* not one ladder, several */
-      return (lo + hi) / 2;
+    name: "Move-Out Cleaning",
+    /* Round 52: `inspectionName` and `expressName` were read by /call's
+       explain sheet and by /pricing. `name` replaces both. */
+    description: "The full interior reset — oven, fridge, cabinets, closets, baseboards, interior windows, ceiling fans, vents and light fixtures. One price for your home's size, backed by the deposit guarantee.",
+    /* What it does NOT cover. With one tier this is the whole exclusion
+       list, and it is short because every item on it is outside the home.
+       Naming it is what makes "everything inside" credible. */
+    excludes: "Exterior windows, the garage floor, carpet extraction and junk removal aren't included — each can be added while booking.",
+    /* Round 52: the chooser question is gone. It asked whether a landlord
+       was going to inspect the place, and it was the right question when
+       the answer picked a product. It no longer changes anything: the
+       scope, the price and the guarantee are the same either way. The
+       spoken line below leads with the scope instead. */
+    spoken: "It's the full reset — inside the oven, the fridge, cabinets, baseboards, the works — one price for the size of the place, and we stand behind it if your landlord flags something.",
+    spokenAsk: "How many bedrooms, and how many full baths?",
+    /* The sentence that makes a given rung self-explanatory. Round 52:
+       this used to be workRatio(), comparing the two tiers' crew-hours.
+       It reads the one ladder now and says what THIS home actually buys,
+       which is the honest answer to "why does it cost that" and the only
+       version of the question that survives having one product. Returns
+       "" rather than guessing when the size isn't known yet. */
+    workSpoken(beds = (typeof rpState !== "undefined" ? rpState.bedrooms : null)) {
+      if (typeof RP_MSG.crewMath !== "function") return "";
+      const m = RP_MSG.crewMath("moveout", beds);
+      if (!m || !m.crew || !m.onSite) return "";
+      const who = m.crew === 1 ? "one cleaner" : `${m.crew} cleaners`;
+      return `That's ${who} for ${m.onSite} hour${m.onSite === 1 ? "" : "s"} — the whole interior, not the main rooms.`;
     }
   },
 
@@ -279,14 +229,19 @@ const RP_MSG = {
       const d = RP_MSG.deposit.for(beds);
       if (!d || !price) return "";
       /* Only make the "less than half" claim where it is arithmetically
-         true. It holds at 2, 3 and 4+ bedrooms; at 1 bedroom the clean is
-         about two thirds of a typical deposit, so that size gets the
-         plainer version instead of a claim that doesn't survive a
-         calculator. */
+         true. Round 52: it now holds at EVERY size -- the round-45 ladder
+         had a 1-bedroom clean at roughly two thirds of a typical deposit,
+         which is why the plainer fallback below exists. At $199 against a
+         $600 deposit it is a third. The check stays because the claim must
+         survive a calculator, not because it is expected to fail.
+
+         The old line ended "and it's the one we guarantee", which drew a
+         contrast with Move-Out Express. There is nothing to contrast with
+         now, so it states the guarantee instead of implying a choice. */
       const underHalf = price < d.low / 2;
       const opener = `${d.subject} around here is usually ${d.amount}.`;
       return underHalf
-        ? `${opener} This costs less than half that — and it's the one we guarantee.`
+        ? `${opener} This costs less than half that, and it's guaranteed.`
         : `${opener} This is what protects it.`;
     },
     /* Liz's version, for the phone. Same numbers, said out loud. */
@@ -301,7 +256,7 @@ const RP_MSG = {
      Reads crew size and hours off the pricing engine, so it can never
      promise a crew or a duration the price wasn't built on. Returns "" if
      the engine can't answer, rather than guessing. */
-  crewMath(service) {
+  crewMath(service, beds = (typeof rpState !== "undefined" ? rpState.bedrooms : null)) {
     /* Round 38: read from the engine, not restated here, so the spoken
        line and the screen can never disagree about how many people turn up.
 
@@ -309,16 +264,20 @@ const RP_MSG = {
        a flat "8-10 hours" range, so this no longer parses two figures out
        of a string -- it asks the engine for crew, on-site hours and total
        crew-hours directly. `lo`/`hi` are kept on the returned object (both
-       set to the same exact figure) because workRatio() and /call's
-       comparison table still read them, and an exact number is just a
-       range that happens to be closed.
+       set to the same exact figure) for any caller still reading a range;
+       an exact number is just a range that happens to be closed. Round 52
+       deleted workRatio(), which was the main one.
 
        Returns "" until the bedroom count is known: every caller already
        renders nothing on a falsy return, and a crew or a duration quoted
        before we know the size of the home would be a made-up promise. */
     if (typeof rpMoveoutCrewSize !== "function" || typeof rpMoveoutOnSiteHours !== "function") return "";
-    const crew = rpMoveoutCrewSize(service);
-    const onSite = rpMoveoutOnSiteHours(service);
+    /* Round 52: takes an explicit bedroom count so a caller can ask about
+       a specific home without mutating rpState. Both engine accessors
+       already default to rpState.bedrooms, so passing null is the old
+       behaviour exactly. */
+    const crew = rpMoveoutCrewSize(service, beds || undefined);
+    const onSite = rpMoveoutOnSiteHours(service, beds || undefined);
     if (!crew || !onSite) return "";
     const total = crew * onSite;
     const people = `${crew} cleaner${crew === 1 ? "" : "s"}`;

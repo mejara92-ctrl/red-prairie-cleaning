@@ -531,7 +531,7 @@ button.cmp-h:hover{color:var(--ink-2)}
   font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
 }
 
-/* Priced rows inside a card (the Express buy-back list, recurring plans). */
+/* Priced rows inside a card (recurring plans; formerly the Express buy-backs). */
 .cmp-item{
   display:flex; justify-content:space-between; gap:10px; align-items:baseline;
   padding:5px 14px; font-size:13px;
@@ -698,7 +698,7 @@ button.cmp-h:hover{color:var(--ink-2)}
   <div class="top-actions">
     <span class="clock" id="clock" title="Time on this call">0:00</span>
     <div class="money" id="money"><b>—</b><small>Total</small></div>
-    <button class="tbtn" type="button" id="tierBtn" hidden onclick="openSheet('tierSheet')" aria-label="Explain the difference between the tiers">
+    <button class="tbtn" type="button" id="tierBtn" hidden onclick="openSheet('tierSheet')" aria-label="Explain what a Move-Out Cleaning covers">
       <span aria-hidden="true">⚖️</span><span class="lbl">Explain</span>
     </button>
     <button class="tbtn" type="button" id="stuckBtn" onclick="openSheet('stuckSheet')" aria-label="I'm stuck">
@@ -732,13 +732,15 @@ button.cmp-h:hover{color:var(--ink-2)}
   <div class="sheet-body"><div id="lookupResults"></div></div>
 </section>
 
-<!-- Round 40: the tier explainer, one tap away for the whole call on any
-     screen size. Body is rendered live from rp-messages.js and the engine,
-     so it cannot describe the products differently from the website the
-     caller very likely has open while they talk. -->
-<section class="sheet" id="tierSheet" hidden aria-label="Inspection Ready vs Move-Out Express">
+<!-- Round 40: one tap away for the whole call on any screen size. Body is
+     rendered live from rp-messages.js and the engine, so it cannot describe
+     the product differently from the website the caller very likely has
+     open while they talk. Round 52: was the Inspection Ready vs Express
+     explainer; it is the scope sheet now -- what a move-out covers, which
+     is the question that survived the tier collapse. -->
+<section class="sheet" id="tierSheet" hidden aria-label="What a Move-Out Cleaning covers">
   <div class="sheet-top">
-    <div class="who" style="flex:1"><b>Inspection Ready vs Move-Out Express</b><span>Say the first line, then ask the question</span></div>
+    <div class="who" style="flex:1"><b>What a Move-Out covers</b><span>Say the first line, then answer what they ask</span></div>
     <button class="tbtn" type="button" onclick="closeSheet('tierSheet')">Close</button>
   </div>
   <div class="sheet-body"><div id="tierSheetBody"></div></div>
@@ -805,11 +807,11 @@ const LS_KEY = "rpCallConsole.v1";
 
 /* The engine reads this global. Field names match /book's rpState. */
 const rpState = {
-  step:"service", service:null, moveoutTierChosen:false,
+  step:"service", service:null,
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
-  garageWash:false, laundryLoads:0, fridgeAddon:false, ovenAddon:false, cabinetsAddon:false, detailPassAddon:false, junkSize:null, handymanInterest:false, addonDropNotice:"",
+  garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null, handymanInterest:false,
   /* Round 40: add-ons stopped being a step you walk through and became a
      section that is either done or not. This is what "done" means for it. */
   addonsAsked:false,
@@ -861,8 +863,12 @@ const rpState = {
    land before the tier screen shows a number.
    ========================================================================= */
 const FLOWS = {
-  moveout:        ["service","caller","home","tiers","addons","quote","contact","calendar","done"],
-  moveoutrefresh: ["service","caller","home","tiers","addons","quote","contact","calendar","done"],
+  /* Round 52: the "tiers" step is gone. It was where the CSR read the
+     Inspection Ready vs. Express comparison off the screen and the caller
+     chose one. With a single move-out product the home details lead
+     straight into add-ons -- one fewer screen for the CSR to get through
+     while a caller is on the line. */
+  moveout:        ["service","caller","home","addons","quote","contact","calendar","done"],
   deep:           ["service","caller","addons","quote","contact","calendar","done"],
   maintenance:    ["service","caller","frequency","addons","quote","contact","calendar","done"],
   carpet:         ["service","caller","rooms","quote","contact","calendar","done"],
@@ -897,26 +903,16 @@ function stepIdx(){ const i = flow().indexOf(rpState.step); return i < 0 ? 0 : i
    everyone; "PCS" only lands with people who already know the acronym.
    ========================================================================= */
 const SERVICE_ANGLES = {
-  /* Round 19 -- Move-Out is now two services, not one service with a
-     billing-mode branch. "moveout" is the guaranteed tier (Inspection
-     Ready); "moveoutrefresh" is the new lighter tier. Both are plain
-     strings now -- the old rpIsMoveoutHourly() function-wrapper trick
-     is gone along with hourly move-out billing. */
+  /* Round 52: one move-out entry. The "moveoutrefresh" angle that sat
+     below this one -- built around steering a caller toward the
+     guaranteed tier if it turned out a landlord WAS inspecting -- is
+     deleted. There is no lighter tier to steer away from, which also
+     means the CSR no longer has to qualify the inspection question
+     before quoting a number. */
   moveout: {
     value: "that covers the whole interior \u2014 inside the oven and fridge, inside cabinets, everything \u2014 so nothing gets flagged at the walkthrough",
     addon: "Landlords often check carpets and windows specifically at move-out, so those are worth asking about by name.",
-    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection.",
-    urgencyNoun: "move-out slots",
-    seasonNote: "our busiest moving season"
-  },
-  moveoutrefresh: {
-    /* Ask the qualifying question FIRST on this one -- if it turns out
-       there IS a landlord/PM inspection, steer them to moveout instead
-       before quoting, the same way the old hourly carve-out steered
-       people toward the guaranteed tier. */
-    value: "that's the fast, affordable option when there's no landlord walkthrough to answer to \u2014 kitchen, bathrooms, floors, surfaces wiped down",
-    addon: "If they mention a landlord or property manager checking the place afterward, stop and ask before quoting \u2014 that's Inspection Ready, not Express.",
-    objection: "This one's priced lighter because it skips the deep-clean items a landlord inspection checks for \u2014 oven and fridge interiors, inside cabinets, baseboards. If there's any inspection at all, Inspection Ready is the one that protects the deposit \u2014 if something's flagged, we come back and fix it free.",
+    objection: "Most people booking a move-out are trying to protect their deposit \u2014 this is what it takes to pass a landlord's inspection, and it's the whole interior for one price.",
     urgencyNoun: "move-out slots",
     seasonNote: "our busiest moving season"
   },
@@ -952,7 +948,7 @@ const SERVICE_ANGLES = {
        spot; the ones who don't were never paying the full ticket anyway, and a booked
        slot beats a lost call. */
     qualifier: "Is this a move-out, or a house you're living in?",
-    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and only the full reset is backed by our deposit-protection guarantee. If you want it inspection-backed, that's Inspection Ready Move-Out.\"",
+    guaranteeWarning: "MOVING OUT? SAY THIS: \"I can absolutely do that hourly \u2014 but I want to be straight with you: partial cleans are where deposits get lost, and hourly isn't backed by our deposit guarantee because you're setting the scope. If you want it inspection-backed, that's a Move-Out Cleaning.\"",
     scopeWarning: "GET THE PRIORITY LIST BEFORE YOU QUOTE. Most important first. Type it into notes verbatim \u2014 the crew works it in that order. Never promise the list gets finished."
   },
   airbnb: {
@@ -1014,7 +1010,7 @@ function calendarSayLine(){
    good advice for a move-out, but doesn't apply to a maintenance signup or
    a carpet job with no deadline. */
 function calendarWatchLine(){
-  if(["moveout","moveoutrefresh"].includes(rpState.service)) return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
+  if(rpState.service === "moveout") return "Move-outs are deadline-driven. Ask when they have to be out by, and work backward from there.";
   if(rpState.service==="deep" || rpState.service==="maintenance") return "Ask if there's an event or date they're working around \u2014 otherwise just offer your two soonest openings.";
   return "Offer your two soonest real openings \u2014 no deadline to work around here, so don't invent one.";
 }
@@ -1046,7 +1042,7 @@ const LINES = {
   service:{
     act:"Click what they're asking for. Not sure? Ask them to describe the job in their own words first — you can always change this.",
     say:()=>`“Thanks for calling Red Prairie Cleaning, this is ${csrGreetingName()} — what can we help you with today?”`,
-    coach:"Let them describe it in their own words first — people move for all kinds of reasons, so don't assume military and don't assume not. <b>If it's a move-out, ask now, before anything else: is a landlord, property manager or inspector going to walk through and check the place against a list?</b> You're noting the lean, not picking a tier — real numbers come three screens from now."
+    coach:"Let them describe it in their own words first — people move for all kinds of reasons, so don't assume military and don't assume not. <b>Round 52:</b> you no longer have to ask up front whether anyone is inspecting the place. There is one Move-Out Cleaning, it covers the whole interior, and every one of them carries the deposit guarantee — so the answer doesn't change the price or the product. Still worth knowing if they volunteer it, because it tells you what they're anxious about."
   },
   caller:{
     act:"Type their name and number as they say them. Don't worry about spelling; the number is the part that matters.",
@@ -1056,25 +1052,7 @@ const LINES = {
   home:{
     act:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Then answer the three checks honestly. If you're unsure about any of them, say no.",
     say:"“Let me get a couple of quick details on the place — how many bedrooms, and how many full bathrooms?”",
-    coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the three checks: water, A/C, mold or pests. If any of them fail, the job can't be booked as normal and you do not quote a price."
-  },
-  tiers:{
-    act:"Read out both prices, then stop and let them pick. Don't steer them to the cheaper one to be kind — ask the inspection question instead.",
-    say:()=>{
-      const ir=rpMoveoutTierBasePrice("moveout"), rf=rpMoveoutTierBasePrice("moveoutrefresh");
-      const fmt=p=>p===null?"a custom quote":`$${p.toFixed(0)}`;
-      return `“For a home like that I can do it two ways — Inspection Ready at ${fmt(ir)}, which protects your deposit if anyone inspects afterward, or Move-Out Express at ${fmt(rf)} if nobody's checking. Which sounds like the fit?”`;
-    },
-    /* Round 33: the deposit figure for THIS home, handed to her at the
-       moment she recommends a tier. It is the argument that reframes a
-       price-sensitive caller, and it only renders once bedrooms are known. */
-    coach:()=>{
-      const d = RP_MSG.deposit.for(rpState.bedrooms);
-      const lead = d
-        ? `<b>On this home the deposit is usually ${d.amount}.</b> Say that before the price if they sound price-sensitive — it reframes the whole call. `
-        : "";
-      return lead + `Lead with whichever tier matches what they told you at the start. Inspection expected, or they're not sure → <b>“That's the one most people book — full interior reset, oven to baseboards, and if something gets flagged after you're gone we come back and fix it free.”</b> Flat no, just handing over keys → Express is an honest recommendation, not a downsell: <b>“No point paying for a guarantee nobody's going to test.”</b> Both are worth being proud to sell.`;
-    }
+    coach:"Bedrooms only — an office counts if <em>they'd</em> call it a bedroom. Full baths only; “two and a half” is 2, and half-baths aren't priced separately so don't make a thing of it. Then the three checks: water, A/C, mold or pests. If any of them fail, the job can't be booked as normal and you do not quote a price. <b>Bedrooms set the price on their own</b> — one, two, three or four-plus — so once this screen is answered you have a real number."
   },
   addons:{
     act:"Ask about carpet, windows and the garage <b>by name</b> — people almost never bring them up.",
@@ -1155,7 +1133,7 @@ function objectionPriceAnswer(){
      protect, and it is a bigger number than anything we charge. Only
      fires once bedrooms are known, and only on the move-out tiers --
      there is no deposit riding on a recurring clean. */
-  if (["moveout","moveoutrefresh"].includes(rpState.service) && rpState.bedrooms && rpFinalPrice() > 0) {
+  if (rpState.service === "moveout" && rpState.bedrooms && rpFinalPrice() > 0) {
     const dep = RP_MSG.deposit.spoken(rpState.bedrooms, Math.round(rpFinalPrice()));
     if (dep) return `\u201cI hear you \u2014 and honestly, that's the wrong number to compare it against. ${dep}\u201d`;
   }
@@ -1173,9 +1151,6 @@ function removableAddonLabel(){
   if(rpAddonAvailable("windows") && rpState.windowsTier) return "the exterior windows";
   if(rpAddonAvailable("garage") && rpState.garageWash) return "the garage floor wash";
   if(rpAddonAvailable("fridge") && rpState.fridgeAddon) return "the refrigerator interior";
-  if(rpAddonAvailable("oven") && rpState.ovenAddon) return "the oven interior";
-  if(rpAddonAvailable("cabinets") && rpState.cabinetsAddon) return "the cabinets & closets";
-  if(rpAddonAvailable("detailPass") && rpState.detailPassAddon) return "the detail pass";
   if(rpAddonAvailable("laundry") && Number(rpState.laundryLoads)>0) return "the laundry service";
   return null;
 }
@@ -1184,29 +1159,23 @@ function doBetterPriceAnswer(){
   const removeLine = removable ? ` Or if you'd rather handle ${removable} yourself, I can take that off the total.` : "";
   return `\u201cI can't move the base price \u2014 it's already the full number, nothing gets added once we're there.${removeLine}\u201d`;
 }
-/* Round 28 (direct instruction: "make /call an absolute weapon... handle
-   rejections"). Tier-aware deposit answer -- the old line was the same
-   regardless of which tier they were on, which meant an Express caller
-   asking about their deposit got a vague non-answer instead of the
-   honest, genuinely useful redirect: Express was never built to survive
-   an inspection, and if there's a real chance of one, that's exactly
-   the moment to offer the switch, not dodge the question. */
+/* Round 52: the tier branch is gone. This used to split -- an Express
+   caller got an honest "this one was never built to survive an
+   inspection, want me to switch you?" redirect, and an Inspection Ready
+   caller got the guarantee. Every move-out carries the guarantee now, so
+   there is one answer and it is the strong one. */
 function depositAnswer(){
-  if(rpState.service === "moveoutrefresh"){
-    return "\u201cI can't promise that on this one \u2014 Express is priced for when nobody's checking, so it skips some of what a landlord walkthrough looks for. If there's any real chance of an inspection, Inspection Ready is the tier built to protect it \u2014 want me to switch it over?\u201d";
-  }
-  return "\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it free \u2014 that's exactly what Inspection Ready is built for.\u201d";
+  return "\u201cI can't speak for your landlord, but if they flag something that's in our scope, we come back and fix it free \u2014 that's exactly what a Move-Out Cleaning is built for.\u201d";
 }
-/* Move-out-specific competitor answer -- the generic version just
-   defends the price. This one gives Liz an honest way to actually WIN
-   the call instead of just holding ground: if what the caller describes
-   really is a no-inspection situation, Express undercuts most
-   competitors' "everything included" quotes on price AND is a truthful
-   fit, not a downsell. Turns a price objection into a second at-bat
-   instead of a wall. */
+/* Move-out-specific competitor answer. Round 52: the old version's
+   second half offered to re-price the call as Move-Out Express, which
+   was an honest pivot when a cheaper tier existed and is now impossible.
+   What replaces it is the scope comparison, which is the stronger
+   argument anyway and is the one thing a "$150 move-out clean" quote
+   almost never survives. */
 function competitorAnswer(){
-  if(["moveout","moveoutrefresh"].includes(rpState.service)){
-    return "\u201cThey might be quoting a lighter scope \u2014 worth asking if inside the oven, the fridge, and the cabinets are included, since a lot of move-out quotes leave those out and add them later. But if it's genuinely just a light clean with nobody inspecting afterward, that might actually be our Express option, which runs lower too \u2014 want me to price that one out for you instead?\u201d";
+  if(rpState.service === "moveout"){
+    return "\u201cThey might be quoting a lighter scope \u2014 worth asking if inside the oven, the fridge, and inside the cabinets and closets are included, since a lot of move-out quotes leave those out and add them on later. Ours is one price for the whole interior, and it's the full number up front.\u201d";
   }
   return "\u201cThey might be quoting a lighter scope. Worth asking if inside the oven, inside the fridge, and inside cabinets are included \u2014 a lot of quotes leave those out and add them later. Ours is the full number up front.\u201d";
 }
@@ -1217,8 +1186,8 @@ const OBJECTIONS = [
      the whole value of a paid phone lead is the human in the middle.
      Bridge, get the two facts, THEN quote bundled with what's included. */
   {q:"\u201cHow much for a move-out clean?\u201d (asked before you've got any details)",
-   a:"\u201cHappy to \u2014 it comes down to bedroom count and which of two options fits, so let me get you the real number instead of guessing high. How many bedrooms and full baths, and is a landlord or property manager going to inspect the place after you leave?\u201d",
-   n:()=>"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Move-Out pricing is flat by bedroom count now (no square footage, no condition tiers), so don't ask about size or condition \u2014 bedrooms and the inspection question are the only two things that change the price. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's [the price], and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause. (Inspection Ready currently starts at $"+RP_MOVEOUT_BEDROOM_TIERS[0].base+" for a 1\u20132 bedroom; the tiers screen a few questions from now gives you the real number for THIS home \u2014 read it from there, not from memory.)"},
+   a:"\u201cHappy to \u2014 it comes down to bedroom count, so let me get you the real number instead of guessing high. How many bedrooms and full baths?\u201d",
+   n:()=>"DO NOT SAY A NUMBER YET. This isn't a dodge \u2014 it's true, and it buys the 90 seconds where you build everything else. Move-Out pricing is flat by bedroom count (no square footage, no condition tiers, and since round 52 no tier to choose), so bedroom count is the ONLY thing that changes the price. Ask it, then STOP TALKING and let them answer. When you do quote, never say the number naked: \u201cThat's [the price], and that includes inside the oven, the fridge, cabinets and closets \u2014 full price, nothing added when we show up.\u201d Then pause. (Move-Out starts at $"+RP_MOVEOUT_BEDROOM_TIERS[0].base+" for a 1\u20132 bedroom; the quote screen gives you the real number for THIS home \u2014 read it from there, not from memory.)"},
   {q:"\u201cHave you done this before? / Are you legit?\u201d",
    a:()=>`\u201cWe're a veteran-owned local company, fully insured, with over ${RP_MSG.facts.reviewCount} five-star reviews from folks right here in the Lawton area \u2014 a lot of them the exact same move-out situation you're in.\u201d`,
    n:"The review count reads from js/rp-messages.js now, so it can't go stale the way it just had (this line said 60 while every page said 61). Never round it up."},
@@ -1227,7 +1196,7 @@ const OBJECTIONS = [
    n:"Don't drop the price. Restate value first \u2014 this line already adapts to the service they're booking."},
   {q:"\u201cAnother company quoted me less.\u201d",
    a:competitorAnswer,
-   n:"Never bad-mouth a competitor by name. For a move-out caller, this is a real second at-bat, not just a defense \u2014 if what they describe genuinely has no inspection coming, pivoting to Express can win the call on a truthful, lower number instead of just holding the line on Inspection Ready."},
+   n:"Never bad-mouth a competitor by name. The scope question is the whole answer \u2014 most cheap move-out quotes leave out the oven, the fridge and inside the cabinets, then charge for them on the day. Ask what their quote includes and let them work it out; don't claim we're cheaper, because usually we aren't."},
   {q:"\u201cCan you do better on price?\u201d",
    a:doBetterPriceAnswer,
    n:"Remove scope to lower price, never the base \u2014 this line only offers to drop an add-on that's actually on the order. If nothing's been added, there's nothing to offer; hold the price."},
@@ -1236,16 +1205,18 @@ const OBJECTIONS = [
    n:"Removes the risk of committing, doesn't pressure. If they still say no, log the outcome."},
   {q:"\u201cWill I get my deposit back?\u201d",
    a:depositAnswer,
-   n:"NEVER promise a deposit back \u2014 the landlord decides, not us. But this is also a real moment to sell: if they're on Express and clearly worried about an inspection, that's the caller Inspection Ready was built for \u2014 offer the switch, don't just reassure and move on."},
+   n:"NEVER promise a deposit back \u2014 the landlord decides, not us. What you CAN say without hedging is that every move-out we sell is backed: if the landlord flags something in our scope, we come back and fix it free."},
   {q:"\u201cWhy does it take two people / how long does it take?\u201d",
-   a:"\u201cTwo cleaners either way \u2014 what changes is how long they're there. Express is four to five hours. Inspection Ready is eight to ten, because it's genuinely double the work: every interior surface instead of the main ones. That's the whole reason one is double the price of the other.\u201d",
-   n:"The cleanest answer on the list, because the arithmetic backs it exactly: 2 cleaners for 4\u20135 hours is 8\u201310 hours of work, 2 for 8\u201310 is 16\u201320. Double at both ends of the range, and double the price at every size. Nothing to hedge."},
-  {q:"\u201cWhat's actually different between the two options?\u201d",
-   a:"\u201cInspection Ready is the full interior reset \u2014 inside the oven, fridge, cabinets, baseboards, windows, everything \u2014 and it's the one that protects your deposit if a landlord flags something. Express covers the kitchen, bathrooms, floors and surfaces, which is plenty if nobody's inspecting the place, and you can still add the oven, fridge, cabinets, or a full detail pass individually if there's something specific you want done.\u201d",
-   n:"Same pitch as the tiers screen, for whenever the question resurfaces later \u2014 on addons, or even at the price. Keep leading with whichever tier matches what they've told you about an inspection, not the bigger number."},
-  {q:"\u201cCan't I just add the oven and fridge to Express instead of paying for Inspection Ready?\u201d",
-   a:"\u201cYou can, but once you add a couple of those on it usually comes out to about the same as just switching over \u2014 and Inspection Ready throws in the full guarantee on top, so at that point it's the better deal, not just the safer one.\u201d",
-   n:"This is true by design, not a sales trick \u2014 Express plus enough add-ons always lands at or above Inspection Ready's price, and the quote screen's own guardrail will flag it the moment it happens. Don't fight this objection, just point it out plainly; the math sells itself."},
+   a:()=>{
+     const crew = rpMoveoutCrewSize("moveout"), hrs = rpMoveoutTierHours("moveout");
+     return crew && hrs
+       ? `\u201cOn a home your size it's ${crew===1?"one cleaner":crew+" cleaners"} for ${hrs}. It's the whole interior \u2014 inside the oven and fridge, inside cabinets and closets, baseboards, interior windows \u2014 so it genuinely takes that long.\u201d`
+       : "\u201cIt depends on the size \u2014 a one or two bedroom is one cleaner for a full day, and three bedrooms up is two cleaners. It's the whole interior, so it genuinely takes that long.\u201d";
+   },
+   n:"Round 52: this used to compare Express's hours against Inspection Ready's. It reads the real crew and hours off the tier row for THIS home now, so it can't drift from what the crew sheet says. If bedrooms aren't entered yet it falls back to the shape of the ladder rather than naming one size's hours as if they applied to all of them."},
+  {q:"\u201cIs there a cheaper option? / What's the basic version?\u201d",
+   a:"\u201cThere isn't a lighter move-out any more \u2014 there's one Move-Out Cleaning and it's the whole interior: inside the oven, the fridge, cabinets and closets, baseboards, interior windows, the lot. That's the price you're hearing, and nothing on that list gets billed separately when we show up.\u201d",
+   n:"Round 52 retired Move-Out Express. If a caller is quoting a lower number they saw before, they saw the old Express tier \u2014 don't apologise for it, just say the product changed and everything Express charged extra for is included now. If they genuinely want a light clean with no inspection behind it, an Hourly booking is the honest alternative, and say plainly that it has no deposit guarantee."},
   {q:"\u201cCan you come today or tomorrow?\u201d",
    a:"Check the calendar and offer the soonest real opening.",
    n:"Never promise a slot you haven't confirmed on the calendar."},
@@ -1342,38 +1313,15 @@ function guardrails(forStep){
      was exactly the duplication this rewrite exists to remove. Guardrails
      are for things that are only true SOMETIMES: this job can't be quoted,
      the address wasn't read back, the tier maths just flipped.  */
-  /* Round 25 (direct instruction: "I need to make money and the
-     expectations need to be clear" -- and the pricing itself was built so
-     buying every excluded-scope add-on on Express always costs MORE than
-     switching tiers outright, by design; see rpDetailPassPrice()'s
-     comment in the engine). Nothing used to say this out loud, so a
-     caller could stack fridge + oven + cabinets + Detail Pass on Express
-     and end up paying more than Inspection Ready for LESS scope and no
-     guarantee -- worse for them, and it undersells the tier that's
-     actually the better fit. Computed live off the same base-price
-     function /book and /pricing use, so it can't drift out of sync with
-     the real numbers. */
-  /* Round 35b: this used to test rpAddonsTotal() — EVERY add-on. Only the
-     four buy-backs (oven, fridge, cabinets, Detail Pass) are scope
-     Inspection Ready already includes; carpet, windows, garage and junk
-     cost the same on both tiers and travel with the customer through a
-     switch. On a 3-bedroom carrying $300 of carpet and garage the old test
-     fired and told the CSR that Inspection Ready was "$499 for the same
-     home" when the real figure was $799. Basis is now
-     rpExpressBuyBackTotal(), and the body names the carried-over add-ons
-     so the number said out loud is the number they would actually pay. */
-  if(["addons","quote"].includes(s) && rpState.service==="moveoutrefresh" && !rpIsCustomQuoteOnly()){
-    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
-    const buyBacks=rpExpressBuyBackTotal(), carried=rpTierNeutralAddonTotal();
-    if(irPrice!==null && rfPrice!==null && irPrice>rfPrice && buyBacks>=(irPrice-rfPrice)){
-      const nowAt=rfPrice+buyBacks+carried, switched=irPrice+carried;
-      const carriedNote = carried>0
-        ? ` The other $${carried.toFixed(0)} of add-ons costs the same either way, so it carries over.`
-        : "";
-      g.push({level:"info",title:"Inspection Ready is now the better deal",
-        body:`Express with these comes to $${nowAt.toFixed(0)}. The same home on Inspection Ready is $${switched.toFixed(0)} — fully guaranteed, nothing left out.${carriedNote} Worth saying: “At this point Inspection Ready actually comes out even or cheaper, and it's backed by Defend Your Deposit — want me to switch it?”`});
-    }
-  }
+  /* Round 52: the "Inspection Ready is now the better deal" guardrail is
+     deleted. It fired when a caller had stacked enough Express buy-backs
+     (oven, fridge, cabinets, Detail Pass) that switching tiers outright
+     was cheaper, and it was carefully built -- round 35b fixed it to
+     measure only the buy-backs rather than every add-on, after it told a
+     CSR that Inspection Ready was "$499 for the same home" on a booking
+     that would really have come to $799. None of it survives the tier
+     collapse: there are no buy-backs, no second tier, and no cheaper
+     route to the full checklist to warn anyone about. */
   return g;
 }
 function hasBlockingGuard(){ return guardrails().some(x=>x.level==="stop"); }
@@ -1421,8 +1369,7 @@ function sectionValid(key){
     case "caller":    return rpState.fullName.trim().length>1 && phoneOk(rpState.phone);
     case "service":   return !!rpState.service;
     case "home":      return !!rpState.bedrooms && !!rpState.bathrooms
-                        && (["moveout","moveoutrefresh"].includes(rpState.service) ? rpMoveoutQuestionnaireAnswered() : true);
-    case "tiers":     return !!rpState.moveoutTierChosen;
+                        && (rpState.service === "moveout" ? rpMoveoutQuestionnaireAnswered() : true);
     case "frequency": return !!rpState.frequency;
     case "rooms":     return Number(rpState.carpetRooms)>0;
     case "hourly":    return !!rpState.cleanerCount && !!rpState.hourCount;
@@ -1516,9 +1463,9 @@ function sectionBody(s){
   if(priceLocked() && ["tiers","addons","quote"].includes(s)) return lockedBody();
 
   if(s==="service"){
-    const items = Object.entries(rpServices).filter(([k])=>k!=="moveoutrefresh").map(([k,v])=>
+    const items = Object.entries(rpServices).map(([k,v])=>
       opt(k==="moveout" ? "Move-Out Cleaning" : v.name, `pickService('${k}')`,
-        rpState.service==="moveout"||rpState.service==="moveoutrefresh" ? k==="moveout" : rpState.service===k,
+        rpState.service===k,
         k==="moveout" ? "Both tiers. You'll show two real prices in a moment."
         : k==="hourly" ? "Only certain areas. 3-hr minimum. Ask first: moving out, or living in it?" : null)
     ).join("");
@@ -1537,7 +1484,7 @@ function sectionBody(s){
 
   /* Merged: bedrooms + bathrooms + the three hard-stop checks. */
   if(s==="home"){
-    const isMoveout = ["moveout","moveoutrefresh"].includes(rpState.service);
+    const isMoveout = rpState.service === "moveout";
     const yn=(field,label)=>`<div class="grp">
         <div class="grp-h">${label}</div>
         <div class="opts two">
@@ -1555,29 +1502,26 @@ function sectionBody(s){
       ${isMoveout ? `
       ${yn("moveoutWaterOn","Is the water on? <em>— any “no” below and you don't quote</em>")}
       ${yn("moveoutAcOn","Is the air conditioning working?")}
-      ${yn("moveoutMoldPests","Any signs of mold or pests?")}` : ""}`;
-  }
-
-  if(s==="tiers"){
-    const irPrice=rpMoveoutTierBasePrice("moveout"), rfPrice=rpMoveoutTierBasePrice("moveoutrefresh");
-    const fmt=p=>p===null?"Custom":`$${p.toFixed(0)}`;
-    const chosen = rpState.moveoutTierChosen ? rpState.service : null;
-    return `
-      <div class="grp"><div class="grp-h">Why are they moving? <em>— decides which one you lead with</em></div>
+      ${yn("moveoutMoldPests","Any signs of mold or pests?")}
+      ${/* Round 52: moved here from the deleted "tiers" screen. Neither
+           field changes the price -- renting vs. selling used to decide
+           which tier the CSR led with, and now just tells the crew and the
+           office what the job is for. The PM/realtor name is the one that
+           earns its place: it feeds the property-manager referral channel. */""}
+      <div class="grp"><div class="grp-h">Why are they moving? <em>— context for the crew, doesn't change the price</em></div>
         <div class="opts two">
           ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
           ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
         </div></div>
-      <div class="opts">
-        ${opt("Inspection Ready",`chooseMoveoutTier('moveout')`,chosen==="moveout",
-          "Protects the deposit. Oven, fridge, cabinets and the full Detail Pass all in this price.", fmt(irPrice))}
-        ${opt("Move-Out Express",`chooseMoveoutTier('moveoutrefresh')`,chosen==="moveoutrefresh",
-          "Satisfaction Guaranteed, no deposit guarantee. Oven, fridge, cabinets addable next.", fmt(rfPrice))}
-      </div>
       <div class="f" style="margin-top:12px"><label for="pmName">Property manager or realtor (optional)</label>
-        <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" autocomplete="off" oninput="set('moveoutPmOrRealtor',this.value)"></div>`;
+        <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" autocomplete="off" oninput="set('moveoutPmOrRealtor',this.value)"></div>` : ""}`;
   }
 
+  /* Round 52: the "tiers" screen is deleted, but two fields it collected
+     are NOT -- moveoutRentalOrSelling and moveoutPmOrRealtor both feed the
+     webhook (moveout_intent, moveout_pm_or_realtor) and the PM/realtor name
+     drives a real referral channel. They move onto the "home" step above so
+     nothing stops arriving in GHL. */
   if(s==="frequency") return `<div class="opts two">${["One-Time","Weekly","Bi-Weekly","Monthly"]
     .map(f=>opt(f,`pick('frequency','${f}')`,rpState.frequency===f)).join("")}</div>`;
 
@@ -1618,9 +1562,6 @@ function sectionBody(s){
     }
     if(list.includes("garage")) rows.push(opt("Garage floor wash",`toggle('garageWash')`,rpState.garageWash,"Garage must be empty",`+$${rpAddonCatalog.garage.price}`));
     if(list.includes("fridge")) rows.push(opt("Refrigerator interior",`toggle('fridgeAddon')`,rpState.fridgeAddon,null,`+$${rpAddonCatalog.fridge.price}`));
-    if(list.includes("oven")) rows.push(opt("Oven interior",`toggle('ovenAddon')`,rpState.ovenAddon,null,`+$${rpAddonCatalog.oven.price}`));
-    if(list.includes("cabinets")) rows.push(opt("Inside cabinets & closets",`toggle('cabinetsAddon')`,rpState.cabinetsAddon,null,`+$${rpAddonCatalog.cabinets.price}`));
-    if(list.includes("detailPass")) rows.push(opt("Detail Pass",`toggle('detailPassAddon')`,rpState.detailPassAddon,"Baseboards, windows, walls, fans, vents, lights",`+$${rpDetailPassPrice()}`));
     if(list.includes("secondCleaner")) rows.push(opt("Additional cleaner",`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner,`For the full ${rpSecondCleanerHours()}hrs booked`,`+$${rpSecondCleanerPrice()}`));
     if(rows.length) h+=`<div class="grp"><div class="grp-h">Also available</div><div class="opts">${rows.join("")}</div></div>`;
 
@@ -1637,16 +1578,9 @@ function sectionBody(s){
 
   if(s==="quote"){
     const custom=rpIsCustomQuoteOnly();
-    const switchTo = rpState.service==="moveout" ? "moveoutrefresh" : "moveout";
-    const tierSwitch = (["moveout","moveoutrefresh"].includes(rpState.service) && !custom)
-      ? `<div class="opts" style="margin-bottom:12px">${opt(
-          rpState.service==="moveout" ? "Switch to Move-Out Express" : "Switch to Inspection Ready",
-          `switchMoveoutTier('${switchTo}')`, false,
-          rpState.service==="moveout" ? "Drops the deposit guarantee" : "Adds Defend Your Deposit",
-          fmtTierPrice(switchTo))}</div>` : "";
-    const dropNotice = rpState.addonDropNotice
-      ? `<div class="guard info"><span class="ic">${guardIcon("info")}</span><div><b>Removed — already in this tier</b>${esc(rpState.addonDropNotice)}</div></div>` : "";
-    return `${tierSwitch}${dropNotice}
+    /* Round 52: the mid-call tier switch and the "removed, already in this
+       tier" notice are both gone with the second tier. */
+    return `
       ${custom?"":closersHtml()}
       <div class="opts" style="margin-top:12px">${chk("quotedAloud","I gave them this quote and they're ready to book")}</div>`;
   }
@@ -1685,11 +1619,6 @@ function lockedBody(){
 }
 /* Kept so anything still calling the old name gets the focused section. */
 function screenHtml(){ return sectionBody(rpState.step); }
-
-function fmtTierPrice(svc){
-  const p = rpMoveoutTierBasePrice(svc);
-  return p===null ? "Custom" : `$${p.toFixed(0)}`;
-}
 
 /* The quote screen's closers. 1.0 also reprinted four full objections here,
    which is roughly 200 words she has to read past while a customer waits on
@@ -1789,12 +1718,10 @@ function sectionSummary(k){
       const bits=[];
       if(rpState.bedrooms) bits.push(rpState.bedrooms+" bed");
       if(rpState.bathrooms) bits.push(rpState.bathrooms+" bath");
-      if(["moveout","moveoutrefresh"].includes(rpState.service) && rpMoveoutQuestionnaireAnswered())
+      if(rpState.service === "moveout" && rpMoveoutQuestionnaireAnswered())
         bits.push(rpMoveoutBlocked() ? rpMoveoutBlockReasons().join(", ") : "checks clear");
       return bits.join(" · ");
     }
-    case "tiers":    return rpState.moveoutTierChosen
-                       ? ((rpServices[rpState.service]||{}).name||"") + P(" — " + fmtTierPrice(rpState.service)) : "";
     case "addons": {
       const items = rpAddonLineItems();
       if(!items.length) return "None";
@@ -2112,7 +2039,7 @@ function renderTop(){
   /* GUARDRAIL 3: the tier explainer is reachable for the whole call, in both
      shells, from the moment the call is known to be a move-out. */
   const tb = el("tierBtn");
-  if(tb) tb.hidden = !["moveout","moveoutrefresh"].includes(rpState.service);
+  if(tb) tb.hidden = rpState.service !== "moveout";
 }
 
 /* Round 40: the chips used to mean POSITION -- done behind you, pending
@@ -2245,10 +2172,13 @@ function cmpVerdict(html, level){
   return `<div class="cmp-verdict ${level||""}">${html}</div>`;
 }
 
-/* ---- 1. Inspection Ready vs Express -------------------------------------
-   The reason this rail exists. Both real prices for this home, the gap
-   between them, what the cheaper one leaves out, and what each of those
-   costs to add back. */
+/* ---- 1. What a Move-Out covers ------------------------------------------
+   Round 52: this slot used to be "Inspection Ready vs Express" -- both
+   real prices for this home, the gap between them, what the cheaper one
+   left out, and what each of those cost to add back. It was the reason
+   this rail existed. With one move-out product there is nothing to
+   compare, so cmpTiers() is deleted and cmpScope() (further down) is the
+   card that answers "what am I actually buying". */
 /* A block of collapsible detail inside a card. Used for "the numbers" —
    present, one click away, not the first thing in the column. */
 function cmpFold(key, label, body){
@@ -2270,88 +2200,9 @@ function cmpScript(say, ask, answers){
     ${answers.map(a=>`<div class="cmp-branch"><span>${esc(a[0])}</span><b>${esc(a[1])}</b></div>`).join("")}`;
 }
 
-function cmpTiers(){
-  if(!["moveout","moveoutrefresh"].includes(rpState.service)) return "";
-
-  const ir = rpMoveoutTierBasePrice("moveout");
-  const ex = rpMoveoutTierBasePrice("moveoutrefresh");
-
-  /* Blocked questionnaire or an off-ladder home: the console's own guard
-     already says don't quote. Repeating a number here would undo it. */
-  if(ir===null || ex===null){
-    return cmpCard("tiers","Inspection Ready vs Express",
-      cmpVerdict("<b>Don't quote either tier on this call.</b> This home doesn't price on the ladder — take the details and log it as a callback.","stop"));
-  }
-
-  const beds = Number(rpState.bedrooms||0);
-  const known = beds>0 && ir>0 && ex>0;
-  const pick = rpState.service==="moveout" ? "a" : "b";
-  const irMath = RP_MSG.crewMath("moveout") || {};
-  const exMath = RP_MSG.crewMath("moveoutrefresh") || {};
-
-  /* Round 37: script first. Her job the second someone asks "what's the
-     difference" is to SAY something, not to read a table and translate it
-     into a sentence while the caller waits. The table is still here, one
-     click down, because "how many people come out?" is a real question --
-     it just isn't the first thing in the column any more. */
-  let h = cmpScript(
-    RP_MSG.tiers.spoken,
-    RP_MSG.tiers.spokenAsk,
-    known
-      ? [["Yes, or not sure  →  Inspection Ready", cmpMoney(ir)],
-         ["A firm no  →  Express", cmpMoney(ex)]]
-      : [["Yes, or not sure  →", "Inspection Ready"],
-         ["A firm no  →", "Express"]]
-  );
-
-  if(known){
-    h += `<div class="cmp-gap"><b>${cmpMoney(ir-ex)}</b> apart — that's the whole decision.</div>`;
-    /* The deposit anchor for THIS home. The number that reframes a caller
-       who is comparing us against a cheaper cleaner. */
-    const d = RP_MSG.deposit.for(beds);
-    if(d) h += `<div class="cmp-line"><b>On the line: ${esc(d.amount)}</b> — ${esc(d.subject.toLowerCase())} around here.</div>`;
-  } else {
-    h += `<div class="cmp-line">Ask bedrooms and both prices land here.</div>`;
-  }
-
-  /* The numbers, folded. With bedrooms unknown this used to open with the
-     entire three-row ladder -- a wall of prices for a home nobody had
-     described yet. */
-  let nums = "";
-  if(known){
-    nums += cmpRow(`${beds} bedroom${beds===1?"":"s"}`, "INSPECTION", "EXPRESS", {head:true, pick});
-    nums += cmpRow("Price", cmpMoney(ir), cmpMoney(ex), {pick});
-  } else {
-    nums += cmpRow("Any size", "INSPECTION", "EXPRESS", {head:true});
-    RP_MOVEOUT_BEDROOM_TIERS.forEach((t,i)=>{
-      const e = RP_MOVEOUT_REFRESH_BEDROOM_TIERS[i];
-      nums += cmpRow(t.label, cmpMoney(t.base), cmpMoney(e?e.base:null));
-    });
-    /* Round 51: the ladder stops at five bedrooms. Saying so on the sheet
-       stops Liz quoting the top rung at someone with a six-bedroom house. */
-    nums += cmpRow(`${RP_MOVEOUT_MAX_PRICED_BEDROOMS + 1}+ bedrooms`, "Quote it", "Quote it");
-  }
-  /* Round 51: crew and hours are per-bedroom-bracket now, so these three
-     rows only have an answer once Liz has asked the size. Before, they
-     printed a flat "8-10 hours / 4-5 hours" for every home on the call and
-     a crew number that fell back to a hardcoded 3/2 -- both wrong often
-     enough that she'd have been reading them out to callers. With the size
-     unknown the rows are simply left off and the ladder above already shows
-     what changes with size. */
-  if(known && irMath.crew && exMath.crew){
-    nums += cmpRow("Cleaners", String(irMath.crew), String(exMath.crew));
-    nums += cmpRow("On site", rpMoveoutTierHours("moveout"), rpMoveoutTierHours("moveoutrefresh"));
-    nums += cmpRow("Hours of work", `${irMath.lo}`, `${exMath.lo}`);
-  }
-  nums += cmpRow("Deposit backed", "Yes", "No", {pick});
-  nums += `<div class="cmp-line">Both come back free within ${esc(RP_MSG.guarantee.window)}. Only Inspection Ready is sold as protecting a deposit — ${esc(RP_MSG.guarantee.depositName)}.</div>`;
-  h += cmpFold("tiernums", "The numbers", nums);
-
-  return cmpCard("tiers","Saying the difference", h);
-}
-
-/* Basic vs Deep — asked for directly, and previously absent. Same shape as
-   the tier card: the sentence, the question, then the numbers folded. */
+/* Basic vs Deep. Round 52: with the move-out tiers gone this is the only
+   two-way comparison the console has left, and it matters more than it
+   did -- "which of those two do I need" is now asked here or nowhere. */
 function cmpBasicDeep(){
   if(!["deep","maintenance"].includes(rpState.service)) return "";
   const pick = rpState.service==="deep" ? "b" : "a";
@@ -2371,81 +2222,18 @@ function cmpBasicDeep(){
   return cmpCard("basicdeep","Basic vs Deep", h);
 }
 
-/* ---- 2. Express + add-ons vs just upgrading ------------------------------
-   The pricing engine has an invariant: buying back everything Express
+/* ---- 2. (retired) Express + add-ons vs just upgrading --------------------
+   The pricing engine had an invariant: buying back everything Express
    leaves out must always cost MORE than paying the tier gap outright, so
    a la carte is never the cheaper route to the full checklist. That
    invariant is checked in the engine's comments at every price change,
-   and it has been broken and repaired once already (round 26 -> 27).
-
-   Liz has no way to see it. This card is that invariant, rendered live:
-   what Express leaves out, what each costs, what she's added so far, and
-   whether this caller has now spent past the point where switching is the
-   better deal. */
-function cmpAlaCarte(){
-  if(rpState.service!=="moveoutrefresh") return "";
-  const ir = rpMoveoutTierBasePrice("moveout");
-  const ex = rpMoveoutTierBasePrice("moveoutrefresh");
-  if(ir===null || ex===null || !rpState.bedrooms || ir<=0 || ex<=0) return "";
-
-  const beds = Number(rpState.bedrooms);
-  /* Same list the guardrail uses — see rpExpressBuyBackItems() in the
-     engine for why this must not be rpAddonsTotal(). */
-  const BUYBACK = rpExpressBuyBackItems(beds);
-  const gap  = ir - ex;
-  const all  = BUYBACK.reduce((a,r)=>a+r.price,0);
-  const on   = BUYBACK.filter(r=>r.selected);
-  const spent= rpExpressBuyBackTotal(beds);
-  const now  = ex + spent;
-  const diff = now - ir;   // positive = Express has passed Inspection Ready
-  /* Carpet, windows, garage and junk cost the same on either tier, so they
-     are excluded from the comparison above and called out separately —
-     otherwise the rail would repeat the bug it was written to catch. */
-  const carried = rpTierNeutralAddonTotal();
-
-  /* Conclusion first. This card is tall, and on a laptop the bottom of it
-     is below the fold — putting the itemised list on top meant the one
-     line she actually needs to act on was the one she could not see. The
-     running numbers and the verdict lead; the priced list underneath is
-     reference for quoting each item. */
-  let h = "";
-  /* Labelled explicitly rather than "this caller is at", because when the
-     quote also carries carpet or a garage wash this figure is deliberately
-     LOWER than the running total in the header — those cost the same on
-     either tier and would cancel out of the comparison. A vague label here
-     reads as the two disagreeing. */
-  h += cmpItem(`Express + these ${on.length===1?"one":on.length===4?"four":on.length}`, cmpMoney(now), {sum:true});
-  h += cmpItem("Inspection Ready", cmpMoney(ir));
-
-  if(spent===0){
-    h += cmpVerdict(`All four cost <b>${cmpMoney(all)}</b>. Paying the gap costs <b>${cmpMoney(gap)}</b>. Adding everything back is <b>${cmpMoney(all-gap)} worse</b> than just switching — and it still isn't guaranteed.`);
-  } else if(diff > 0){
-    h += cmpVerdict(`<b>${cmpMoney(diff)} past Inspection Ready</b> — and this one isn't deposit-backed. Switch it.`,"stop")
-       + cmpSay(`Actually, at that point Inspection Ready is the cheaper one — ${cmpMoney(ir)} instead of ${cmpMoney(now)}, and it's the one we guarantee. Want me to just put you on that?`);
-  } else if(diff === 0){
-    /* Reachable, and not rare: at 1-2 bedrooms any one flat buy-back plus a
-       Detail Pass is $200, which is exactly the tier gap. Without this branch
-       it fell into "$X under" and rendered "$0 under Inspection Ready. One
-       more add-on and switching is cheaper" — nonsense on its face, and it
-       contradicted the guardrail, which fires at >= the gap and was telling
-       her to offer the switch on the very same screen. */
-    h += cmpVerdict(`<b>Exactly level with Inspection Ready</b> — same price, less scope, no deposit backing. Switch it.`,"stop")
-       + cmpSay(`At that point it's the same money either way — ${cmpMoney(ir)} — so let me put you on Inspection Ready instead. You get the whole checklist and it's the one we guarantee.`);
-  } else if(diff > -50){
-    h += cmpVerdict(`<b>${cmpMoney(Math.abs(diff))} under Inspection Ready.</b> One more add-on and switching is cheaper.`,"warn")
-       + cmpSay(`One more of those and you're past what the full one costs — for ${cmpMoney(ir - now)} more than where you are now I can put you on Inspection Ready and it's guaranteed.`);
-  } else {
-    h += cmpVerdict(`<b>${cmpMoney(Math.abs(diff))} under Inspection Ready.</b> Room for ${on.length<4?"more":"no more"} before switching wins.`);
-  }
-  if(carried>0) h += `<div class="cmp-sub">The ${cmpMoney(carried)} of carpet, windows, garage or junk on this quote isn't in that comparison — it costs the same on either tier and carries over whichever they book.</div>`;
-
-  h += `<div class="cmp-split">What Express leaves out</div>`;
-  BUYBACK.forEach(r=>{
-    h += cmpItem(r.label, (r.selected?"":"+")+cmpMoney(r.price), {on:r.selected, tag:r.selected?"added":""});
-  });
-  h += `<div class="cmp-sub">Detail Pass is baseboards, interior windows, walls, ceiling fans, vents and light fixtures. All four are already in Inspection Ready's base price.</div>`;
-  return cmpCard("alacarte","Adding on vs upgrading", h);
-}
+   Round 52: cmpAlaCarte() is deleted. It rendered that invariant live --
+   what Express left out, what each piece cost, what this caller had added
+   so far, and whether they had spent past the point where switching tiers
+   was the better deal. The invariant was real, it broke once (round 26)
+   and was repaired (round 27), and this card was the only way a CSR could
+   see it. None of it exists now: one move-out, one price, everything
+   inside the home included, so there is no a la carte route to guard. */
 
 /* ---- 3. Which service is this? ------------------------------------------
    Callers describe a situation, not a product. The split that actually
@@ -2542,7 +2330,7 @@ function cmpScope(){
    so editing or re-ordering OBJECTIONS cannot quietly point a step at the
    wrong answer. A step whose keywords match nothing renders no card at
    all, rather than a card full of chips for objections nobody is making. */
-const MOVEOUT = ["moveout","moveoutrefresh"];
+const MOVEOUT = ["moveout"];
 /* Each entry: the keyword that finds the objection in OBJECTIONS, the SHORT
    label for the chip, and optionally the services it applies to.
 
@@ -2553,16 +2341,19 @@ const MOVEOUT = ["moveout","moveoutrefresh"];
    paragraph pretending to be a button.
 
    The service scope matters just as much: without it, a Deep Cleaning call
-   was offering her the Express add-on objection, which cannot come up. */
+   was offering her the Express add-on objection, which cannot come up.
+
+   Round 52: the "tiers" step and the "add the oven" chips are gone with
+   the Express tier. The remaining move-out chips moved onto "home", which
+   is now the last step before a price is spoken. */
 const CMP_OBJECTIONS_BY_STEP = {
   service:  [{k:"how much", s:"How much?"}, {k:"legit", s:"Are you legit?"}],
   caller:   [{k:"legit", s:"Are you legit?"}],
-  home:     [{k:"need to be there", s:"Do I need to be there?"}],
-  tiers:    [{k:"actually different", s:"What's the difference?", svc:MOVEOUT},
-             {k:"deposit back", s:"Will I get my deposit back?", svc:MOVEOUT},
-             {k:"add the oven", s:"Just add the oven instead?", svc:["moveoutrefresh"]}],
-  addons:   [{k:"add the oven", s:"Just add the oven instead?", svc:["moveoutrefresh"]},
-             {k:"three people", s:"Why so many cleaners?", svc:MOVEOUT},
+  home:     [{k:"need to be there", s:"Do I need to be there?"},
+             {k:"cheaper option", s:"Is there a cheaper one?", svc:MOVEOUT},
+             {k:"deposit back", s:"Will I get my deposit back?", svc:MOVEOUT}],
+  addons:   [{k:"cheaper option", s:"Is there a cheaper one?", svc:MOVEOUT},
+             {k:"two people", s:"Why so many cleaners?", svc:MOVEOUT},
              {k:"how much", s:"How much?"}],
   quote:    [{k:"more than i expected", s:"More than I expected"},
              {k:"quoted me less", s:"Someone quoted less"},
@@ -2622,27 +2413,16 @@ function cmpObjections(){
 /* Mobile keeps round 30's screen: everything above collapses into one
    closed disclosure so the phone layout is unchanged until she asks. */
 function comparePanels(){
-  /* Ordered by what she needs THIS second, not by a fixed list. Once a
-     caller has started adding things onto Express, "are they about to buy a
-     worse deal than the upgrade" outranks the tier explainer she has already
-     read to them. The rail is tall enough that first position is the only
-     position that reliably gets seen. */
-  const buyingBack = rpState.service==="moveoutrefresh"
-    && (rpState.ovenAddon || rpState.fridgeAddon || rpState.cabinetsAddon || rpState.detailPassAddon);
-  /* Round 37: objections lead on the steps where somebody pushes back --
-     the quote screen above all -- because at that moment the difference
-     between the two tiers is settled and what she needs is a reply. On
-     every other step the articulation card leads and objections sit under
-     it, still one click from open. */
+  /* Ordered by what she needs THIS second. Round 52 collapsed three
+     branches into one: the old first-position contest was between the
+     a la carte warning, the tier explainer and the objections card, and
+     two of those three are gone. Objections still lead on the steps where
+     somebody pushes back -- the quote screen above all -- because at that
+     moment what she needs is a reply, not an explainer. */
   const objectionsFirst = ["quote","contact","calendar"].includes(rpState.step);
-  let order;
-  if(objectionsFirst){
-    order = [cmpObjections(), cmpAlaCarte(), cmpTiers(), cmpBasicDeep(), cmpServices(), cmpRecurring(), cmpScope()];
-  } else if(buyingBack){
-    order = [cmpAlaCarte(), cmpTiers(), cmpBasicDeep(), cmpObjections(), cmpServices(), cmpRecurring(), cmpScope()];
-  } else {
-    order = [cmpTiers(), cmpBasicDeep(), cmpObjections(), cmpAlaCarte(), cmpServices(), cmpRecurring(), cmpScope()];
-  }
+  const order = objectionsFirst
+    ? [cmpObjections(), cmpBasicDeep(), cmpServices(), cmpRecurring(), cmpScope()]
+    : [cmpBasicDeep(), cmpObjections(), cmpServices(), cmpRecurring(), cmpScope()];
   const cards = order.filter(Boolean).join("");
   if(!cards) return "";
   const desktop = !window.matchMedia || window.matchMedia("(min-width:1000px)").matches;
@@ -2754,38 +2534,45 @@ function renderDock(){
 function jumpToStep(step){ focusSection(step); }
 
 /* =========================================================================
-   GUARDRAIL 3 + 4 - the tier explainer
+   GUARDRAIL 3 + 4 - what a Move-Out Cleaning covers
    =========================================================================
-   "What's the difference?" is the most-asked question on a move-out call and
-   the one where a wrong answer costs the most: describe Express as protecting
-   a deposit and we owe a free re-clean on a job that was never priced for it.
+   Round 52: this was the tier explainer. It existed because "what's the
+   difference?" was the most-asked question on a move-out call and the one
+   where a wrong answer cost the most -- describe Express as protecting a
+   deposit and we owe a free re-clean on a job never priced for it. That
+   risk went with the tier. The sheet answers the question that replaced
+   it: what the price actually covers.
 
-   Every word below comes from rp-messages.js or the engine. Nothing here is
-   written down twice, so the phone and the website cannot describe the same
-   two products differently -- and RP_MSG.guarantee.limit, the sentence that
+   Every word below still comes from rp-messages.js or the engine. Nothing
+   here is written down twice, so the phone and the website cannot describe
+   the product differently -- and RP_MSG.guarantee.limit, the sentence that
    stops anyone promising a deposit back, is carried verbatim.
    ========================================================================= */
 function renderTierSheet(){
   const host = el("tierSheetBody");
   if(!host) return;
-  if(!["moveout","moveoutrefresh"].includes(rpState.service)){ host.innerHTML = ""; return; }
-  const ratio = RP_MSG.tiers.workRatio();
+  if(rpState.service !== "moveout"){ host.innerHTML = ""; return; }
+  /* Round 52: was RP_MSG.tiers.workRatio(), the "same crew both ways,
+     double the hours, double the price" comparison. workSpoken() says what
+     THIS home's crew and hours actually are instead. */
+  const work = RP_MSG.tiers.workSpoken();
   host.innerHTML = `
     <div class="tier-say">
       <span class="k">Say this</span>
       <p>“${esc(RP_MSG.tiers.spoken)}”</p>
       <p class="ask">“${esc(RP_MSG.tiers.spokenAsk)}”</p>
-      ${ratio?`<p>“${esc(ratio)}”</p>`:""}
+      ${work?`<p>“${esc(work)}”</p>`:""}
+      <p>${esc(RP_MSG.tiers.excludes)}</p>
     </div>
     <div class="never">
       <b>Never say</b>${esc(RP_MSG.guarantee.limit)}
     </div>
     <div class="guard info" style="margin-top:0; margin-bottom:12px"><span class="ic">${guardIcon("info")}</span><div>
       <b>The guarantee, exactly</b>
-      <div style="margin-bottom:6px"><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.inspectionName)}:</b> ${esc(RP_MSG.guarantee.deposit())}</div>
-      <div><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.expressName)}:</b> ${esc(RP_MSG.guarantee.satisfaction())}</div>
+      <div style="margin-bottom:6px"><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">${esc(RP_MSG.tiers.name)}:</b> ${esc(RP_MSG.guarantee.deposit())}</div>
+      <div><b style="display:inline;letter-spacing:0;text-transform:none;font-size:13.5px">Deep and Basic:</b> ${esc(RP_MSG.guarantee.satisfaction())}</div>
     </div></div>
-    ${priceLocked() ? `<p class="locked-note">This job can't be priced on the phone, so the numbers are hidden. The wording above still applies.</p>` : cmpTiers()}`;
+    ${priceLocked() ? `<p class="locked-note">This job can't be priced on the phone, so the numbers are hidden. The wording above still applies.</p>` : cmpScope()}`;
 }
 
 /* =========================================================================
@@ -2821,23 +2608,20 @@ function lookupIndex(){
     if(svc.fineprint) out.push({kind:"Not included", title:"What's NOT in the base price", answer:svc.fineprint});
   }
 
-  const ir=RP_MOVEOUT_BEDROOM_TIERS, ex=RP_MOVEOUT_REFRESH_BEDROOM_TIERS;
-  out.push({kind:"Price", title:"Inspection Ready move-out",
-    answer: ir.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — bathrooms included, no square-footage charge."});
-  out.push({kind:"Price", title:"Move-Out Express",
-    answer: ex.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — no deposit guarantee; oven, fridge, cabinets and Detail Pass addable."});
-  out.push({kind:"Price", title:"Deep cleaning", answer:`Flat ${money(RP_DEEP_ANCHOR_PRICE)} for ${RP_DEEP_ANCHOR_HOURS} hours. Extra time ${money(RP_EXTRA_HOUR_RATE)}/hour.`});
-  out.push({kind:"Price", title:"Basic cleaning", answer:`Flat ${money(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours. Recurring saves 20% weekly, 15% biweekly, 10% monthly.`});
+  out.push({kind:"Price", title:"Move-Out cleaning",
+    answer: RP_MOVEOUT_BEDROOM_TIERS.map(t=>`${t.label} ${money(t.base)}`).join(" · ") + " — everything inside the home, bathrooms included, no square-footage charge, deposit guarantee on every one.",
+    why:"There is one move-out product as of round 52. If someone asks which tier, or what the cheaper option is, the answer is that there isn't one — the number they're hearing is the whole interior."});
+  out.push({kind:"Price", title:"Deep cleaning", answer:`Flat ${money(RP_DEEP_ANCHOR_PRICE)} for ${RP_DEEP_ANCHOR_HOURS} hours, one cleaner. A second cleaner doubles it to ${money(RP_DEEP_ANCHOR_PRICE*2)}. Extra time ${money(RP_EXTRA_HOUR_RATE)}/hour.`});
+  out.push({kind:"Price", title:"Basic cleaning", answer:`Flat ${money(RP_BASIC_ANCHOR_PRICE)} for ${RP_BASIC_ANCHOR_HOURS} hours, one cleaner. A second cleaner doubles it to ${money(RP_BASIC_ANCHOR_PRICE*2)}. No recurring discount — a repeat visit costs the same as a one-off.`});
   out.push({kind:"Price", title:"Carpet cleaning", answer:`${money(rpAddonCatalog.carpet.bundlePrice)} per room, two-room minimum. Pet enzyme ${money(RP_PET_ENZYME_RATE)}/room.`});
   out.push({kind:"Price", title:"Hourly cleaning", answer:`${money(HOURLY_RATE_PER_CLEANER)} per cleaner per hour, ${HOURLY_MIN_HOURS}-hour minimum. Booking our time, not a finished checklist — the deposit guarantee doesn't apply.`});
-  out.push({kind:"Price", title:"Oven interior · fridge interior · inside cabinets",
-    answer:`${money(rpAddonCatalog.oven.price)} each on Express. All three already included on Inspection Ready.`});
-  out.push({kind:"Price", title:"Detail Pass",
-    answer:`${money(RP_DETAIL_PASS_PRICES[0].price)}–${money(RP_DETAIL_PASS_PRICES[RP_DETAIL_PASS_PRICES.length-1].price)} by bedroom count${rpState.bedrooms?` — ${money(rpDetailPassPrice())} for this home`:""}. Baseboards, interior windows, walls, ceiling fans, vents and light fixtures. Included on Inspection Ready.`});
+  out.push({kind:"Price", title:"Oven, fridge, cabinets, baseboards, interior windows",
+    answer:`All included in the Move-Out price — there is no add-on for any of them. Fridge interior is ${money(rpAddonCatalog.fridge.price)} on an Hourly booking only.`,
+    why:"This used to be the Express buy-back list at $50 a piece plus a Detail Pass. If a caller has an old quote or has read an old page naming those prices, the answer is that they're included now."});
   out.push({kind:"Price", title:"Exterior windows · garage floor · laundry",
     answer:`Windows ${money(rpAddonCatalog.windows.basic)} basic or ${money(rpAddonCatalog.windows.premium)} premium (screens included). Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
   out.push({kind:"Price", title:"Junk hauling", answer:"Quoted separately — volume varies too much for a flat number. Never goes in the booked total without their say-so."});
-  out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit one-time, ${money(RP_RECURRING_MIN_PER_VISIT)} per visit on a recurring plan.`});
+  out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit, one-time or recurring.`});
 
   /* Round 32: every one of these used to be a second, hand-typed copy of a
      claim /book also made, in /book's own different words. They now read
@@ -2864,11 +2648,11 @@ function lookupIndex(){
   out.push({kind:"Policy", title:"Does the home need to be empty?", answer:`“${RP_MSG.access.empty}”`});
   out.push({kind:"Policy", title:"Water and power", answer:RP_MSG.access.utilities});
   out.push({kind:"Policy", title:"Licensed and insured?", answer:`“Yes — ${RP_MSG.trustSpoken()}.”`});
-  out.push({kind:"Policy", title:"If something gets missed", answer:`Inspection Ready: “${RP_MSG.guarantee.deposit()}”  ·  Everything else: “${RP_MSG.guarantee.satisfaction()}”`, why:RP_MSG.guarantee.limit});
+  out.push({kind:"Policy", title:"If something gets missed", answer:`Move-Out: “${RP_MSG.guarantee.deposit()}”  ·  Deep and Basic: “${RP_MSG.guarantee.satisfaction()}”  ·  Hourly: no guarantee, they set the scope.`, why:RP_MSG.guarantee.limit});
   out.push({kind:"Policy", title:"Service area", answer:`${RP_MSG.areaSentence()} are core. Further out, book it and note it — the office confirms coverage and travel before the date.`});
   out.push({kind:"Policy", title:"Rescheduling", answer:`“${RP_MSG.scheduling.reschedule}”`, why:"Move dates slip constantly on a PCS. Book the date they think they need."});
   out.push({kind:"Policy", title:"Arrival window", answer:RP_MSG.scheduling.window});
-  out.push({kind:"Price", title:"What about a really big house?", answer:`The move-out ladder tops out at $${RP_MOVEOUT_BEDROOM_TIERS[RP_MOVEOUT_BEDROOM_TIERS.length-1].base} — a 4-bedroom and a 6-bedroom are the same number.`, why:"Say it as a fact about the ladder, not as a promise. Worth having ready for anyone bracing for a big number."});
+  out.push({kind:"Price", title:"What about a really big house?", answer:`The published ladder runs to 5 bedrooms at $${RP_MOVEOUT_BEDROOM_TIERS[RP_MOVEOUT_BEDROOM_TIERS.length-1].base}. Six or more is a real quote, not a number off this list — take the details and log it as a callback.`, why:"Say it as a fact about the ladder, not a promise. The old version of this line claimed a 4-bedroom and a 6-bedroom cost the same, which stopped being true in round 51."});
   out.push({kind:"Policy", title:"Water off, no A/C, mold or pests", answer:"The job can't be booked as normal. Take the name and number, log it as a callback, and do not say a price.", why:"A number said on the phone is the number they expect."});
   return out;
 }
@@ -3058,42 +2842,16 @@ function set(f,v){
 }
 function pick(f,v){ rpState[f]=v; render(); }
 function toggle(f){ rpState[f]=!rpState[f]; render(); }
-/* Swap Move-Out tier without resetting size/addon state -- unlike
-   pickService(), which is a genuine service change. See the comment on
-   moveoutTierToggle above. */
-/* Round 20: a tier switch changes rpState.service WITHOUT pickService()'s
-   full reset, so any add-on the incoming tier doesn't offer must be
-   dropped explicitly — same bug class as the "$525 instead of $225"
-   note on pickService() below. Concretely: Express offers Refrigerator
-   Interior ($50) because Express excludes it; Inspection Ready includes
-   it in the base, so carrying the selection across quoted $50 for work
-   already in scope. Liz gets a one-line heads-up so she can say it out
-   loud instead of the number quietly changing mid-call. */
+/* Round 52: switchMoveoutTier() and chooseMoveoutTier() are deleted along
+   with the "tiers" screen and the mid-call switch on the quote screen.
+   Both moved rpState.service between "moveout" and "moveoutrefresh"
+   without pickService()'s full reset, which is why switchMoveoutTier()
+   also had to drop any add-on the incoming tier already included -- the
+   round-20 bug where a fridge interior carried across from Express and
+   quoted $50 for work Inspection Ready had in its base price. One service,
+   nothing to switch, and pickService() below still does the full reset on
+   a real service change. */
 
-
-function switchMoveoutTier(k){
-  rpState.service=k;
-  const dropped=rpClearUnavailableAddons(k);
-  rpState.addonDropNotice = dropped.length
-    ? dropped.map(x => rpAddonCatalog[x] ? rpAddonCatalog[x].label : x).join(", ")
-    : "";
-  render();
-}
-/* Round 26: the FIRST tier pick, from the new "tiers" screen -- as
-   opposed to switchMoveoutTier() above, which flips an already-chosen
-   tier later from the quote screen. No add-ons exist yet at this point
-   in the flow (tiers sits before addons), so nothing needs dropping;
-   just set the real service, mark it chosen (so the screen shows which
-   one is picked instead of both looking unselected), and move on. */
-function chooseMoveoutTier(k){
-  rpState.service=k;
-  rpState.moveoutTierChosen=true;
-  /* Round 40: this used to call next(), which yanked the screen to the
-     following step the instant she tapped a tier. On a board that is exactly
-     the "forcing the conversation" behaviour being removed -- a caller often
-     picks a tier and immediately asks something else. Just record it. */
-  render();
-}
 function pickService(k){ markCallStart(); rpState.service=k;
   rpState.sqft=null; rpState.bedrooms=null; rpState.bathrooms=null;
   rpState.condition=null; rpState.frequency=null; rpState.customNotes="";
@@ -3106,7 +2864,7 @@ function pickService(k){ markCallStart(); rpState.service=k;
      rpResetServiceState() coverage. */
   rpState.carpetRooms=0; rpState.addonCarpetRooms=0; rpState.addonCarpetPetEnzyme=false; rpState.windowsTier=null;
   rpState.garageWash=false; rpState.laundryLoads=0;
-  rpState.fridgeAddon=false; rpState.ovenAddon=false; rpState.cabinetsAddon=false; rpState.detailPassAddon=false; rpState.junkSize=null; rpState.handymanInterest=false; rpState.cleanerCount=null; rpState.addonDropNotice=""; rpState.moveoutTierChosen=false;
+  rpState.fridgeAddon=false; rpState.junkSize=null; rpState.handymanInterest=false; rpState.cleanerCount=null;
   rpState.hourCount=null; rpState.addonExtraHours=0; rpState.addonSecondCleaner=false;
   rpState.addonPetEnzyme=false; rpState.heavySoil=false; rpState.petOdor=false;
   rpState.addonsAsked=false;
@@ -3194,8 +2952,8 @@ function jobDetails(){
      never fixed the other. Without this, a phone-booked move-out would
      lose the rental/PM lead and the pre-clean confirmation entirely,
      same failure mode as the /book bug. */
-  const moveoutExtras = ["moveout","moveoutrefresh"].includes(rpState.service) ? [
-    `Tier: ${rpState.service==="moveout"?"Inspection Ready (Defend Your Deposit)":"Move-Out Express (Satisfaction Guaranteed, no deposit guarantee)"}`,
+  const moveoutExtras = rpState.service === "moveout" ? [
+    `Move-Out Cleaning: ${rpTeamSize()}, ${rpMoveoutTierHours("moveout")} on site (Defend Your Deposit)`,
     `Rental or selling: ${rpState.moveoutRentalOrSelling==="renting"?"Renting":rpState.moveoutRentalOrSelling==="selling"?"Selling":"N/A"}`,
     rpState.moveoutPmOrRealtor?`Property manager/realtor: ${rpState.moveoutPmOrRealtor}`:"",
     `Pre-clean check: Water ${rpState.moveoutWaterOn?"On":"N/A"}, A/C ${rpState.moveoutAcOn?"Working":"N/A"}, Mold/Pests ${rpState.moveoutMoldPests?"YES":"No"}`
