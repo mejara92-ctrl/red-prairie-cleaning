@@ -149,7 +149,7 @@ Mobile-First Style Sheet
             border: 1px solid #eee;
         }
         .trust-card i { color: var(--red); font-size: 24px; margin-bottom: 8px; }
-        .trust-card h3 { font-size: 18px; margin: 0 0 4px; }
+        .trust-card h3, .trust-card b { display: block; font-size: 18px; font-weight: 700; margin: 0 0 4px; }
         .trust-card p { margin: 0; color: var(--muted); font-size: 12px; }
 
         .rp-funnel { background: var(--light); color: var(--text); padding: 56px 14px; }
@@ -476,7 +476,7 @@ Mobile-First Style Sheet
         }
         .review-carousel .review-card { min-width: 86%; scroll-snap-align: center; }
         .review-card p { margin: 14px 0; color: #444; font-size: 14px; }
-        .review-card h4 { margin: 0; }
+        .review-card h4, .review-card .review-author { margin: 0; font-size: 15px; font-weight: 700; color: #111; }
         .review-card span { display: inline-block; margin-top: 6px; color: var(--red); font-weight: 900; font-size: 13px; }
         .review-cta { display: flex; justify-content: center; margin-top: 24px; }
 

@@ -158,7 +158,39 @@ body {
     max-width: 30px !important;
     max-height: 30px !important;
   }
-  .navbar .rp-site-wordmark-copy strong { font-size: 10px; }
-  .navbar .rp-site-wordmark-copy small { font-size: 10px; }
+  /* Round 48: was a flat 10px here (down from 16px at the 520px breakpoint
+     just above) -- legible on a big phone, a genuine squint on a small one.
+     clamp() keeps a 11px floor no matter how narrow the screen gets, instead
+     of one more fixed step down. */
+  .navbar .rp-site-wordmark-copy strong { font-size: clamp(11px, 3.2vw, 13px); }
+  .navbar .rp-site-wordmark-copy small { font-size: clamp(11px, 3.2vw, 13px); }
   .navbar .book-btn { padding-inline: 8px; font-size: 12px; }
 }
+
+/* ==========================================================================
+   Round 29 — touch-target floor (WCAG 2.5.8 / iOS HIG: 44px)
+   --------------------------------------------------------------------------
+   Audited at 390px across every landing page: the FAQ <summary> rows were
+   25px tall, the "Prefer to call / Prefer to text" hero links 16px, and the
+   footer phone links 16px. Those are the highest-intent taps on the whole
+   page — a renter with one thumb, mid-move, trying to reach a human — and
+   they were the smallest. Padding is added rather than font-size so nothing
+   about the visual rhythm of these pages changes.
+   ========================================================================== */
+.faq-item > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding-block: 10px;
+}
+.rp-hero-text-link a,
+.footer-content a,
+.hero-trust .google-review-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.logo.rp-site-wordmark { min-height: 44px; }
+/* Inline links inside a sentence must not become 44px-tall blocks — those
+   are read, not tapped, and stretching them breaks the line box. */
+.rp-hero-text-link { line-height: 1.35; }

@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# The internal CSR tool is an application screen, not a landing page.
+# (Round 49: /book used to be noindex and was described here as such. It is
+# indexable now -- the homepage redirects every visitor to it, so it has to
+# be the page that can rank and be shared. Its own head carries index,follow
+# plus a self-canonical.)
+Disallow: /call
+Disallow: /call/
+
+# Internal ops/build files that live in the repo and therefore get served.
+# The real fix is keeping them out of the deploy; this at least keeps them
+# out of the index. See _headers for the matching X-Robots-Tag.
+Disallow: /tools/
+Disallow: /workers/
+Disallow: /WEBHOOK-MAPPING-V28.txt
+# Round 52: the session change notes moved into /docs/ and are covered by
+# the same reasoning as the two lines above -- they are repo files that get
+# served, not pages anyone should land on.
+Disallow: /docs/
+
+Sitemap: https://redprairiecleaning.com/sitemap.xml
