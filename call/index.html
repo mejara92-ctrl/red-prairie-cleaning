@@ -793,7 +793,7 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js?v=57c88f8f"></script>
+<script src="../js/rp-messages.js?v=3dcb8801"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -991,8 +991,19 @@ function quoteSayLine(){
      hear it -- and a crew asking for more money on arrival becomes the
      first they knew of it. Saying it in the same breath as the price is
      the difference between a disclosed term and an ambush. */
+  /* ROUND 57: THE HALF-SENTENCE THAT WAS MISSING ON BOTH SURFACES.
+     Every version of this caveat said the crew agrees extra before starting
+     and nothing gets added after. Both true; neither answers the question the
+     caller is actually asking, which is "so what happens if I say no?" Left
+     unanswered, the caller assumes the answer is "we leave" -- so a
+     disclosure meant to build trust lands as a threat.
+
+     They can decline and still get the clean they booked, at the quoted
+     price. /book's estimate panel now says exactly this, and so does this
+     line, in the same order, because a caller who books by phone and a
+     customer who books online must not be told two different policies. */
   const heavy = (rpState.service === "moveout" && rpState.moveoutHeavyCondition === true && !rpIsCustomQuoteOnly())
-    ? " And just so it's said up front \u2014 that covers a standard clean. With the extra buildup you mentioned, the crew will look it over when they arrive and agree anything on top with you before they start. Nothing gets added after."
+    ? " And just so it's said up front \u2014 that covers a standard clean. With the extra buildup you mentioned, the crew walks it when they arrive and, if it needs more, they'll tell you the number right then. Say yes and they carry on; say no and they do the standard clean at the price I just gave you. Either way nothing gets added to your bill after."
     : "";
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.${heavy}\u201d`;
 }
@@ -1233,8 +1244,8 @@ const OBJECTIONS = [
    },
    n:"Round 52: this used to compare Express's hours against Inspection Ready's. It reads the real crew and hours off the tier row for THIS home now, so it can't drift from what the crew sheet says. If bedrooms aren't entered yet it falls back to the shape of the ladder rather than naming one size's hours as if they applied to all of them."},
   {q:"\u201cSo the price could go up when you get here?\u201d",
-   a:"\u201cOnly if the home's a long way from a standard clean \u2014 heavy trash, heavy grease, that kind of thing. And it's never a surprise on the bill: the crew looks it over before they start, tells you the number, and you decide then. Most homes are exactly the price I just gave you.\u201d",
-   n:"Round 54. Don't dodge this and don't over-promise \u2014 the honest answer sells better than a flat 'no'. The thing they're afraid of is a bigger bill AFTER the work, and we never do that. Lead with 'never a surprise on the bill', then the mechanism, then 'most homes are the price I gave you'. If they already told you it's heavy, you should have said this on the home screen; this is the version for when they raise it themselves."},
+   a:"\u201cOnly if the home's a long way from a standard clean \u2014 heavy trash, heavy grease, that kind of thing. And it's never a surprise on the bill: the crew looks it over before they start, tells you the number, and you decide then. If you'd rather not, they do the standard clean at the price I gave you. Most homes are exactly that price anyway.\u201d",
+   n:"Round 54. Don't dodge this and don't over-promise \u2014 the honest answer sells better than a flat 'no'. The thing they're afraid of is a bigger bill AFTER the work, and we never do that. Lead with 'never a surprise on the bill', then the mechanism, then 'most homes are the price I gave you'. If they already told you it's heavy, you should have said this on the home screen; this is the version for when they raise it themselves. ROUND 57 added the sentence about declining: 'you decide then' left the caller to guess what happens if they decide no, and the answer they guess is that we walk. Say the real one \u2014 they keep the clean at the quoted price. That is what makes the disclosure build trust instead of costing the booking."},
   {q:"\u201cIs there a cheaper option? / What's the basic version?\u201d",
    a:"\u201cThere isn't a lighter move-out any more \u2014 there's one Move-Out Cleaning and it's the whole interior: inside the oven, the fridge, cabinets and closets, baseboards, interior windows, the lot. That's the price you're hearing, and nothing on that list gets billed separately when we show up.\u201d",
    n:"Round 52 retired Move-Out Express. If a caller is quoting a lower number they saw before, they saw the old Express tier \u2014 don't apologise for it, just say the product changed and everything Express charged extra for is included now. If they genuinely want a light clean with no inspection behind it, an Hourly booking is the honest alternative, and say plainly that it has no deposit guarantee."},
@@ -1524,10 +1535,16 @@ function sectionBody(s){
       ${yn("moveoutWaterOn","Is the water on? <em>— any “no” below and you don't quote</em>")}
       ${yn("moveoutAcOn","Is the air conditioning working?")}
       ${yn("moveoutMoldPests","Any signs of mold or pests?")}
-      ${/* Round 54: same question /book asks. Does NOT change the price and
-           does NOT block the booking -- it sets the expectation on the call
-           so an arrival surcharge is never the first they hear of it. */""}
-      ${yn("moveoutHeavyCondition","Heavy trash or built-up grime? <em>\u2014 doesn't change this quote, but say the next line</em>")}
+      ${/* Round 54: same question /book asks. Does not change the quoted
+           number and does NOT block the booking -- it sets the expectation on
+           the call so an arrival surcharge is never the first they hear of it.
+
+           ROUND 57: the label read "doesn't change this quote", which is true
+           of the number on this screen and false about the job -- and a CSR
+           who reads that as "cosmetic" ticks it and moves on without saying
+           the caveat. It is the one answer on this screen that changes what
+           the crew does on arrival. Say that instead. */""}
+      ${yn("moveoutHeavyCondition","Heavy trash or built-up grime? <em>\u2014 quote stays the same; crew re-checks on arrival, so read the caveat</em>")}
       ${/* Round 52: moved here from the deleted "tiers" screen. Neither
            field changes the price -- renting vs. selling used to decide
            which tier the CSR led with, and now just tells the crew and the

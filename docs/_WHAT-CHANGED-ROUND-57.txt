@@ -1,0 +1,301 @@
+ROUND 57 — THE ANALYTICAL PASS
+===============================================================================
+Brief: "Check it from an analytical perspective. Make sure what we're saying
+makes sense, and in the right order, and it's not redundant. As long as the
+customer knows they're getting an inspection ready move-out, and that if the
+move-out is heavy duty then we might say it's gonna cost extra. If it's
+flagged just call us. Make it make sense. Make sure the theme is consistent
+throughout as far as style."
+
+No pricing changed this round. $199 / $299 / $399 / $499 and $40/hr are
+untouched, and check-prices.py confirms no drift across 20 published pages.
+This round is about what the words say, the order they say it in, and whether
+the funnel draws the same idea the same way twice.
+
+
+-------------------------------------------------------------------------------
+1. THE CONDITION MESSAGE WAS SAID THREE TIMES ON ONE PATH
+-------------------------------------------------------------------------------
+A customer who ticked "no, the home is heavy" used to see the same idea in
+three places:
+
+  - the questionnaire note, right after answering
+  - the flagged note on the estimate
+  - the fine print at the bottom of the estimate
+
+The last two sit on the same screen, four inches apart, saying nearly the same
+sentence. Said twice on one screen it stops being emphasis and starts being
+boilerplate — and the second telling makes the first read as legal cover
+rather than a promise.
+
+FIX: the fine print is now conditional. When the home is flagged, the note
+carries the message, with the specifics and a phone number, and the fine print
+drops out. When the home is standard, the note does not render at all, so the
+fine print is the only place the exception is stated and it stays — that
+customer has not seen it anywhere else in the funnel. Exactly one of the two
+renders, ever.
+
+Verified: flagged → condition panel present, fine print absent. Standard →
+condition panel absent, fine print present.
+
+
+-------------------------------------------------------------------------------
+2. THE CLAUSE THAT WAS MISSING FROM EVERY VERSION OF THE CAVEAT
+-------------------------------------------------------------------------------
+This is the most important change in the round.
+
+Every version of the heavy-condition message — on /book, on /call, in the CSR
+script, on the landing pages — said the same two things: the price covers a
+standard clean, and anything extra is agreed before the crew starts. Both
+true. Neither answers the question the customer is actually asking, which is:
+
+    "So what happens if I say no?"
+
+Left unanswered, the customer supplies their own answer, and the answer they
+supply is "they leave and I have no cleaner the day before my inspection." So
+a disclosure written to build trust was landing as a threat.
+
+They can decline and still get the clean they booked, at the quoted price.
+That clause is now in all six places the policy is stated:
+
+  js/rp-messages.js       price.flaggedBody   (new entry)
+  book/index.html         questionnaire note
+  book/index.html         estimate condition panel
+  call/index.html         quoteSayLine() spoken caveat
+  call/index.html         "So the price could go up?" objection answer
+  9 static pages          the re-quote sentences in the price bands
+
+It costs the business nothing to say, because it is what the arrival SOP is
+supposed to do anyway. (That SOP is still unbuilt — see OPEN RISK below.)
+
+
+-------------------------------------------------------------------------------
+3. "INSIDE AND OUT" WAS SELLING SOMETHING WE DO NOT SELL
+-------------------------------------------------------------------------------
+The move-out includes screen was headed "Inspection-ready, inside and out".
+This is an interior clean. Exterior windows and the garage floor are paid
+add-ons — and they are the literal next screen.
+
+So the customer read "inside and out", formed the reasonable belief that the
+outside was included, and was asked to pay for the outside two taps later.
+That is a manufactured objection: we created it in a heading and then charged
+for it. The fine print on that same screen already named those exclusions
+correctly, so the screen was contradicting itself top to bottom.
+
+FIX: "Every room, ready for the walkthrough." Same energy, no promise to walk
+back.
+
+Note: "appliances inside and out" on the landing pages is correct and was left
+alone — that means the inside and outside of the appliance, which is true.
+
+
+-------------------------------------------------------------------------------
+4. THE ESTIMATE CARD, REORDERED
+-------------------------------------------------------------------------------
+Two things were in the wrong place.
+
+THE CAVEAT WAS BELOW THE PROMISE. The flagged note sat under the guarantee
+panel and under the line-item breakdown. So the screen promised "this is the
+price" in a red panel and then, two blocks later, explained that the price
+might change. In that order the guarantee reads like something the fine print
+is quietly walking back — and a customer who stops reading at the red panel,
+which is most of them, had been told the reassuring half and not the true one.
+
+Caveat first now, promise second. Both honest, nothing below contradicting
+anything above.
+
+THE DEPOSIT MATH WAS BURIED INSIDE THE GUARANTEE. It was the quiet grey second
+line inside the red panel, which put the two strongest arguments on the page in
+one container and let the weaker-looking one absorb the stronger. They are not
+the same argument:
+
+    guarantee = risk reversal. "If the landlord flags it, we come back."
+    deposit   = value.         "This costs less than half what you're protecting."
+
+One answers "what if it goes wrong", the other answers "is this worth it at
+all" — and the second is the question standing between this customer and the
+button. It now sits directly above the CTA, the last thing read before the
+tap, which is the job it was written for. The guarantee panel keeps the
+guarantee alone and dropped a wrapper div in the process.
+
+FINAL ORDER:
+    price
+    4 bed · 2 bath                    <- what they have
+    2 cleaners · 8 hours on site      <- what the price buys
+    inspection-ready line
+    condition panel (only if flagged)
+    guarantee
+    breakdown (only if add-ons)
+    ── rule ──
+    deposit comparison
+    pay-after note
+    Book This Cleaning
+    Text me this quote instead
+    trust line
+    fine print (only if NOT flagged)
+
+THE SPEC LINE SPLIT. It ran "4 bed · 2 bath · 2 cleaners · 8 hours" as one
+dot-joined string. Two different kinds of fact: the first pair is what the
+customer has and already knows, the second is what the price buys and is the
+only part that argues for the number. Joined together, the part doing the
+selling was the tail of a string the reader had already started skipping.
+Two lines now, the second quieter, and "8 hours" became "8 hours on site".
+
+
+-------------------------------------------------------------------------------
+5. TWO DIFFERENT THINGS WERE BOTH CALLED "FLAGGED" AND LOOKED IDENTICAL
+-------------------------------------------------------------------------------
+There are two flagged outcomes in this funnel and they mean opposite things:
+
+    water off / A/C out / mold  ->  BLOCKED. No price possible. Must call.
+    heavy trash or grime        ->  PRICED, with a caveat. Book away.
+
+Both were drawn as amber panels with a warning triangle. So the heavy-condition
+customer — the common case, who has a price and can book — was shown a warning
+triangle on the screen where they were about to tap Book, and read it as
+"something is wrong with your booking", which is the opposite of what it says.
+
+COLOUR NOW CARRIES THE MEANING, one each:
+
+    red      guarantee, and the brand
+    amber    we cannot price this; we need you to call     (blocked screen only)
+    neutral  heads-up, priced, nothing for you to do       (condition panels)
+
+A circled `i` icon was added to the set so the warning triangle means exactly
+one thing. The blocked screen's "Needs a look" row is now the only amber in
+the funnel, which is correct: it is the reason that screen has a phone number
+instead of a Book button.
+
+AND THE HEAVY-CONDITION CUSTOMER GOT A CALL OPTION. Their only exits were Book
+and Text-me-the-quote. A genuinely rough home is the case where the customer
+most wants a human and the business most wants the call — it is where the real
+number gets set and where an arrival surcharge stops being a surprise. There
+is now an inline "Or call us and we'll price it now — (580) 215-0915" inside
+the panel. Inline, not a second button, so it never competes with Book. No lead
+post on it: the contact gate runs before the estimate, so they are already in
+the CRM.
+
+
+-------------------------------------------------------------------------------
+6. THEME CONSISTENCY
+-------------------------------------------------------------------------------
+THE "SECOND OPTION" ROLE HAD TWO SHAPES. The blocked screen drew it as a
+bordered full-width button; the estimate drew the same role — the other way to
+reach us — as a 28px underlined link with 13px of padding bolted on in round 55
+to clear the tap-target minimum. Both use .rp-secondary-cta now. The rule
+gained font-family, cursor, appearance and an .is-sent state so it works on the
+estimate's <button>, which relabels itself on tap. .rp-text-link is deleted
+outright rather than left unused — five rules with no markup left to style is
+how a stylesheet ends up with two ways to draw one thing.
+
+HEADING TREATMENT. Both screens are .rp-est cards now, so .rp-blocked-h is
+sized explicitly to the same serif scale rather than left to inherit. A 30px
+serif heading on one card and a 24px one on the next is drift nobody can name
+and everybody notices.
+
+ONE SHAPE FOR "READ THIS, NOTHING IS WRONG". .rp-quest-note (questionnaire),
+.rp-est-note.is-condition (estimate) and .rp-included-warn (new, see 7) are
+the same neutral panel with the same circled-i icon, on three different
+screens.
+
+KEPT DELIBERATELY: the blocked screen reuses .rp-est-line for its recap rows.
+That shared row style is why it reads as part of the product rather than an
+error page. Not something for a later pass to tidy up.
+
+
+-------------------------------------------------------------------------------
+7. THE ONE MISTAKE THE FUNNEL MUST NOT LET SOMEBODY MAKE
+-------------------------------------------------------------------------------
+Booking three hours of Basic to pass a housing inspection is the worst outcome
+available here, and it is a quiet one: the clean will be good, the crew will do
+everything asked, and the inspection fails on the oven and the cabinet
+interiors nobody bought. No refund conversation fixes that and no review
+survives it.
+
+The warning did exist — as the last sentence of a four-sentence fine-print
+paragraph under a Continue button, which is functionally nowhere. It is now its
+own panel with an icon, above the fine print, on Deep and Basic only:
+
+    "This is hourly cleaning, not a move-out. If you need to pass an
+     inspection, book Move-Out Cleaning instead."
+
+(RP_MSG.timed.notMoveoutShort — new entry, so both surfaces read one source.)
+
+
+-------------------------------------------------------------------------------
+8. SMALLER COPY FIXES
+-------------------------------------------------------------------------------
+PROMISE ORDER FLIPPED, everywhere. Was "Standard home in standard condition —
+the price you see is the price you pay", which opens on the caveat and closes
+on the promise, so a skimmer reads the hedge and leaves. Now "The price you see
+is the price you pay — for a standard home in standard condition." Same claim,
+same words, reassurance first. Applied to RP_MSG.price.promise and to the
+promise strip on 9 static pages.
+
+BLOCKED SCREEN OVER-PROMISED. "One call or text and we'll sort it today"
+promises a same-day answer to a text sent at 9pm on a Sunday. A small broken
+promise on first contact costs more than the urgency it buys. Now "we'll get
+you a real number fast". Also "this home" rather than "it" — "it" was pointing
+at the reason, not the house.
+
+CONTACT GATE HAD A DANGLING PRONOUN. "And where should we send it?" — nothing
+on that screen says what "it" is. Now "Where should we send your quote?"
+
+CSR CHECKBOX WAS TELLING LIZ SOMETHING UNTRUE. The heavy-condition toggle was
+labelled "doesn't change this quote" — true of the number on that screen and
+false about the job. A CSR who reads that as cosmetic ticks it and moves on
+without reading the caveat. Now: "quote stays the same; crew re-checks on
+arrival, so read the caveat."
+
+
+-------------------------------------------------------------------------------
+VERIFICATION
+-------------------------------------------------------------------------------
+  tools/check-prices.py     no drift across 20 published pages
+  tools/r52-test.js         ALL CHECKS PASSED
+  tools/funnel-test.js      FUNNEL OK — all 5 services walk to a real price
+  tools/undefined-refs.js   no undefined references on either surface
+  tools/stamp-assets.py     re-run, 141 references versioned
+
+Browser (Chromium, 390x844, real render):
+  standard home   one card, no dock, fine print present, condition absent,
+                  deposit in the action block, 0 orphaned .rp-text-link
+  flagged home    condition panel present and ABOVE the guarantee, fine print
+                  suppressed, tel: link live
+  blocked home    amber blocker row rgb(122,78,11), serif heading 27.3px,
+                  prefilled SMS decodes correctly with home + reason + name
+  questionnaire   neutral panel rgba(70,52,37,0.035), decline clause present
+  includes        moveout "Every room, ready for the walkthrough"; deep and
+                  maintenance both carry the not-a-move-out panel
+  contact gate    "Where should we send your quote?"
+  JS errors       none on any path
+  tap targets     only the fixed header back button and logo at 42px
+                  (pre-existing, unchanged since round 55)
+
+THE STAMP STEP WAS RUN. Round 52a was an outage caused by editing the JS
+without re-running stamp-assets.py, which left the page and the engine on
+different versions. It has been run twice this round, after the last edit.
+
+
+-------------------------------------------------------------------------------
+OPEN RISK, CARRIED FORWARD FROM ROUND 52 AND NOW LARGER
+-------------------------------------------------------------------------------
+The arrival-walkthrough re-quote SOP is still unbuilt, and this round made six
+more places on the website promise how it behaves — including the new promise
+that a customer can DECLINE the extra and still receive the standard clean at
+the quoted price.
+
+That promise is now on the estimate screen, in Liz's script, in the objection
+answers and on nine landing pages. If a crew ever arrives at a heavy home,
+quotes extra, hears no, and leaves, the site is on record promising otherwise.
+The crew needs three things written down: what counts as beyond standard, who
+they call before touching anything, and that a declined re-quote means they do
+the standard clean anyway. The margins rest on this and so, now, does the copy.
+
+GHL-side, still outstanding from round 52:
+  - add "Move-Out Cleaning" to the moveout_tier dropdown
+  - retire any workflow branching on "Express"
+New this round, minor:
+  - moveout_blocked_contact and heavy_condition_call are the two tracked
+    events worth a report; the second tells you how often a heavy home wants
+    a human, which is the number that says whether the SOP above is urgent.

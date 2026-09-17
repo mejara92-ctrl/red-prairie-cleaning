@@ -1,0 +1,86 @@
+RED PRAIRIE CLEANING — ROUND 56
+THE ESTIMATE IS ONE CARD; BLOCKED HOMES GET A PHONE, NOT A FORM
+=========================================================================
+
+PRICES UNCHANGED.
+
+
+1. "REQUEST A CALLBACK" IS GONE
+-------------------------------
+Instruction: "I don't see how request a callback will work, just put a
+button to call or text red prairie, and have it feed the information
+from the home."
+
+Right on both counts. That screen is reached when a home can't be priced
+online — water off, A/C out, mold or pests. The person standing in that
+house has a problem RIGHT NOW and a move-out date they can't move.
+"Request a callback" asked them to do nothing and wait, on a promise
+somebody at the office has to remember to keep. Every minute between the
+tap and the call back is a minute they spend calling a competitor.
+
+Two buttons now, both reaching a human immediately:
+
+    Call (580) 215-0915
+    Text us instead — your details are already in it
+
+THE TEXT BUTTON CARRIES THE HOME WITH IT, which is the part that makes
+this better than a form rather than just faster. The message is prefilled:
+
+    Hi Red Prairie - I need a move-out clean and the website couldn't
+    price it.
+    Home: 4 bed, 2 bath
+    Flagged: Water is off, A/C isn't working
+    Name: Mike Smith
+    Area: Lawton
+
+The first message already says more than most phone calls manage, so the
+office can answer with a real number instead of starting the questions
+over. The lead is still posted to the CRM the moment either button is
+tapped — and unlike the old form, that now fires for callers too, not
+just the ones who completed a submit.
+
+The screen also shows the home back to them before the buttons (size,
+and what got flagged), so they can see we understood the problem.
+
+
+2. THE ESTIMATE IS ONE CARD
+---------------------------
+Instruction: "this screen is goofy, and different from the rest ... make
+it simple and like one thing instead of a weird top and a weird bottom."
+
+It was literally two things. The estimate lived in a white card; the
+payment note, the CTA, the text link and the fine print lived in the
+sticky beige dock that every other screen uses for a single Continue
+button. Two containers, two background colours, with the hero photo
+showing through the gap between them.
+
+The dock earns its keep when content scrolls past the fold and the action
+has to stay reachable. It does not when it holds four elements and half
+the screen's copy — at that point it stops being a dock and becomes a
+second, differently-coloured screen stuck to the bottom of the first.
+
+Now: price, what it buys, guarantee, breakdown, then a rule, then the
+reassurance and the button. One card, read top to bottom, ending on the
+thing you do next. The screen returns no footer and the dock does not
+render at all.
+
+The blocked screen got the same treatment for the same reason.
+
+Nothing was dropped in the move — the low-availability line, the payment
+note, the trust line and the fine print are all still there, just inside
+the card with everything else.
+
+
+CHECKED
+-------
+  python3 tools/check-prices.py     no drift, stamps current
+  node tools/r52-test.js            ladder, margins, floors
+  node tools/funnel-test.js         every service reaches a price
+  node tools/undefined-refs.js      every function called exists
+
+Plus: both rebuilt screens rendered at phone width, the prefilled text
+body decoded and read back to confirm it carries the home, every estimate
+variant re-rendered (move-out with and without add-ons, Deep, Basic,
+recurring, carpet, hourly, and both custom-quote paths), and the tap-target
+sweep re-run. No JS errors, no horizontal overflow. The only remaining
+sub-44px targets are the fixed header's back button and logo at 42px.

@@ -92,7 +92,14 @@ const RP_MSG = {
        conversation BEFORE work starts, never an invoice after. That is
        still a stronger promise than a competitor who won't publish a
        number at all, and it is one this business can keep. */
-    promise: "Standard home in standard condition — the price you see is the price you pay.",
+    /* ROUND 57 — THE CLAUSES WERE THE WRONG WAY ROUND.
+       It read "Standard home in standard condition — the price you see is
+       the price you pay." Which opens on the caveat and closes on the
+       promise, so a skimmer reads the qualifier and leaves. The promise is
+       the reason to keep reading; the condition is what makes it true.
+       Same words, same claim, reversed: reassurance first, qualifier
+       second. */
+    promise: "The price you see is the price you pay — for a standard home in standard condition.",
     promiseSpoken: "for a standard home that's the full price, nothing gets added when we show up",
     /* The honest exception. This is the ONLY place the carve-outs are
        listed; if they ever change, they change once. */
@@ -107,7 +114,24 @@ const RP_MSG = {
        quote covers, and that anything beyond it is agreed BEFORE work, not
        billed after. */
     fineprint: "Standard home, standard condition — that's the price. Heavy trash, heavy grime or anything outside a normal clean gets priced with you before the crew starts, never added afterward.",
-    conditionFull: "Our prices assume a standard home in standard condition. If the crew arrives to heavy trash, heavy grease or grime, pet mess, or anything outside a normal clean, they'll stop and quote the difference with you before any work starts — you can approve it or reschedule. Nothing is ever added to your bill afterward."
+    conditionFull: "Our prices assume a standard home in standard condition. If the crew arrives to heavy trash, heavy grease or grime, pet mess, or anything outside a normal clean, they'll stop and quote the difference with you before any work starts — you can approve it or reschedule. Nothing is ever added to your bill afterward.",
+    /* ROUND 57 — WHAT THE FLAGGED CUSTOMER IS ACTUALLY AFRAID OF.
+       Every version of this message so far has said the same two things:
+       the price covers a standard clean, and extra gets agreed before the
+       crew starts. Both true, and both beside the point. The customer who
+       ticked "no, it's heavy" is not worried that it will cost more. They
+       are worried about standing in an empty house with a crew who has
+       already started and a number they did not agree to.
+
+       So the clause that was missing from all of it, and that this entry
+       exists to carry: THEY CAN SAY NO AND STILL GET THE CLEAN THEY
+       BOOKED, at the price on the screen. That is the sentence that
+       removes the fear, and it costs the business nothing to say, because
+       it is what the SOP is supposed to do anyway.
+
+       Written as two spans so the screen can bold the first half. */
+    flaggedLead: "You told us this one's heavier than standard — good, that helps.",
+    flaggedBody: "The price above covers a standard clean. The crew walks the home on arrival and, if it needs more, prices the extra with you on the spot — say yes and they carry on, say no and they do the standard clean at the price above. Nothing is ever added afterward."
     /* Round 37 (direct instruction): the price-ceiling claim is gone. The
        top of the move-out ladder is still the top of the ladder — we just
        don't make a promise out of it any more. Deleted rather than left
@@ -182,7 +206,15 @@ const RP_MSG = {
     basicWhen: "Best for a home that's already tidy and just needs keeping that way.",
     /* The line that steers someone to the right product. A move-out is
        scope-priced and inspection-backed; these are not. */
-    notMoveout: "Moving out? A Move-Out Cleaning is the one priced for a full interior and backed for an inspection."
+    notMoveout: "Moving out? A Move-Out Cleaning is the one priced for a full interior and backed for an inspection.",
+    /* ROUND 57: the same warning, short enough to sit on the includes
+       screen as its own line rather than at the tail of a four-sentence
+       fine print. Somebody booking three hours of Basic to pass a housing
+       inspection is the single worst outcome this funnel can produce -- the
+       clean will be fine and the inspection will still fail -- and until
+       now the only thing standing in the way was the last sentence of a
+       paragraph under a Continue button. */
+    notMoveoutShort: "This is hourly cleaning, not a move-out. If you need to pass an inspection, book Move-Out Cleaning instead."
   },
 
   guarantee: {

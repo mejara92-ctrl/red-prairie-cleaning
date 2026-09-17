@@ -918,17 +918,22 @@ quiet treatment — bordered, centred {
   text-align: center;
 }
 
+/* Round 57: was amber with a warning triangle. Amber now means one thing
+   in this funnel -- "we cannot price this, call us" -- and this is not that:
+   the customer answered a question honestly and their price is unaffected.
+   Neutral panel, circled `i`, same prominence, no alarm. Matches
+   .rp-est-note.is-condition, which says the same thing two screens later. */
 .rp-quest-note {
   display: flex; align-items: flex-start; gap: 10px;
   margin: 14px 0 0; padding: 13px 14px;
   text-align: left;
-  background: rgba(176,116,20,.08);
-  border: 1px solid rgba(176,116,20,.26);
+  background: rgba(70,52,37,.035);
+  border: 1px solid rgba(70,52,37,.16);
   border-radius: 14px;
   font-size: 13px; line-height: 1.5; color: var(--ink);
 }
-.rp-quest-note .rp-ic-sm { color: #96610f; flex-shrink: 0; margin-top: 2px; }
-.rp-quest-note strong { color: #7a4e0b; }
+.rp-quest-note .rp-ic-sm { color: var(--ink-soft); flex-shrink: 0; margin-top: 2px; }
+.rp-quest-note strong { color: var(--ink); font-weight: 800; }
 .rp-quest-note em { font-style: normal; font-weight: 800; }
 
 .rp-quest-row { text-align: center; }
@@ -1322,14 +1327,23 @@ line all the way in bold" -- crew size used to be the LAST bullet in
   letter-spacing: .09em; text-transform: uppercase;
   color: var(--muted);
 }
-/* What the number buys. One line, replacing four blocks. */
+/* Round 57: two lines, because they are two kinds of fact. The home the
+   customer already knows, in ink -- it identifies the quote. What the price
+   buys in crew and hours, quieter underneath -- it justifies it. */
 .rp-est-spec {
   margin: 12px 0 0;
   font-size: 14px; font-weight: 700; color: var(--ink);
 }
-/* ONE panel, not a panel plus a floating paragraph. The guarantee is the
-   headline; the deposit comparison is the quieter second line inside it.
-   It is a reframe, not a claim, and it lost the argument when it shouted. */
+.rp-est-spec-sub {
+  margin: 3px 0 0;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+}
+/* ROUND 57: the deposit comparison moved out of here and down to the CTA.
+   Two arguments were sharing one panel -- risk reversal (we come back) and
+   value (this costs less than half your deposit) -- and the one that closes
+   was the small grey line inside the one that reassures. The panel is the
+   guarantee alone now, one sentence, and the flex child is the <p> directly
+   rather than a wrapper div. */
 .rp-est-guarantee {
   display: flex; align-items: flex-start; gap: 10px;
   text-align: left;
@@ -1344,10 +1358,14 @@ line all the way in bold" -- crew size used to be the LAST bullet in
   margin: 0;
   font-size: 13.5px; line-height: 1.5; font-weight: 600; color: var(--ink);
 }
+/* Round 57: no longer nested inside the guarantee panel, so the !important
+   overrides that fought that panel's `p` rule are gone with it. It is the
+   last thing read before the button and it is sized to be read. */
 .rp-est-deposit {
-  margin: 7px 0 0 !important;
-  font-size: 12.5px !important; line-height: 1.5 !important;
-  font-weight: 500 !important; color: var(--ink-soft) !important;
+  margin: 0 0 12px;
+  font-size: 13px; line-height: 1.5;
+  font-weight: 600; color: var(--ink-soft);
+  text-align: center;
 }
 .rp-est-lines { margin: 20px 0 0; text-align: left; }
 .rp-est-line {
@@ -1379,23 +1397,128 @@ line all the way in bold" -- crew size used to be the LAST bullet in
   font-size: 12.5px; line-height: 1.45; color: var(--muted);
   text-align: left;
 }
-/* Round 54: the condition flag. Carries an icon and sits up rather than
-   reading as a footnote, because it is the one line on this screen that
-   changes what the customer should expect to pay. */
-.rp-est-note.is-flagged {
+/* ROUND 57 — COLOUR NOW MEANS ONE THING EACH.
+
+   Two different outcomes were both being drawn as amber warnings:
+
+     water off / A/C out / mold  → BLOCKED. No price is possible. Call us.
+     heavy trash or grime        → PRICED, with a caveat. Book away.
+
+   The second is the common one and it was wearing the first one's clothes:
+   an amber panel with a warning triangle, on the screen where the customer
+   was about to book. Read as "something is wrong with your booking", which
+   is the opposite of what it says, and the customer who reads it that way
+   does not tap the button underneath it.
+
+   So the palette carries the meaning now:
+
+     red     = the guarantee, and the brand
+     amber   = we cannot price this; we need you to call  (blocked screen)
+     neutral = heads-up, priced, nothing for you to do    (this panel)
+
+   Same information, same prominence, no alarm. The panel is ink-on-cream
+   with a plain border and a circled `i` rather than a triangle, and it
+   ends in a phone number for the customer who would rather talk. */
+.rp-est-note.is-condition {
   display: flex; align-items: flex-start; gap: 9px;
-  margin-top: 16px; padding: 12px 13px;
-  background: rgba(176,116,20,.08);
-  border: 1px solid rgba(176,116,20,.26);
-  border-radius: 12px;
-  color: var(--ink); font-size: 12.5px;
+  margin: 16px 0 0; padding: 13px 14px;
+  text-align: left;
+  background: rgba(70,52,37,.035);
+  border: 1px solid rgba(70,52,37,.16);
+  border-radius: 14px;
+  color: var(--ink); font-size: 12.5px; line-height: 1.5;
 }
-.rp-est-note.is-flagged .rp-ic-sm { color: #96610f; flex-shrink: 0; margin-top: 2px; }
+.rp-est-note.is-condition .rp-ic-sm { color: var(--ink-soft); flex-shrink: 0; margin-top: 2px; }
+.rp-est-note.is-condition strong { color: var(--ink); font-weight: 800; }
+/* The call option inside the panel: its own line, not a word in a
+   paragraph, so it reads as an action -- but a link, not a button, so it
+   never competes with Book This Cleaning below it. */
+.rp-inline-tel {
+  display: inline-block;
+  margin-top: 9px; padding: 3px 0;
+  font-size: 12.5px; font-weight: 800;
+  color: var(--red-dark);
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
 /* One line under the price saying what kind of product this is. */
 .rp-est-what {
   margin: 8px 0 0;
   font-size: 13px; line-height: 1.45; font-weight: 600; color: var(--muted);
 }
+/* Round 56: the action block, now inside the estimate card rather than in
+   the sticky dock. Separated from the numbers above it by a rule instead
+   of by a different-coloured container -- same card, two halves: here is
+   the price, here is what you do about it. */
+.rp-est-act {
+  margin: 22px -20px 0;
+  padding: 18px 20px 4px;
+  border-top: 1px solid rgba(70,52,37,.12);
+}
+.rp-est-act .rp-primary { margin-top: 2px; }
+
+/* The blocked screen's two ways to reach a human.
+
+   Round 57: both this screen and the estimate are .rp-est cards now, so this
+   heading is sized here rather than left to inherit -- a 30px serif heading
+   on one card and a 24px one on the next is the kind of drift nobody can
+   name but everybody notices. Matches the estimate card's serif scale. */
+.rp-blocked-h {
+  margin: 2px 0 0;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(25px, 7vw, 30px);
+  line-height: 1.15; letter-spacing: -.02em;
+  color: var(--ink);
+}
+.rp-blocked-sub {
+  margin: 10px 0 0;
+  font-size: 14.5px; line-height: 1.55; color: var(--ink-soft);
+}
+.rp-blocked-recap { margin: 18px 0 20px; text-align: left; }
+/* THE AMBER, and the only amber left in the funnel. This row is the reason
+   the screen offers a phone number instead of a Book button, so it carries
+   the one colour that now means "we need something from you". */
+.rp-blocked-recap .rp-est-line.is-blocker span {
+  display: flex; align-items: center; gap: 7px;
+  color: #7a4e0b; font-weight: 800;
+}
+.rp-blocked-recap .rp-est-line.is-blocker span .rp-ic-sm { color: #96610f; flex-shrink: 0; }
+.rp-blocked-recap .rp-est-line.is-blocker strong { color: #7a4e0b; }
+.rp-blocked-cta { text-decoration: none; }
+/* THE SECOND OPTION, one shape everywhere.
+
+   Round 57: this was the blocked screen's Text button. The estimate screen
+   had its own version of the same role -- "Text me this quote instead" --
+   as an underlined link, which meant the funnel drew "the other way to
+   reach us" two different ways on two consecutive screens. Now both use
+   this, and since the estimate's version is a <button> that relabels
+   itself on tap, the rule carries the properties a button does not
+   inherit: font-family, cursor, and a pressed state. */
+.rp-secondary-cta {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 50px; box-sizing: border-box;
+  margin: 10px 0 0; padding: 13px 16px;
+  background: rgba(255,255,255,.85);
+  border: 1.5px solid rgba(159,32,39,.35);
+  border-radius: 15px;
+  color: var(--red-dark); font-size: 14.5px; font-weight: 800;
+  font-family: inherit;
+  text-align: center; text-decoration: none; line-height: 1.35;
+  cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.rp-secondary-cta:hover { border-color: rgba(159,32,39,.5); }
+/* Confirmed state, after rpTextMeThisQuote() relabels it. No longer an
+   action, so it stops looking like one -- but it keeps its footprint so
+   the card does not jump when the label grows. */
+.rp-secondary-cta.is-sent {
+  background: rgba(20,92,66,.06);
+  border-color: rgba(20,92,66,.28);
+  color: #145c42;
+  cursor: default;
+}
+
 .rp-est-trust {
   margin: 20px 0 0;
   font-size: 11px; font-weight: 700; color: var(--muted);
@@ -1413,33 +1536,11 @@ line all the way in bold" -- crew size used to be the LAST bullet in
 /* Round 53: was green, which put a third accent on a screen that only
    needs one. */
 .rp-est-pay strong { color: var(--ink); font-weight: 800; }
-/* THE SECONDARY ACTION. This was .rp-soft-cta: full-width, 46px tall, with
-   a 1.5px grey border and muted grey label on a cream card -- the exact
-   visual signature of an empty text input, sitting directly beneath a
-   heavy gradient button. A real secondary action is a link. */
-/* Round 55: was 28px tall. A link is still a tap target, and 28px fails
-   the 44px minimum on every mobile accessibility guideline there is --
-   this one sits directly under the primary CTA, where a mis-tap books a
-   cleaning the person did not mean to book. The underline still makes it
-   read as a link; the padding just makes it hittable. */
-.rp-text-link {
-  display: block; width: 100%;
-  margin: 8px 0 0; padding: 13px 4px;
-  background: none; border: 0;
-  font-size: 14px; font-weight: 700;
-  color: var(--red-dark);
-  text-decoration: underline; text-underline-offset: 3px;
-  text-decoration-thickness: 1.5px;
-  cursor: pointer;
-}
-.rp-text-link:hover { color: var(--red); }
-.rp-text-link[disabled] { cursor: default; }
-/* Confirmed state. Still a line of text rather than a box -- the point of
-   the change was that this action is not button-shaped. */
-.rp-text-link.is-sent {
-  color: #145c42; font-weight: 800;
-  text-decoration: none;
-}
+/* ROUND 57: .rp-text-link is deleted, not left unused. It was the
+   estimate screen's "Text me this quote instead", and that button now uses
+   .rp-secondary-cta like its twin on the blocked screen. Five rules with no
+   markup left to style is how a stylesheet ends up with two ways to draw
+   the same thing, which is the problem this round exists to fix. */
 .rp-est-fine {
   margin: 12px 0 0;
   font-size: 11.5px; line-height: 1.4; color: var(--muted);
@@ -1790,6 +1891,19 @@ details.rp-includes li::before {
   color: #fff; background: var(--red); border-radius: 50%;
   box-shadow: 0 4px 10px rgba(159,32,39,.25);
 }
+/* Round 57: the "this is hourly cleaning, not a move-out" line on Deep and
+   Basic. Same neutral panel as .rp-est-note.is-condition and .rp-quest-note
+   -- one shape for "read this, nothing is wrong" across the whole funnel. */
+.rp-included-warn {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 18px 0 0; padding: 12px 14px;
+  text-align: left;
+  background: rgba(70,52,37,.035);
+  border: 1px solid rgba(70,52,37,.16);
+  border-radius: 14px;
+  font-size: 13px; line-height: 1.5; font-weight: 600; color: var(--ink);
+}
+.rp-included-warn .rp-ic-sm { color: var(--ink-soft); flex-shrink: 0; margin-top: 2px; }
 .rp-included-note {
   margin: 16px 3px 0; color: var(--muted);
   font-size: 13.5px; line-height: 1.5; max-width: 440px;
@@ -3194,7 +3308,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=57c88f8f"></script>
+<script src="../js/rp-messages.js?v=3dcb8801"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -3310,7 +3424,8 @@ const rpIconPaths = {
   check:   '<path d="m5.5 12.5 4.3 4.3L18.5 8"/>',
   chev:    '<path d="m9.5 6 6 6-6 6"/>',
   lock:    '<rect x="5.5" y="10.5" width="13" height="9.5" rx="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
-  alert:   '<path d="M12 3.8 21 19.2H3Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.1" r=".25" fill="currentColor" stroke="none"/>'
+  alert:   '<path d="M12 3.8 21 19.2H3Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.1" r=".25" fill="currentColor" stroke="none"/>',
+  info:    '<circle cx="12" cy="12" r="8.4"/><path d="M12 11.2v5"/><circle cx="12" cy="8.1" r=".25" fill="currentColor" stroke="none"/>'
 };
 function rpIcon(name, cls = "rp-ic") {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${rpIconPaths[name] || ""}</svg>`;
@@ -3660,8 +3775,21 @@ function rpScreenHtml() {
            checklist reading the screen below it is trying to correct.
            Move-out genuinely does include a fixed scope, so it keeps a
            scope heading, now naming what that scope is for. */""}
+      ${/* ROUND 57 — "INSIDE AND OUT" WAS SELLING SOMETHING WE DO NOT SELL.
+
+           This is an interior clean. Exterior windows and the garage floor
+           are paid add-ons, and they are the very next screen. So the
+           customer read "inside and out" here, formed the reasonable belief
+           that the outside was included, and was then asked to pay for the
+           outside two taps later. That is a manufactured objection: we
+           created it in a heading and then charged for it.
+
+           The fine print on this same screen already names those exclusions
+           correctly, which means the screen was contradicting itself top to
+           bottom. Heading now says what the product actually is, with the
+           same energy and no promise we have to walk back. */""}
       <h2>${isMoveout
-        ? "Inspection-ready, inside and out"
+        ? "Every room, ready for the walkthrough"
         : ["deep","maintenance","hourly"].includes(rpState.service)
           ? `Here's what you're booking`
           : `Here's what your ${svcName} includes`}</h2>
@@ -3670,6 +3798,23 @@ function rpScreenHtml() {
         ${highlights.map(([iconKey, text]) => `<span class="rp-highlight-chip">${iconKey ? rpIcon(iconKey, "rp-ic") : ""}${text}</span>`).join("")}
       </div>` : ""}
       ${inc && inc.outcome ? `<p class="rp-included-body" style="text-align:left"><strong>${inc.outcome}</strong></p>` : ""}
+      ${/* ROUND 57 — THE ONE MISTAKE THIS FUNNEL MUST NOT LET SOMEBODY MAKE.
+
+           Booking three hours of Basic to pass a housing inspection is the
+           worst outcome available here, and it is a quiet one: the clean
+           will be good, the crew will do everything asked, and the
+           inspection will still fail on the oven and the cabinet interiors
+           nobody bought. There is no refund conversation that fixes that
+           and no review that survives it.
+
+           The warning did already exist -- as the last sentence of a
+           four-sentence fine-print paragraph under a Continue button, which
+           is functionally nowhere. Same words, promoted to their own line
+           with an icon, above the fine print instead of buried in it. Only
+           on Deep and Basic; the move-out screen obviously does not need
+           telling. */""}
+      ${["deep","maintenance"].includes(rpState.service) ? `
+      <p class="rp-included-warn">${rpIcon("info","rp-ic rp-ic-sm")}<span>${RP_MSG.timed.notMoveoutShort}</span></p>` : ""}
       <p class="rp-included-note">${fine}</p>
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue</button>` };
   }
@@ -3799,8 +3944,15 @@ function rpScreenHtml() {
       </div>
       ${rpState.moveoutHeavyCondition === true ? `
       <div class="rp-quest-note">
-        ${rpIcon("alert","rp-ic rp-ic-sm")}
-        <span><strong>Good to know — and thanks for telling us.</strong> Your price below still stands for a standard clean. On a home like this the crew will look it over on arrival and agree any extra with you <em>before</em> they start. You can say yes, or reschedule. Nothing gets added to your bill afterward.</span>
+        ${rpIcon("info","rp-ic rp-ic-sm")}
+        ${/* ROUND 57: "You can say yes, or reschedule" made declining sound
+             like losing the booking. It is not -- they get the standard
+             clean at the quoted price. Saying so here, where they first
+             admit the home is rough, is what stops them abandoning two
+             screens before the price. Same clause as the estimate panel,
+             which is deliberate: this is the promise, that is the
+             confirmation. */""}
+        <span><strong>Good to know — and thanks for telling us.</strong> Your price still stands for a standard clean. On a home like this the crew walks it on arrival and prices anything extra with you <em>before</em> they start — say yes and they carry on, say no and they do the standard clean at the quoted price. Nothing gets added to your bill afterward.</span>
       </div>` : ""}
     </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue</button>` };
   }
@@ -3829,28 +3981,76 @@ function rpScreenHtml() {
      load-bearing reference to functions that no longer exist. */
 
   if (rpState.step === "moveoutblocked") {
-    /* Round 24: contactgate now runs BEFORE this screen (see rpFlows.moveout
-       in the engine), so rpState.fullName/phone are already populated --
-       no need to ask a second time. If somehow reached without them
-       (shouldn't happen given the flow order, but session-resume edge
-       cases exist), fall back to asking, same form as before. */
-    if (rpState.fullName && rpState.phone) {
-      return { scroll: `<div class="rp-center">
-        ${eyebrow}
-        <h2>Let's talk it through first</h2>
-        <p class="rp-sub">${rpMoveoutBlockReasons().join(", ")}. We can't price this online until we've talked it through. We already have your number, ${rpState.fullName.split(" ")[0]} — we'll call you directly, usually within the hour.</p>
-      </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback</button>` };
-    }
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>Let's talk it through first</h2>
-      <p class="rp-sub">${rpMoveoutBlockReasons().join(", ")}. We can't price this online until we've talked it through. Leave your number and we'll call you directly, usually within the hour.</p>
-      <div class="rp-lead-form">
-        <div class="rp-lead-field"><label for="rpBlockedName">Full Name *</label><input id="rpBlockedName" type="text" autocomplete="name" value="${rpEscapeAttr(rpState.fullName)}" placeholder="Your name" oninput="rpCaptureLeadField('fullName',this.value);rpClearLeadFieldError(this)"></div>
-        <div class="rp-lead-field"><label for="rpBlockedPhone">Phone Number *</label><input id="rpBlockedPhone" type="tel" autocomplete="tel" inputmode="tel" value="${rpEscapeAttr(rpState.phone)}" placeholder="(580) 000-0000" oninput="rpCaptureLeadField('phone',this.value);rpClearLeadFieldError(this)"></div>
-        <div class="rp-error" id="rpBlockedError" style="display:none"></div>
+    /* ROUND 56 — "REQUEST A CALLBACK" IS GONE.
+
+       Direct instruction: "I don't see how request a callback will work,
+       just put a button to call or text red prairie, and have it feed the
+       information from the home."
+
+       He is right, and the reason is worth writing down. This screen is
+       reached when a home cannot be priced online -- water off, A/C out,
+       mold or pests. The person standing in that house has a problem
+       RIGHT NOW and a move-out date they cannot move. "Request a
+       callback" asked them to do nothing and wait, on a promise the
+       business has to remember to keep. Every minute between the tap and
+       the call back is a minute they spend calling somebody else.
+
+       Two buttons instead, both of which reach a human immediately and
+       neither of which depends on anyone remembering anything.
+
+       THE TEXT BUTTON CARRIES THE HOME WITH IT. rpBlockedTextBody()
+       prefills the message with the size of the home and exactly which
+       check failed, so the first message says more than most phone calls
+       manage -- and the office can answer with a real number instead of
+       starting the questions over. That is the "feed the information from
+       the home" part, and it is the whole reason this beats a callback
+       form: the lead arrives already qualified.
+
+       The lead is still posted to the CRM on tap, exactly as the callback
+       button did, so nothing is lost if they change their mind mid-text. */
+    const first = rpState.fullName ? rpState.fullName.split(" ")[0] : "";
+    const reasons = rpMoveoutBlockReasons();
+    return { scroll: `<div class="rp-est">
+      ${/* ROUND 57 — THIS IS THE SCREEN AMBER IS FOR.
+
+           There are two "flagged" outcomes in this funnel and until now they
+           looked the same. Heavy trash or grime gets a price and a booking;
+           water off, A/C out or mold does not, and the only way forward is a
+           phone call. That difference is the whole point of this screen, and
+           drawing both of them as amber warning panels meant neither read as
+           what it was: the priced one looked broken, and this one looked like
+           a footnote it might be possible to tap past.
+
+           So amber lives here now and only here -- on the reason row,
+           because that row is why this screen has a phone number instead of
+           a Book button. The heads-up on a priced home is neutral.
+           One colour, one meaning.
+
+           Everything structural stays: the .rp-est card, the .rp-est-line
+           recap rows shared with the estimate screen. That reuse is why this
+           reads as part of the product rather than an error page, and it is
+           deliberate -- not something for a later pass to tidy up. */""}
+      <h2 class="rp-blocked-h">Let's sort this out on the phone</h2>
+      ${/* Round 57: was "One call or text and we'll sort it today", which
+           promises a same-day answer to a text sent at 9pm on a Sunday. The
+           business cannot keep that on its own schedule, and a small broken
+           promise on first contact costs more than the urgency it buys.
+           Also says "this home" rather than "it" -- "it" was pointing at the
+           reason, not the house. */""}
+      <p class="rp-blocked-sub">${first ? `Thanks for flagging that, ${first}. ` : ""}We can still clean this home — we just can't put an honest number on it online without seeing it. One call or text and we'll get you a real number fast.</p>
+
+      <div class="rp-blocked-recap">
+        <div class="rp-est-line"><span>Home</span><strong>${rpState.bedrooms ? `${rpState.bedrooms} bed` : "—"}${rpState.bathrooms ? ` · ${rpState.bathrooms} bath` : ""}</strong></div>
+        ${/* One row, however many reasons -- two "Needs a look" rows
+             stacked read like a rendering bug rather than two facts. */""}
+        ${reasons.length ? `<div class="rp-est-line is-blocker"><span>${rpIcon("alert","rp-ic rp-ic-sm")}Needs a look</span><strong>${reasons.join(" · ")}</strong></div>` : ""}
       </div>
-    </div>`, footer: `<button class="rp-primary" onclick="rpSubmitMoveoutBlockedLead()">Request a Callback</button>` };
+
+      <a class="rp-primary rp-blocked-cta" href="tel:${RP_MSG.facts.phoneDigits}" onclick="rpBlockedContact('call')">Call ${RP_MSG.facts.phone}</a>
+      <a class="rp-secondary-cta" href="sms:${RP_MSG.facts.phoneDigits}${/iPhone|iPad|Macintosh/i.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(rpBlockedTextBody())}" onclick="rpBlockedContact('text')">Text us instead — your details are already in it</a>
+
+      <p class="rp-est-trust">${RP_MSG.trust()}</p>
+    </div>` };
   }
 
   if (rpState.step === "moveoutblockedconfirmed") {
@@ -4246,16 +4446,28 @@ function rpAddonSummaryRows() {
 
 /* One line, under the price, that says what the number buys. Replaces the
    tagline, the crew-hours sentence, and the Estimated Time / Bedrooms /
-   Bathrooms rows -- four blocks saying what fits comfortably in one. */
+   Bathrooms rows -- four blocks saying what fits comfortably in one.
+
+   ROUND 57: on move-out this ran all four facts together --
+   "4 bed · 2 bath · 2 cleaners · 8 hours" -- which reads as one list but is
+   two different kinds of fact. The first two are what the CUSTOMER HAS and
+   they already know them; the last two are what the PRICE BUYS and they are
+   the only part that argues for the number. Dot-joined together, the part
+   that does the selling is the tail of a string the reader has already
+   started skipping. Split: the home identifies the quote, the crew line
+   justifies it. Returns { main, sub }. */
 function rpEstimateSpecLine() {
   const bits = [];
+  let sub = "";
   if (rpState.service === "moveout") {
     if (rpState.bedrooms) bits.push(`${rpState.bedrooms}${rpState.bedrooms >= 5 ? "+" : ""} bed`);
     if (rpState.bathrooms) bits.push(`${rpState.bathrooms}${rpState.bathrooms >= 4 ? "+" : ""} bath`);
     const crew = rpMoveoutCrewSize("moveout");
     const hrs = rpMoveoutTierHours("moveout");
-    if (crew) bits.push(`${crew} cleaner${crew === 1 ? "" : "s"}`);
-    if (hrs) bits.push(hrs);
+    const sbits = [];
+    if (crew) sbits.push(`${crew} cleaner${crew === 1 ? "" : "s"}`);
+    if (hrs) sbits.push(`${hrs} on site`);
+    sub = sbits.join(" · ");
   } else if (rpState.service === "deep" || rpState.service === "maintenance") {
     const anchor = rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
     const extra = Number(rpState.addonExtraHours || 0);
@@ -4269,7 +4481,7 @@ function rpEstimateSpecLine() {
     const n = Number(rpState.carpetRooms || 0);
     if (n) bits.push(`${n}${n >= 6 ? "+" : ""} room${n === 1 ? "" : "s"}`);
   }
-  return bits.join(" · ");
+  return { main: bits.join(" · "), sub: sub };
 }
 
 /* The guarantee, in ONE sentence per service. The move-out version used to
@@ -4303,18 +4515,44 @@ function rpEstimateScreen(eyebrow) {
         <strong>${firstVisitDeep ? rpFormatMoneyDisplay(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong>
         <span>${firstVisitDeep ? "Due on your first visit" : service.name}</span>
       </div>
-      ${spec ? `<p class="rp-est-spec">${spec}</p>` : ""}
+      ${spec.main ? `<p class="rp-est-spec">${spec.main}</p>` : ""}
+      ${spec.sub ? `<p class="rp-est-spec-sub">${spec.sub}</p>` : ""}
       ${rpState.service === "moveout" && !noGuaranteedPrice
-        ? `<p class="rp-est-what">Inspection-ready — the full interior, cleaned to pass a walkthrough.</p>` : ""}
+        ? `<p class="rp-est-what">Inspection-ready — every room inside, cleaned to pass the walkthrough.</p>` : ""}
       ${["deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice
         ? `<p class="rp-est-what">Time, not a finished checklist. We work your priorities for the hours booked.</p>` : ""}
 
+      ${/* ROUND 57 — THE CAVEAT MOVED ABOVE THE PROMISE.
+
+           It used to sit three blocks lower, under the guarantee panel and
+           under the line-item breakdown. Which produced a screen that
+           promised "this is the price" in a red panel and then, two blocks
+           later, explained that the price might change. In that order the
+           guarantee reads like something the fine print is quietly walking
+           back, and a customer who stops reading at the red panel -- most
+           of them -- has been told the reassuring half and not the true
+           half.
+
+           Caveat first, promise second, and both are honest: here is what
+           might change and how, and here is what we guarantee regardless.
+           Nothing below it contradicts anything above it. */""}
+      ${rpMoveoutHeavyConditionFlagged() ? `
+      <div class="rp-est-note is-condition">
+        ${rpIcon("info","rp-ic rp-ic-sm")}
+        <span><strong>${RP_MSG.price.flaggedLead}</strong> ${RP_MSG.price.flaggedBody}
+        ${/* ROUND 57: the one exit this customer did not have. A genuinely
+             rough home is the case where the customer most wants a human and
+             the business most wants the call -- it is where the real number
+             gets set and where a walkthrough surcharge stops being a
+             surprise. Inline rather than a second button, so it does not
+             compete with Book above it. No lead post here: the contact gate
+             runs before this screen, so they are already in the CRM. */""}
+        <a class="rp-inline-tel" href="tel:${RP_MSG.facts.phoneDigits}" onclick="rpTrack('heavy_condition_call',{estimate:rpPriceLabel()})">Or call us and we'll price it now — ${RP_MSG.facts.phone}</a></span>
+      </div>` : ""}
+
       <div class="rp-est-guarantee">
         ${rpIcon("shield","rp-ic rp-ic-sm")}
-        <div>
-          <p>${rpEstimateGuaranteeLine()}</p>
-          ${depositLine ? `<p class="rp-est-deposit">${depositLine}</p>` : ""}
-        </div>
+        <p>${rpEstimateGuaranteeLine()}</p>
       </div>
 
       ${showBreakdown ? `<div class="rp-est-lines">
@@ -4329,13 +4567,79 @@ function rpEstimateScreen(eyebrow) {
         <div class="rp-est-line is-total"><span>Total</span><strong>${firstVisitDeep ? rpFormatMoneyDisplay(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong></div>
       </div>` : ""}
 
-      ${rpMoveoutHeavyConditionFlagged() ? `
-      <p class="rp-est-note is-flagged">${rpIcon("alert","rp-ic rp-ic-sm")}<span><strong>You told us this one's heavier than standard.</strong> This price covers a standard clean. The crew will look it over on arrival and agree anything extra with you before they start.</span></p>` : ""}
       ${rpState.handymanInterest ? `<p class="rp-est-note">Make-ready repairs quoted separately — not in this total.</p>` : ""}
       ${rpHasQuotedAddon() ? `<p class="rp-est-note">Junk hauling is quoted separately — not in this total.</p>` : ""}
       ${rpIsRecurringPlan() ? `<p class="rp-est-note">No contract. Cancel or reschedule anytime.</p>` : ""}
 
-      <p class="rp-est-trust">${RP_MSG.trust()}</p>
+      ${/* ROUND 56 — ONE CARD, NOT A CARD AND A DOCK.
+
+           Direct instruction: "this screen is goofy, and different from
+           the rest ... make it simple and like one thing instead of a
+           weird top and a weird bottom."
+
+           It was literally two things. The estimate lived in a white card;
+           the payment note, the CTA, the text link and the fine print
+           lived in the sticky beige dock every other screen uses for a
+           single Continue button. Two containers, two background colours,
+           with the hero photo showing through the gap between them --
+           which is fine when the dock holds one button and absurd when it
+           holds four elements and half the screen's copy.
+
+           The dock earns its keep on a screen where the content scrolls
+           past the fold and the action has to stay reachable. This screen
+           is short. So the price, what it buys, the guarantee, the
+           breakdown, the reassurance and the button are now one continuous
+           card, read top to bottom, ending on the thing you do next. The
+           screen returns no footer and the dock does not render. */""}
+      <div class="rp-est-act">
+        ${/* ROUND 57 — THE DEPOSIT MATH CAME OUT OF THE GUARANTEE PANEL.
+
+             It was the quiet second line inside the red panel, which put the
+             two strongest arguments on the page in one container and let the
+             weaker-looking one absorb the stronger. They are not the same
+             argument. The guarantee is risk reversal: if the landlord flags
+             something, we come back. The deposit comparison is value: this
+             costs less than half of what you are trying to protect. One
+             answers "what if it goes wrong", the other answers "is it worth
+             it at all", and the second is the question standing between this
+             customer and the button.
+
+             So it sits here now, directly above the CTA -- the last thing
+             read before the tap, which is the job it was written for. The
+             guarantee panel keeps the guarantee alone and dropped a wrapper
+             div in the process. */""}
+        ${depositLine ? `<p class="rp-est-deposit">${depositLine}</p>` : ""}
+        ${(() => {
+          if (rpState.slotsLoading || rpState.slotsError) return "";
+          const openCount = rpUpcomingWeekOpenSlotsCount();
+          if (openCount <= 0 || openCount > RP_LOW_AVAILABILITY_THRESHOLD) return "";
+          return `<p class="rp-slots-low rp-slots-low-estimate">Only ${openCount} opening${openCount === 1 ? "" : "s"} left in the next 7 days.</p>`;
+        })()}
+        <p class="rp-est-pay"><strong>${RP_MSG.payment.short}</strong> Pay after the clean, once you've seen it.</p>
+        <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>
+        ${/* ROUND 57: the "second option" role had two different shapes in
+             this funnel. The blocked screen gave it a bordered full-width
+             button; this screen gave it a 28px underlined link with 13px of
+             padding bolted on to clear the tap-target minimum. Same job on
+             both screens -- the other way to reach us -- so it gets the same
+             shape, and the padding hack retires with it. */""}
+        ${noGuaranteedPrice ? "" : `<button type="button" class="rp-secondary-cta" id="rpTextQuoteBtn" onclick="rpTextMeThisQuote()">Text me this quote instead</button>`}
+        <p class="rp-est-trust">${RP_MSG.trust()}</p>
+        ${/* ROUND 57: the fine print and the flagged note were on the same
+             screen, four inches apart, saying the same sentence -- standard
+             home, standard condition, priced with you before the crew
+             starts. Said twice on one screen it stops being emphasis and
+             starts being boilerplate, and the second telling makes the first
+             one read as legal cover rather than a promise.
+
+             One of them says it, never both. When the home is flagged the
+             note above carries it, with the specifics and the call link, and
+             this drops out. When the home is standard the note does not
+             render at all, so this is the only place the exception is
+             stated and it stays -- that customer has not seen it anywhere
+             else in the funnel. */""}
+        ${rpMoveoutHeavyConditionFlagged() ? "" : `<p class="rp-est-fine">${RP_MSG.price.fineprint}</p>`}
+      </div>
     </section>
 
     ${showHandymanHere ? `
@@ -4345,17 +4649,7 @@ function rpEstimateScreen(eyebrow) {
       <span class="rp-make-ready-copy"><strong>Small handyman repairs?</strong><span>Patches, caulking, turnover fixes. Quoted separately.</span></span>
       <span class="rp-make-ready-check" aria-hidden="true">${rpIcon("check")}</span>
     </label>` : ""}
-  </div>`, footer: `
-    ${(() => {
-      if (rpState.slotsLoading || rpState.slotsError) return "";
-      const openCount = rpUpcomingWeekOpenSlotsCount();
-      if (openCount <= 0 || openCount > RP_LOW_AVAILABILITY_THRESHOLD) return "";
-      return `<p class="rp-slots-low rp-slots-low-estimate">Only ${openCount} opening${openCount === 1 ? "" : "s"} left in the next 7 days.</p>`;
-    })()}
-    <p class="rp-est-pay"><strong>${RP_MSG.payment.short}</strong> Pay after the clean, once you've seen it.</p>
-    <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>
-    ${noGuaranteedPrice ? "" : `<button type="button" class="rp-text-link" id="rpTextQuoteBtn" onclick="rpTextMeThisQuote()">Text me this quote instead</button>`}
-    <p class="rp-est-fine">${RP_MSG.price.fineprint}</p>` };
+  </div>` };
 }
 
 /* =========================================================================
@@ -4390,6 +4684,31 @@ function rpQuoteTextBody() {
   bits.push(`Quote: ${rpPriceLabel()}`);
   if (rpState.fullName) bits.push(`Name: ${rpState.fullName}`);
   return bits.join("\n");
+}
+
+/* Round 56: what the blocked-home text message says before they type a
+   word. Everything the office needs to price it over the phone, so the
+   first reply can be a number rather than another round of questions. */
+function rpBlockedTextBody() {
+  const bits = ["Hi Red Prairie - I need a move-out clean and the website couldn't price it."];
+  const home = [];
+  if (rpState.bedrooms) home.push(`${rpState.bedrooms} bed`);
+  if (rpState.bathrooms) home.push(`${rpState.bathrooms} bath`);
+  if (home.length) bits.push(`Home: ${home.join(", ")}`);
+  const reasons = rpMoveoutBlockReasons();
+  if (reasons.length) bits.push(`Flagged: ${reasons.join(", ")}`);
+  if (rpState.moveoutHeavyCondition === true) bits.push("Also heavier than a standard clean");
+  if (rpState.fullName) bits.push(`Name: ${rpState.fullName}`);
+  const area = rpServiceAreaStatus();
+  if (area.area) bits.push(`Area: ${area.area}`);
+  return bits.join("\n");
+}
+/* Posts the lead the moment they reach for the phone, so a conversation
+   that happens off-site still lands in the CRM. Fires on BOTH buttons --
+   the old callback button only captured people who completed a form. */
+function rpBlockedContact(how) {
+  rpTrack("moveout_blocked_contact", { how: how, reasons: rpMoveoutBlockReasons().join(", ") });
+  try { rpSubmitMoveoutBlockedLead({ silent: true, how: how }); } catch (e) { /* never block the dialer */ }
 }
 
 function rpTextMeThisQuote() {
@@ -4533,7 +4852,9 @@ function rpContactGateScreen(eyebrow) {
               exchange had already been handed over -- which reads as a bait
               and invites a fake number. The ask is the callback, so say
               that. */""}
-         <p class="rp-sub">And where should we send it?</p>`
+         ${/* Round 57: read "And where should we send it?" -- and nothing on
+              this screen says what "it" is. The quote. Say the word. */""}
+         <p class="rp-sub">Where should we send your quote?</p>`
       : `<p class="rp-sub">Just a name and number, then your price is right here.</p>`}
     <div class="rp-trust-signal" style="margin-bottom:14px"><strong>\u2605 ${RP_MSG.facts.rating}</strong> \u00b7 ${RP_MSG.facts.reviewCount}+ reviews \u00b7 Veteran-owned & insured</div>
     <div class="rp-lead-form">
@@ -5166,7 +5487,12 @@ function rpSetMoveoutAnswer(field, value) { rpState[field] = value; rpRefresh();
    to switch between, and rpClearUnavailableAddons() in the engine still
    guards every real service change. */
 
-function rpSubmitMoveoutBlockedLead() {
+function rpSubmitMoveoutBlockedLead(opts) {
+  /* Round 56: `silent` is used by the Call and Text buttons. They post the
+     lead but must NOT navigate -- the person is being handed off to their
+     dialer or messages app, and moving the page under them means that if
+     they come back to try the other button it is gone. */
+  const silent = !!(opts && opts.silent);
   /* Round 24: contactgate now runs before this screen, so most of the
      time rpState.fullName/phone are already set and there's no form on
      screen to read (see the moveoutblocked render block) -- this only
@@ -5197,7 +5523,7 @@ function rpSubmitMoveoutBlockedLead() {
   }
   const fullName = rpState.fullName;
   const phone = rpState.phone;
-  rpTrack("moveout_blocked_lead_submitted", { reasons: rpMoveoutBlockReasons() });
+  rpTrack("moveout_blocked_lead_submitted", { reasons: rpMoveoutBlockReasons(), how: (opts && opts.how) || "form" });
 
   try {
     fetch(`${RP_BOOKING_API}/lead`, {
@@ -5233,7 +5559,7 @@ function rpSubmitMoveoutBlockedLead() {
     }).catch(() => {});
   } catch (e) { /* never block the confirmation on a failed post */ }
 
-  rpGoToStep("moveoutblockedconfirmed", "forward");
+  if (!silent) rpGoToStep("moveoutblockedconfirmed", "forward");
 }
 function rpSelectCondition(label, element) { rpCommitChoice(element, () => { rpState.condition = label; rpAdvance(); }); }
 function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpState.frequency = label; rpAdvance(); }); }
