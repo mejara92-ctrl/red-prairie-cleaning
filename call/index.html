@@ -2074,7 +2074,10 @@ function forwardTarget(){
    it points at the one unfinished thing, or the call is ready to close and
    it closes it. */
 function primaryAction(){
-  if(hasStopGuard())              return {label:"Can't book this one — see the red box above", dead:true};
+  /* ROUND 62: was dead:true. A flagged job still has a correct next move --
+     take the number and log the callback -- so the button does that instead
+     of sitting there refusing to work. */
+  if(hasStopGuard())              return {label:"Take a number & end the call", run:logCallbackAndFinish};
   if(rpState.bookingSubmitting)   return {label:"Booking…", dead:true};
   if(rpState.customLeadSaving)    return {label:"Saving…", dead:true};
   if(nextThing() === null){
@@ -2097,16 +2100,14 @@ function primaryAction(){
      So on a phone the button finishes the step she is standing in before it
      offers her the next one. She can still jump anywhere she likes from the
      step sheet -- this governs the big button, not her freedom. */
-  if(isPhoneLayout() && rpState.step && !sectionValid(rpState.step)){
-    return {label:"Finish this step first", key:rpState.step, dead:true};
-  }
   const k = forwardTarget();
   if(k) return {label:`Next: ${NUDGE_SHORT[k]||k}`, key:k};
-  /* Only reachable when the single unfinished thing is the one she's in.
-     Round 59: said "Finish this section", which on a phone -- where the
-     section IS the screen and there is no other card to compare against --
-     tells her nothing about WHICH answer is missing. Names the thing. */
-  return {label:"Finish this step first", key:rpState.step, dead:true};
+  /* Round 62: the only unfinished thing is the one she is standing in. Move
+     her on anyway -- the Steps sheet shows what is still blank and she can
+     come back to it. Never a dead button. */
+  const keys2 = sectionKeys(), nxt = keys2[keys2.indexOf(rpState.step) + 1];
+  if(nxt) return {label:`Next: ${NUDGE_SHORT[nxt]||nxt}`, key:nxt};
+  return {label:"Done — end the call", run:() => openSheet("endSheet")};
 }
 
 function isPhoneLayout(){
@@ -3037,30 +3038,23 @@ function renderDock(){
   const d = el("dock");
   if(rpState.step==="done"){ d.hidden = true; syncDockHeight(); return; }
   d.hidden = false;
-  /* Round 61: was visibility:hidden at the first step -- a button that
-     disappears is a button she stops trusting, and she had already learned
-     it sometimes did nothing. It stays put and greys out instead. */
+  /* ROUND 62: never disabled. Round 61 greyed it out when there was nowhere
+     left to go, which combined with a dead Next to strand her completely on a
+     flagged call -- both buttons refusing at once, customer on the line. It
+     is always live now; at the very start it simply has nothing to undo. */
   const bb = el("backBtn");
   bb.style.visibility = "visible";
-  bb.disabled = !canGoBack();
+  bb.disabled = false;
   const a = primaryAction();
   const stopped = !!a.dead && hasStopGuard();
   el("goLabel").textContent = a.label;
   el("goBtn").disabled = !!a.dead;
   el("goBtn").classList.toggle("is-stopped", stopped);
-  /* Round 59: a disabled button with no reason next to it is the oldest
-     dead end in software. On a phone the reason has to be ON the dock,
-     because the control she has not filled in may be off the top of the
-     screen by the time she reaches for the button. */
+  /* Round 62: the amber "here is why that button won't work" line is gone,
+     along with the gate it existed to explain. Nothing is disabled now, so
+     there is nothing to apologise for. */
   const why = el("dockWhy");
-  if(why){
-    const show = isPhoneLayout() && !!a.dead && !stopped && a.key === rpState.step;
-    why.hidden = !show;
-    if(show){
-      const n = NUDGE[rpState.step] || [];
-      why.textContent = [n[0], n[1]].filter(Boolean).join(" — ") || "This step needs an answer before you move on.";
-    }
-  }
+  if(why) why.hidden = true;
   requestAnimationFrame(syncDockHeight);
 }
 

@@ -1,0 +1,70 @@
+ROUND 62 — THE GATE COMES OUT
+===============================================================================
+"when u hit the back button after like a condition flag it prevents u from
+hitting back? IT IS USED FOR CONVENIENCE ON MOBILE STOP MAKING IT HARD"
+
+Correct on every count. Reproduced, and it was worse than reported.
+
+WHAT ACTUALLY HAPPENED AFTER A CONDITION FLAG:
+
+    after flag : Next DISABLED  "Can't book this one - see the red box above"
+    after back : Next DISABLED   step=caller
+    back again : Next DISABLED   Back DISABLED   step=service
+
+BOTH BUTTONS DEAD AT ONCE. Next refused because the job was flagged. Back
+refused because she had reached the first step. No way out but closing the
+tab, with a customer on the line.
+
+I built both halves of that trap:
+
+  - Round 59 added "Finish this step first" — a disabled Next until the
+    current step was complete. Dummy-proofing nobody asked for.
+  - Round 61 added a disabled Back when there was nowhere left to go, for
+    "honesty".
+
+Each looked reasonable alone. Together they lock the door. And the desktop
+board never worked like this: it always let her move and simply showed what
+was missing. This is a tool for taking a phone call, not a form that needs
+protecting from the person using it.
+
+-------------------------------------------------------------------------------
+WHAT CHANGED: CODE REMOVED, NOT ADDED
+-------------------------------------------------------------------------------
+1. The round-59 phone gate is DELETED. Not softened — deleted. Next always
+   moves her forward. If the current step is half-answered she can carry on;
+   the Steps sheet already shows what is blank and she can go back to it.
+
+2. A flagged job gets a real action instead of a dead button:
+       was:  "Can't book this one — see the red box above"   [disabled]
+       now:  "Take a number & end the call"                  [runs it]
+   The red box still explains why. The button now does the thing the red box
+   is telling her to do.
+
+3. Back is NEVER disabled. Always visible, always live.
+
+4. The amber "here is why that button won't work" line under the dock is
+   gone with the gate it existed to explain.
+
+5. The last dead branch — "the only unfinished thing is the one you're in" —
+   now just moves to the next step, or offers to end the call.
+
+-------------------------------------------------------------------------------
+VERIFIED: ZERO DEAD BUTTONS, ANYWHERE
+-------------------------------------------------------------------------------
+Every step x every state, on the phone:
+
+                    service caller home addons quote contact calendar
+    empty call         ok     ok    ok    ok     ok     ok      ok
+    nothing answered   ok     ok    ok    ok     ok     ok      ok
+    flagged: water     ok     ok    ok    ok     ok     ok      ok
+    flagged: mold      ok     ok    ok    ok     ok     ok      ok
+    heavy condition    ok     ok    ok    ok     ok     ok      ok
+    all good           ok     ok    ok    ok     ok     ok      ok
+
+    dead or hidden buttons found: 0
+
+Round 61's back behaviour still holds: the phone's own back button closes a
+sheet instead of leaving the console, the dock Back closes a sheet first, and
+Back returns to the screen she came from rather than one up the list.
+
+All four suites pass. Assets re-stamped.
