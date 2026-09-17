@@ -350,6 +350,48 @@ button,input,select,textarea{font:inherit; color:inherit}
 /* THE DOCK, two rows on a phone. Top row is the three tools that used to be
    crammed into the header; bottom row is Back and the one big button. */
 .dock{flex-direction:column; align-items:stretch; gap:8px}
+/* Round 61: the full-width way out, pinned to the bottom of every sheet
+   where a thumb already is. */
+.sheet-done{
+  flex:0 0 auto; width:100%; min-height:52px; cursor:pointer;
+  background:var(--panel-2); border:0; border-top:1px solid var(--line);
+  color:var(--ink); font-size:15px; font-weight:800;
+  padding-bottom:calc(6px + env(safe-area-inset-bottom));
+}
+.sheet-done:active{background:var(--sunk)}
+/* The panic script, first thing in Help. */
+.stuck-top{
+  margin:0 0 14px; padding:13px 14px; border-radius:11px;
+  background:var(--red-wash); border:1px solid rgba(159,32,39,.22);
+}
+.stuck-top b{display:block; font-size:14px; font-weight:800; color:var(--red-ink); margin-bottom:6px}
+.stuck-top p{margin:0 0 7px; font-size:14px; line-height:1.45; color:var(--ink)}
+.stuck-top p.stuck-rule{margin:0; font-size:13px; font-weight:700; color:var(--ink-2)}
+
+/* Round 61: the DO fold. Closed, it is one short link; open, it is the
+   coaching plus a way to close it again. */
+.do-show{
+  display:block; width:100%; min-height:44px;
+  margin:-2px 0 10px; padding:10px 12px; cursor:pointer;
+  background:transparent; border:1px dashed var(--line-2); border-radius:10px;
+  color:var(--ink-2); font-size:13.5px; font-weight:800;
+}
+.do-show:active{background:var(--sunk)}
+.do-toggle{
+  margin-top:8px; min-height:38px; padding:0 12px; cursor:pointer;
+  background:transparent; border:0; color:var(--ink-2);
+  font-size:12.5px; font-weight:800; text-decoration:underline; text-underline-offset:3px;
+}
+
+/* Round 61: one closer in full, the rest folded. */
+.closer-main{margin:0; font-family:Newsreader,Georgia,serif; font-size:17px; line-height:1.4}
+.closer-more{margin-top:8px}
+.closer-more summary{
+  min-height:40px; display:flex; align-items:center; cursor:pointer;
+  font-size:12.5px; font-weight:800; color:var(--ink-2);
+}
+.closer-alt{margin:6px 0 0; font-family:Newsreader,Georgia,serif; font-size:16px; line-height:1.4; color:var(--ink-2)}
+
 .dock-tools{display:flex; gap:7px}
 .dock-tools button{
   flex:1; min-height:46px; border-radius:9px; cursor:pointer;
@@ -877,9 +919,7 @@ button.cmp-h:hover{color:var(--ink-2)}
        have keyboard shortcuts. -->
   <div class="dock-tools" id="dockTools">
     <button type="button" onclick="openSheet('callSheet');renderCallSheet()">Steps</button>
-    <button type="button" onclick="openLookup()">Look up</button>
-    <button type="button" onclick="openSheet('stuckSheet')">Stuck?</button>
-    <button type="button" id="dockExplain" onclick="openSheet('tierSheet')" hidden>Explain</button>
+    <button type="button" onclick="openLookup()">Help</button>
   </div>
   <p class="dock-why" id="dockWhy" hidden></p>
   <div class="dock-go">
@@ -894,7 +934,15 @@ button.cmp-h:hover{color:var(--ink-2)}
     <input id="lookupInput" type="search" placeholder="oven, deposit, pay, carpet, not home…" autocomplete="off" oninput="renderLookup()">
     <button class="tbtn" type="button" onclick="closeSheet('lookupSheet')">Close</button>
   </div>
-  <div class="sheet-body"><div id="lookupResults"></div></div>
+  <div class="sheet-body">
+    <div class="stuck-top">
+      <b>Don't know the answer?</b>
+      <p>&ldquo;Let me check that properly and call you right back &mdash; what's the best number for you?&rdquo;</p>
+      <p class="stuck-rule">Never guess a price. Never promise a deposit back. Never push past a red box.</p>
+    </div>
+    <div id="lookupResults"></div>
+  </div>
+  <button class="sheet-done" type="button" onclick="closeSheet('lookupSheet')">Done</button>
 </section>
 
 <!-- Round 40: one tap away for the whole call on any screen size. Body is
@@ -909,6 +957,7 @@ button.cmp-h:hover{color:var(--ink-2)}
     <button class="tbtn" type="button" onclick="closeSheet('tierSheet')">Close</button>
   </div>
   <div class="sheet-body"><div id="tierSheetBody"></div></div>
+  <button class="sheet-done" type="button" onclick="closeSheet('tierSheet')">Done</button>
 </section>
 
 <!-- Round 59, phone only: the step map and the running recap, which the
@@ -919,6 +968,7 @@ button.cmp-h:hover{color:var(--ink-2)}
     <button class="tbtn" type="button" onclick="closeSheet('callSheet')">Close</button>
   </div>
   <div class="sheet-body"><div id="callSheetBody"></div></div>
+  <button class="sheet-done" type="button" onclick="closeSheet('callSheet')">Done</button>
 </section>
 
 <section class="sheet" id="stuckSheet" hidden aria-label="If you don't know what to say">
@@ -952,6 +1002,7 @@ button.cmp-h:hover{color:var(--ink-2)}
       <p>Back works at any point, every answer can be changed, and the price recalculates itself. Nothing reaches the office until you book the job or log the call at the end.</p>
     </div>
   </div>
+  <button class="sheet-done" type="button" onclick="closeSheet('stuckSheet')">Done</button>
 </section>
 
 <section class="sheet" id="endSheet" hidden aria-label="End the call">
@@ -965,8 +1016,8 @@ button.cmp-h:hover{color:var(--ink-2)}
     <p class="note out-missing" id="outMissing" hidden></p>
     <div id="outList"></div>
     <p id="outStatus" class="note" style="margin-top:10px"></p>
-    <button class="out-btn" type="button" onclick="closeSheet('endSheet')" style="margin-top:14px;text-align:center;font-weight:700">Never mind — back to the call</button>
   </div>
+  <button class="sheet-done" type="button" onclick="closeSheet('endSheet')">Never mind — back to the call</button>
 </section>
 
 <script src="../js/rp-messages.js?v=f7ad2d17"></script>
@@ -1859,10 +1910,19 @@ function closersHtml(){
   const urgency = quoteUrgencyLine();
   return `
     ${urgency?`<div class="guard warn"><span class="ic">${guardIcon("warn")}</span><div><b>Real scarcity — say it</b>${urgency}</div></div>`:""}
+    ${/* ROUND 61: printed all three closers, every time. Three alternatives
+         is not help -- it is a decision, handed to her in the two seconds
+         after she has said a price out loud and is supposed to be silent.
+         She says ONE of them. So: one, in full, and the other two folded
+         behind a link for the call where the first does not land. */""}
     <div class="grp" style="margin-top:12px"><div class="grp-h">Then close</div>
-      ${QUOTE_CLOSERS.map(c=>`<p style="margin:0 0 7px;font-family:Newsreader,Georgia,serif;font-size:17px;line-height:1.4">${c}</p>`).join("")}
+      <p class="closer-main">${QUOTE_CLOSERS[0]}</p>
+      <details class="closer-more">
+        <summary>Other ways to say it</summary>
+        ${QUOTE_CLOSERS.slice(1).map(c=>`<p class="closer-alt">${c}</p>`).join("")}
+      </details>
     </div>
-    <p class="note">Pushback? Hit <b>Look up</b> (or press <b>/</b>) and type a word — “expected”, “less”, “spouse”, “deposit”.</p>`;
+    <p class="note">Pushback? Hit <b>Help</b> and type a word — “expected”, “less”, “spouse”, “deposit”.</p>`;
 }
 
 /* =========================================================================
@@ -1918,6 +1978,12 @@ function toggleSection(k){
 }
 function focusSection(k){
   if(!sectionKeys().includes(k) && k !== "done") return;
+  /* Round 61: remember the screen she is leaving, so Back returns to it
+     rather than to whatever happens to sit above it in the list. */
+  if(!navSuppress && rpState.step && rpState.step !== k){
+    navHist.push(rpState.step);
+    if(navHist.length > 12) navHist.shift();
+  }
   rpState.step = k;
   delete secOpen[k];
   /* GUARDRAIL 2. The bank used to fire from next(); nobody has to press
@@ -2116,6 +2182,16 @@ function renderSayZone(){
   if(z) z.innerHTML = sayBlock();
 }
 
+/* Round 61: shown/hidden state for the DO line, per person, persisted. */
+let doOpen = (() => {
+  try{ return localStorage.getItem("rpCallConsole.doOpen") === "1"; }catch(e){ return false; }
+})();
+function toggleDo(){
+  doOpen = !doOpen;
+  try{ localStorage.setItem("rpCallConsole.doOpen", doOpen ? "1" : "0"); }catch(e){}
+  render();
+}
+
 function sayBlock(){
   /* Round 40c. The blocked board hid every price correctly and then left the
      largest text on the screen -- the line she reads out loud -- offering the
@@ -2137,7 +2213,16 @@ function sayBlock(){
       <p>${line.say}</p>
       <div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>
     </div>
-    ${line.act ? `<div class="doline"><span class="k">Do</span><p>${line.act}</p></div>` : ""}`;
+    ${line.act ? (
+      /* Round 61: on the board it always shows -- the column is there and
+         empty otherwise. On a phone it is a fold, closed by default. */
+      !isPhoneLayout()
+        ? `<div class="doline"><span class="k">Do</span><p>${line.act}</p></div>`
+        : doOpen
+          ? `<div class="doline"><span class="k">Do</span><p>${line.act}</p>
+               <button type="button" class="do-toggle" onclick="toggleDo()">Hide</button></div>`
+          : `<button type="button" class="do-show" onclick="toggleDo()">What do I do?</button>`
+    ) : ""}`;
 }
 
 function errorBlocks(){
@@ -2432,8 +2517,6 @@ function renderTop(){
      shells, from the moment the call is known to be a move-out. */
   const tb = el("tierBtn");
   if(tb) tb.hidden = rpState.service !== "moveout";
-  const de = el("dockExplain");
-  if(de) de.hidden = rpState.service !== "moveout";
 }
 
 /* Round 40: the chips used to mean POSITION -- done behind you, pending
@@ -2954,8 +3037,12 @@ function renderDock(){
   const d = el("dock");
   if(rpState.step==="done"){ d.hidden = true; syncDockHeight(); return; }
   d.hidden = false;
-  const keys = sectionKeys(), i = keys.indexOf(rpState.step);
-  el("backBtn").style.visibility = i > 0 ? "visible" : "hidden";
+  /* Round 61: was visibility:hidden at the first step -- a button that
+     disappears is a button she stops trusting, and she had already learned
+     it sometimes did nothing. It stays put and greys out instead. */
+  const bb = el("backBtn");
+  bb.style.visibility = "visible";
+  bb.disabled = !canGoBack();
   const a = primaryAction();
   const stopped = !!a.dead && hasStopGuard();
   el("goLabel").textContent = a.label;
@@ -3144,10 +3231,63 @@ function renderLookup(){
     : `<p class="sheet-empty">Nothing matches \u201c${esc(q)}\u201d.<br>Try a single word \u2014 \u201coven\u201d, \u201cdeposit\u201d, \u201cinsured\u201d, \u201clate\u201d.</p>`;
 }
 function openLookup(){
-  el("lookupSheet").hidden=false; document.body.style.overflow="hidden";
-  el("lookupInput").value=""; renderLookup();
-  setTimeout(()=>el("lookupInput").focus(),30);
+  /* ROUND 61: this was the one sheet that did NOT go through openSheet(),
+     so it was the one sheet the phone's back button could not close -- it
+     pushed no history entry, and back walked straight off the console. It
+     is also the most-opened sheet on the tool. Same door as the rest now. */
+  el("lookupInput").value="";
+  renderLookup();
+  openSheet("lookupSheet");
+  setTimeout(()=>{ const i=el("lookupInput"); if(i) i.focus(); },30);
 }
+/* =========================================================================
+   ROUND 61 - GETTING OUT OF THINGS
+   =========================================================================
+   Reported: "when you hit the wrong window you get sucked into stuff and the
+   back button doesn't always work."
+
+   Both halves were real and they were the same bug.
+
+   THIS CONSOLE HAD FIVE FULL-SCREEN OVERLAYS -- Look up, Explain, Stuck,
+   Steps, End -- and ZERO history handling. Not "some". None. So on a phone,
+   where the way out of a full-screen thing is the system back gesture,
+   pressing back did not close the sheet: it navigated off the console
+   entirely, mid-call. The only way out was to find the small Close button in
+   the corner, and if she missed it she lost the call.
+
+   AND THE DOCK'S OWN BACK WAS POSITIONAL, NOT HISTORICAL. It went to the
+   previous step in the list, never to where she actually came from. Jump from
+   the step sheet to the address, press Back, and you land on the quote --
+   which is not where you were. At the first step it did nothing at all and
+   hid itself, so it was also sometimes simply absent. "Doesn't always work"
+   is exactly right.
+
+   Now: opening any sheet pushes a history entry, so the system back gesture
+   and the hardware button close it like they close anything else. The dock's
+   Back means one thing -- undo the last move -- in this order: close a sheet
+   if one is open, otherwise return to the screen she came from, otherwise
+   step back through the flow. It is never hidden and never silently dead. */
+const SHEET_IDS = ["lookupSheet","tierSheet","callSheet","stuckSheet","endSheet"];
+function anyOpenSheet(){
+  return SHEET_IDS.find(id => { const e = el(id); return e && !e.hidden; }) || null;
+}
+let sheetDepth = 0;
+function forceCloseSheet(id){
+  const e = el(id); if(e) e.hidden = true;
+  if(!anyOpenSheet()) document.body.style.overflow = "";
+}
+/* The system back gesture, the hardware button, and iOS edge-swipe all
+   arrive here. Close the overlay instead of leaving the call. */
+window.addEventListener("popstate", () => {
+  const open = anyOpenSheet();
+  if(open){ forceCloseSheet(open); if(sheetDepth > 0) sheetDepth--; }
+});
+
+/* Where she came FROM, so Back can return there rather than guessing.
+   Capped: this is an undo for the last few moves, not a browser history. */
+const navHist = [];
+let navSuppress = false;
+
 function openSheet(id){
   if(id==="endSheet"){
     /* Round 60: a soft note, never a gate. It tells her what the office will
@@ -3167,8 +3307,16 @@ function openSheet(id){
       `<button class="out-btn" type="button" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
   }
   el(id).hidden=false; document.body.style.overflow="hidden";
+  /* Round 61: the entry that makes the phone's own back button close this
+     instead of walking off the page. */
+  try{ history.pushState({ rpSheet:id }, ""); sheetDepth++; }catch(e){}
 }
-function closeSheet(id){ el(id).hidden=true; document.body.style.overflow=""; }
+function closeSheet(id){
+  forceCloseSheet(id);
+  /* Unwind the entry we pushed, so back doesn't need pressing twice later.
+     popstate then finds nothing open and does nothing. */
+  if(sheetDepth > 0){ sheetDepth--; try{ history.back(); }catch(e){} }
+}
 
 /* =========================================================================
    KEYBOARD — for the half of her shifts she's at a laptop
@@ -3362,8 +3510,32 @@ function next(){
   if(a.key){ focusSection(a.key); return; }
 }
 function back(){
+  /* 1. A sheet is open -- close it. This is the case that used to throw her
+        off the page entirely. */
+  const open = anyOpenSheet();
+  if(open){ closeSheet(open); return; }
+  /* 2. Go back to where she actually came from. */
+  if(navHist.length){
+    const prev = navHist.pop();
+    if(sectionKeys().includes(prev)){
+      navSuppress = true;
+      try{ focusSection(prev); } finally { navSuppress = false; }
+      return;
+    }
+  }
+  /* 3. Nothing remembered -- walk back through the flow. */
   const keys = sectionKeys(), i = keys.indexOf(rpState.step);
-  if(i > 0) focusSection(keys[i-1]);
+  if(i > 0){
+    navSuppress = true;
+    try{ focusSection(keys[i-1]); } finally { navSuppress = false; }
+  }
+}
+/* Whether Back has anywhere to go, so the button can be honest about it
+   instead of vanishing. */
+function canGoBack(){
+  if(anyOpenSheet()) return true;
+  if(navHist.length) return true;
+  return sectionKeys().indexOf(rpState.step) > 0;
 }
 
 

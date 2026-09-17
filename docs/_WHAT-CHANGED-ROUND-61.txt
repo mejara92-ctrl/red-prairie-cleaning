@@ -1,0 +1,131 @@
+ROUND 61 — GETTING OUT OF THINGS, AND FEWER WORDS
+===============================================================================
+Brief: "It needs to be flexible and easy. Right now it's too many words, when
+you hit the wrong window you get sucked into stuff and the back button doesn't
+always work. Dumb it down make it simpler."
+
+Three complaints. The middle two turned out to be one bug.
+
+-------------------------------------------------------------------------------
+1. "SUCKED INTO STUFF" + "BACK DOESN'T ALWAYS WORK" — THE SAME BUG
+-------------------------------------------------------------------------------
+THIS CONSOLE HAD FIVE FULL-SCREEN OVERLAYS AND ZERO HISTORY HANDLING. Not
+some. None. Look up, Explain, Stuck, Steps, End all covered the screen
+completely, and on a phone the way out of a full-screen thing is the system
+back gesture. Pressing it did not close the sheet — it navigated off the
+console entirely, mid-call. The only exit was a small Close button in the
+top-right corner, the hardest spot on a phone for a thumb, and missing it
+cost the call.
+
+Worse, the most-opened sheet of the five was the worst offender: openLookup()
+did not go through openSheet() at all, so it had its own private open path
+that no fix would have covered by accident.
+
+AND THE DOCK'S BACK WAS POSITIONAL, NOT HISTORICAL:
+
+    function back(){
+      const keys = sectionKeys(), i = keys.indexOf(rpState.step);
+      if(i > 0) focusSection(keys[i-1]);
+    }
+
+It went one place up the LIST, never to where she actually came from. Jump
+from the step sheet to the calendar, press Back, and you land on the address
+— which is not where you were. At the first step it did nothing AND hid
+itself. "Doesn't always work" is exactly right; it worked in one case out of
+three.
+
+FIXED:
+  - Opening any sheet pushes a history entry. The system back gesture, the
+    hardware button and the iOS edge-swipe now close the overlay like they
+    close anything else, and stay on the console.
+  - openLookup() routed through openSheet() so it can never drift again.
+  - Back now means ONE thing — undo the last move — in this order:
+        1. a sheet is open      -> close it
+        2. she came from somewhere -> go back there (a real nav stack)
+        3. otherwise            -> step back through the flow
+  - Back is never hidden. At the true start it greys out instead of
+    vanishing, because a button that disappears is one she stops trusting.
+
+VERIFIED:
+    Help / Steps / End open -> system back closes the sheet, stays on console
+    dock Back with a sheet open -> closes the sheet, step unchanged
+    quote -> jump to calendar -> Back lands on QUOTE (not contact)
+    trail service>quote>home>calendar, four Backs: home, quote, service, service
+    first step: visible, disabled.  after moving: visible, enabled.
+
+-------------------------------------------------------------------------------
+2. FEWER DOORS — FOUR BECOME TWO
+-------------------------------------------------------------------------------
+The dock offered Steps, Look up, Stuck? and Explain: four buttons opening
+four full-screen overlays, three of which answer the same question — "I need
+to know something." Look up already searches the whole corpus; Explain is one
+entry inside it; Stuck is a fixed page she needs twice ever, hidden behind a
+button she has to remember exists at the moment she is least able to remember
+anything.
+
+    was:  [ Steps ] [ Look up ] [ Stuck? ] [ Explain ]
+    now:  [ Steps ] [ Help ]
+
+The panic script is pinned to the top of Help, above the search results,
+where someone who is stuck will actually hit it:
+
+    Don't know the answer?
+    "Let me check that properly and call you right back — what's the best
+     number for you?"
+    Never guess a price. Never promise a deposit back. Never push past a red box.
+
+Every sheet also gained a full-width exit pinned to the bottom, where the
+thumb already is, instead of only a corner Close.
+
+-------------------------------------------------------------------------------
+3. FEWER WORDS
+-------------------------------------------------------------------------------
+Measured per step on the phone, before -> after:
+
+    service   107 ->  86        addons    120 -> 107
+    caller     86 ->  69        quote     141 ->  92
+    home      151 -> 127        contact    67 ->  51
+                                calendar   57 ->  39
+
+THE DO LINE NOW FOLDS. It ran 17-28 words on every screen:
+
+    "Say the number once, plainly, then stop talking. Count to three in your
+     head before you say anything else."
+
+Good coaching, and the right thing to show someone on their first shift. By
+the second week it is furniture between her and the controls, on every screen
+of every call. Closed by default on the phone, one tap to open, and THE
+CHOICE STICKS — it lives in localStorage because it is how this person likes
+the tool, not a fact about this caller. A new CSR opens it once and it stays
+open for her; Liz closes it once and it stays closed. That is the "flexible"
+half of the ask. The desktop board still always shows it: the column is there
+and has nothing to gain by hiding it.
+
+THE QUOTE STEP PRINTED THREE CLOSING LINES, every time. Three alternatives is
+not help — it is a decision, handed to her in the two seconds after she has
+said a price out loud and is supposed to be silent. She says one of them. Now
+one shows in full and the other two sit behind "Other ways to say it".
+
+The SAY block was left alone at 16-36 words. It is the sentence she reads out
+loud and the entire reason the tool exists.
+
+-------------------------------------------------------------------------------
+VERIFICATION
+-------------------------------------------------------------------------------
+  check-prices.py / r52-test.js / funnel-test.js / undefined-refs.js  pass
+  stamp-assets.py re-run after the final edit
+  Round 60's blank-screen regression re-tested and still fixed (all three
+    stale-session values land on a real step)
+  Cold walk with real taps: password -> name -> Move-Out -> contact -> home
+    -> add-ons -> quote, no blanks, no JS errors
+  Desktop board unchanged: 7 cards, DO line always shown, header tools intact
+
+-------------------------------------------------------------------------------
+STILL OPEN (from round 57, now the oldest item on the list)
+-------------------------------------------------------------------------------
+The arrival-walkthrough re-quote SOP is still not written. Six places on the
+website and two in this console promise how it behaves, including that a
+customer can decline the extra and still get the standard clean at the quoted
+price. The crew needs three lines: what counts as beyond standard, who they
+call before touching anything, and that a declined re-quote means they do the
+standard clean anyway.
