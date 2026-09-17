@@ -886,6 +886,12 @@ quiet treatment — bordered, centred {
    secondary action and it looked like an empty text input -- see the note
    on .rp-text-link, which replaced it. Nothing else used it. */
 .rp-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Round 58: the condition question's two answers are phrases, not words, so
+   they get full width and stack. The 260px two-up that suits Yes/No would
+   wrap "Heavy buildup, or things left behind" to three lines a piece. */
+.rp-quest-pills.is-stacked { grid-template-columns: 1fr; max-width: 100%; }
+.rp-quest-pills.is-stacked .rp-pill { padding: 12px 14px; }
+.rp-quest-row.is-wide { margin-top: 2px; }
 .rp-pill {
   background: rgba(255,255,255,.90);
   border: 1px solid var(--line);
@@ -3308,7 +3314,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=3dcb8801"></script>
+<script src="../js/rp-messages.js?v=f7ad2d17"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -3940,7 +3946,19 @@ function rpScreenHtml() {
         ${q("moveoutWaterOn", "Is the water on?")}
         ${q("moveoutAcOn", "Is the air conditioning working?")}
         ${q("moveoutMoldPests", "Is the home free of mold or pest issues?", true)}
-        ${q("moveoutHeavyCondition", "Is the home free of heavy trash and built-up grime?", true)}
+        ${/* ROUND 58: not a Yes/No. The other three questions have factual
+             answers -- the water is on or it isn't. This one asked for a
+             self-assessment, and dressed it as "free of heavy trash and
+             built-up grime", which is a sentence people answer Yes to out of
+             pride rather than accuracy. Two plain descriptions instead, both
+             of which a person can pick without conceding anything. */""}
+        <div class="rp-quest-row is-wide">
+          <span class="rp-quest-label">What shape is the home in?</span>
+          <div class="rp-choice-grid rp-quest-pills is-stacked">
+            <button class="rp-pill ${rpState.moveoutHeavyCondition === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', false)">Normal<small>Just needs a good clean</small></button>
+            <button class="rp-pill ${rpState.moveoutHeavyCondition === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', true)">It's seen better days<small>Heavy buildup, or things left behind</small></button>
+          </div>
+        </div>
       </div>
       ${rpState.moveoutHeavyCondition === true ? `
       <div class="rp-quest-note">

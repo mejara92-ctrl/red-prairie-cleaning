@@ -1,0 +1,156 @@
+ROUND 59 — A REAL PHONE CONSOLE
+===============================================================================
+Brief: "Call console is too hard to use on mobile, it should be a separate
+version than the desktop version. Make it dummy proof mobile friendly."
+
+MEASURED FIRST, because "too hard to use" needed a number.
+
+At 390x844, per step, BEFORE:
+    service   1,869px    home  2,194px    addons  1,893px
+    quote     1,824px    contact 1,827px  calendar 1,490px
+    13–16 controls under the 44px tap minimum
+    up to 14 pieces of text under 12px
+
+Two and a half screens of thumb-scrolling per step, on a live call, while a
+stranger waits.
+
+AFTER:
+    service   1,106px    home  1,564px    addons  1,293px
+    quote     1,069px    contact 1,061px  calendar   844px  (one screen)
+    0 controls under 44px
+    0 text under 12px
+
+-------------------------------------------------------------------------------
+WHY IT WAS BAD: IT WAS RENDERING THE DESKTOP BOARD
+-------------------------------------------------------------------------------
+renderPhone() was drawing all seven step cards as an accordion -- one open,
+six folded -- plus the desktop side rail stacked underneath. So below the
+words Liz needs sat roughly 1,200px of things she does not, including, on the
+quote step, a folded card repeating the quote script she was already reading.
+
+It was not a styling problem. A phone shows one thing; the board shows the
+whole call. They are different tools.
+
+-------------------------------------------------------------------------------
+WHAT "SEPARATE VERSION" MEANS HERE
+-------------------------------------------------------------------------------
+Two shells, one brain. The phone shell renders completely different DOM from
+the desktop board -- different navigation, different chrome, different dock.
+From Liz's side it is a different app.
+
+It is NOT a second file, and that was deliberate. sectionBody(), sectionValid(),
+guardrails(), lineFor(), primaryAction(), TITLES, NUDGE and every word of
+script are the same functions the board calls. A call/mobile/index.html would
+have been two CSR scripts, and inside a month Liz on her phone would have been
+quoting a different product from Liz at her desk. That is the exact drift this
+codebase has spent 59 rounds preventing in the pricing engine; it applies
+harder to the words.
+
+-------------------------------------------------------------------------------
+THE PHONE SHELL
+-------------------------------------------------------------------------------
+HEADER, one row: caller name, phone, running total, End. The three tools that
+used to be crammed in beside them (Explain / Stuck / Look up) moved to the
+dock -- at 390px the header held six things and the caller's name wrapped to
+three lines.
+
+PROGRESS BAR, sticky, replaces the chip strip:
+    STEP 5 OF 7   Give the quote                          All steps
+    ────────────────────────────────
+The chip strip scrolled horizontally, which meant the chip marked "now" -- the
+only one answering "where am I" -- could be the one off the left edge. This
+cannot scroll anywhere. Tapping it opens the call sheet.
+
+BODY: one step. The line she says, what to do, that step's controls, its
+guardrails. No accordion, no folded cards, no side rail.
+
+DOCK, two rows, fixed:
+    [ Steps ] [ Look up ] [ Stuck? ] [ Explain ]
+    [ Back ] [        Next: the address        ]
+Its height is MEASURED at render and written to --dock-h, because it grows a
+reason line (below) and a hard-coded 112px guess had already trapped two
+controls behind it once during this round.
+
+CALL SHEET, one tap from either the bar or the dock: the seven steps with
+what each one holds and a "You're here" marker, plus the running recap the
+desktop keeps in its side column. Tap any step to go there.
+
+-------------------------------------------------------------------------------
+THE DUMMY-PROOFING
+-------------------------------------------------------------------------------
+IT WILL NOT LET HER WALK PAST A BLANK ANSWER. forwardTarget() finds the next
+unfinished step AFTER the current one, which is right on the board: every step
+is visible, so a gap she leaves is a gap she can see, and skipping around is
+how a real call goes. On a phone the step she left blank scrolls out of
+existence the moment she moves, and the next thing that tells her is the
+quote -- caller on the line, half-built job, no idea which answer is missing.
+
+So on a phone the big button finishes the current step before offering the
+next one. She can still jump anywhere from the call sheet; this governs the
+button, not her freedom.
+
+THE DISABLED BUTTON SAYS WHY, on the dock, in amber:
+    Bedrooms, bathrooms, and the three checks — Water, A/C, mold or pests.
+    Unsure? Answer no.
+    [ Back ] [      Finish this step first      ]
+A disabled button with no reason beside it is the oldest dead end in software,
+and on a phone the control she skipped may be off the top of the screen by the
+time she reaches for it.
+
+READABLE AT ARM'S LENGTH. Field labels -- which ARE the questions she reads
+out loud -- were 11px uppercase. "Is the air conditioning working?" at caption
+size, on a control whose wrong answer quotes an unbookable home. Now 14px
+sentence case. Every tap target is 44px or more; inputs are 16px so iOS stops
+zooming the page on focus.
+
+-------------------------------------------------------------------------------
+ONE BUG FROM ROUND 58, CAUGHT BY BUILDING THIS
+-------------------------------------------------------------------------------
+Round 58 relabelled the condition question on /call to "What shape is the
+place in?" to match /book. On /book that is a two-choice pick, so the question
+fits its answers. On /call it is still a Yes/No pair -- so the phone screen
+read:
+
+    What shape is the place in?     [ Yes ]  [ No ]
+
+Gibberish at a glance, and the kind of thing that gets tapped wrong mid-call.
+Now "Has the place seen better days?", which keeps round 58's non-judgmental
+framing and is an actual yes/no question. Same field, same boolean.
+
+-------------------------------------------------------------------------------
+THE DESKTOP BOARD IS UNCHANGED
+-------------------------------------------------------------------------------
+Verified at 1440x950 after every edit: 7 accordion cards, 7 chips in the strip,
+589px side rail with the recap AND the compare panels, header tools present
+with their keyboard shortcuts, one-row dock, phone bar hidden. Nothing about
+the board moved.
+
+recapRows() was lifted out of renderSide() so the desktop rail and the phone
+sheet read the SAME list -- two copies of a price breakdown is how a recap
+ends up disagreeing with the header about what a job costs.
+
+-------------------------------------------------------------------------------
+VERIFICATION
+-------------------------------------------------------------------------------
+  check-prices.py / r52-test.js / funnel-test.js / undefined-refs.js  all pass
+  stamp-assets.py re-run after the final edit
+
+  Phone 390x844:  1 step card per screen, chip strip hidden, side rail empty,
+                  0 controls trapped behind the dock at full scroll,
+                  call sheet lists 7 steps with a 60px minimum row,
+                  jumping from the sheet lands on the step and closes it,
+                  incomplete step -> "Finish this step first", disabled,
+                  blocked call -> blocked card only, 0 step cards, 947px,
+                  no JS errors
+  Desktop 1440:   board, strip, rail, compare, header tools, row dock intact,
+                  no JS errors
+
+-------------------------------------------------------------------------------
+STILL OPEN (from round 57, unchanged and now the oldest thing on the list)
+-------------------------------------------------------------------------------
+The arrival-walkthrough re-quote SOP is not written. Six places on the website
+and two in this console now promise how it behaves, including that a customer
+can decline the extra and still get the standard clean at the quoted price.
+The crew needs three lines: what counts as beyond standard, who they call
+before touching anything, and that a declined re-quote means they do the
+standard clean anyway.

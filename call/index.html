@@ -275,6 +275,147 @@ button,input,select,textarea{font:inherit; color:inherit}
 .dock .go kbd{font:700 10px/1 "Public Sans",sans-serif; padding:3px 5px; border-radius:3px; background:rgba(255,255,255,.22)}
 @media (max-width:560px){ .dock .go kbd{display:none} }
 
+/* =========================================================================
+   ROUND 59 - THE PHONE SHELL
+   =========================================================================
+   Everything from here to the next divider applies below 1000px only, which
+   is the same breakpoint isPhoneLayout() tests in JS. The two must agree:
+   the shells render different DOM, so a CSS breakpoint that disagreed with
+   the JS one would style a board as a phone or the reverse. */
+
+/* THE PROGRESS BAR. Replaces the chip strip. The strip scrolled
+   horizontally, which meant the chip marked "now" -- the only one that
+   answers "where am I" -- could be the one off the left edge. This cannot
+   scroll anywhere: it is one line that names the step, counts it, and opens
+   the map. */
+.ph-bar{
+  position:sticky; top:0; z-index:30;
+  background:var(--panel-2); border-bottom:1px solid var(--line);
+}
+.ph-bar-btn{
+  display:flex; align-items:center; gap:10px; width:100%;
+  min-height:48px; padding:8px 14px; cursor:pointer;
+  background:transparent; border:0; color:var(--ink); text-align:left;
+}
+.ph-bar-step{
+  flex:0 0 auto; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted);
+}
+.ph-bar-title{flex:1; min-width:0; font-size:15px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ph-bar-more{
+  flex:0 0 auto; font-size:12px; font-weight:800; color:var(--red-ink);
+  text-decoration:underline; text-underline-offset:3px;
+}
+.ph-prog{height:3px; background:var(--sunk)}
+.ph-prog i{display:block; height:100%; background:var(--green); transition:width .25s ease}
+
+/* THE ONE STEP ON SCREEN. No accordion header, no chevron, no number badge
+   -- there is nothing to collapse it against and nothing to count it among.
+   The step's name is already in the bar above; this is the working title
+   directly over its own controls. */
+.ph-sec{border-radius:12px}
+.ph-sec-h{
+  padding:13px 15px 0;
+  font-size:17px; font-weight:800; letter-spacing:-.01em; color:var(--ink);
+}
+.ph-sec .sec-b{padding-top:10px}
+
+/* THE STEP MAP, in the call sheet. Full-width rows, 56px each, each one
+   carrying what it holds -- so she can see the whole call without opening
+   seven cards, which is what the accordion made her do. */
+.ph-steps{display:flex; flex-direction:column; gap:7px}
+.ph-step{
+  display:flex; align-items:center; gap:12px; width:100%;
+  min-height:56px; padding:10px 13px; border-radius:11px; cursor:pointer;
+  background:var(--panel); border:1.5px solid var(--line); color:var(--ink); text-align:left;
+}
+.ph-step-n{
+  flex:0 0 auto; width:28px; height:28px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--sunk); border:1px solid var(--line-2);
+  font-size:13px; font-weight:800; color:var(--muted);
+}
+.ph-step-t{flex:1; min-width:0}
+.ph-step-t b{display:block; font-size:15px; font-weight:800; line-height:1.3}
+.ph-step-t span{display:block; margin-top:2px; font-size:12.5px; color:var(--ink-2); line-height:1.35}
+.ph-step-t span.muted{color:var(--muted)}
+.ph-step-here{
+  flex:0 0 auto; padding:4px 9px; border-radius:99px;
+  background:var(--red); color:#fff; font-size:10.5px; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase;
+}
+.ph-step.ok .ph-step-n{background:var(--green-wash); border-color:var(--green); color:var(--green)}
+.ph-step.now{border-color:var(--red); box-shadow:0 0 0 3px var(--red-wash)}
+
+/* THE DOCK, two rows on a phone. Top row is the three tools that used to be
+   crammed into the header; bottom row is Back and the one big button. */
+.dock{flex-direction:column; align-items:stretch; gap:8px}
+.dock-tools{display:flex; gap:7px}
+.dock-tools button{
+  flex:1; min-height:46px; border-radius:9px; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line-2); color:var(--ink-2);
+  font-size:12.5px; font-weight:800; white-space:nowrap;
+}
+.dock-tools button:active{background:var(--sunk)}
+.dock-go{display:flex; gap:10px; align-items:center}
+.dock-why{
+  margin:0; padding:0 2px;
+  font-size:12.5px; line-height:1.4; font-weight:700; color:var(--amber);
+}
+
+@media (min-width:1000px){
+  /* The board keeps its one-row dock and its header tools. */
+  .ph-bar{display:none}
+  .dock{flex-direction:row; align-items:center; gap:10px}
+  .dock-tools{display:none}
+  .dock-why{display:none}
+  .dock-go{flex:1; display:flex; gap:10px}
+}
+
+@media (max-width:999px){
+  /* The header sheds everything that moved to the dock, so the caller's
+     name stops wrapping to three lines at 390px. */
+  #tierBtn, #stuckBtn, #lookupBtn{display:none}
+  .top{padding:8px 12px; gap:10px}
+  .who h1{font-size:16px; line-height:1.2}
+  .who span{font-size:12px}
+  .money{min-height:40px; padding:3px 10px}
+  .money b{font-size:18px}
+  /* Two dock rows plus the safe area. --dock-h is what every other rule in
+     this file uses to clear the dock, so it is redefined rather than
+     worked around -- the last control on a step must never sit behind the
+     one button that moves the call forward. */
+  :root{--dock-h:112px}
+  .wrap{padding:12px 12px calc(var(--dock-h,112px) + 24px + env(safe-area-inset-bottom))}
+  /* NOTHING UNDER 13px, and nothing under 44px she has to hit. The audit
+     found up to 14 pieces of sub-12px text and 16 sub-44px controls per
+     step; both classes of problem came from desktop-density rules applying
+     unchanged to a screen held at arm's length in a moving car. */
+  .sec-b{font-size:15px}
+  /* The "More detail" toggle on the SAY card measured 34px. It sits inside
+     the one block she reads out loud, so a mis-tap while talking expands
+     coaching over the words mid-sentence. */
+  .coach-btn{min-height:44px; padding:0 14px; font-size:12.5px}
+  /* The CSR hints under a field label ("any no below and you don't quote")
+     rendered at 11px. They are instructions to the person holding the
+     phone, not decoration, and eight of them per step under 12px is how
+     the audit found this screen unreadable at arm's length. */
+  /* The field label IS the question she reads out loud -- "Is the air
+     conditioning working?" was set at 11px uppercase, which is a caption
+     size, on a control whose wrong answer quotes an unbookable home. On a
+     desktop at 60cm that reads; on a phone held one-handed mid-call it does
+     not. Sentence case at 14px, because uppercase costs another 10% of
+     legibility and buys nothing here. */
+  .grp-h{font-size:14px; letter-spacing:.01em; text-transform:none; color:var(--ink-2); margin-bottom:8px}
+  .grp-h em{font-size:13px; line-height:1.4; display:block; margin-top:3px; letter-spacing:0}
+  .f label, .f > label{font-size:14px; letter-spacing:.01em; text-transform:none; color:var(--ink-2)}
+  .recap-row{font-size:14px; padding:11px 14px; min-height:44px}
+  .o{min-height:52px}
+  .opts.five,.opts.six{grid-template-columns:repeat(4,1fr)}
+  .opts button,.opt,.pill{min-height:48px}
+  input,select,textarea{font-size:16px; min-height:48px}
+}
+
 /* ── Side panel (desktop) / stacked (mobile): live recap only. ───────── */
 .side{display:flex; flex-direction:column; gap:12px}
 /* Round 40c: .side became a fixed-height scroll container in round 35 and
@@ -713,14 +854,33 @@ button.cmp-h:hover{color:var(--ink-2)}
 
 <nav class="strip" id="strip" aria-label="Call steps"></nav>
 
+<!-- Round 59, phone only: where she is, how far in, and the door to
+     everything the desktop board keeps permanently on screen. -->
+<div class="ph-bar" id="phBar" hidden></div>
+
 <div class="wrap">
   <div class="col-main" id="main" aria-live="polite"></div>
   <aside class="side" id="side"></aside>
 </div>
 
 <div class="dock" id="dock" hidden>
-  <button class="back" type="button" id="backBtn" onclick="back()">Back</button>
-  <button class="go" type="button" id="goBtn" onclick="next()"><span id="goLabel">Next</span><kbd>↵</kbd></button>
+  <!-- Round 59: on a phone the three header tools moved down here. The
+       header had six things crammed in one row at 390px and the caller's
+       name wrapped to three lines; these are also the tools she reaches for
+       mid-sentence, which is a thumb job, not a stretch to the top of a
+       6-inch screen. Hidden on desktop, where they stay in the header and
+       have keyboard shortcuts. -->
+  <div class="dock-tools" id="dockTools">
+    <button type="button" onclick="openSheet('callSheet');renderCallSheet()">Steps</button>
+    <button type="button" onclick="openLookup()">Look up</button>
+    <button type="button" onclick="openSheet('stuckSheet')">Stuck?</button>
+    <button type="button" id="dockExplain" onclick="openSheet('tierSheet')" hidden>Explain</button>
+  </div>
+  <p class="dock-why" id="dockWhy" hidden></p>
+  <div class="dock-go">
+    <button class="back" type="button" id="backBtn" onclick="back()">Back</button>
+    <button class="go" type="button" id="goBtn" onclick="next()"><span id="goLabel">Next</span><kbd>↵</kbd></button>
+  </div>
 </div>
 
 <!-- Lookup: replaces the always-on scope rail AND the 16-item objection drawer -->
@@ -744,6 +904,16 @@ button.cmp-h:hover{color:var(--ink-2)}
     <button class="tbtn" type="button" onclick="closeSheet('tierSheet')">Close</button>
   </div>
   <div class="sheet-body"><div id="tierSheetBody"></div></div>
+</section>
+
+<!-- Round 59, phone only: the step map and the running recap, which the
+     desktop shows in a permanent column and a phone has no room for. -->
+<section class="sheet" id="callSheet" hidden aria-label="This call">
+  <div class="sheet-top">
+    <div class="who" style="flex:1"><b>This call</b><span>Tap any step to go there</span></div>
+    <button class="tbtn" type="button" onclick="closeSheet('callSheet')">Close</button>
+  </div>
+  <div class="sheet-body"><div id="callSheetBody"></div></div>
 </section>
 
 <section class="sheet" id="stuckSheet" hidden aria-label="If you don't know what to say">
@@ -793,7 +963,7 @@ button.cmp-h:hover{color:var(--ink-2)}
   </div>
 </section>
 
-<script src="../js/rp-messages.js?v=3dcb8801"></script>
+<script src="../js/rp-messages.js?v=f7ad2d17"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -1544,7 +1714,12 @@ function sectionBody(s){
            who reads that as "cosmetic" ticks it and moves on without saying
            the caveat. It is the one answer on this screen that changes what
            the crew does on arrival. Say that instead. */""}
-      ${yn("moveoutHeavyCondition","Heavy trash or built-up grime? <em>\u2014 quote stays the same; crew re-checks on arrival, so read the caveat</em>")}
+      ${/* Round 58: /book stopped asking customers to grade their own
+           housekeeping, so this stops too. On a live call it is a question
+           Liz asks out loud -- "what shape is the place in?" is one a caller
+           answers honestly; "heavy trash or built-up grime?" is one they
+           defend against. Same field, same boolean, same caveat. */""}
+      ${yn("moveoutHeavyCondition","Has the place seen better days? <em>\u2014 heavy buildup or things left behind. Quote stays the same; crew re-checks on arrival, so read the caveat</em>")}
       ${/* Round 52: moved here from the deleted "tiers" screen. Neither
            field changes the price -- renting vs. selling used to decide
            which tier the CSR led with, and now just tells the crew and the
@@ -1834,10 +2009,32 @@ function primaryAction(){
     if(isCustomService())         return {label:"Submit request", run:submitCustomLead};
     return {label:"Confirm booking", run:submitBooking};
   }
+  /* ROUND 59 - THE PHONE WILL NOT LET HER WALK PAST A BLANK ANSWER.
+
+     forwardTarget() finds the next unfinished step AFTER this one, which is
+     right on the board: every step is on screen, so if she leaves bedrooms
+     blank and jumps to add-ons she can SEE the gap she left, and skipping
+     around is how a real call actually goes.
+
+     A phone shows one step. The one she left blank scrolls out of existence
+     the moment she moves, and the next thing that tells her is the quote --
+     by which point she has a caller on the line, a half-built job, and no
+     idea which answer is missing. That is the specific failure "dummy proof"
+     is asking about.
+
+     So on a phone the button finishes the step she is standing in before it
+     offers her the next one. She can still jump anywhere she likes from the
+     step sheet -- this governs the big button, not her freedom. */
+  if(isPhoneLayout() && rpState.step && !sectionValid(rpState.step)){
+    return {label:"Finish this step first", key:rpState.step, dead:true};
+  }
   const k = forwardTarget();
   if(k) return {label:`Next: ${NUDGE_SHORT[k]||k}`, key:k};
-  /* Only reachable when the single unfinished thing is the one she's in. */
-  return {label:"Finish this section", key:rpState.step, dead:true};
+  /* Only reachable when the single unfinished thing is the one she's in.
+     Round 59: said "Finish this section", which on a phone -- where the
+     section IS the screen and there is no other card to compare against --
+     tells her nothing about WHICH answer is missing. Names the thing. */
+  return {label:"Finish this step first", key:rpState.step, dead:true};
 }
 
 function isPhoneLayout(){
@@ -1966,18 +2163,116 @@ function renderBoard(){
   wireFocusFollow();
 }
 
+/* =========================================================================
+   ROUND 59 - THE PHONE SHELL IS ITS OWN TOOL NOW
+   =========================================================================
+   Direct instruction: "Call console is too hard to use on mobile, it should
+   be a separate version than the desktop version. Make it dummy proof mobile
+   friendly."
+
+   MEASURED BEFORE TOUCHING IT, because "too hard to use" needed a number.
+   At 390x844 every step rendered between 1,800 and 2,200 pixels tall. That
+   is two and a half screens of thumb-scrolling per step, on a live call,
+   while a stranger waits. Thirteen to sixteen controls were under the 44px
+   tap minimum and up to fourteen pieces of text were under 12px.
+
+   The cause was not styling. renderPhone() was rendering the DESKTOP BOARD:
+   all seven step cards as an accordion, one open and six folded, plus the
+   desktop side rail dumped underneath. So below the words she needs sat
+   roughly 1,200px of things she does not -- including, on the quote step, a
+   folded card that repeated the quote script she was already reading.
+
+   WHAT A PHONE SHELL IS FOR. On a desktop the board is right: a 1,400px
+   column shows the whole call at once and jumping around is free. A phone
+   shows one thing. So this renders ONE STEP, full width, and nothing else:
+   the line she says, what to do, the controls for that step, and the button
+   that moves her on. Everything the board keeps permanently on screen -- the
+   step map, the running recap -- moves into one sheet, one tap away.
+
+   WHAT IS NOT DUPLICATED, which is the whole reason this is a shell and not
+   a second file: sectionBody(), sectionValid(), guardrails(), lineFor(),
+   primaryAction(), TITLES, NUDGE and every word of script are the same
+   functions the desktop board calls. There is exactly one CSR script in this
+   building. A second call/mobile/index.html would have been two, and within
+   a month Liz on her phone would have been quoting a different product from
+   Liz at her desk. */
 function renderPhone(){
-  const keys = sectionKeys();
   const stopped = hasStopGuard();
+  const k = rpState.step;
+  /* The focused step owns the number keys -- on a phone there is nothing
+     else on screen to own them. */
+  KEYS_ON = !stopped;
+  const body = k ? sectionBody(k) : "";
+  KEYS_ON = false;
+  const guards = stopped ? [] : guardrails(k).filter(g => g.level !== "stop");
+  const t = TITLES[k] || ["",""];
+
   el("main").innerHTML = `
     ${stopped?blockedActionCard():""}
     <div id="sayZone">${sayBlock()}</div>
     ${stopped?"":blockedActionCard()}
-    ${stopped?"":quickBar()}
-    ${nudgeCard()}
     ${errorBlocks()}
-    <div style="margin-top:12px">${keys.map((k,i)=>sectionCard(k,i+1)).join("")}</div>`;
+    ${stopped?"":`<section class="sec open focus ph-sec" id="sec-${k}">
+      <div class="ph-sec-h">${esc(t[0])}</div>
+      <div class="sec-b">${body}
+        ${guards.map(g=>`<div class="guard ${g.level}"><span class="ic">${guardIcon(g.level)}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
+      </div>
+    </section>`}
+    ${stopped?"":quickBar()}`;
   wireFocusFollow();
+}
+
+/* The sticky bar under the header: where she is, how far in, and the way
+   into everything the board used to keep permanently on screen. Replaces
+   the chip strip, which on a 390px screen was a horizontally-scrolling row
+   whose left end was cut off -- so the one chip marked "now" could be the
+   one off the edge of the display. */
+function renderPhoneProgress(){
+  const bar = el("phBar");
+  if(!bar) return;
+  if(!isPhoneLayout() || rpState.step === "done" || !rpState.csrName || !isAuthed()){
+    bar.hidden = true; return;
+  }
+  bar.hidden = false;
+  const keys = sectionKeys();
+  const i    = Math.max(0, keys.indexOf(rpState.step));
+  const done = keys.filter(sectionValid).length;
+  const t    = TITLES[rpState.step] || [SHORT[rpState.step] || ""];
+  bar.innerHTML = `
+    <button type="button" class="ph-bar-btn" onclick="openSheet('callSheet');renderCallSheet()">
+      <span class="ph-bar-step">Step ${i+1} of ${keys.length}</span>
+      <span class="ph-bar-title">${esc(t[0])}</span>
+      <span class="ph-bar-more">All steps</span>
+    </button>
+    <div class="ph-prog"><i style="width:${Math.round((done/keys.length)*100)}%"></i></div>`;
+}
+
+/* The board's two permanent columns, folded into one sheet: where she is in
+   the call, and what she has captured so far. Opened from the progress bar
+   or the Steps button in the dock. */
+function renderCallSheet(){
+  const host = el("callSheetBody");
+  if(!host) return;
+  const keys = sectionKeys();
+  const rows = recapRows();
+  host.innerHTML = `
+    <div class="ph-steps">
+      ${keys.map((k,n)=>{
+        const ok  = sectionValid(k);
+        const now = rpState.step === k;
+        const sum = sectionSummary(k);
+        return `<button type="button" class="ph-step ${now?"now":""} ${ok?"ok":""}"
+          onclick="closeSheet('callSheet');focusSection('${k}')">
+          <span class="ph-step-n">${ok?"✓":n+1}</span>
+          <span class="ph-step-t"><b>${esc((TITLES[k]||[k])[0])}</b>${sum?`<span>${esc(sum)}</span>`:`<span class="muted">Not answered yet</span>`}</span>
+          ${now?`<span class="ph-step-here">You're here</span>`:""}
+        </button>`;
+      }).join("")}
+    </div>
+    ${rows.length?`<div class="recap" style="margin-top:14px">
+      <div class="recap-h">On this call</div>
+      ${rows.map(r=>`<div class="recap-row"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("")}
+    </div>`:""}`;
 }
 
 /* The two jobs that are not a whole call: quote somebody a number and send
@@ -2052,6 +2347,9 @@ function render(){
   else renderBoard();
 
   renderStrip(); renderSide(); renderTop(); renderDock(); renderTierSheet();
+  renderPhoneProgress();
+  /* Keep an open call sheet truthful -- she may jump a step from inside it. */
+  try{ const cs = el("callSheet"); if(cs && !cs.hidden) renderCallSheet(); }catch(e){}
   save();
 }
 
@@ -2082,12 +2380,19 @@ function renderTop(){
      shells, from the moment the call is known to be a move-out. */
   const tb = el("tierBtn");
   if(tb) tb.hidden = rpState.service !== "moveout";
+  const de = el("dockExplain");
+  if(de) de.hidden = rpState.service !== "moveout";
 }
 
 /* Round 40: the chips used to mean POSITION -- done behind you, pending
    ahead. On a board there is no behind or ahead, so they mean STATE: filled
    in or not, and every one of them is live at every moment. */
 function renderStrip(){
+  /* Round 59: hidden on a phone. renderPhoneProgress() replaces it with
+     something that cannot scroll its own current item off the screen. */
+  const strip = el("strip");
+  if(isPhoneLayout()){ strip.innerHTML = ""; strip.hidden = true; return; }
+  strip.hidden = false;
   const keys = sectionKeys();
   el("strip").innerHTML = keys.map(k=>
     `<button type="button" class="chip ${rpState.step===k?"now":sectionValid(k)?"done":""}" onclick="focusSection('${k}')">${SHORT[k]||k}</button>`
@@ -2108,7 +2413,10 @@ function renderStrip(){
    only when someone actually asks. What lives here instead is the class of
    thing a search box handles badly — a side-by-side, computed from this
    caller's own answers. */
-function renderSide(){
+/* Round 59: lifted out of renderSide() so the desktop rail and the phone
+   sheet read the SAME list. Two copies of a price breakdown is how a recap
+   ends up disagreeing with the header about what the job costs. */
+function recapRows(){
   const rows=[];
   if(rpState.service) rows.push(["Service", isCustomService()?"Custom quote":(rpServices[rpState.service]||{}).name]);
   if(rpState.bedrooms) rows.push(["Bedrooms", rpState.bedrooms]);
@@ -2123,6 +2431,16 @@ function renderSide(){
     rpAddonLineItems().forEach(r=>rows.push([r.label, "—"]));
   }
   if(rpState.bookedAt) rows.push(["Scheduled", rpState.bookedAt]);
+  return rows;
+}
+
+function renderSide(){
+  /* Round 59: on a phone this column is not rendered at all. It used to be
+     stacked under the accordion, 242px of recap and compare rail below
+     1,400px of folded cards -- reachable only by a scroll nobody performs
+     mid-call. It lives in the call sheet now, one tap from the dock. */
+  if(isPhoneLayout()){ el("side").innerHTML = ""; return; }
+  const rows = recapRows();
 
   const area = rpServiceAreaStatus();
   const areaCard = (area.status==="core"||area.status==="unknown") ? "" : `
@@ -2133,7 +2451,7 @@ function renderSide(){
         : `${esc(area.area)} — extra drive time. Fine to book; the office sees the flag.`}</div></div>`;
 
   el("side").innerHTML = `
-    ${isPhoneLayout()?"":nudgeCard()}
+    ${nudgeCard()}
     ${rows.length?`<div class="recap">
       <div class="recap-h">On this call</div>
       ${rows.map(r=>`<div class="recap-row ${r[2]?"neg":""}"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("")}
@@ -2557,9 +2875,22 @@ function blockedActionCard(){
    still outstanding, or -- when nothing is -- it closes the call. Back
    becomes "collapse this and step back to the previous section", which is
    still useful on a phone and harmless on a board. */
+/* Round 59: the dock's height is variable on a phone (a tools row, and an
+   amber reason line that comes and goes), so the page's bottom padding is
+   read off the rendered element rather than guessed at in CSS. Runs after
+   paint so the measurement is of the dock that actually exists. */
+function syncDockHeight(){
+  try{
+    const d = el("dock");
+    if(!d || d.hidden){ document.documentElement.style.removeProperty("--dock-h"); return; }
+    const h = Math.ceil(d.getBoundingClientRect().height);
+    if(h > 0) document.documentElement.style.setProperty("--dock-h", h + "px");
+  }catch(e){}
+}
+
 function renderDock(){
   const d = el("dock");
-  if(rpState.step==="done"){ d.hidden = true; return; }
+  if(rpState.step==="done"){ d.hidden = true; syncDockHeight(); return; }
   d.hidden = false;
   const keys = sectionKeys(), i = keys.indexOf(rpState.step);
   el("backBtn").style.visibility = i > 0 ? "visible" : "hidden";
@@ -2568,6 +2899,20 @@ function renderDock(){
   el("goLabel").textContent = a.label;
   el("goBtn").disabled = !!a.dead;
   el("goBtn").classList.toggle("is-stopped", stopped);
+  /* Round 59: a disabled button with no reason next to it is the oldest
+     dead end in software. On a phone the reason has to be ON the dock,
+     because the control she has not filled in may be off the top of the
+     screen by the time she reaches for the button. */
+  const why = el("dockWhy");
+  if(why){
+    const show = isPhoneLayout() && !!a.dead && !stopped && a.key === rpState.step;
+    why.hidden = !show;
+    if(show){
+      const n = NUDGE[rpState.step] || [];
+      why.textContent = [n[0], n[1]].filter(Boolean).join(" — ") || "This step needs an answer before you move on.";
+    }
+  }
+  requestAnimationFrame(syncDockHeight);
 }
 
 /* Jumping around is normal on a real call — a caller volunteers the address

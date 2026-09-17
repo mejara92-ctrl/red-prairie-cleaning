@@ -299,3 +299,57 @@ New this round, minor:
   - moveout_blocked_contact and heavy_condition_call are the two tracked
     events worth a report; the second tells you how often a heavy home wants
     a human, which is the number that says whether the SOP above is urgent.
+
+
+===============================================================================
+ROUND 58 ADDENDUM — THE CONDITION QUESTION
+===============================================================================
+Brief: "Is the home free of heavy grime? Idk if I like that question. Think of
+something different."
+
+Right to flag it. Three faults, and they compound:
+
+  1. "Free of" inverts the answer -- Yes means good, directly beneath a
+     question where Yes means the water works.
+  2. "Grime" is a word nobody applies to their own house. It is an accusation
+     with a question mark on the end.
+  3. It asked the customer to self-assess as dirty. So the homes that most
+     needed the flag were the least likely to get it, which made the question
+     worst at the only job it has.
+
+REPLACED WITH a two-choice pick instead of a Yes/No:
+
+    What shape is the home in?
+      [ Normal            / Just needs a good clean              ]
+      [ Seen better days  / Heavy buildup, or things left behind ]
+
+Asks about the house, not their housekeeping. "It's seen better days" is an
+idiom people say about their own homes without embarrassment -- and a good
+share of these customers are landlords cleaning up after a tenant, where it
+was never their mess to begin with. The second option also names both real
+cost drivers in plain words: buildup, and things left behind.
+
+Stacked full-width rather than the 260px two-up the Yes/No rows use, because
+the labels are phrases. The row is visibly different from the three above it,
+which is correct -- it is a different kind of question.
+
+WIRING UNCHANGED. true still means heavy. rpMoveoutHeavyConditionFlagged(),
+the estimate panel, rpBlockedTextBody(), the webhook field and the crew sheet
+all read the same boolean. Nothing downstream needed touching.
+
+ALSO UPDATED:
+  - RP_MSG.price.flaggedLead now echoes their words: "You told us it's seen
+    better days" rather than "this one's heavier than standard". Saying the
+    answer back is what makes the panel read as a reply, not a system notice.
+  - /call's CSR toggle relabelled to match. "What shape is the place in?" is
+    a question a caller answers honestly out loud; "heavy trash or built-up
+    grime?" is one they defend against.
+
+NOT CHANGED: "Is the home free of mold or pest issues?" keeps its phrasing.
+It has the same double-negative shape, but mold and pests are unambiguous
+facts rather than a judgment call, so it does not carry the self-assessment
+problem. Worth revisiting if the Yes/No inversion ever tests badly.
+
+Verified: all four suites pass, Continue stays disabled until the condition is
+answered, both picks set the boolean correctly, the note and estimate panel
+render only on "seen better days", no JS errors.
