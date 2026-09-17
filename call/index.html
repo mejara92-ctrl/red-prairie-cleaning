@@ -358,6 +358,11 @@ button,input,select,textarea{font:inherit; color:inherit}
 }
 .dock-tools button:active{background:var(--sunk)}
 .dock-go{display:flex; gap:10px; align-items:center}
+.out-missing{
+  margin:0 0 10px; padding:10px 12px; border-radius:9px;
+  background:rgba(176,116,20,.10); border:1px solid rgba(176,116,20,.30);
+  font-size:13px; line-height:1.45; font-weight:700; color:var(--amber);
+}
 .dock-why{
   margin:0; padding:0 2px;
   font-size:12.5px; line-height:1.4; font-weight:700; color:var(--amber);
@@ -951,12 +956,13 @@ button.cmp-h:hover{color:var(--ink-2)}
 
 <section class="sheet" id="endSheet" hidden aria-label="End the call">
   <div class="sheet-top">
-    <div class="who" style="flex:1"><b>How did the call end?</b><span>Logs the lead so it can be worked again</span></div>
+    <div class="who" style="flex:1"><b>How did the call end?</b><span>Saves whatever you have — a number is optional</span></div>
     <button class="tbtn" type="button" onclick="closeSheet('endSheet')">Close</button>
   </div>
   <div class="sheet-body">
     <div class="f"><label for="outNotes">Anything worth noting</label>
       <textarea id="outNotes" placeholder="What they said, what to try next time…"></textarea></div>
+    <p class="note out-missing" id="outMissing" hidden></p>
     <div id="outList"></div>
     <p id="outStatus" class="note" style="margin-top:10px"></p>
     <button class="out-btn" type="button" onclick="closeSheet('endSheet')" style="margin-top:14px;text-align:center;font-weight:700">Never mind — back to the call</button>
@@ -2198,7 +2204,15 @@ function renderBoard(){
    Liz at her desk. */
 function renderPhone(){
   const stopped = hasStopGuard();
-  const k = rpState.step;
+  let k = rpState.step;
+  /* Round 60, second line of defence. ensureValidStep() runs before this and
+     should make it unreachable, but a phone shell that can paint an empty
+     screen is the one failure mode that strands her mid-call with nothing to
+     tap. If it ever happens again she gets the first step, not a void. */
+  if(!stopped && !sectionKeys().includes(k)){
+    k = nextThing() || sectionKeys()[0];
+    rpState.step = k;
+  }
   /* The focused step owns the number keys -- on a phone there is nothing
      else on screen to own them. */
   KEYS_ON = !stopped;
@@ -2280,7 +2294,11 @@ function renderCallSheet(){
    possible before and neither was reachable without walking the wizard. */
 function quickBar(){
   const canText  = phoneOk(rpState.phone) && !priceLocked() && rpFinalPrice() > 0;
-  const canLead  = String(rpState.fullName||"").trim().length > 1 && phoneOk(rpState.phone);
+  /* Round 60: was name AND a valid 10-digit phone. A button that hides
+     itself until the caller has surrendered a phone number is the same
+     block by another name -- and it hid at exactly the moment she most
+     needs it, on the call that is going nowhere. Either one shows it. */
+  const canLead  = String(rpState.fullName||"").trim().length > 1 || phoneOk(rpState.phone);
   if(!canText && !canLead) return "";
   return `<div class="qbar">
     ${canText?`<button type="button" class="primary" onclick="textThisPrice()">Text them this price</button>`:""}
@@ -2337,9 +2355,43 @@ function nudgeCard(){
   </div></div>`;
 }
 
+/* =========================================================================
+   ROUND 60 - THE BLANK MIDDLE. A ROUND-59 REGRESSION, AND A BAD ONE.
+   =========================================================================
+   Reported as: header says "Call Console", Next button at the bottom, and
+   the whole middle of the screen empty. Reproduced in one try.
+
+   rpState.step was null, or held a step name that no longer exists in the
+   flow ("tiers", retired in round 52). Round 59's phone shell renders ONE
+   step -- rpState.step -- and nothing else. So an invalid step rendered an
+   empty card, and an empty card on a phone is an empty screen.
+
+   WHY NOTHING CAUGHT IT. Every test I wrote set rpState.step to a real step
+   and called render(). The board never needed the step to be valid: it drew
+   all seven cards regardless and simply focused none of them, so null was a
+   legitimate state that meant "nothing focused" -- toggleSection() sets it
+   deliberately when she collapses a card. Round 59 turned a harmless state
+   into a fatal one and I never tested the harmless state. Any saved session
+   carrying step:null, or carrying a step from a build before round 52, was a
+   black screen on the first load after deploying.
+
+   The repair is here, in render(), rather than inside the phone shell, so
+   BOTH shells get a sane step and a stale saved session can never again
+   render a screen with nothing on it. null is still allowed on the board,
+   because there it means something. */
+function ensureValidStep(){
+  if(rpState.step === "done") return;
+  const keys = sectionKeys();
+  if(keys.includes(rpState.step)) return;
+  /* On the board, null is "nothing focused" and is a real state. */
+  if(rpState.step == null && !isPhoneLayout()) return;
+  rpState.step = nextThing() || keys[0] || null;
+}
+
 function render(){
   if(!isAuthed()){ renderAuthGate(); return; }
   if(!rpState.csrName){ renderSetup(); return; }
+  ensureValidStep();
   KEYMAP = []; KEYS_ON = false;
 
   if(rpState.step === "done"){ el("main").innerHTML = doneScreen(); }
@@ -2834,9 +2886,19 @@ function flashBlocked(){
    /lead path the End-call sheet uses, so the office sees it in exactly the
    shape it already knows. */
 async function logCallbackAndFinish(){
-  const nameOk = String(rpState.fullName||"").trim().length > 1;
+  const nameOk  = String(rpState.fullName||"").trim().length > 1;
   const phoneOk_ = phoneOk(rpState.phone);
-  if(!nameOk || !phoneOk_){
+  /* ROUND 60: this used to demand BOTH before it would log anything, and
+     bounced her back to the caller step if either was missing. On a blocked
+     job -- water off, mold, a house we can't price -- the caller is often
+     already annoyed, and "I need your number before I can even take this
+     down" is not the sentence to end on.
+
+     One contact detail is enough to make it a workable lead: a name the
+     office can match, or a number they can ring. With neither there is
+     genuinely nothing to follow up, so it still asks once -- but it asks by
+     sending her to the step, not by refusing to save. */
+  if(!nameOk && !phoneOk_){
     rpState.step = "caller";
     rpState.blockedNeedsContact = true;
     render();
@@ -3087,8 +3149,23 @@ function openLookup(){
   setTimeout(()=>el("lookupInput").focus(),30);
 }
 function openSheet(id){
-  if(id==="endSheet") el("outList").innerHTML = OUTCOMES.map(o=>
-    `<button class="out-btn" type="button" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
+  if(id==="endSheet"){
+    /* Round 60: a soft note, never a gate. It tells her what the office will
+       be missing so she can ask if the caller is still on the line -- and
+       every outcome button below it still works either way. */
+    const miss = [];
+    if(String(rpState.fullName||"").trim().length < 2) miss.push("name");
+    if(!phoneOk(rpState.phone)) miss.push("phone number");
+    const note = el("outMissing");
+    if(note){
+      note.hidden = miss.length === 0;
+      note.textContent = miss.length
+        ? `No ${miss.join(" or ")} for this one — still fine to log it. If they're on the line, worth one more ask.`
+        : "";
+    }
+    el("outList").innerHTML = OUTCOMES.map(o=>
+      `<button class="out-btn" type="button" onclick="logOutcome('${o[0].replace(/'/g,"\\'")}')">${o[0]}<small>${o[1]}</small></button>`).join("");
+  }
   el(id).hidden=false; document.body.style.overflow="hidden";
 }
 function closeSheet(id){ el(id).hidden=true; document.body.style.overflow=""; }
@@ -3293,6 +3370,10 @@ function back(){
 /* ---------- Persistence (survives an accidental refresh mid-call) ---------- */
 const CSR_IDENTITY_KEY = "rpCallConsole.csrIdentity";
 function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(rpState)); }catch(e){} }
+/* Round 60: the black screen arrived through here -- a session saved by an
+   older build, restored into a shell that assumed its step still existed.
+   Sanitised on the way in as well as at render, so a bad value never even
+   reaches rpState. */
 function load(){
   try{ const raw=localStorage.getItem(LS_KEY); if(raw){
     const d=JSON.parse(raw); if(!(d&&d.bookedAt)) Object.assign(rpState,d);

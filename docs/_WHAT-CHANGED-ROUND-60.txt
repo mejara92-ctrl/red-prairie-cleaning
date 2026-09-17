@@ -1,0 +1,115 @@
+ROUND 60 — THE BLANK MIDDLE (a round-59 regression) + ENDING A CALL
+===============================================================================
+Reported: "On mobile I just get a black screen." Then, more precisely: "It
+says call console at the top, next button on the bottom. But this middle
+section is completely blank. Also I don't like that end call forces you to put
+the contact number in, make that optional."
+
+-------------------------------------------------------------------------------
+1. THE BLANK MIDDLE — MY BUG, FROM ROUND 59
+-------------------------------------------------------------------------------
+Reproduced in one try from the description, because "header + dock + nothing
+between them" names the failure exactly: render() completed, renderTop() and
+renderDock() ran, and renderPhone() produced an empty card.
+
+CAUSE. Round 59's phone shell renders ONE step -- rpState.step -- and nothing
+else. It assumed that value is always a live step in the current flow. It is
+not:
+
+  - rpState.step is legitimately NULL on the desktop board. toggleSection()
+    sets it when Liz collapses a card; on a board that means "nothing
+    focused", which is a real and harmless state because all seven cards are
+    on screen anyway.
+  - A session saved by an older build can carry a RETIRED step name. "tiers"
+    was a step until round 52 deleted it.
+
+Either value produced <section id="sec-null"> with an empty body. On a phone,
+an empty card is an empty screen. And because the console saves rpState to
+localStorage to survive a refresh mid-call, anyone with a session from before
+the deploy hit it on first load.
+
+WHY NOTHING CAUGHT IT. Every test I wrote for round 59 set rpState.step to a
+real step and called render(). I never tested the two states the board had
+always tolerated. The round-59 verification was thorough about the code I
+wrote and silent about the assumption I had changed underneath it.
+
+FIX, in render() rather than in the shell, so both layouts are protected and
+a stale session can never render an empty screen again:
+
+    function ensureValidStep(){
+      if(rpState.step === "done") return;
+      const keys = sectionKeys();
+      if(keys.includes(rpState.step)) return;
+      if(rpState.step == null && !isPhoneLayout()) return;   // board: legit
+      rpState.step = nextThing() || keys[0] || null;
+    }
+
+Plus a second line of defence inside renderPhone(): if the step is somehow
+still not in the flow, it takes the first unfinished one rather than painting
+nothing. A phone shell that can render an empty screen is the one failure
+that strands her mid-call with nothing to tap, so it gets two guards.
+
+VERIFIED, as a cold load with the bad value already in localStorage:
+    saved step null             -> 574px, 78 words, 3 controls, lands on caller
+    saved step "tiers"          -> 574px, 78 words, 3 controls, lands on caller
+    saved step (unknown key)    -> 574px, 78 words, 3 controls, lands on caller
+    desktop, saved step null    -> 7 cards, step stays null (unchanged)
+
+-------------------------------------------------------------------------------
+2. ENDING A CALL NO LONGER NEEDS A PHONE NUMBER
+-------------------------------------------------------------------------------
+He is right, and the cost was worse than the annoyance.
+
+The two calls most worth logging are the two where a number is hardest to
+get: a wrong number, and a caller who hangs up mid-sentence. Requiring a
+valid 10-digit phone before the call could be closed out meant those two
+ended with Liz either typing a fake number to escape the screen or closing
+the tab and logging nothing. Either way the outcome data is poisoned -- the
+feature built to capture leads was destroying the record of the calls that
+had none.
+
+A number is worth ASKING for every time. It is not worth BLOCKING on.
+
+  - logCallbackAndFinish() demanded name AND phone and bounced her back to
+    the caller step if either was missing. Now one is enough: a name the
+    office can match or a number they can ring makes a workable lead. With
+    genuinely neither it still sends her to ask once, because there is
+    nothing to follow up at all.
+  - quickBar()'s "Save lead & end" was hidden until name AND phone were
+    both valid -- the same block wearing a different hat, and it hid at
+    exactly the moment she most needs it, on the call going nowhere. Either
+    one shows it now.
+  - The End sheet subtitle says so out loud: "Saves whatever you have — a
+    number is optional."
+  - What is missing is shown as an amber note, not a barrier:
+        No phone number for this one — still fine to log it.
+        If they're on the line, worth one more ask.
+    All seven outcome buttons stay live underneath it.
+
+VERIFIED: 7 outcomes tappable with no phone; 7 tappable with neither name nor
+phone; "Save lead & end" appears with only a name.
+
+-------------------------------------------------------------------------------
+3. FULL COLD WALK-THROUGH, WHICH ROUND 59 NEVER DID
+-------------------------------------------------------------------------------
+The gap that let this ship was testing by seeding rpState instead of using the
+console. Round 60 adds a walk that starts from an empty browser and clicks:
+
+    password -> name -> Move-Out -> type name and phone into the real fields
+    -> home -> add-ons -> quote
+
+    setup done        762px   step=service
+    tap Move-Out      868px   step=service   go="Next: name and number"
+    at caller step    681px   step=caller    [disabled, correctly]
+    typed name+phone  681px   step=caller    go="Next: about the home"
+    home             1384px
+    add-ons          1113px
+    quote             889px   stops on the quote checkbox, correctly
+    no JS errors anywhere
+
+-------------------------------------------------------------------------------
+VERIFICATION
+-------------------------------------------------------------------------------
+  check-prices.py / r52-test.js / funnel-test.js / undefined-refs.js  pass
+  stamp-assets.py re-run after the last edit
+  Desktop board re-checked: 7 cards, side rail, null step still legal
