@@ -1,0 +1,73 @@
+ROUND 63 — THE "NASTY POPUP"
+===============================================================================
+"IT'S STILL GETTING ME STUCK ON THAT SCREEN, EVEN WHEN I HIT BACK ITS JUST
+LIKE A NASTY POPUP"
+
+THE BUG
+-------------------------------------------------------------------------------
+When a stop guard fired — water off, A/C out, mold — renderPhone() drew the
+red blocked card AND NOTHING ELSE. No step, no controls. And hasStopGuard()
+reads the guards for the WHOLE call, not the current step, so it stayed true
+on every screen.
+
+So Back worked. rpState.step really did change. But the screen did not,
+because every step rendered the same red card:
+
+    flagged, on home   ->  red card, step controls: NOT RENDERED
+    back -> step=caller ->  red card, step controls: NOT RENDERED
+    back -> step=service->  red card, step controls: NOT RENDERED
+
+A screen that never changes no matter what you press IS a popup, and this one
+had no close button.
+
+And the part that made it unrecoverable: the ONE control that clears the flag
+— the water toggle on the home step — was among the things being hidden. Tap
+the wrong answer on that question and there was no way back to it. The only
+exit was ending the call.
+
+THE FIX — one branch deleted
+-------------------------------------------------------------------------------
+The step always renders. The red card sits above it as a warning, which is
+all it ever needed to be.
+
+    was:  ${stopped ? "" : `<section class="ph-sec">…</section>`}
+    now:  <section class="ph-sec">…</section>
+
+VERIFIED
+-------------------------------------------------------------------------------
+    flagged, on home    -> red card AND step controls AND water toggle visible
+    back -> caller      -> step controls render, screen visibly changes
+    back -> service     -> step controls render, screen visibly changes
+
+    tapping "Yes" on the water question:
+        stopped: true  -> false
+        red card: gone
+        button:  "Take a number & end the call" -> "Next: ask about add-ons"
+
+She can now undo a mis-tap in one tap, which is what should have happened all
+along.
+
+REGRESSIONS CHECKED
+-------------------------------------------------------------------------------
+  0 dead or hidden buttons across every step x every state (round 62)
+  stale saved sessions still land on a real step (round 60)
+  full cold walk with real taps, no blanks, no JS errors (round 60)
+  back-button behaviour from round 61 intact
+  check-prices / r52-test / funnel-test / undefined-refs all pass
+  assets re-stamped
+
+WHAT I GOT WRONG ACROSS 59-62
+-------------------------------------------------------------------------------
+Four rounds of "getting stuck" complaints, four different causes, all mine:
+
+  59  the phone shell rendered only rpState.step, and assumed it was valid
+      -> blank screen on a stale session (fixed r60)
+  59  "Finish this step first" disabled the Next button
+  61  disabled Back when there was nowhere to go
+      -> those two combined into both-buttons-dead (fixed r62)
+  59  the stop guard replaced the whole screen instead of warning on it
+      -> the popup with no exit (fixed here)
+
+The common thread: every one was a guard I added to protect the user from a
+tool they are holding during a live phone call. The desktop board never did
+any of it and never had any of these problems.

@@ -1,0 +1,90 @@
+ROUND 64 — FOUR THINGS CUT FROM THE PHONE
+===============================================================================
+"the mobile version needs to be simpler if possible"
+
+Asked which four to cut rather than guessing a fifth time. All four approved.
+Every one is PHONE-ONLY. The desktop board keeps all of it — that is the
+whole point of having two shells.
+
+-------------------------------------------------------------------------------
+1. THE TWO ADMIN FIELDS
+-------------------------------------------------------------------------------
+"Why are they moving? (Renting / Selling)" and "Property manager or realtor
+(optional)". They were the only two things on the home screen that change
+nothing: not the price, not whether we can book it, not what the crew does on
+arrival. The code's own comment said "context for the crew, doesn't change the
+price".
+
+On a 1,400px desktop column they cost nothing. On a phone they were two of
+seven questions, and one was a text field to type into while a stranger talks.
+
+Home screen: 7 questions -> 5. Step body 929px -> 730px.
+
+The fields still exist on rpState, still reset, still reach the office in the
+webhook. They are simply not asked for on a phone. Anyone working the
+property-manager referral channel works it from a desk.
+
+-------------------------------------------------------------------------------
+2. "TEXT THEM THIS PRICE / SAVE LEAD & END" — ONLY WHERE IT APPLIES
+-------------------------------------------------------------------------------
+Was on all seven steps. "Text them this price" means nothing before there is a
+price, and "Save lead & end" is a thing she does at the end — so on five of
+seven screens it was a pair of buttons that either could not fire or was not
+what she was doing.
+
+Now: quote, address, calendar, and any flagged call. Gone from the other three.
+
+-------------------------------------------------------------------------------
+3. ONE DOOR TO THE STEP LIST, NOT TWO
+-------------------------------------------------------------------------------
+The progress bar said "All steps" and the dock has a "Steps" button. Two doors
+to the same sheet, eight inches apart, on a tool whose main complaint has been
+falling into windows.
+
+The bar is a label now — where she is, and nothing else. It also lost the
+pointer and the 48px tap height that advertised it as a button. The dock's
+Steps button is the single way in.
+
+-------------------------------------------------------------------------------
+4. NO "MORE DETAIL" ON THE SCRIPT CARD
+-------------------------------------------------------------------------------
+It sat inside the one block she reads out loud, so a mis-tap mid-sentence
+dropped a paragraph of coaching on top of the words she was saying. The same
+coaching is searchable under Help, which is a deliberate trip rather than an
+accident. Desktop keeps it.
+
+-------------------------------------------------------------------------------
+PHONE, AFTER
+-------------------------------------------------------------------------------
+                 page      words    quick bar
+    service      972px      76
+    caller       844px      59
+    home       1,209px      97        (was 1,564px)
+    addons     1,159px      97
+    quote        909px      90        yes
+    contact    1,008px      49        yes
+    calendar     844px      37        yes
+
+For reference, the same screens before round 59: 1,800–2,200px each.
+
+-------------------------------------------------------------------------------
+DESKTOP — UNCHANGED, CONFIRMED
+-------------------------------------------------------------------------------
+    7 accordion cards, 529px side rail
+    "Why are they moving?"  present
+    Renting / Selling       present
+    Property manager field  present
+    "More detail" expander  present
+    no JS errors
+
+-------------------------------------------------------------------------------
+REGRESSIONS — ALL STILL FIXED
+-------------------------------------------------------------------------------
+  r63  flagged call renders the step AND the red card; water toggle reachable;
+       tapping "Yes" clears the flag and the button returns to "Next: ..."
+  r62  0 dead or hidden buttons across every step x every state
+  r61  system back closes a sheet and stays on the console; Back returns to
+       the screen she came from
+  r60  stale saved sessions land on a real step
+  check-prices / r52-test / funnel-test / undefined-refs all pass
+  assets re-stamped

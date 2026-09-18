@@ -292,9 +292,12 @@ button,input,select,textarea{font:inherit; color:inherit}
   position:sticky; top:0; z-index:30;
   background:var(--panel-2); border-bottom:1px solid var(--line);
 }
+/* Round 64: a label, not a button. It stopped being a door to the step
+   sheet -- the dock's Steps button is the only one now -- so it loses the
+   pointer and the tap height that advertised it as one. */
 .ph-bar-btn{
   display:flex; align-items:center; gap:10px; width:100%;
-  min-height:48px; padding:8px 14px; cursor:pointer;
+  min-height:40px; padding:7px 14px;
   background:transparent; border:0; color:var(--ink); text-align:left;
 }
 .ph-bar-step{
@@ -1781,14 +1784,28 @@ function sectionBody(s){
            field changes the price -- renting vs. selling used to decide
            which tier the CSR led with, and now just tells the crew and the
            office what the job is for. The PM/realtor name is the one that
-           earns its place: it feeds the property-manager referral channel. */""}
+           earns its place: it feeds the property-manager referral channel.
+
+           ROUND 64, DIRECT INSTRUCTION: both are cut on the phone. They are
+           the only two things on this screen that change nothing -- not the
+           price, not whether we can book it, not what the crew does on
+           arrival. On a 1,400px desktop column they cost nothing. On a phone
+           they are two of seven questions and one of them is a text field
+           she has to type into while a stranger talks.
+
+           The DESKTOP KEEPS BOTH, which is the point of having two shells.
+           Anyone working the property-manager channel works it from a desk.
+           Nothing else changes: the fields still exist on rpState, still
+           reset, and still go to the office in the webhook -- they simply
+           are not asked for on a phone. */""}
+      ${isPhoneLayout() ? "" : `
       <div class="grp"><div class="grp-h">Why are they moving? <em>— context for the crew, doesn't change the price</em></div>
         <div class="opts two">
           ${opt("Renting","pick('moveoutRentalOrSelling','renting')",rpState.moveoutRentalOrSelling==="renting")}
           ${opt("Selling","pick('moveoutRentalOrSelling','selling')",rpState.moveoutRentalOrSelling==="selling")}
         </div></div>
       <div class="f" style="margin-top:12px"><label for="pmName">Property manager or realtor (optional)</label>
-        <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" autocomplete="off" oninput="set('moveoutPmOrRealtor',this.value)"></div>` : ""}`;
+        <input id="pmName" value="${esc(rpState.moveoutPmOrRealtor)}" placeholder="Name or company" autocomplete="off" oninput="set('moveoutPmOrRealtor',this.value)"></div>`}` : ""}`;
   }
 
   /* Round 52: the "tiers" screen is deleted, but two fields it collected
@@ -2208,11 +2225,17 @@ function sayBlock(){
   if(hasStopGuard()) return "";
   const line = lineFor(rpState.step);
   if(!line) return "";
+  /* ROUND 64: the More detail expander is desktop-only now. It sat inside
+     the one block she reads out loud, so a mis-tap mid-sentence dropped a
+     paragraph of coaching on top of the words she was saying. The same
+     coaching is searchable under Help, which is a deliberate trip rather
+     than an accident. */
+  const coach = !isPhoneLayout();
   return `<div class="say">
-      <div class="say-label"><span>Say</span><span class="spacer"></span>
-        <button class="coach-btn" type="button" aria-expanded="${coachOpen}" onclick="toggleCoach()">More detail</button></div>
+      <div class="say-label"><span>Say</span>${coach ? `<span class="spacer"></span>
+        <button class="coach-btn" type="button" aria-expanded="${coachOpen}" onclick="toggleCoach()">More detail</button>` : ""}</div>
       <p>${line.say}</p>
-      <div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>
+      ${coach ? `<div class="coach" ${coachOpen?"":"hidden"}>${line.coach}</div>` : ""}
     </div>
     ${line.act ? (
       /* Round 61: on the board it always shows -- the column is there and
@@ -2295,7 +2318,7 @@ function renderPhone(){
      should make it unreachable, but a phone shell that can paint an empty
      screen is the one failure mode that strands her mid-call with nothing to
      tap. If it ever happens again she gets the first step, not a void. */
-  if(!stopped && !sectionKeys().includes(k)){
+  if(!sectionKeys().includes(k)){
     k = nextThing() || sectionKeys()[0];
     rpState.step = k;
   }
@@ -2307,18 +2330,48 @@ function renderPhone(){
   const guards = stopped ? [] : guardrails(k).filter(g => g.level !== "stop");
   const t = TITLES[k] || ["",""];
 
+  /* ROUND 63 - THE STEP ALWAYS RENDERS. THIS WAS THE "NASTY POPUP".
+
+     Reported: "IT'S STILL GETTING ME STUCK ON THAT SCREEN, EVEN WHEN I HIT
+     BACK ITS JUST LIKE A NASTY POPUP."
+
+     Exactly right, and here is what was happening. When a stop guard fired
+     -- water off, A/C out, mold -- this rendered the red blocked card AND
+     NOTHING ELSE. No step, no controls. And hasStopGuard() reads the guards
+     for the WHOLE call, not the current step, so it stayed true on every
+     screen.
+
+     So: Back worked. rpState.step really did change. But the screen did not,
+     because every step rendered the same red card. Measured:
+
+         flagged, on home -> red card, no step controls
+         back  -> step=caller   -> red card, no step controls
+         back  -> step=service  -> red card, no step controls
+
+     A screen that never changes no matter what you press is a popup, and
+     this one had no close button. Worse: the ONE control that clears the
+     flag -- the water toggle on the home step -- was the thing being hidden.
+     A mis-tap on that question was unrecoverable without ending the call.
+
+     Fixed by deleting the branch. The step always renders. The red card sits
+     above it as a warning, which is all it ever needed to be. Back visibly
+     moves, and if she tapped the wrong answer she just taps it again. */
   el("main").innerHTML = `
-    ${stopped?blockedActionCard():""}
+    ${blockedActionCard()}
     <div id="sayZone">${sayBlock()}</div>
-    ${stopped?"":blockedActionCard()}
     ${errorBlocks()}
-    ${stopped?"":`<section class="sec open focus ph-sec" id="sec-${k}">
+    <section class="sec open focus ph-sec" id="sec-${k}">
       <div class="ph-sec-h">${esc(t[0])}</div>
       <div class="sec-b">${body}
         ${guards.map(g=>`<div class="guard ${g.level}"><span class="ic">${guardIcon(g.level)}</span><div><b>${g.title}</b>${g.body}</div></div>`).join("")}
       </div>
-    </section>`}
-    ${stopped?"":quickBar()}`;
+    </section>
+    ${/* ROUND 64: was on all seven steps. "Text them this price" means
+         nothing before there is a price, and "Save lead & end" is a thing
+         she does at the end -- so on five of the seven screens this was a
+         pair of buttons that either could not fire or was not what she was
+         doing. It shows where it applies. */""}
+    ${["quote","contact","calendar"].includes(k) || hasStopGuard() ? quickBar() : ""}`;
   wireFocusFollow();
 }
 
@@ -2338,12 +2391,15 @@ function renderPhoneProgress(){
   const i    = Math.max(0, keys.indexOf(rpState.step));
   const done = keys.filter(sectionValid).length;
   const t    = TITLES[rpState.step] || [SHORT[rpState.step] || ""];
+  /* ROUND 64: the bar used to be a button saying "All steps" and the dock
+     has a Steps button. Two doors to one sheet, eight inches apart. The bar
+     is a label now -- it says where she is and nothing more -- and the dock
+     button is the single way in. */
   bar.innerHTML = `
-    <button type="button" class="ph-bar-btn" onclick="openSheet('callSheet');renderCallSheet()">
+    <div class="ph-bar-btn">
       <span class="ph-bar-step">Step ${i+1} of ${keys.length}</span>
       <span class="ph-bar-title">${esc(t[0])}</span>
-      <span class="ph-bar-more">All steps</span>
-    </button>
+    </div>
     <div class="ph-prog"><i style="width:${Math.round((done/keys.length)*100)}%"></i></div>`;
 }
 
