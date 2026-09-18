@@ -1,0 +1,57 @@
+ROUND 65 — "STANDARD OR HEAVY BUILD UP"
+===============================================================================
+"Has the place seen better days? Instead put How's the condition of the home,
+standard or heavy build up. Apply to website as well."
+
+Done on both surfaces, same words.
+
+    WAS (/book):   What shape is the home in?
+                     [ Normal / Just needs a good clean ]
+                     [ It's seen better days / Heavy buildup, or things left behind ]
+
+    WAS (/call):   Has the place seen better days?   [ Yes ] [ No ]
+
+    NOW (both):    How's the condition of the home?
+                     [ Standard / Just needs a good clean ]
+                     [ Heavy build up / Or things being left behind ]
+
+WHY IT IS BETTER THAN WHAT I WROTE IN ROUND 58
+-------------------------------------------------------------------------------
+"Standard" is the word this site already uses for exactly this idea, in every
+other place it appears: "standard home in standard condition" on the estimate,
+the promise strip, the landing pages and the fine print. So the word the
+customer taps here is now the same word they read everywhere else. My idiom
+was friendlier and made the customer translate.
+
+It also fixed a shape mismatch. /call was still a Yes/No, so the console and
+the website asked the same question two different ways -- and "Has the place
+seen better days? [Yes] [No]" is a sentence a CSR has to decode before she can
+tap. She now taps the word the caller just said.
+
+EVERYWHERE THE ANSWER IS ECHOED BACK, ALIGNED
+-------------------------------------------------------------------------------
+  js/rp-messages.js  flaggedLead
+      was: "You told us it's seen better days — good, that helps."
+      now: "You told us there's heavy build up — good, that helps."
+
+  call/index.html  spoken caveat
+      was: "With the extra buildup you mentioned…"
+      now: "With the heavy build up you mentioned…"
+
+  book/index.html  prefilled SMS on a blocked home
+      was: "Also heavier than a standard clean"
+      now: "Condition: heavy build up"
+
+Nothing behind it changed: same field, same boolean, same caveat, same crew
+sheet, same webhook.
+
+VERIFIED
+-------------------------------------------------------------------------------
+  /book  question and both labels render; picking Heavy build up sets the flag
+         and the estimate panel opens with "You told us there's heavy build up";
+         picking Standard renders no panel
+  /call  home step reads "How's the condition of the home?" with Standard /
+         Heavy build up; the spoken quote carries the caveat
+  check-prices / r52-test / funnel-test / undefined-refs  all pass
+  0 dead or hidden buttons
+  assets re-stamped

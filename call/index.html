@@ -1023,7 +1023,7 @@ button.cmp-h:hover{color:var(--ink-2)}
   <button class="sheet-done" type="button" onclick="closeSheet('endSheet')">Never mind — back to the call</button>
 </section>
 
-<script src="../js/rp-messages.js?v=f7ad2d17"></script>
+<script src="../js/rp-messages.js?v=f7beae0a"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -1233,7 +1233,7 @@ function quoteSayLine(){
      line, in the same order, because a caller who books by phone and a
      customer who books online must not be told two different policies. */
   const heavy = (rpState.service === "moveout" && rpState.moveoutHeavyCondition === true && !rpIsCustomQuoteOnly())
-    ? " And just so it's said up front \u2014 that covers a standard clean. With the extra buildup you mentioned, the crew walks it when they arrive and, if it needs more, they'll tell you the number right then. Say yes and they carry on; say no and they do the standard clean at the price I just gave you. Either way nothing gets added to your bill after."
+    ? " And just so it's said up front \u2014 that covers a standard clean. With the heavy build up you mentioned, the crew walks it when they arrive and, if it needs more, they'll tell you the number right then. Say yes and they carry on; say no and they do the standard clean at the price I just gave you. Either way nothing gets added to your bill after."
     : "";
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.${heavy}\u201d`;
 }
@@ -1779,7 +1779,16 @@ function sectionBody(s){
            Liz asks out loud -- "what shape is the place in?" is one a caller
            answers honestly; "heavy trash or built-up grime?" is one they
            defend against. Same field, same boolean, same caveat. */""}
-      ${yn("moveoutHeavyCondition","Has the place seen better days? <em>\u2014 heavy buildup or things left behind. Quote stays the same; crew re-checks on arrival, so read the caveat</em>")}
+      ${/* ROUND 65: same question, same two words, as /book. It was a Yes/No
+           here, which meant the console and the website asked the same thing
+           in two different shapes -- and "Has the place seen better days?
+           [Yes] [No]" is a sentence a CSR has to translate before she can
+           tap. Now she taps the word the caller just said. */""}
+      <div class="grp"><div class="grp-h">How's the condition of the home? <em>\u2014 quote stays the same either way; on heavy build up, read the caveat below</em></div>
+        <div class="opts two">
+          ${opt("Standard","pick('moveoutHeavyCondition',false)",rpState.moveoutHeavyCondition===false)}
+          ${opt("Heavy build up","pick('moveoutHeavyCondition',true)",rpState.moveoutHeavyCondition===true)}
+        </div></div>
       ${/* Round 52: moved here from the deleted "tiers" screen. Neither
            field changes the price -- renting vs. selling used to decide
            which tier the CSR led with, and now just tells the crew and the

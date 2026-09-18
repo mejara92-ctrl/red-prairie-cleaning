@@ -131,9 +131,9 @@ const RP_MSG = {
 
        Written as two spans so the screen can bold the first half. */
     /* Round 58: echoes the answer they gave in their words. They picked
-       "it's seen better days"; saying it back is what makes the panel read
+       "heavy build up"; saying it back is what makes the panel read
        as a reply rather than a system notice. */
-    flaggedLead: "You told us it's seen better days — good, that helps.",
+    flaggedLead: "You told us there's heavy build up — good, that helps.",
     flaggedBody: "The price above covers a standard clean. The crew walks the home on arrival and, if it needs more, prices the extra with you on the spot — say yes and they carry on, say no and they do the standard clean at the price above. Nothing is ever added afterward."
     /* Round 37 (direct instruction): the price-ceiling claim is gone. The
        top of the move-out ladder is still the top of the ladder — we just

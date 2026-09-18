@@ -3314,7 +3314,7 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=f7ad2d17"></script>
+<script src="../js/rp-messages.js?v=f7beae0a"></script>
 <script src="../js/rp-pricing-engine.js?v=4569118c"></script>
 <script>
 /* =========================================================================
@@ -3953,10 +3953,18 @@ function rpScreenHtml() {
              pride rather than accuracy. Two plain descriptions instead, both
              of which a person can pick without conceding anything. */""}
         <div class="rp-quest-row is-wide">
-          <span class="rp-quest-label">What shape is the home in?</span>
+          ${/* ROUND 65, DIRECT INSTRUCTION: "How's the condition of the home,
+               standard or heavy build up." Names the thing plainly instead of
+               reaching for an idiom. "Standard" is also the word the price
+               promise uses everywhere else on this site -- "standard home in
+               standard condition" -- so the answer the customer picks here is
+               the same word they read on the estimate, the landing pages and
+               the fine print. The idiom was friendlier; this is clearer, and
+               it lines up the whole vocabulary. */""}
+          <span class="rp-quest-label">How's the condition of the home?</span>
           <div class="rp-choice-grid rp-quest-pills is-stacked">
-            <button class="rp-pill ${rpState.moveoutHeavyCondition === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', false)">Normal<small>Just needs a good clean</small></button>
-            <button class="rp-pill ${rpState.moveoutHeavyCondition === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', true)">It's seen better days<small>Heavy buildup, or things left behind</small></button>
+            <button class="rp-pill ${rpState.moveoutHeavyCondition === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', false)">Standard<small>Just needs a good clean</small></button>
+            <button class="rp-pill ${rpState.moveoutHeavyCondition === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', true)">Heavy build up<small>Or things being left behind</small></button>
           </div>
         </div>
       </div>
@@ -4715,7 +4723,7 @@ function rpBlockedTextBody() {
   if (home.length) bits.push(`Home: ${home.join(", ")}`);
   const reasons = rpMoveoutBlockReasons();
   if (reasons.length) bits.push(`Flagged: ${reasons.join(", ")}`);
-  if (rpState.moveoutHeavyCondition === true) bits.push("Also heavier than a standard clean");
+  if (rpState.moveoutHeavyCondition === true) bits.push("Condition: heavy build up");
   if (rpState.fullName) bits.push(`Name: ${rpState.fullName}`);
   const area = rpServiceAreaStatus();
   if (area.area) bits.push(`Area: ${area.area}`);
