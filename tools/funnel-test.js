@@ -46,6 +46,8 @@ const setups = {
      service with no test. */
   reset:       {},
   carpet:      {carpetRooms:3},
+  /* Round 66c: bookable on its own, not only as an add-on. */
+  cardetailing:{carDetail:"standard"},
   hourly:      {cleanerCount:2,hourCount:4},
 };
 for (const [svc, extra] of Object.entries(setups)) {
@@ -101,7 +103,7 @@ console.log("\n--- the guarantee a customer is promised matches the product ---"
    branch of rpGuaranteeType() to a "deposit" default, so a carpet-only
    booking was promised a landlord guarantee. Untested defaults are how that
    survived fourteen rounds. */
-const g = {moveout:"deposit", deep:"satisfaction", maintenance:"satisfaction", reset:"satisfaction", carpet:"satisfaction", hourly:"none"};
+const g = {moveout:"deposit", deep:"satisfaction", maintenance:"satisfaction", reset:"satisfaction", carpet:"satisfaction", cardetailing:"satisfaction", hourly:"none"};
 for (const [svc,want] of Object.entries(g)) {
   ctx.reset(Object.assign({},base,{service:svc,bedrooms:3,bathrooms:2,cleanerCount:1,hourCount:3,frequency:"One-Time"}));
   const got = ctx.det().guarantee_type;
@@ -262,6 +264,43 @@ console.log("\n--- interior car detailing ---");
       "car detailing tiers are hours x $40, same rate as the house services");
 }
 
+/* =========================================================================
+   ROUND 66c — CAR DETAILING, BOOKED ON ITS OWN
+   =========================================================================
+   The service key ("cardetailing") and the add-on key ("cardetail") are
+   deliberately different so rpAddonAvailable() cannot match both. If they
+   ever collide, the standalone service offers itself as its own add-on and
+   bills twice -- which a total-based check would show as a plausible $240
+   and miss. Asserted directly.
+   ========================================================================= */
+console.log("\n--- car detailing prices the same booked alone or attached ---");
+{
+  const cd = ctx.addonCatalog().cardetail;
+  for (const [tier, pet, want] of [["standard",false,cd.standard],["deep",false,cd.deep],
+                                   ["standard",true,cd.standard+cd.petHair],["deep",true,cd.deep+cd.petHair]]) {
+    ctx.reset(Object.assign({},base,{service:"cardetailing",carDetail:tier,carDetailPetHair:pet}));
+    const alone = ctx.price();
+    ctx.reset(Object.assign({},base,{service:"maintenance",frequency:"One-Time",carDetail:tier,carDetailPetHair:pet}));
+    const attached = ctx.price() - 120;
+    chk(alone === want, `${tier}${pet?" + pet hair":""} alone is $${want} (got $${alone})`);
+    chk(attached === want, `${tier}${pet?" + pet hair":""} attached is $${want} (got $${attached})`);
+    console.log(`  ${(tier+(pet?" + pet hair":"")).padEnd(22)} alone $${alone}  ·  attached $${attached}`);
+  }
+  chk(ctx.addons().cardetailing.length === 0, "the standalone service offers no add-ons");
+  chk(!ctx.addons().cardetailing.includes("cardetail"), "it cannot offer itself as its own add-on");
+  /* Thinnest ticket on the list, and a separate trip -- exactly the job the
+     wage floor and the margin target exist to watch. */
+  ctx.reset(Object.assign({},base,{service:"cardetailing",carDetail:"standard"}));
+  const e = ctx.econ();
+  chk(ctx.budgetHours() === cd.standardHours, `budgets ${cd.standardHours} crew-hours for the floor check`);
+  chk(e && !e.onFloor, "a standalone standard detail is not on the minimum-wage floor");
+  chk(e && e.margin >= 0.20, `it clears the 20% target (${(e.margin*100).toFixed(1)}%)`);
+  chk(ctx.price() / ctx.budgetHours() === 40, "it bills $40 per crew-hour like everything else");
+  chk(!ctx.flows().cardetailing.includes("addons"), "no add-ons step in its flow");
+  chk(ctx.flow().includes("contactgate"), "the contact gate is still inserted before the price");
+  console.log(`  standalone standard: $${ctx.price()} / ${ctx.budgetHours()} hrs, margin ${(e.margin*100).toFixed(1)}%`);
+}
+
 console.log("\n--- hourly is off the public menu, still bookable by phone ---");
 chk(ctx.isPublic("hourly") === false, "hourly is hidden from the public picker");
 chk(ctx.isPublic("maintenance") && ctx.isPublic("deep") && ctx.isPublic("reset"), "the three timed rungs are public");
@@ -324,6 +363,14 @@ console.log("\n--- the pre-gate teaser never undersells the real price ---");
       "rpGatePricePreview accounts for the condition surcharge");
   chk(!/figure:\s*`\$\$\{\s*rpServiceBasePrice\(\)\s*\}`/.test(body),
       "rpGatePricePreview does not quote the bare base price as the figure");
+  /* Round 66c: the same failure from the other direction -- a timed service
+     whose hours the customer had already stepped up. rpDisplayBasePrice()
+     returns the service ANCHOR, so reading it here quoted $120 on a $200
+     five-hour booking the previous screen had just shown them. */
+  chk(!/const\s+total\s*=\s*rpDisplayBasePrice\(\)\s*;/.test(body),
+      "rpGatePricePreview does not quote a timed service's bare anchor");
+  chk(/rpFinalPrice\(\)/.test(body),
+      "rpGatePricePreview reads the live total for timed services");
 }
 
 /* =========================================================================

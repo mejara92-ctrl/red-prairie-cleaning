@@ -468,3 +468,111 @@ including the $40/hr derivation.
 The two halves of the asked-once fix are asserted separately and on purpose:
 they pull in opposite directions, and fixing one by breaking the other is the
 obvious mistake — it is the one that was actually made.
+
+
+===============================================================================
+ROUND 66c — CAR DETAILING ON THE FRONT PAGE, AND A REDUNDANCY PASS
+===============================================================================
+"Add interior car detailing to front page too under carpet cleaning."
+"Do a final pass to eliminate redundancy and check for bugs. Make sure its all
+ good language? Good design."
+
+THE THING WORTH KNOWING FIRST: THE HOMEPAGE REDIRECTS
+-------------------------------------------------------------------------------
+index.html has RP_HOMEPAGE_REDIRECT = true and sends every first-time visitor
+straight to /book. So the "front page" almost nobody reads is the marketing
+homepage; the front page everybody reads is the booking funnel. Car detailing
+therefore went in three places, not one:
+
+  * the homepage footer's Cleaning Services list, directly under Carpet
+    Cleaning as asked, plus an Offer in the homepage JSON-LD (this is the SEO
+    and returning-visitor copy)
+  * /pricing's add-on table, with an #addons anchor for the footer link
+  * /book's service picker, under Carpet Cleaning, as a BOOKABLE SERVICE
+
+This also means an earlier round's page sweep was checking a 404: the test
+server 404'd directories instead of serving their index.html, so "/" resolved
+to nothing and the homepage checks passed against an error page. The harness
+now mirrors the real host (directory -> index.html, no-trailing-slash ->
+directory). Worth remembering — a green check against the wrong document is
+worse than no check.
+
+CAR DETAILING AS A BOOKABLE SERVICE
+-------------------------------------------------------------------------------
+$120 / 3 hrs standard, $240 / 6 hrs deep, pet hair +$50 — the same $40 an hour
+everything else on this price list sells, which is the reason it works: the
+tiers are just hours, and the engine already had rpCarDetailPrice().
+
+THE SERVICE KEY IS "cardetailing"; THE ADD-ON KEY IS "cardetail". Deliberately
+different, and asserted in the test suite. rpAddonAvailable() is keyed on the
+add-on name, so a collision would let the standalone service offer itself as
+its own add-on and bill twice — and $240 for a $120 detail is a plausible
+enough number that no total-based check would have flagged it.
+
+Both paths share rpState.carDetail / carDetailPetHair and one price function,
+so a $290 detail costs $290 whichever way it was bought. The test asserts
+alone-vs-attached parity across all four configurations.
+
+Its flow has no add-ons step (nothing bolts onto a car), which means
+rpCurrentFlow() inserts the contact gate before "estimate" — the fallback that
+branch was written for, exercised for the first time.
+
+MARGIN: 21.9% on the standard tier, the thinnest ticket on the list and tied
+with Basic. It clears the 20% target and the wage floor, but note what the
+model does NOT capture: a standalone detail is a whole trip for the smallest
+job we sell, with no house clean to share the drive-out with. That is why both
+the booking screen and Liz's script push the cross-sell — same price, one
+trip — rather than selling the standalone version harder.
+
+THE REDUNDANCY PASS
+-------------------------------------------------------------------------------
+* "It's time, not a finished checklist" was said TWICE on every timed path —
+  once on the included screen, once verbatim on the estimate. Split so each
+  does different work: the included screen explains how the hours run, the
+  estimate carries the caveat at the point of commitment (round 57's
+  caveat-before-promise ordering).
+
+* The Reset's outcome line re-listed the scope chips sitting directly above
+  it — appliances, cabinets, baseboards, fans, vents, every room. It now says
+  what the list cannot: why two people for a day finishes in one visit.
+
+* The Reset's fineprint and intro both explained the empty-house distinction.
+  Cut to one.
+
+MORE BUGS, ALL CAUGHT BY READING RENDERED SCREENS
+-------------------------------------------------------------------------------
+* THE CONTACT GATE UNDERSTATED A STEPPED-UP BOOKING. It read
+  rpDisplayBasePrice() — the anchor — so a Basic stepped to five hours showed
+  "Continue with $200" on one screen and "starts at $120" on the next. Same
+  bug class as round 66's move-out gate, from the other direction: there the
+  surcharge was missing, here the hours were. Now reads the live total, and
+  drops "starts at" once the customer has configured the job.
+
+* THE ESTIMATE FINEPRINT PUT A MOVE-OUT POLICY ON EVERY SERVICE. Round 66b's
+  rewrite told a $120 Basic customer that "heavy buildup is a flat 25%" — a
+  charge that cannot happen to them. Warning someone about an impossible
+  charge is worse than silence: it invents the doubt the line exists to
+  remove. It is service-aware now, in three versions.
+
+* Five defects on the new car-detailing path, every one a service-name list
+  that silently dropped the newcomer: the generic heading read "Here's what
+  your Interior Car Detailing includes"; the estimate had no spec line (the
+  Reset's round-66b bug, again); the fineprint talked about "the home you
+  described"; the gate said "starts at $290 for your home" on a car; and the
+  estimate offered "Small handyman repairs?" under a car detail.
+
+* "YARD CARE" WAS PROMISED IN THE FOOTER OF ALL 15 PAGES. The service was
+  removed sitewide several rounds ago. Replaced with interior car detailing,
+  which is a thing we actually sell.
+
+* /pricing's meta description and og:description were stale — no Reset, and
+  an og line still promising "standard home in standard condition".
+
+THE LESSON THIS ROUND KEEPS TEACHING
+-------------------------------------------------------------------------------
+Every bug in 66b and 66c had the same shape: a function that enumerated
+services by name, written before the newest service existed. The pricing side
+was fixed structurally in round 66 (RP_TIMED_SERVICES) and has not broken
+since. The COPY side still has these lists — headings, spec lines, fineprint,
+upsell gates — and each one is a place the next service will be dropped
+silently. If there is a round 67, that is where it should go.

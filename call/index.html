@@ -1023,8 +1023,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   <button class="sheet-done" type="button" onclick="closeSheet('endSheet')">Never mind — back to the call</button>
 </section>
 
-<script src="../js/rp-messages.js?v=307bfa17"></script>
-<script src="../js/rp-pricing-engine.js?v=29cb2743"></script>
+<script src="../js/rp-messages.js?v=8b5f7626"></script>
+<script src="../js/rp-pricing-engine.js?v=5cabe169"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -1117,6 +1117,8 @@ const FLOWS = {
      itself is alive in both places and writes the same rpState.frequency. */
   reset:          ["service","caller","addons","quote","contact","calendar","done"],
   carpet:         ["service","caller","rooms","quote","contact","calendar","done"],
+  /* Round 66c: bookable on its own by phone too. */
+  cardetailing:   ["service","caller","cardetails","quote","contact","calendar","done"],
   hourly:         ["service","caller","hourly","addons","quote","contact","calendar","done"],
   airbnb:         ["service","caller","home","quote","contact","calendar","done"],
   custom:         ["service","caller","customDetails","contact","done"]
@@ -1187,6 +1189,18 @@ const SERVICE_ANGLES = {
     objection: "Once this is on a schedule it's genuinely one less thing on your plate every week \u2014 that's really what you're paying for, not just the cleaning itself.",
     urgencyNoun: "recurring slots",
     seasonNote: "filling up our regular schedule"
+  },
+  /* Round 66c. The angle Liz needs is the cross-sell, not the pitch: a
+     caller booking only a car detail is a separate trip for the thinnest
+     ticket on the price list, and asking one question can turn it into a
+     house clean with the car attached. */
+  cardetailing: {
+    value: "that's a full interior — vacuum, seats, carpets, glass, door jambs — done right in your driveway",
+    addon: "ASK whether the house needs anything while we're out. A car detail on its own is a whole trip for our smallest ticket; attached to a cleaning it's the same price and one visit.",
+    objection: "It's the same hourly rate as our house cleaning — you're paying for a detailer's time, three hours or six, not a quick vacuum-out.",
+    urgencyNoun: "detailing slots",
+    seasonNote: "a busy week",
+    qualifier: "Is the house needing anything too, or just the car?"
   },
   carpet: {
     value: "that's real hot-water extraction with pre-treatment, not a rental machine or a quick surface pass",
@@ -1875,6 +1889,14 @@ function sectionBody(s){
      nothing stops arriving in GHL. */
   if(s==="frequency") return `<div class="opts two">${["One-Time","Weekly","Bi-Weekly","Monthly"]
     .map(f=>opt(f,`pick('frequency','${f}')`,rpState.frequency===f)).join("")}</div>`;
+
+  if(s==="cardetails") return `
+    <div class="grp"><div class="grp-h">Interior detail <em>— $${RP_HOURLY_LABOUR_RATE}/hr, same as the house</em></div>
+      <div class="opts two">
+        ${opt(`Standard — ${rpAddonCatalog.cardetail.standardHours} hrs`,`pick('carDetail','standard')`,rpState.carDetail==="standard","Vacuum, wipe-down, glass, jambs",`$${rpAddonCatalog.cardetail.standard}`)}
+        ${opt(`Deep clean — ${rpAddonCatalog.cardetail.deepHours} hrs`,`pick('carDetail','deep')`,rpState.carDetail==="deep","Adds shampooed seats & carpets, vents",`$${rpAddonCatalog.cardetail.deep}`)}
+      </div></div>
+    ${rpCarDetailSelected()?`<div class="opts">${opt("Pet hair removal",`toggle('carDetailPetHair')`,rpState.carDetailPetHair,"Ask if a dog rides in it — embedded hair is slow manual work",`+$${rpAddonCatalog.cardetail.petHair}`)}</div>`:""}`;
 
   if(s==="rooms") return `
     <div class="grp"><div class="grp-h">Carpeted rooms <em>— two-room minimum</em></div>

@@ -61,6 +61,14 @@ const rpServices = {
      without implying anything about how bad the home is. */
   reset:       { name: "Whole-Home Reset",                 emoji: "🌀" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
+  /* ROUND 66c: bookable on its own, not only as an add-on. Note the key is
+     "cardetailing" while the ADD-ON key is "cardetail" -- deliberately
+     different, because rpAddonAvailable() is keyed on the add-on name and a
+     collision would let the standalone service offer itself as its own
+     add-on and bill twice. They share rpState.carDetail / carDetailPetHair
+     and rpCarDetailPrice(), so there is still one price for this work
+     however it is bought. */
+  cardetailing:{ name: "Interior Car Detailing",           emoji: "🚗" },
   hourly:      { name: "Hourly Cleaning",                  emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
 };
@@ -233,6 +241,11 @@ function rpBudgetedCrewHours(service = rpState.service) {
   if (rpIsTimedService(service)) return rpTimedBookedHours(service) * rpTimedServiceCrew(service);
   if (service === "hourly")      return Number(rpState.hourCount || HOURLY_MIN_HOURS) * Number(rpState.cleanerCount || 1);
   if (service === "carpet")      return RP_BASIC_ANCHOR_HOURS;
+  /* Round 66c: one detailer, for the tier's hours. Feeds the minimum-wage
+     floor check like every other service -- a standalone detail is the
+     thinnest ticket on the list and is exactly the job that check exists
+     to watch. */
+  if (service === "cardetailing") { const t = rpCarDetailTier(); return t ? t.hours : 0; }
   return 0;
 }
 /* The economics of the call currently in rpState. Returns null when there is
@@ -1018,7 +1031,11 @@ const rpServiceAddons = {
      in the way. Extra hours are the honest way to buy more work here.
      Carpet and the garage floor are genuinely separate jobs and stay. */
   reset:       ["extraHours", "carpet", "cardetail", "windows", "garage"],
-  hourly:      ["fridge", "laundry", "cardetail", "windows", "garage"]
+  hourly:      ["fridge", "laundry", "cardetail", "windows", "garage"],
+  /* Round 66c: none. A car in a driveway has nothing to bolt on, and an
+     empty list is what keeps the standalone service from offering its own
+     add-on twin (see the key note on rpServices.cardetailing). */
+  cardetailing: []
   /* Yard Refresh removed sitewide (direct instruction) -- it's gone from
      the catalog above too. Every service that offered it now just offers
      one less row on the add-ons screen; nothing else depended on it. */
@@ -1326,7 +1343,7 @@ const rpIncludes = {
      the time goes rather than as a checklist that gets completed. */
   deep: {
     intro: "Kitchen and bathrooms in detail, plus baseboards, doors, fixtures and floors.",
-    outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
+    outcome: "You tell us what matters most and we work down that list, in your order, for the hours booked.",
     fineprint: "Most homes get a full reset in six hours. Need the whole checklist in one visit? A Whole-Home Reset sends two cleaners for six hours instead.",
     itemsLead: "Where the time usually goes:",
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
@@ -1382,7 +1399,7 @@ const rpIncludes = {
      through the original `included` branch. */
   maintenance: {
     intro: "Kitchen, bathrooms, floors and the everyday surfaces.",
-    outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
+    outcome: "You tell us what matters most and we work down that list, in your order, for the hours booked.",
     fineprint: "If it's been a while, Deep Cleaning buys six hours instead. Moving out? A Move-Out Cleaning is priced for the whole interior.",
     itemsLead: "Where the time usually goes:",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
@@ -1393,10 +1410,26 @@ const rpIncludes = {
      compared to the $399 move-out. */
   reset: {
     intro: "The full move-out checklist, done around your furniture.",
-    outcome: "Two people for a full day's work: appliances inside and out, cabinets, baseboards, fans and vents, every room. It's the deepest clean we sell for a home you're still living in.",
-    fineprint: "This is the same checklist as our Move-Out Cleaning, which needs an empty house. If yours is empty, book that instead — it's priced for the whole interior and backed by our deposit guarantee.",
+    outcome: "Two people working the whole house at once, which is what makes a full checklist finishable in a single day rather than spread across two visits.",
+    fineprint: "A Move-Out Cleaning covers the same list for less, but it needs an empty house. If yours will be empty, book that one instead.",
     itemsLead: "Where the time usually goes:",
     items: ["Kitchen, detailed clean", "Inside oven, fridge & microwave", "Cabinet & drawer fronts, inside where reachable", "Bathrooms, scrubbed top to bottom", "Baseboards, doors, trim & fixtures", "Ceiling fans, vents & light fixtures", "Interior windows, sills & tracks", "All floors throughout"]
+  },
+  /* Round 66c. Note what this copy does NOT do: promise a finished result.
+     A three-hour interior at $40/hour is the same honest bargain as a
+     three-hour Basic -- real time, real work, not a showroom guarantee --
+     and the tier names carry the expectation instead. */
+  cardetailing: {
+    intro: "One detailer, in your driveway, working the inside of the car.",
+    highlights: [
+      ["clock", "3 or 6 hours"],
+      [null, "$120 or $240"],
+      ["shield", "Satisfaction guaranteed"]
+    ],
+    outcome: "Standard is a proper clean: vacuum, wipe-down, glass and door jambs. The deep clean adds shampooed seats and carpets, which is what actually lifts stains and smells rather than covering them.",
+    fineprint: "Interior only — we don't wash or wax the outside. Pet hair is slow, manual work and priced separately. Booking a house cleaning the same day? Add the car there instead and the crew does both in one trip.",
+    itemsLead: "What the time goes on:",
+    items: ["Full interior vacuum, seats and carpets", "Dash, console, doors and trim wiped down", "Interior glass", "Door jambs", "Shampooed seats & carpets (deep clean)", "Vents and crevices (deep clean)"]
   },
   carpet: {
     /* "Not a rental machine" removed per direct feedback: nobody was
@@ -1519,6 +1552,11 @@ const rpFlows = {
   maintenance: ["included", "contactgate", "addons", "estimate", "lead", "calendar"],
   reset:       ["included", "contactgate", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "contactgate", "estimate", "lead", "calendar"],
+  /* Round 66c: no "addons" step -- there is nothing to attach to a car.
+     rpCurrentFlow() therefore inserts the contact gate before "estimate"
+     rather than before "addons", which is exactly what that fallback is
+     for. */
+  cardetailing:["included", "cardetails", "contactgate", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "contactgate", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["included", "size", "airbnbdetails", "contactgate", "estimate", "lead", "calendar"]
 };
@@ -1679,6 +1717,7 @@ function rpTimeEstimate() {
   if (rpState.service === "hourly") return rpState.hourCount ? `${rpState.hourCount} hour${rpState.hourCount === 1 ? "" : "s"}` : `${HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "airbnb") return "Varies by property size";
   if (rpState.service === "carpet") return "Varies by room count";
+  if (rpState.service === "cardetailing") { const t = rpCarDetailTier(); return t ? `${t.hours} hours` : "3-6 hours"; }
   return "";
 }
 function rpTeamSize() {
@@ -1704,6 +1743,7 @@ function rpTeamSize() {
   if (rpState.service === "hourly") return rpState.cleanerCount ? `${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}` : "You choose";
   if (rpState.service === "airbnb") return "1–2 cleaners";
   if (rpState.service === "carpet") return "1 technician";
+  if (rpState.service === "cardetailing") return "1 detailer";
   return "";
 }
 
@@ -1951,6 +1991,7 @@ function rpDisplayBasePrice() {
   /* Round 66: one lookup for Basic, Deep and Reset. */
   const timed = rpTimedService();
   if (timed) return timed.price;
+  if (rpState.service === "cardetailing") return rpCarDetailPrice();
   return 0;
 }
 
@@ -2016,6 +2057,11 @@ function rpPreDiscountSubtotalCents() {
        standard-condition move-out takes the identical path it always did. */
     const base = rpServiceBasePrice();
     return rpToCents(base) + rpConditionSurchargeCents(base);
+  }
+  if (rpState.service === "cardetailing") {
+    /* Same function the add-on prices through, so a $290 car detail costs
+       $290 whether it was booked on its own or attached to a house clean. */
+    return rpToCents(rpCarDetailPrice());
   }
   if (rpState.service === "hourly") {
     if (!rpState.cleanerCount || !rpState.hourCount) return 0;

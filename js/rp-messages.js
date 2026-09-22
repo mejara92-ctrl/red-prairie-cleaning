@@ -125,7 +125,32 @@ const RP_MSG = {
        only when someone said standard and the home is not. Saying so is
        also the honest nudge: a customer reading this who knows their home
        is rough learns that declaring it is the way to get a firm number. */
-    fineprint: "This is the price for the home you described. If it turns out to be heavier than that, the crew prices the difference with you before they start — never after. Heavy buildup you tell us about up front is a flat 25%, and that number is firm.",
+    /* ROUND 66c — SERVICE-AWARE, because the round-66b rewrite put a
+       move-out-only policy on every estimate in the funnel.
+
+       The 25% heavy surcharge exists on Move-Out alone: it is the one
+       product that quotes a flat price for a whole home sight-unseen. A
+       Basic Cleaning customer reading "heavy buildup is a flat 25%" under a
+       $120 three-hour booking is being warned about a charge that cannot
+       happen to them, which is worse than saying nothing -- it invents the
+       doubt this line exists to remove.
+
+       Timed services answer a heavier home with more hours, which the
+       customer buys themselves on the stepper, so their version says that
+       instead. Kept as a function rather than two constants so there is
+       still exactly one place this promise is written. */
+    fineprint(service) {
+      /* Round 66c: car detailing is not a house, so neither the heavy
+         surcharge nor "the home you described" applies to it. */
+      if (service === "cardetailing") {
+        return "This is the full price for the tier you picked. Pet hair is the only thing that changes it, and you've already chosen. Nothing is added afterward.";
+      }
+      const timed = ["maintenance", "deep", "reset"].includes(service);
+      if (timed) {
+        return "This is the price for the hours you picked. If the home needs more than that, the crew will say so on the day rather than working faster — you can add time then or book a second visit. Nothing is ever added to your bill without your say-so.";
+      }
+      return "This is the price for the home you described. If it turns out to be heavier than that, the crew prices the difference with you before they start — never after. Heavy buildup you tell us about up front is a flat 25%, and that number is firm.";
+    },
     conditionFull: "Tell us at booking that the home has heavy buildup and we add a flat 25% for the extra time — that price is then firm, and the crew will not re-price it on arrival. If instead the crew arrives to heavy trash, heavy grease, pet mess or anything well outside what was described, they stop and quote the difference with you before any work starts — you can approve it or keep the standard clean at your quoted price. Nothing is ever added to your bill afterward.",
     /* ROUND 57 — WHAT THE FLAGGED CUSTOMER IS ACTUALLY AFRAID OF.
        Every version of this message so far has said the same two things:

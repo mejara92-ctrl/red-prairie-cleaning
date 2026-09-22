@@ -3594,8 +3594,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=307bfa17"></script>
-<script src="../js/rp-pricing-engine.js?v=29cb2743"></script>
+<script src="../js/rp-messages.js?v=8b5f7626"></script>
+<script src="../js/rp-pricing-engine.js?v=5cabe169"></script>
 <script>
 /* =========================================================================
    BOOKING STATE & UI — customer-facing (/book). Pricing math itself now
@@ -4258,6 +4258,13 @@ function rpScreenHtml() {
         <div class="rp-rows">
           ${rpRowBtn(rpRowHint('moveout',{ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Inspection-ready. The whole empty interior, in one price.", featured:true, badge:"Most Popular", val:`$${RP_MOVEOUT_BEDROOM_TIERS[0].base}`, valNote:"and up" }))}
           ${rpRowBtn(rpRowHint('carpet',{ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction. Two-room minimum.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" }))}
+          ${/* Round 66c: bookable on its own, by direct instruction. It sits
+               under Carpet Cleaning because this is the group for jobs that
+               are not a house clean -- you book one of these INSTEAD of
+               cleaning the house, not as well. It is also an add-on on every
+               other service, which is the cheaper way to buy it (no separate
+               trip), and the screen says so. */""}
+          ${rpRowBtn(rpRowHint('cardetailing',{ onclick:"rpSelectService('cardetailing', this)", icon:"car", title:"Interior Car Detailing", desc:"Inside the car only. In your driveway.", val:`$${rpAddonCatalog.cardetail.standard}`, valNote:"3 hrs · 1 detailer" }))}
         </div>
         <p class="rp-rate-note">Move-Out is priced for the whole home rather than by the hour, and it's the one backed by our Defend Your Deposit guarantee.</p>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a>, or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
@@ -4341,8 +4348,18 @@ function rpScreenHtml() {
            correctly, which means the screen was contradicting itself top to
            bottom. Heading now says what the product actually is, with the
            same energy and no promise we have to walk back. */""}
+      ${/* Round 66c: car detailing got "Here's what your Interior Car
+           Detailing includes" from the generic branch -- the service name
+           read back at the customer inside a sentence, which is the kind of
+           template seam that makes a page feel generated. Named headings
+           for the services that reach this renderer; the fallback stays for
+           anything new that lands here before someone writes it one. */""}
       <h2>${isMoveout
         ? "Every room, ready for the walkthrough"
+        : rpState.service === "cardetailing"
+          ? "Inside the car, done properly"
+        : rpState.service === "carpet"
+          ? "Deep-cleaned, not surface-cleaned"
         : ["deep","maintenance","hourly"].includes(rpState.service)
           ? `Here's what you're booking`
           : `Here's what your ${svcName} includes`}</h2>
@@ -4705,6 +4722,39 @@ function rpScreenHtml() {
      Same reasoning as round 52's deletion of the tier-comparison screen.
 
      rpSelectFrequency() is deleted with it -- see the handlers section. */
+
+  /* ROUND 66c — THE STANDALONE CAR-DETAILING SCREEN.
+     Deliberately the same shape as the add-on sheet: two tiers, then pet
+     hair, then a running total. A customer who has seen one should not have
+     to learn the other, and both write the same two rpState fields. */
+  if (rpState.step === "cardetails") {
+    const cd = rpAddonCatalog.cardetail;
+    const chosen = rpCarDetailSelected();
+    return { scroll: `<div class="rp-center">
+      ${eyebrow}
+      <h2>How deep does it need to go?</h2>
+      <p class="rp-sub">Both are one detailer at $${RP_HOURLY_LABOUR_RATE} an hour — the same rate as our house cleaning. You're choosing how long.</p>
+      <div class="rp-choice-grid">
+        <button class="rp-pill ${rpState.carDetail === "standard" ? "is-selected" : ""}" onclick="rpSelectCarDetail('standard')">Standard<br><small>${cd.standardHours} hrs · $${cd.standard}</small></button>
+        <button class="rp-pill ${rpState.carDetail === "deep" ? "is-selected" : ""}" onclick="rpSelectCarDetail('deep')">Deep clean<br><small>${cd.deepHours} hrs · $${cd.deep}</small></button>
+      </div>
+      <p class="rp-tap-note" style="margin-top:12px">Standard is vacuum, wipe-down, glass and door jambs. Deep adds shampooed seats and carpets, and the vents and crevices a wipe-down can't reach.</p>
+      ${chosen ? `
+      <label class="rp-enzyme-card ${rpState.carDetailPetHair ? "is-on" : ""}">
+        <input type="checkbox" ${rpState.carDetailPetHair ? "checked" : ""} onchange="rpToggleCarDetailPetHair(this.checked)">
+        <span class="rp-enzyme-body">
+          <strong>Pet hair removal <em>+$${cd.petHair}</em></strong>
+          <small>Embedded hair in upholstery and carpet is slow, manual work — a vacuum will not lift it. Add it if a dog rides in this car.</small>
+        </span>
+      </label>
+      <p class="rp-addon-running"><span>${rpCarDetailSummary()}</span><strong>$${rpCarDetailPrice()}</strong></p>` : ""}
+      ${/* The honest cross-sell: if they are booking a house clean anyway,
+           the car is cheaper as an add-on because there is no second trip.
+           Saying so costs this booking nothing and wins the bigger one. */""}
+      <p class="rp-included-note">Getting the house cleaned too? Add the car on any cleaning instead — same price, one trip, and you don't pay for us to come out twice.</p>
+    </div>`,
+    footer: `<button class="rp-primary" ${chosen ? "" : "disabled"} onclick="rpAdvance()">${chosen ? `Continue with $${rpCarDetailPrice()}` : "Pick one to continue"}</button>` };
+  }
 
   if (rpState.step === "rooms") {
     return { scroll: `<div class="rp-center">
@@ -5219,6 +5269,15 @@ function rpEstimateSpecLine() {
   } else if (rpState.service === "hourly") {
     if (rpState.cleanerCount) bits.push(`${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}`);
     if (rpState.hourCount) bits.push(`${rpState.hourCount} hour${rpState.hourCount === 1 ? "" : "s"}`);
+  } else if (rpState.service === "cardetailing") {
+    /* Round 66c: without this the estimate showed "$290" and the service
+       name with nothing saying what $290 buys -- the same gap the Reset had
+       in round 66b, from the same cause: a branch list that named services
+       by hand and silently dropped the new one. */
+    const t = rpCarDetailTier();
+    if (t) { bits.push(t.label); bits.push(`${t.hours} hours`); }
+    if (rpState.carDetailPetHair) bits.push("pet hair");
+    sub = "1 detailer";
   } else if (rpState.service === "carpet") {
     const n = Number(rpState.carpetRooms || 0);
     if (n) bits.push(`${n}${n >= 6 ? "+" : ""} room${n === 1 ? "" : "s"}`);
@@ -5238,7 +5297,13 @@ function rpEstimateGuaranteeLine() {
 function rpEstimateScreen(eyebrow) {
   const isQuoteOnly = rpState.service === "airbnb";
   const noGuaranteedPrice = rpIsCustomQuoteOnly();
-  const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1;
+  /* Round 66c: "Small handyman repairs?" is offered on the estimate when a
+     flow has no add-ons step of its own. Car detailing is such a flow, and
+     a make-ready repair prompt under a $290 car detail is a non-sequitur --
+     it is a HOUSE service, prompted by a booking that has no house in it.
+     Gated on the job actually being about a property. */
+  const showHandymanHere = rpCurrentFlow().indexOf("addons") === -1
+    && rpState.service !== "cardetailing";
   const service = rpServices[rpState.service];
   const addonRows = rpAddonLineItems();
   const firstVisitDeep = rpRecurringNeedsDeepFirst() && rpRecurringDeepFirstCents() > 0;
@@ -5373,7 +5438,7 @@ function rpEstimateScreen(eyebrow) {
           return `<p class="rp-slots-low rp-slots-low-estimate">Only ${openCount} opening${openCount === 1 ? "" : "s"} left in the next 7 days.</p>`;
         })()}
         <p class="rp-est-pay"><strong>${RP_MSG.payment.short}</strong> Pay after the clean, once you've seen it.</p>
-        <button class="rp-primary" onclick="rpAdvance()">Book This Cleaning</button>
+        <button class="rp-primary" onclick="rpAdvance()">${rpState.service === "cardetailing" ? "Book This Detail" : "Book This Cleaning"}</button>
         ${/* ROUND 57: the "second option" role had two different shapes in
              this funnel. The blocked screen gave it a bordered full-width
              button; this screen gave it a 28px underlined link with 13px of
@@ -5395,7 +5460,7 @@ function rpEstimateScreen(eyebrow) {
              render at all, so this is the only place the exception is
              stated and it stays -- that customer has not seen it anywhere
              else in the funnel. */""}
-        ${rpMoveoutHeavyConditionFlagged() ? "" : `<p class="rp-est-fine">${RP_MSG.price.fineprint}</p>`}
+        ${rpMoveoutHeavyConditionFlagged() ? "" : `<p class="rp-est-fine">${RP_MSG.price.fineprint(rpState.service)}</p>`}
       </div>
     </section>
 
@@ -5595,12 +5660,38 @@ function rpGatePricePreview() {
     };
   }
 
-  const base = rpDisplayBasePrice();
-  if (!(base > 0)) return null;
+  /* ROUND 66c — THIS UNDERSTATED A BOOKING THE CUSTOMER HAD ALREADY
+     CHANGED. It read rpDisplayBasePrice(), the service's anchor, so someone
+     who stepped Basic up to five hours saw "Continue with $200" on one
+     screen and "starts at $120" on the next. Same bug class as the move-out
+     gate fixed in round 66, from the other direction: there the surcharge
+     was missing, here the hours are.
+
+     It reads the live total now, and drops "starts at" once the customer has
+     configured the job -- at that point it is not a starting price, it is
+     their price, and hedging it invites them to wonder what else moves. */
+  const timed = rpTimedService();
+  const total = timed ? rpFinalPrice() : rpDisplayBasePrice();
+  if (!(total > 0)) return null;
   const name = (rpServices[rpState.service] || {}).name || "your clean";
+  const configured = timed && (Number(rpState.addonExtraHours || 0) > 0 || rpState.addonSecondCleaner);
+  /* Round 66c: car detailing reaches this with its tier already chosen, so
+     the number is exact, not a starting point -- and "for your home" is
+     wrong on a car. It also has no add-ons step, so the trailing line has
+     to stop promising one. */
+  if (rpState.service === "cardetailing") {
+    const t = rpCarDetailTier();
+    return {
+      figure: `$${total}`,
+      line: `Your ${t ? t.label.toLowerCase() : ""} interior detail comes to <b>$${total}</b>.`,
+      after: "That's the full price — nothing else gets added."
+    };
+  }
   return {
-    figure: `$${base}`,
-    line: `${name} starts at <b>$${base}</b> for your home.`,
+    figure: `$${total}`,
+    line: configured
+      ? `Your ${rpTimedBookedHours()}-hour ${name} comes to <b>$${total}</b>.`
+      : `${name} starts at <b>$${total}</b> for your home.`,
     after: "Add-ons and the full total are on the next screen."
   };
 }
@@ -6939,7 +7030,7 @@ function rpAttributionSummary() {
    product would have done. "basic" and "whole-home-reset" are accepted as
    aliases too, since those are the words a human writing a link will reach
    for before they reach for the internal key. */
-const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", basic: "maintenance", hourly: "hourly", reset: "reset", "whole-home-reset": "reset", wholehomereset: "reset" };
+const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", basic: "maintenance", hourly: "hourly", reset: "reset", "whole-home-reset": "reset", wholehomereset: "reset", cardetailing: "cardetailing", "car-detailing": "cardetailing", cardetail: "cardetailing", car: "cardetailing" };
 const rpSuggestedService = (function rpReadServiceHint() {
   const params = new URLSearchParams(window.location.search);
   const requested = (params.get("service") || "").trim().toLowerCase();
