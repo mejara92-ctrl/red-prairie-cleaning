@@ -576,3 +576,139 @@ was fixed structurally in round 66 (RP_TIMED_SERVICES) and has not broken
 since. The COPY side still has these lists — headings, spec lines, fineprint,
 upsell gates — and each one is a place the next service will be dropped
 silently. If there is a round 67, that is where it should go.
+
+
+===============================================================================
+ROUND 67 — MARKETING TAGS, AND A CAR-DETAILING LANDING PAGE
+===============================================================================
+"Shouldn't we add tags to see what kind of move-out they ordered so that we
+ can sell them promotions, reminders? idk if we do that."
+"Can we also build a landing page for car detailing?"
+
+THE ANSWER TO "IDK IF WE DO THAT": WE DID NOT, AND THE GAP WAS BACKWARDS
+-------------------------------------------------------------------------------
+The site already sent HighLevel forty-odd CUSTOM FIELDS on every booking --
+bedroom count, heavy condition, every add-on, rental vs selling. None of it
+was a TAG.
+
+That distinction is the whole problem. A custom field is something you read
+once you have already found a contact. A tag is what you filter a smart list
+by and what a workflow triggers on. The only tags that existed were in
+workers/PATCH-lead-endpoint.md, and they tag people who did NOT book
+("website-partial-lead", "call-no-booking").
+
+So the business could automate follow-up to everyone who walked away, and
+nothing at all to anyone who paid.
+
+WHAT SHIPPED, AFTER A CORRECTION: the first version had five tag families --
+svc-*, moveout-*, bought-*, plan-*, plus has-pets and two-story -- about
+twenty tags in the vocabulary. Direct instruction cutting it back:
+
+  "I don't need a million tags, just basic-clean, deep-clean, move-out,
+   basic-detail, deep-detail. and i'll remarket to people getting details and
+   cleans, ignoring the move-out cause their gone."
+
+Five tags now, and the test asserts them as a CLOSED SET rather than spot-
+checking a few -- a sixth tag fails a test, because the value of five tags is
+that they stay five.
+
+    basic-clean     Basic Cleaning
+    deep-clean      Deep Cleaning, and Whole-Home Reset
+    move-out        Move-Out Cleaning
+    basic-detail    standard 3-hour car detail
+    deep-detail     deep 6-hour car detail
+
+THE CUT WAS RIGHT, and the reasoning is worth keeping: a tag earns its
+permanent place on a contact record only if a campaign would actually segment
+by it. Twenty tags nobody filters on is twenty columns of noise on every
+customer forever. Nothing was lost -- bedroom count, heavy vs standard, which
+add-ons, recurring cadence and the rest all still ship as CUSTOM FIELDS on the
+same payload, and a HighLevel smart list can filter those directly. They
+stopped pretending to be segments.
+
+A BOOKING CAN CARRY TWO. The detail tags are the car-detail options, not a
+service-vs-add-on split, so a Deep Cleaning with a deep car detail is both
+"deep-clean" and "deep-detail" -- two purchases with two repeat clocks. That
+is the case a service-only scheme would miss, and most detailing will sell as
+an add-on rather than standalone.
+
+TWO PLACEMENTS NEEDED A DECISION, since five tags cover seven products:
+  Whole-Home Reset -> deep-clean. It is the deepest clean we sell and a Reset
+    customer is a deep-clean remarketing target. A sixth tag would have
+    re-grown what this cut removed.
+  Carpet-only -> NO TAG. Neither a clean nor a detail. Flagged in
+    TAGS-AND-CAMPAIGNS.md rather than silently decided -- carpet is the most
+    naturally annual thing on the price list and is now invisible to every
+    campaign. One line to add if wanted.
+
+MOVE-OUT IS TAGGED BUT NOT MARKETED TO, by instruction -- they have left the
+address. The tag still ships because it is what a SUPPRESSION list filters on:
+without it there is no way to exclude move-out contacts from a campaign aimed
+at everyone else.
+
+ONE SUPPRESSION LEFT FOR THE GHL SIDE: recurring customers get basic-clean
+like everyone else, and "book your next clean" lands badly on someone whose
+next clean is already scheduled. No tag for it -- filter the `frequency`
+custom field to exclude anything but One-Time.
+
+workers/TAGS-AND-CAMPAIGNS.md documents the vocabulary, seven campaigns, and
+the Worker change needed to apply them. ONE THING TO GET RIGHT THERE:
+HighLevel's contact upsert REPLACES the tag list. A repeat customer who booked
+a move-out last year and a Basic today should end up with both tags -- that
+history is exactly what makes the segments valuable -- so the Worker has to
+union with the existing tags or use the add-tags endpoint.
+
+TWO BUGS FOUND WHILE WIRING THE PAYLOAD
+-------------------------------------------------------------------------------
+* addon_windows_tier was still reading rpState.windowsTier, the legacy
+  basic/premium field that nothing has written since windows went per-window
+  in round 66. Every booking since then reported "None" for a window job that
+  was actually sold. Now reads the live summary, with a price field beside it.
+
+* Car detailing had NO webhook fields at all. It shipped in round 66c and the
+  office could not see which option was sold, or whether pet hair was on it.
+
+A GAP LEFT OPEN ON PURPOSE: moveout-rental / moveout-selling only ever
+populate from /call, because /book never asks why they are moving. It is one
+tap and it splits the move-out list into two genuinely different audiences --
+a renter chasing a deposit and a seller staging a house want different things.
+Not added unprompted: it is a new question in a funnel this round has been
+busy shortening, and that is a conversion judgement, not a code one.
+
+THE LANDING PAGE: /interior-car-detailing-lawton-ok/
+-------------------------------------------------------------------------------
+Built by cloning the carpet page's shell -- head, nav, footer, sticky CTA,
+tracking -- so the design system, CSS and Ads conversion wiring are identical
+rather than reimplemented. Only the body content and the page-specific
+metadata are new.
+
+Structured data: a Service node with all three real prices as Offers, a
+BreadcrumbList, and a seven-question FAQPage. All of it valid JSON-LD.
+
+The copy leads with the pricing model rather than adjectives, because the
+model IS the pitch: $40 an hour for a detailer, the same rate as a cleaner in
+the house, which is why there are two options instead of ten packages. It also
+says plainly what we do NOT do -- no exterior wash, wax, paint correction,
+engine bays or headlights -- since that is the first question a detailing
+search has and pretending otherwise wins a booking we would do badly.
+
+It pushes the cross-sell rather than the standalone sale: same price either
+way, but attached to a cleaning it is one trip instead of two. A standalone
+detail is a whole visit for the thinnest ticket on the price list (21.9%,
+tied with Basic), so the page is honest about which is the better buy.
+
+The reviews section says out loud that the reviews shown are for cleaning
+work, not detailing. Inventing detailing reviews for a service that launched
+this month is the one thing that would undermine a 5.0 rating built on real
+ones.
+
+Wired in: linked from the footer of all 18 pages that list services (the
+round-66c footer link pointed at /pricing#addons and now points here),
+self-link suppressed on the page itself, added to sitemap.xml, and every
+inherited /book?service=carpet CTA retargeted to ?service=cardetailing --
+three of them, which is the kind of thing cloning a shell always leaves
+behind and a rendered-page check always catches.
+
+Copy note: "tier" was reworded to "option" throughout. It is jargon a customer
+never uses, AND check-prices.py reserves the word for the retired move-out
+tiers -- the guard flagged it, and both reasons pointed the same way.

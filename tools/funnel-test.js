@@ -24,7 +24,8 @@ const ctx = new Function('return (function(){ var rpState = {};' + engine + msgs
   'windowsHasScreens:function(){return rpWindowsHasScreens()}, windowsSummary:function(){return rpWindowsSummary()},' +
   'heavyPct:function(){return RP_HEAVY_SURCHARGE_PCT}, surcharge:function(){return rpConditionSurcharge(rpServiceBasePrice())},' +
   'screenKeys:function(s){return rpAddonScreenKeys(s)}, perVisit:function(){return rpMaintenanceBasePerVisit()},' +
-  'monthly:function(){return rpMonthlyTotal()}, firstVisit:function(){return rpFirstVisitTotal()}};})()')();
+  'monthly:function(){return rpMonthlyTotal()}, firstVisit:function(){return rpFirstVisitTotal()},' +
+  'tags:function(){return rpMarketingTags()}};})()')();
 
 const base = {bedrooms:null,bathrooms:null,sqft:null,condition:null,addonCarpetRooms:0,
   addonCarpetPetEnzyme:false,junkSize:null,windowsTier:null,garageWash:false,laundryLoads:0,
@@ -299,6 +300,72 @@ console.log("\n--- car detailing prices the same booked alone or attached ---");
   chk(!ctx.flows().cardetailing.includes("addons"), "no add-ons step in its flow");
   chk(ctx.flow().includes("contactgate"), "the contact gate is still inserted before the price");
   console.log(`  standalone standard: $${ctx.price()} / ${ctx.budgetHours()} hrs, margin ${(e.margin*100).toFixed(1)}%`);
+}
+
+/* =========================================================================
+   ROUND 67 — MARKETING TAGS (five, by instruction)
+   =========================================================================
+   "I don't need a million tags, just basic-clean, deep-clean, move-out,
+    basic-detail, deep-detail."
+
+   The vocabulary is asserted as a CLOSED SET, not just spot-checked. That is
+   the whole point of cutting it back: the value of five tags is that they
+   stay five. A sixth appearing later -- however reasonable it looked to
+   whoever added it -- is the failure this test exists to catch.
+   ========================================================================= */
+console.log("\n--- marketing tags: exactly five, nothing else ---");
+{
+  const ALLOWED = ["basic-clean","deep-clean","move-out","basic-detail","deep-detail"];
+  const T = cfg => { ctx.reset(Object.assign({},base,cfg)); return ctx.tags(); };
+  const eq = (tags, want, why) =>
+    chk(tags.slice().sort().join(",") === want.slice().sort().join(","),
+        `${why}: want [${want.join(" ")}], got [${tags.join(" ")}]`);
+
+  eq(T({service:"maintenance",frequency:"One-Time"}), ["basic-clean"], "Basic Cleaning");
+  eq(T({service:"deep"}),                             ["deep-clean"],  "Deep Cleaning");
+  /* The Reset maps to deep-clean rather than earning a sixth tag. */
+  eq(T({service:"reset"}),                            ["deep-clean"],  "Whole-Home Reset");
+  eq(T({service:"moveout",bedrooms:4,bathrooms:2,moveoutHeavyCondition:true}), ["move-out"], "Move-Out");
+  eq(T({service:"cardetailing",carDetail:"standard"}), ["basic-detail"], "standalone standard detail");
+  eq(T({service:"cardetailing",carDetail:"deep"}),     ["deep-detail"],  "standalone deep detail");
+
+  /* A detail added to a cleaning earns BOTH tags -- two purchases, two
+     repeat clocks. This is the case a service-only tag scheme would miss. */
+  eq(T({service:"deep",carDetail:"deep"}),                          ["deep-clean","deep-detail"],  "Deep + deep detail");
+  eq(T({service:"maintenance",frequency:"Biweekly",carDetail:"standard"}), ["basic-clean","basic-detail"], "Basic + standard detail");
+  eq(T({service:"moveout",bedrooms:3,bathrooms:2,carDetail:"deep"}), ["move-out","deep-detail"],    "Move-Out + deep detail");
+
+  /* Carpet-only carries no tag by design -- it is neither a clean nor a
+     detail. Flagged in TAGS-AND-CAMPAIGNS.md rather than silently decided. */
+  eq(T({service:"carpet",carpetRooms:3}), [], "carpet-only gets no tag");
+  /* A stale carDetail left by a service switch must not tag a booking that
+     is not selling one, exactly as it must not reach the price. */
+  eq(T({service:"carpet",carpetRooms:3,carDetail:"deep"}), [], "stale carDetail on carpet does not tag");
+  eq(T({}), [], "no service picked, no tags");
+
+  /* The closed set, checked across every configuration this funnel can
+     produce -- including add-ons and plans that used to have tags of their
+     own, to prove those families are genuinely gone rather than dormant. */
+  const seen = new Set();
+  const svcCfg = {moveout:{bedrooms:4,bathrooms:2}, deep:{}, maintenance:{frequency:"Weekly"},
+                  reset:{}, carpet:{carpetRooms:3}, cardetailing:{carDetail:"deep"}, hourly:{cleanerCount:2,hourCount:4}};
+  for (const [svc,cfg] of Object.entries(svcCfg)) {
+    for (const extra of [{}, {carDetail:"standard"}, {carDetail:"deep",carDetailPetHair:true},
+                         {addonCarpetRooms:3,addonCarpetPetEnzyme:true,garageWash:true,windowCount:"l",windowTwoStory:true,junkSize:"yes"},
+                         {moveoutHeavyCondition:true}, {frequency:"Biweekly"}, {addonSecondCleaner:true,addonExtraHours:2}]) {
+      for (const tag of T(Object.assign({service:svc},cfg,extra))) seen.add(tag);
+    }
+  }
+  for (const tag of seen) chk(ALLOWED.includes(tag), `"${tag}" is not one of the five allowed tags`);
+  chk(seen.size <= ALLOWED.length, `the vocabulary is at most ${ALLOWED.length} tags (saw ${seen.size})`);
+  console.log("  vocabulary:", [...seen].sort().join(" "));
+  /* Every booking that produces a tag produces at most one clean tag and at
+     most one detail tag -- never both halves of a pair. */
+  for (const [svc,cfg] of Object.entries(svcCfg)) {
+    const tags = T(Object.assign({service:svc},cfg,{carDetail:"deep"}));
+    chk(tags.filter(x=>x.endsWith("-clean")).length <= 1, `${svc}: at most one -clean tag`);
+    chk(tags.filter(x=>x.endsWith("-detail")).length <= 1, `${svc}: at most one -detail tag`);
+  }
 }
 
 console.log("\n--- hourly is off the public menu, still bookable by phone ---");

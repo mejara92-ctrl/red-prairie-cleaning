@@ -2484,6 +2484,98 @@ function rpFrequencySummary() {
    Field-name note: existing field names are preserved exactly. GHL
    dropdowns and workflows are keyed to them, so renaming would silently
    break automations. New fields are additive only. */
+/* =========================================================================
+   ROUND 67 — MARKETING TAGS
+   =========================================================================
+   Asked: "Shouldn't we add tags to see what kind of move-out they ordered so
+   that we can sell them promotions, reminders? idk if we do that."
+
+   WE DID NOT, and the gap was backwards. rpBuildSharedDetails() below
+   already sends forty-odd CUSTOM FIELDS to HighLevel -- bedroom count, heavy
+   condition, every add-on. None of it was a TAG. In HighLevel a custom field
+   is something you read once you have already found a contact; a tag is what
+   you filter a smart list by and what a workflow triggers on. The only tags
+   that existed tag people who did NOT book (workers/PATCH-lead-endpoint.md).
+   So the business could automate follow-up to everyone who walked away and
+   nothing at all to anyone who paid.
+
+   THE FIRST VERSION OF THIS SHIPPED TOO MANY TAGS. It had five families --
+   svc-*, moveout-*, bought-*, plan-*, plus has-pets and two-story -- roughly
+   twenty in the vocabulary. Direct instruction cutting it back:
+
+     "I don't need a million tags, just basic-clean, deep-clean, move-out,
+      basic-detail, deep-detail. and i'll remarket to people getting details
+      and cleans, ignoring the move-out cause their gone."
+
+   So: five tags, and they are the five below. The reasoning behind the cut
+   is sound and worth keeping written down -- a tag is only worth its
+   permanent place on a contact record if a campaign would actually segment
+   by it. Twenty tags nobody filters on is twenty columns of noise on every
+   customer forever. Buying-signal detail (which add-ons, how many bedrooms,
+   heavy or standard, recurring or not) all still ships as custom fields on
+   the same payload, so nothing was lost -- it just stopped pretending to be
+   a segment.
+
+   THE ONE JUDGEMENT CALL IN HERE. The instruction names five tags but the
+   business sells seven things, so two had to be placed:
+
+     Whole-Home Reset -> "deep-clean". It is the deepest clean we sell, and
+       for the stated purpose -- remarketing to people who get cleans -- a
+       Reset customer is a deep-clean customer. Giving it a sixth tag would
+       have re-grown the thing this round cut.
+
+     Carpet-only  -> NO TAG, deliberately. It is not a clean or a detail, so
+       it does not fit the five, and inventing a sixth would go against the
+       instruction. Carpet is the one real remarketing segment that now falls
+       through (it is naturally annual), and that is flagged rather than
+       silently decided -- see the note in workers/TAGS-AND-CAMPAIGNS.md.
+
+   THE DETAIL TAGS ARE THE CAR-DETAIL OPTIONS, not a service-vs-add-on
+   split. A car detail bought as an add-on on a house clean earns its detail
+   tag exactly like a standalone booking does, which means one booking can
+   carry two tags -- a Deep Cleaning with a deep car detail is "deep-clean"
+   and "deep-detail". That is correct: they are two different repeat
+   purchases with two different clocks.
+
+   MOVE-OUT IS TAGGED BUT NOT MARKETED TO, by instruction -- they have left
+   the address. The tag still ships because it is what a suppression list
+   filters ON: without it there is no way to exclude move-out contacts from a
+   campaign aimed at everyone else.
+   ========================================================================= */
+const RP_TAGS = {
+  BASIC_CLEAN:  "basic-clean",
+  DEEP_CLEAN:   "deep-clean",
+  MOVE_OUT:     "move-out",
+  BASIC_DETAIL: "basic-detail",
+  DEEP_DETAIL:  "deep-detail"
+};
+
+function rpMarketingTags() {
+  const t = [];
+  const push = v => { if (v && t.indexOf(v) === -1) t.push(v); };
+  const svc = rpState.service;
+  if (!svc) return t;
+
+  /* The clean they bought. "reset" maps to deep-clean -- see the note above. */
+  if (svc === "maintenance") push(RP_TAGS.BASIC_CLEAN);
+  else if (svc === "deep" || svc === "reset") push(RP_TAGS.DEEP_CLEAN);
+  else if (svc === "moveout") push(RP_TAGS.MOVE_OUT);
+
+  /* The car detail, whether booked on its own or added to a cleaning. The
+     availability gate matters: a stale carDetail left in state by a service
+     switch must not tag a booking that is not selling one, exactly as it
+     must not reach the price. */
+  const detailSold = svc === "cardetailing"
+    || (rpAddonAvailable("cardetail") && typeof rpCarDetailSelected === "function" && rpCarDetailSelected());
+  if (detailSold) {
+    push(rpState.carDetail === "deep" ? RP_TAGS.DEEP_DETAIL : RP_TAGS.BASIC_DETAIL);
+  }
+  return t;
+}
+/* Comma-joined, because a HighLevel workflow filter and most CSV imports
+   want a string. Both shapes go on the payload; the Worker can use either. */
+function rpMarketingTagsCsv() { return rpMarketingTags().join(","); }
+
 function rpBuildSharedDetails() {
   const custom = rpIsCustomQuoteOnly();
   const lineItems = rpAddonLineItems();
@@ -2506,6 +2598,11 @@ function rpBuildSharedDetails() {
     /* --- service identity --- */
     service: (rpServices[rpState.service] || {}).name || "N/A",
     service_key: rpState.service || "N/A",
+    /* Round 67: both shapes -- an array for a Worker that posts tags to the
+       HighLevel contact API, and a CSV for workflow filters and imports.
+       See rpMarketingTags() above for the naming rules. */
+    tags: rpMarketingTags(),
+    tags_csv: rpMarketingTagsCsv(),
     /* Discrete tier + guarantee fields so GHL can branch without parsing
        a text blob. guarantee_type is still the field a confirmation
        message should read before promising anything -- it is "none" on an
@@ -2538,7 +2635,17 @@ function rpBuildSharedDetails() {
     addon_carpet_rooms: rpAddonAvailable("carpet") ? String(rpState.addonCarpetRooms || 0) : "0",
     addon_carpet_pet_enzyme: (rpAddonAvailable("carpet") && rpState.addonCarpetPetEnzyme) ? "Yes" : "No",
     addon_junk_haul: (rpAddonAvailable("junk") && rpState.junkSize === "yes") ? "Yes" : "No",
-    addon_windows_tier: rpAddonAvailable("windows") ? (rpState.windowsTier || "None") : "None",
+    /* Round 67: was rpState.windowsTier, the legacy basic/premium field that
+       nothing has written since windows went per-window in round 66. Every
+       booking since then has reported "None" for a window job that was
+       actually sold. Reads the live summary now. */
+    addon_windows_tier: (rpAddonAvailable("windows") && rpWindowsSelected()) ? rpWindowsSummary() : "None",
+    addon_windows_price: (rpAddonAvailable("windows") && rpWindowsSelected()) ? rpWindowsPrice().toFixed(2) : "0.00",
+    /* Round 67: car detailing had no webhook fields at all -- it shipped in
+       round 66c and the office could not see what tier was sold. */
+    addon_car_detail: ((rpAddonAvailable("cardetail") && rpCarDetailSelected()) || rpState.service === "cardetailing") ? (rpCarDetailTier() || {}).label || "Yes" : "No",
+    addon_car_detail_pet_hair: (rpCarDetailSelected() && rpState.carDetailPetHair) ? "Yes" : "No",
+    addon_car_detail_price: rpCarDetailSelected() ? rpCarDetailPrice().toFixed(2) : "0.00",
     addon_garage_wash: (rpAddonAvailable("garage") && rpState.garageWash) ? "Yes" : "No",
     addon_laundry_loads: rpAddonAvailable("laundry") ? String(rpState.laundryLoads || 0) : "0",
     addon_fridge_interior: (rpAddonAvailable("fridge") && rpState.fridgeAddon) ? "Yes" : "No",
