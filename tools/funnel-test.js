@@ -22,7 +22,9 @@ const ctx = new Function('return (function(){ var rpState = {};' + engine + msgs
   'isRecurring:function(){return rpIsRecurringBooking()},' +
   'addonCatalog:function(){return rpAddonCatalog}, windowsPrice:function(){return rpWindowsPrice()},' +
   'windowsHasScreens:function(){return rpWindowsHasScreens()}, windowsSummary:function(){return rpWindowsSummary()},' +
-  'heavyPct:function(){return RP_HEAVY_SURCHARGE_PCT}, surcharge:function(){return rpConditionSurcharge(rpServiceBasePrice())}};})()')();
+  'heavyPct:function(){return RP_HEAVY_SURCHARGE_PCT}, surcharge:function(){return rpConditionSurcharge(rpServiceBasePrice())},' +
+  'screenKeys:function(s){return rpAddonScreenKeys(s)}, perVisit:function(){return rpMaintenanceBasePerVisit()},' +
+  'monthly:function(){return rpMonthlyTotal()}, firstVisit:function(){return rpFirstVisitTotal()}};})()')();
 
 const base = {bedrooms:null,bathrooms:null,sqft:null,condition:null,addonCarpetRooms:0,
   addonCarpetPetEnzyme:false,junkSize:null,windowsTier:null,garageWash:false,laundryLoads:0,
@@ -71,7 +73,7 @@ for (const [svc, list] of Object.entries(ctx.addons())) {
     chk(!["oven","cabinets","detailPass"].includes(k), `${svc} does not offer deleted add-on "${k}"`);
   }
 }
-chk(ctx.addons().moveout.join(",") === "carpet,junk,windows,garage", "move-out add-ons are the four exterior ones");
+chk(ctx.addons().moveout.join(",") === "carpet,junk,windows,garage,cardetail", "move-out add-ons are the exterior ones plus car detailing");
 chk(ctx.addons().maintenance.includes("secondCleaner"), "Basic offers a second cleaner");
 chk(ctx.addons().deep.includes("secondCleaner"), "Deep offers a second cleaner");
 console.log("  move-out add-ons:", ctx.addons().moveout.join(", "));
@@ -204,11 +206,61 @@ chk(ctx.windowsHasScreens(), 'a legacy "premium" selection keeps its screens');
 ctx.reset(Object.assign({},base,{service:"moveout",bedrooms:4,bathrooms:2,windowsTier:"basic"}));
 chk(ctx.windowsPrice() > 0, `a legacy "basic" selection still prices (got $${ctx.windowsPrice()})`);
 chk(!ctx.windowsHasScreens(), 'a legacy "basic" selection has no screens');
-/* Windows are off Basic as of this round -- the add-on could cost more than
-   the service. An unavailable add-on must never reach a total. */
-chk(!ctx.addons().maintenance.includes("windows"), "Basic no longer offers exterior windows");
-ctx.reset(Object.assign({},base,{service:"maintenance",frequency:"One-Time",windowCount:"xl",windowScreens:true}));
-chk(ctx.price() === 120, `a stray window selection on Basic does not reach the total (got $${ctx.price()})`);
+/* Round 66b, direct instruction: Basic, Deep and Reset all sell windows and
+   carpet. An add-on a service does NOT offer must still never reach a total,
+   so the gate is checked against one that is genuinely unavailable. */
+chk(ctx.addons().maintenance.includes("windows"), "Basic offers exterior windows");
+chk(ctx.addons().maintenance.includes("carpet"), "Basic offers carpet cleaning");
+chk(ctx.addons().deep.includes("windows") && ctx.addons().deep.includes("carpet"), "Deep offers windows and carpet");
+chk(ctx.addons().reset.includes("windows") && ctx.addons().reset.includes("carpet"), "Reset offers windows and carpet");
+ctx.reset(Object.assign({},base,{service:"maintenance",frequency:"One-Time",laundryLoads:3,fridgeAddon:true}));
+chk(ctx.price() === 120, `add-ons Basic does not offer never reach the total (got $${ctx.price()})`);
+
+/* =========================================================================
+   ROUND 66b — THE HOURS QUESTION IS ASKED ONCE
+   =========================================================================
+   Extra Time and Additional Cleaner are owned by the timed-service screen's
+   stepper, so the add-ons screen must not show a card for them -- while they
+   must still be fully priceable, which is the half the first attempt at this
+   fix broke. Both halves are asserted, because they pull in opposite
+   directions and fixing one by breaking the other is the obvious mistake.
+   ========================================================================= */
+console.log("\n--- extra time and 2nd cleaner: asked once, still billable ---");
+for (const svc of ["maintenance","deep","reset"]) {
+  chk(!ctx.screenKeys(svc).includes("extraHours"), `${svc}: no duplicate Extra Time card on the add-ons screen`);
+  chk(!ctx.screenKeys(svc).includes("secondCleaner"), `${svc}: no duplicate Additional Cleaner card`);
+  chk(ctx.addons()[svc].includes("extraHours"), `${svc}: Extra Time is still a priceable add-on`);
+  ctx.reset(Object.assign({},base,{service:svc,frequency:"One-Time",addonExtraHours:2}));
+  const want = timed[svc].price + 2*40*timed[svc].crew;
+  chk(ctx.price() === want, `${svc}: the stepper's hours still bill ($${want}, got $${ctx.price()})`);
+}
+/* Every card the add-ons screen DOES show must be one the engine can price
+   -- the round-20 invariant, re-checked against the new filtered list. */
+for (const svc of Object.keys(ctx.addons())) {
+  for (const k of ctx.screenKeys(svc)) {
+    chk(ctx.addonCatalog()[k] !== undefined, `${svc}: add-on card "${k}" exists in the catalog`);
+  }
+}
+
+console.log("\n--- interior car detailing ---");
+{
+  const cd = ctx.addonCatalog().cardetail;
+  chk(!!cd, "car detailing is in the catalog");
+  const cdcase = (cfg, want, why) => {
+    ctx.reset(Object.assign({},base,{service:"maintenance",frequency:"One-Time"},cfg));
+    const got = ctx.price() - 120;
+    chk(got === want, `${why}: want +$${want}, got +$${got}`);
+    console.log(`  ${why.padEnd(38)} +$${got}`);
+  };
+  cdcase({carDetail:"standard"},                        120, "standard, 3 hrs");
+  cdcase({carDetail:"deep"},                            240, "deep clean, 6 hrs");
+  cdcase({carDetail:"standard", carDetailPetHair:true}, 170, "standard + pet hair");
+  cdcase({carDetail:"deep",     carDetailPetHair:true}, 290, "deep + pet hair");
+  cdcase({carDetailPetHair:true},                         0, "pet hair alone never bills");
+  /* Same $40/hr as everything else this business sells. */
+  chk(cd.standard === cd.standardHours * 40 && cd.deep === cd.deepHours * 40,
+      "car detailing tiers are hours x $40, same rate as the house services");
+}
 
 console.log("\n--- hourly is off the public menu, still bookable by phone ---");
 chk(ctx.isPublic("hourly") === false, "hourly is hidden from the public picker");
@@ -273,6 +325,51 @@ console.log("\n--- the pre-gate teaser never undersells the real price ---");
   chk(!/figure:\s*`\$\$\{\s*rpServiceBasePrice\(\)\s*\}`/.test(body),
       "rpGatePricePreview does not quote the bare base price as the figure");
 }
+
+/* =========================================================================
+   ROUND 66b — WHAT RECURS ON A RECURRING PLAN
+   =========================================================================
+   Every one of these was a live bug found by driving the page, not by a
+   test. The per-visit row read "$0 each" (a bedroom guard on a service that
+   has no bedrooms), and once that was fixed it read "$120 each" under a
+   five-hour spec line, because extra hours were a one-time charge on a plan
+   the customer had built as five-hours-every-fortnight.
+
+   The split being asserted: labour that DEFINES the visit recurs; one-off
+   property work does not. Both halves matter -- charging for the windows
+   every fortnight would be the worse error in the other direction.
+   ========================================================================= */
+console.log("\n--- recurring plans: labour recurs, one-off work does not ---");
+{
+  const rec = (cfg, perVisit, monthly, why) => {
+    ctx.reset(Object.assign({},base,{service:"maintenance"},cfg));
+    const pv = ctx.perVisit(), mo = ctx.monthly();
+    chk(pv === perVisit, `${why}: per-visit $${perVisit}, got $${pv}`);
+    chk(mo === monthly,  `${why}: monthly $${monthly}, got $${mo}`);
+    console.log(`  ${why.padEnd(40)} $${pv}/visit  $${mo}/mo`);
+  };
+  rec({frequency:"Biweekly"},                          120, 240,  "plain biweekly");
+  rec({frequency:"Weekly"},                            120, 480,  "plain weekly");
+  rec({frequency:"Biweekly", addonExtraHours:2},       200, 400,  "biweekly + 2 extra hours");
+  rec({frequency:"Weekly",   addonSecondCleaner:true}, 240, 960,  "weekly + 2nd cleaner");
+  /* Windows and the garage are one-time work on the first visit. */
+  rec({frequency:"Biweekly", windowCount:"l", garageWash:true}, 120, 240, "biweekly + windows + garage");
+  /* A one-time booking must be untouched by any of this. */
+  ctx.reset(Object.assign({},base,{service:"maintenance",frequency:"One-Time",addonExtraHours:2}));
+  chk(ctx.price() === 200, `a one-time Basic + 2 hours is still $200 (got $${ctx.price()})`);
+  chk(ctx.firstVisit() === 200, `a one-time booking's first visit is its total (got $${ctx.firstVisit()})`);
+}
+
+/* An add-on a service does not offer must never reach a total, and must
+   never reach the CREW COUNT either -- round 66b found the price path gated
+   and the crew path not, so a Reset reported three cleaners while charging
+   for two. */
+console.log("\n--- an unavailable add-on reaches neither the price nor the crew ---");
+ctx.reset(Object.assign({},base,{service:"reset",addonSecondCleaner:true}));
+chk(ctx.price() === 480, `Reset ignores a stray 2nd cleaner in price (got $${ctx.price()})`);
+chk(ctx.team() === "2 cleaners", `Reset ignores it in the crew count too (got "${ctx.team()}")`);
+ctx.reset(Object.assign({},base,{service:"carpet",carpetRooms:3,carDetail:"deep",carDetailPetHair:true}));
+chk(ctx.price() === 150, `carpet-only ignores car detailing it does not offer (got $${ctx.price()})`);
 
 console.log("\n--- the frequency screen is gone, the selection is not ---");
 chk(!ctx.flows().maintenance.includes("frequency"), "no frequency step in the Basic flow");

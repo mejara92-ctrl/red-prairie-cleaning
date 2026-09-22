@@ -335,3 +335,136 @@ STILL OPEN
 
 * PREPAY, if wanted -- see the note under the frequency section for why it does
   not work on Basic at a discount.
+
+
+===============================================================================
+ROUND 66b — THE BUG SWEEP, AND FOUR MORE INSTRUCTIONS
+===============================================================================
+"I think theres some bugs maybe double check everything" — and there were.
+Nine, found by grepping every place that still enumerated services by name
+and then driving the pages rather than re-running a green test suite.
+
+WHAT WAS BROKEN
+-------------------------------------------------------------------------------
+1. RECURRING BASIC QUOTED "$0 EACH". rpMaintenanceBasePerVisit() required
+   rpState.bedrooms, which Basic has not collected since round 12. The guard
+   was never satisfied on the only service that can be recurring. It rendered
+   "Then biweekly $0 each" directly under a real $240 first-visit charge.
+   Round 66 made this the normal path by putting the recurring toggle on the
+   main screen, which is why it surfaced now.
+
+2. EXTRA HOURS DID NOT RECUR. Once (1) was fixed it read "$120 each" under a
+   five-hour spec line. The customer built "five hours, every two weeks" and
+   was quoted three hours a visit forever. Labour that defines the visit
+   (extra hours, second cleaner) now recurs with it; one-off property work
+   (windows, garage, carpet) still does not, because nobody wants their
+   windows done every fortnight.
+
+3. THE RESET'S EXTRA-TIME SHEET SAID "INCLUDES 3 HOURS" on a six-hour
+   service, at "$40 per hour" on a job that bills $80. A `deep ? DEEP :
+   BASIC` ternary that silently answered "3" for anything that was not Deep.
+   The add-on CARD advertised $40/hour for the same reason.
+
+4. THE RESET'S ESTIMATE HAD NO SPEC LINE AT ALL. rpEstimateSpecLine() named
+   Deep and Basic, so the Reset fell past every branch — "$480", the service
+   name, and nothing saying what the $480 buys. On a timed service the hours
+   and crew are the entire justification for the number.
+
+5. THE RESET REPORTED THREE CLEANERS while charging for two. rpTimedServiceCrew
+   added the second-cleaner add-on without checking whether the service
+   OFFERS it; the price path checked and the crew path did not. A number the
+   office schedules against is not a softer surface than a number the
+   customer pays.
+
+6. "$undefined" ON THE WINDOWS CARD — a key deleted when windows went
+   per-window.
+
+7. THE WEBHOOK REPORTED "N/A" AS THE BASE PRICE on every Reset booking
+   (isConditionPriced named three services).
+
+8. THE CREW SHEET'S CONDITION FLAG read rpState.condition, the legacy string
+   /book has never written, so it said "Condition tagged as undefined" when
+   it fired at all. It now tells the crew the job was quoted long ON PURPOSE
+   and must NOT be re-quoted on arrival — which is the promise the 25%
+   surcharge makes.
+
+9. ?service=reset DEEP LINKS RESOLVED TO NOTHING and dumped the visitor on
+   the service picker. Every ad or landing-page link pointing at the new
+   product would have done that. ("basic" and "whole-home-reset" accepted
+   too, since those are the words a human writing a link reaches for.)
+
+ALSO STALE, AND CUSTOMER-FACING
+-------------------------------------------------------------------------------
+* /call's move-out hint still said "Both tiers. You'll show two real prices
+  in a moment." Round 52 deleted the tiers. For fourteen rounds that had been
+  instructing Liz to do something the console cannot do, on the first screen
+  of every move-out call.
+* SEVEN MOVE-OUT LANDING PAGES still described the old heavy policy ("the
+  number you see is the number you pay... if the place turns out far worse
+  we re-quote"). They now carry the 25% and the firm-price trade, plus the
+  heavy ladder under the tier list.
+* THE ESTIMATE FOOTER (RP_MSG.price.fineprint) promised "standard home,
+  standard condition — that's the price" while a heavy-buildup line item sat
+  above it. Rewritten, along with conditionShort and conditionFull.
+* The move-out resource centre had "Inspection Ready" as a bolded label — a
+  retired tier name reading like a product you can still select.
+
+FOUR NEW INSTRUCTIONS
+-------------------------------------------------------------------------------
+"IT ASKS FOR ADDITIONAL TIME BEFORE THE PHONE NUMBER IS GIVEN AND IT ASKS FOR
+TIME AFTER." Correct, and round 66's own doing: the new hours stepper and the
+old add-ons cards asked the same two questions on both sides of the contact
+gate, writing the same fields, so the second screen showed whatever the first
+had set and read like the answer had not taken.
+
+  THE FIRST FIX WAS WRONG AND THE TEST SUITE CAUGHT IT. Deleting the keys
+  from rpServiceAddons stopped the cards rendering and also stopped the
+  add-ons being PRICED — the stepper moved the hours while the total sat at
+  $120 for a five-hour job. One list was answering two different questions.
+  It now answers one, and rpAddonScreenKeys() answers the other:
+
+      rpServiceAddons      what a service CAN have, and may reach a total
+      rpAddonScreenKeys()  what the add-ons SCREEN offers — minus anything
+                           another screen already asked about
+
+"SELL ADDONS FOR BASIC, DEEP, AND WHOLE-HOME RESET LIKE WINDOW CLEANING AND
+CARPET CLEANING." All three now offer carpet, car detailing, windows and the
+garage. Windows are back on Basic, reversing round 66's own removal — that
+call belongs to the owner, and it is a smaller mismatch now that windows are
+priced per window with a $100 floor rather than $100/$200 flat.
+
+  NOTE THAT LIST ORDER IS NOW A MERCHANDISING DECISION, not just data: /book
+  renders the first three as cards and folds the rest behind "More Add-ons".
+  Car detailing sits second on every house service, above windows.
+
+INTERIOR CAR DETAILING — $120 / 3 hrs, $240 / 6 hrs, pet hair +$50.
+Priced as the same $40/hour block everything else sells, which is the reason
+it works at all: the crew is already on site and already paid by the hour, so
+a car in the driveway is another block of the same labour rather than a new
+business with its own cost model. Two tiers rather than an hours stepper —
+a customer knows whether their car needs a clean or a rescue, and does not
+know whether that is four hours or five. Pet hair is separate because it is
+the one thing that reliably blows up the time, and averaging it into both
+tiers would make every non-pet car subsidise the pet ones.
+
+PET ENZYME, MADE SIMPLE. It was an Add / Not-Needed pair under "Pet odor or
+stains?" — a question that asks the customer to self-diagnose a smell they
+have lived with and stopped noticing, which is exactly why it sold badly. It
+is one checkbox now, and for a move-out it says the useful thing instead:
+most rentals require it if a pet ever lived there, and odor is a deduction
+even on carpet that looks clean. Liz gets the same prompt on /call. It is NOT
+pre-ticked — a charge the customer did not choose is the add-on creep this
+funnel exists to avoid, however well it would perform.
+
+WHAT GUARDS THIS NOW
+-------------------------------------------------------------------------------
+funnel-test.js gained: recurring per-visit and monthly figures across five
+configurations; the labour-recurs / one-off-does-not split; an unavailable
+add-on reaching neither the price nor the crew count; the asked-once /
+still-billable pair for extra time and the second cleaner; every card on the
+add-ons screen existing in the catalog; and car detailing's five price cases
+including the $40/hr derivation.
+
+The two halves of the asked-once fix are asserted separately and on purpose:
+they pull in opposite directions, and fixing one by breaking the other is the
+obvious mistake — it is the one that was actually made.

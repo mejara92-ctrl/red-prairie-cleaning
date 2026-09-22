@@ -631,7 +631,17 @@ function rpTimedServicesAgree() {
 function rpTimedServiceCrew(service = rpState.service) {
   const t = rpTimedService(service);
   if (!t) return 0;
-  return t.crew + (rpState.addonSecondCleaner ? 1 : 0);
+  /* ROUND 66 BUG FIX: gated on rpAddonAvailable, exactly as the PRICE is
+     (see rpAddonsTotal). Without the gate a stray addonSecondCleaner left
+     in state -- from a service switch, or a resumed session saved on a Deep
+     -- made the Reset report THREE cleaners on the crew sheet and the
+     confirmation while charging for two, because the price path checked
+     availability and this one did not. The round-20 rule that every add-on
+     is gated in exactly one place applies to the crew count too; a number
+     the office schedules against is not a softer surface than a number the
+     customer pays. */
+  const extra = (rpAddonAvailable("secondCleaner", service) && rpState.addonSecondCleaner) ? 1 : 0;
+  return t.crew + extra;
 }
 
 /* Services hidden from the PUBLIC /book service picker. /call ignores
@@ -865,6 +875,34 @@ const rpAddonCatalog = {
      why "garage must be completely empty" is stated on the add-on card, the
      tap-through sheet and /pricing, and why it should stay stated. */
   garage:  { label: "Garage Floor Wash",   price: 100 },
+  /* =======================================================================
+     ROUND 66b — INTERIOR CAR DETAILING
+     =======================================================================
+     Direct instruction: "Add Interior Car detailing starting at $120 for
+     three hours and $240 for six hours, pet hair $50."
+
+     Priced as the same $40/hour block the house services sell, which is why
+     $120 and $240 are the two numbers -- three hours and six hours of one
+     person's time. That is not a coincidence to paper over, it is the
+     reason this SKU can exist at all: the crew is already on site and
+     already paid by the hour, so a car in the driveway is another block of
+     the same labour rather than a new business with its own cost model.
+
+     Two tiers rather than an hours stepper, deliberately. A customer knows
+     whether their car needs "a proper clean" or "it's bad"; they do not
+     know whether that is four hours or five, and asking them to guess in
+     hours is the kind of question that loses the sale. The hours are shown
+     because they justify the price, not because they are the choice.
+
+     PET HAIR IS A FLAT $50 ON TOP, per the instruction. It is the one thing
+     that reliably blows up the time on an interior job -- embedded hair in
+     upholstery and carpet is slow, manual work that no amount of vacuuming
+     shortcuts -- so it is priced separately rather than averaged into both
+     tiers, where it would make every non-pet car subsidise the pet ones. */
+  cardetail: { label: "Interior Car Detailing",
+               standard: 120, standardHours: 3,
+               deep: 240,     deepHours: 6,
+               petHair: 50 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
   /* Round 52: the oven, cabinets and detailPass SKUs are deleted. They
@@ -893,13 +931,71 @@ const rpServiceAddons = {
      Everything that is inside it is in the base price now. The Express
      entry, which sold back oven/fridge/cabinets/Detail Pass, is gone with
      its tier. */
-  moveout:     ["carpet", "junk", "windows", "garage"],
+  /* ORDER IS UI, NOT JUST DATA: /book renders the first three of this list
+     as cards and folds the rest behind a "More Add-ons" toggle (see
+     primaryKeys/secondaryKeys in the add-ons screen). So the first three
+     entries are a merchandising decision per service, not an arbitrary
+     order -- an add-on below the fold sells a fraction of one above it.
+
+     Move-out leads with carpet because it is the most common deposit
+     deduction, then junk and windows, which are the two things an empty
+     house most often still needs. */
+  moveout:     ["carpet", "junk", "windows", "garage", "cardetail"],
   /* Fridge and laundry pulled from Deep/Basic — for a crew already on
      site for hours with an anchored-time model, these are small enough
      that "note it in special instructions" covers it without needing a
      separate priced add-on step. Hourly keeps both, because the whole
      service is instruction-driven anyway. */
-  deep:        ["extraHours", "secondCleaner", "carpet", "windows", "garage"],
+  /* =======================================================================
+     ROUND 66b — ASKED TWICE, SOLD ONCE
+     =======================================================================
+     Direct feedback: "it asks for additional time before the phone number is
+     given and it asks for time after the phone number is given."
+
+     Exactly right, and it was this round's own doing. The timed-service
+     screen gained a live hours stepper and a second-cleaner toggle, and the
+     add-ons screen two steps later still carried "Extra Time" and
+     "Additional Cleaner" cards. Same two decisions, on both sides of the
+     contact gate, each with its own control -- and because both wrote the
+     same rpState fields, the second screen silently showed whatever the
+     first had been set to, which reads like the answer did not take.
+
+     THE FIRST ATTEMPT AT THIS FIX WAS WRONG AND THE TEST SUITE CAUGHT IT.
+     Deleting the two keys from these arrays did stop the cards rendering --
+     and also stopped the two add-ons being PRICED, because rpAddonAvailable()
+     gates rpAddonsTotal(). The stepper still moved the hours on screen while
+     the total sat at $120 for a five-hour job. That is the exact bug class
+     round 20 introduced this gate to prevent, arrived at from the other
+     direction: an add-on the service genuinely has, priced at zero.
+
+     The mistake was treating one list as the answer to two different
+     questions. It is not:
+
+         rpServiceAddons      what this service CAN have, and therefore what
+                              may reach a total. Membership here is a pricing
+                              fact.
+         rpAddonScreenKeys()  what the ADD-ONS SCREEN offers. A subset, minus
+                              anything another screen already owns.
+
+     So extraHours and secondCleaner stay here -- they are real, priced
+     add-ons on all three timed services -- and rpAddonScreenKeys() hides
+     their cards, because the stepper upstream already asked. /call is
+     unaffected and still sells both by phone.
+
+     WHAT THE ADD-ONS SCREEN SELLS INSTEAD, per direct instruction: "Sell
+     addons for basic, deep, and whole-home reset like window cleaning and
+     carpet cleaning." All three now offer the genuinely separate jobs -- the
+     ones a crew already on site can do that are not part of the clean
+     itself. Every card on that screen is now something the customer has not
+     already been asked about. */
+  /* Round 66b: extraHours and secondCleaner are first in the LIST because
+     they are real priced add-ons, but rpAddonScreenKeys() removes them
+     before the screen slices its top three -- so the three cards a Deep
+     customer actually sees are carpet, car detailing and windows. Car
+     detailing is deliberately above windows here: the crew is on site for
+     six hours, the car is in the driveway, and it is the easiest yes on the
+     screen. */
+  deep:        ["extraHours", "secondCleaner", "carpet", "cardetail", "windows", "garage"],
   /* Round 52: Basic gains the second-cleaner add-on. It was Deep-only, for
      no reason anyone recorded, and the instruction this round was that
      either service can add one.
@@ -908,14 +1004,21 @@ const rpServiceAddons = {
      to a $120 interior cleaning was the most lopsided pairing on the
      add-ons screen -- the add-on could cost more than the service. It stays
      on Deep, Reset and Move-Out, where the ticket can carry it. */
-  maintenance: ["extraHours", "secondCleaner"],
+  /* Round 66b: windows are back on Basic by direct instruction. The
+     round-66 note removed them because a $100-and-up exterior job on a $120
+     service is a lopsided pairing -- that is still true, and it is the
+     owner's call, not the engine's. It is also less lopsided now that
+     windows are priced per window with a $100 floor rather than $100/$200
+     flat: a small home's windows and a small home's clean are much closer
+     in size than they used to be. */
+  maintenance: ["extraHours", "secondCleaner", "carpet", "cardetail", "windows", "garage"],
   /* Round 66: the Reset takes Extra Time but NOT a second cleaner -- it
      already ships with two (RP_TIMED_SERVICES.reset.crew), and a third
      person in a house this size stops adding throughput and starts getting
      in the way. Extra hours are the honest way to buy more work here.
      Carpet and the garage floor are genuinely separate jobs and stay. */
-  reset:       ["extraHours", "carpet", "windows", "garage"],
-  hourly:      ["fridge", "laundry", "windows", "garage"]
+  reset:       ["extraHours", "carpet", "cardetail", "windows", "garage"],
+  hourly:      ["fridge", "laundry", "cardetail", "windows", "garage"]
   /* Yard Refresh removed sitewide (direct instruction) -- it's gone from
      the catalog above too. Every service that offered it now just offers
      one less row on the add-ons screen; nothing else depended on it. */
@@ -959,6 +1062,21 @@ const rpServiceAddons = {
 function rpAddonAvailable(key, service = rpState.service) {
   return (rpServiceAddons[service] || []).includes(key);
 }
+/* Add-ons that some OTHER screen already asks about, and which the add-ons
+   step must therefore not ask about again. They remain fully available and
+   fully priced (rpAddonAvailable stays true); they simply do not get a card.
+   Round 66b -- see the note on rpServiceAddons above for why this is a
+   separate list rather than a shorter rpServiceAddons. */
+const RP_ADDONS_OWNED_BY_ANOTHER_SCREEN = {
+  /* The timed-service screen's hours stepper and second-cleaner toggle. */
+  maintenance: ["extraHours", "secondCleaner"],
+  deep:        ["extraHours", "secondCleaner"],
+  reset:       ["extraHours"]
+};
+function rpAddonScreenKeys(service = rpState.service) {
+  const hidden = RP_ADDONS_OWNED_BY_ANOTHER_SCREEN[service] || [];
+  return (rpServiceAddons[service] || []).filter(k => !hidden.includes(k));
+}
 /* Add-on key -> the rpState field(s) that hold its selection, and the
    value that means "not selected". Both /book and /call define all of
    these fields on their own rpState. */
@@ -967,6 +1085,7 @@ const RP_ADDON_STATE_DEFAULTS = {
   junk:          { junkSize: null },
   windows:       { windowCount: null, windowScreens: false, windowTwoStory: false, windowsTier: null },
   garage:        { garageWash: false },
+  cardetail:     { carDetail: null, carDetailPetHair: false },
   laundry:       { laundryLoads: 0 },
   fridge:        { fridgeAddon: false },
   extraHours:    { addonExtraHours: 0 },
@@ -1041,6 +1160,7 @@ function rpAddonLineItems() {
      bracket, screens and storey count, so the invoice explains its own
      number instead of showing a bare "Exterior Windows $378". */
   if (rpWindowsSelected()) add("windows", "Exterior Windows", rpWindowsSummary(), rpWindowsPrice());
+  if (rpCarDetailSelected()) add("cardetail", "Interior Car Detailing", rpCarDetailSummary(), rpCarDetailPrice());
   if (rpState.garageWash) add("garage", "Garage Floor Wash", "Garage must be empty", rpAddonCatalog.garage.price);
   if (rpState.laundryLoads > 0) {
     const loads = Number(rpState.laundryLoads);
@@ -1990,6 +2110,30 @@ function rpWindowsPrice() {
 /* The human-readable version of what was chosen, for the invoice row and
    the add-on card. One function so /book and /call cannot phrase it
    differently. */
+/* =========================================================================
+   ROUND 66b — INTERIOR CAR DETAILING
+   =========================================================================
+   rpState.carDetail is null, "standard" or "deep"; rpState.carDetailPetHair
+   is a boolean that only means anything when a tier is chosen.
+   ========================================================================= */
+function rpCarDetailSelected() { return !!rpState.carDetail; }
+function rpCarDetailTier() {
+  const c = rpAddonCatalog.cardetail;
+  if (rpState.carDetail === "deep")     return { key: "deep",     price: c.deep,     hours: c.deepHours,     label: "Deep clean" };
+  if (rpState.carDetail === "standard") return { key: "standard", price: c.standard, hours: c.standardHours, label: "Standard" };
+  return null;
+}
+function rpCarDetailPrice() {
+  const t = rpCarDetailTier();
+  if (!t) return 0;
+  return t.price + (rpState.carDetailPetHair ? rpAddonCatalog.cardetail.petHair : 0);
+}
+function rpCarDetailSummary() {
+  const t = rpCarDetailTier();
+  if (!t) return "";
+  return `${t.label} · ${t.hours} hrs${rpState.carDetailPetHair ? " · pet hair" : ""}`;
+}
+
 function rpWindowsSummary() {
   const b = rpWindowBracket();
   const bits = [b ? `${b.label} windows` : "Whole house"];
@@ -2014,6 +2158,7 @@ function rpAddonsTotal() {
      line for it here anymore. */
   if (rpAddonAvailable("windows") && rpWindowsSelected()) total += rpWindowsPrice();
   if (rpAddonAvailable("garage") && rpState.garageWash) total += rpAddonCatalog.garage.price;
+  if (rpAddonAvailable("cardetail") && rpCarDetailSelected()) total += rpCarDetailPrice();
   if (rpAddonAvailable("laundry") && rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpAddonAvailable("fridge") && rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
   if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpExtraHoursPrice();
@@ -2030,6 +2175,44 @@ function rpAddonsTotal() {
 function rpAddonsCents() { return rpToCents(rpAddonsTotal()); }
 /* Add-ons are always fixed price. */
 function rpAddonsOnceCharge() { return rpAddonsTotal(); }
+
+/* =========================================================================
+   ROUND 66 — WHICH ADD-ONS RECUR, AND WHY THIS SUDDENLY MATTERS
+   =========================================================================
+   Every add-on used to be a one-time charge, full stop, and that was fine
+   while the only way to start a recurring plan was a dedicated frequency
+   SCREEN that came after the add-ons step. The customer picked a cadence in
+   one place and bought extras in another, and nothing put the two decisions
+   in front of them at the same moment.
+
+   Round 66 put the hours stepper and the "repeating visit" checkbox on the
+   same screen. So a customer can now, in two taps, say "five hours" and
+   "every two weeks" -- and mean, obviously, five hours every two weeks. The
+   old model charged the two extra hours once and then billed $120 a visit
+   for three hours forever, and the estimate screen said so in a row reading
+   "Then biweekly $120 each" directly under a 5-hour spec line.
+
+   That is not a rounding error, it is the plan being different from the
+   plan the customer built. So the two add-ons that DEFINE THE VISIT ITSELF
+   -- extra hours and a second cleaner, both of which are simply more labour
+   on the day -- now recur with it.
+
+   THE OTHER ADD-ONS DO NOT RECUR, and that is equally deliberate: nobody
+   wants their exterior windows, garage floor or carpets done every two
+   weeks, and charging for them every visit would be the worse error in the
+   opposite direction. They stay a one-time charge on the first visit.
+
+   ON A ONE-TIME BOOKING NOTHING CHANGES. rpIsRecurringBooking() is false,
+   this returns 0, and every total is computed exactly as before. */
+const RP_PER_VISIT_ADDONS = ["extraHours", "secondCleaner"];
+function rpRecurringPerVisitAddonsTotal() {
+  if (!rpIsRecurringBooking()) return 0;
+  let total = 0;
+  if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpExtraHoursPrice();
+  if (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
+  return total;
+}
+function rpRecurringPerVisitAddonsCents() { return rpToCents(rpRecurringPerVisitAddonsTotal()); }
 
 /* ---------------------------------------------------------------------
    MINIMUM CHARGE
@@ -2183,13 +2366,38 @@ function rpFirstVisitTotalCents() {
 }
 function rpFirstVisitTotal() { return rpCentsToDollars(rpFirstVisitTotalCents()); }
 
+/* The per-visit rate on a recurring plan -- the "then biweekly $X each" row
+   on the estimate.
+
+   ROUND 66 BUG FIX: this required rpState.bedrooms, and Basic Cleaning has
+   not collected a bedroom count since round 12, when it moved to a flat
+   time anchor. So the guard was never satisfied on the only service that
+   can be recurring, and the row rendered "$0 each" directly under a real
+   $240 first-visit charge.
+
+   It survived because the frequency SCREEN used to be the only way to start
+   a recurring booking and the estimate row was rarely looked at in that
+   flow. Round 66 put the recurring toggle on the main Basic screen, which
+   made this the normal path rather than a corner of it.
+
+   The bedroom check is gone rather than repaired: the guard it was trying
+   to express is "is there a real per-visit number yet", and
+   rpNetServiceCents() already answers that by returning 0 when there isn't.
+   Keeping a size field in the condition just meant asking a question the
+   service no longer asks. */
 function rpMaintenanceBasePerVisit() {
-  if (rpState.service !== "maintenance" || !rpState.bedrooms) return 0;
-  return rpCentsToDollars(rpNetServiceCents());
+  if (rpState.service !== "maintenance") return 0;
+  /* Round 66: plus the labour add-ons that recur with the visit -- see
+     RP_PER_VISIT_ADDONS. A plan built as "5 hours, every two weeks" has to
+     quote five hours of labour per visit, not three. */
+  return rpCentsToDollars(rpNetServiceCents() + rpRecurringPerVisitAddonsCents());
 }
 function rpMonthlyTotal() {
   const plan = rpFrequencyPlan();
-  const basePerVisitCents = rpNetServiceCents();
+  /* Round 66: the monthly commitment figure has to multiply the SAME
+     per-visit number the estimate prints on the "then biweekly $X each"
+     row, or the two rows disagree on the same screen. */
+  const basePerVisitCents = rpNetServiceCents() + rpRecurringPerVisitAddonsCents();
   if (!plan || !basePerVisitCents) return 0;
   return rpCentsToDollars(basePerVisitCents * plan.visitsPerMonth);
 }

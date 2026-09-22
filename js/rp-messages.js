@@ -108,13 +108,25 @@ const RP_MSG = {
        here rather than written into a screen so the booking page, the
        estimate, the CSR script and the landing pages cannot end up
        describing this policy differently. */
-    conditionShort: "Heavier than a standard clean? We price it with you before we start.",
+    conditionShort: "Heavy buildup is a published 25% — quoted when you book, never added later.",
     /* The estimate screen's fine print. One sentence, because it sits under
        a CTA and nobody reads three. It has to carry both halves: what the
        quote covers, and that anything beyond it is agreed BEFORE work, not
        billed after. */
-    fineprint: "Standard home, standard condition — that's the price. Heavy trash, heavy grime or anything outside a normal clean gets priced with you before the crew starts, never added afterward.",
-    conditionFull: "Our prices assume a standard home in standard condition. If the crew arrives to heavy trash, heavy grease or grime, pet mess, or anything outside a normal clean, they'll stop and quote the difference with you before any work starts — you can approve it or reschedule. Nothing is ever added to your bill afterward.",
+    /* ROUND 66 — REWRITTEN. This shows on the estimate of anyone who did
+       NOT flag heavy buildup (the flagged version is flaggedLead/flaggedBody
+       above), and it used to promise "standard home, standard condition --
+       that's the price" while describing an arrival re-quote as the only
+       way the number could move.
+
+       Half of that is now wrong: heavy buildup has a published 25% the
+       customer can choose at booking, so "we price it with you before the
+       crew starts" is no longer the whole mechanism -- it is what happens
+       only when someone said standard and the home is not. Saying so is
+       also the honest nudge: a customer reading this who knows their home
+       is rough learns that declaring it is the way to get a firm number. */
+    fineprint: "This is the price for the home you described. If it turns out to be heavier than that, the crew prices the difference with you before they start — never after. Heavy buildup you tell us about up front is a flat 25%, and that number is firm.",
+    conditionFull: "Tell us at booking that the home has heavy buildup and we add a flat 25% for the extra time — that price is then firm, and the crew will not re-price it on arrival. If instead the crew arrives to heavy trash, heavy grease, pet mess or anything well outside what was described, they stop and quote the difference with you before any work starts — you can approve it or keep the standard clean at your quoted price. Nothing is ever added to your bill afterward.",
     /* ROUND 57 — WHAT THE FLAGGED CUSTOMER IS ACTUALLY AFRAID OF.
        Every version of this message so far has said the same two things:
        the price covers a standard clean, and extra gets agreed before the

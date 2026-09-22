@@ -2577,6 +2577,40 @@ details.rp-includes,
 }
 .rp-addon-running span { font-size: 12.5px; font-weight: 700; color: var(--muted); line-height: 1.35; }
 .rp-addon-running strong { font-size: 20px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Round 66b: a one-tap upsell inside an add-on sheet — pet enzyme on carpet,
+   pet hair on car detailing. One checkbox, a price on the same line as the
+   label, and a sentence saying WHY rather than asking the customer to
+   self-diagnose. Selected state is a tint and a border, not the solid red
+   fill .rp-pill uses: this sits inside a sheet where something is already
+   selected, and two competing solid-red elements read as a conflict. */
+.rp-enzyme-card {
+  display: flex; align-items: flex-start; gap: 11px;
+  margin: 13px 0 0; padding: 12px 13px;
+  background: rgba(255,255,255,.88);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-align: left; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .12s ease;
+}
+.rp-enzyme-card:active { transform: scale(.99); }
+.rp-enzyme-card.is-on { border-color: var(--red); background: rgba(159,32,39,.055); }
+.rp-enzyme-card input[type="checkbox"] {
+  width: 21px; height: 21px; margin: 1px 0 0; accent-color: var(--red); flex-shrink: 0;
+}
+.rp-enzyme-body { flex: 1 1 auto; min-width: 0; }
+.rp-enzyme-body strong {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  font-size: 14.5px; font-weight: 800; line-height: 1.3; color: var(--ink);
+}
+.rp-enzyme-body strong em {
+  font-style: normal; font-weight: 800; color: var(--red);
+  flex: 0 0 auto; font-variant-numeric: tabular-nums;
+}
+.rp-enzyme-body small {
+  display: block; margin-top: 4px;
+  font-size: 12.5px; font-weight: 500; line-height: 1.45; color: var(--muted);
+}
 .rp-addon-remove {
   width: 100%;
   min-height: 42px;
@@ -3560,8 +3594,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=c4aad015"></script>
-<script src="../js/rp-pricing-engine.js?v=b6b59e9a"></script>
+<script src="../js/rp-messages.js?v=307bfa17"></script>
+<script src="../js/rp-pricing-engine.js?v=29cb2743"></script>
 <script>
 /* =========================================================================
    BOOKING STATE & UI — customer-facing (/book). Pricing math itself now
@@ -3611,6 +3645,9 @@ const rpState = {
   windowCount: null,
   windowScreens: false,
   windowTwoStory: false,
+  /* Round 66b: Interior Car Detailing. null | "standard" | "deep". */
+  carDetail: null,
+  carDetailPetHair: false,
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
@@ -3860,7 +3897,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutHeavyCondition", "addonPetEnzyme", "windowsTier", "windowCount", "windowScreens", "windowTwoStory", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutHeavyCondition", "addonPetEnzyme", "windowsTier", "windowCount", "windowScreens", "windowTwoStory", "carDetail", "carDetailPetHair", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -4329,7 +4366,15 @@ function rpScreenHtml() {
            with an icon, above the fine print instead of buried in it. Only
            on Deep and Basic; the move-out screen obviously does not need
            telling. */""}
-      ${["deep","maintenance"].includes(rpState.service) ? `
+      ${/* Round 66: this branch is now unreachable. Deep and Basic return
+           early into rpTimedServiceScreen() at the top of the "included"
+           step, so only Move-Out, Carpet, Hourly and Airbnb reach this
+           renderer -- and none of them should be told "this is not a
+           move-out". Left as an explicit false rather than deleted because
+           RP_HOURLY_PUBLIC can put Hourly back on the menu, and Hourly IS a
+           service this warning was written for; whoever flips that switch
+           should find the hook here rather than have to rediscover it. */""}
+      ${rpState.service === "hourly" ? `
       <p class="rp-included-warn">${rpIcon("info","rp-ic rp-ic-sm")}<span>${RP_MSG.timed.notMoveoutShort}</span></p>` : ""}
       <p class="rp-included-note">${fine}</p>
     </div>`, footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">Looks good, continue</button>` };
@@ -4745,11 +4790,18 @@ function rpAddonsScreen(eyebrow) {
      that scope in the base price now and the three SKUs are deleted from
      the engine. The fridge card survives on Hourly, the one service that
      still sells it. */
-  const keys = (rpServiceAddons[rpState.service] || []).filter(k => k !== "junk");
+  /* Round 66b: rpAddonScreenKeys(), not rpServiceAddons directly -- it drops
+     the add-ons another screen already asked about (the hours stepper and
+     second-cleaner toggle on the timed-service screen). Those stay fully
+     available and fully priced; they just do not get a second card here.
+     "junk" is filtered separately because it is quote-only and renders in
+     its own "need help beyond cleaning?" block lower down. */
+  const keys = rpAddonScreenKeys().filter(k => k !== "junk");
   const junkAvailable = (rpServiceAddons[rpState.service] || []).includes("junk");
   const isSelected = {
     carpet: rpState.addonCarpetRooms > 0,
     windows: rpWindowsSelected(),
+    cardetail: rpCarDetailSelected(),
     garage: rpState.garageWash,
     laundry: rpState.laundryLoads > 0,
     fridge: rpState.fridgeAddon,
@@ -4774,11 +4826,15 @@ function rpAddonsScreen(eyebrow) {
     oven:    { icon: "zap", label: "Oven Interior", desc: "Interior racks, walls, and door glass, degreased." },
     cabinets: { icon: "droplet", label: "Inside Cabinets & Closets", desc: "Empty cabinet and closet interiors wiped down." },
     extraHours: { icon: "clock", label: "Extra Time", desc: "Bigger or messier than typical? Add time so nothing gets rushed." },
-    secondCleaner: { icon: "repeat", label: "Additional Cleaner", desc: "A 2nd cleaner for the full time booked, so more gets done in the same visit." }
+    secondCleaner: { icon: "repeat", label: "Additional Cleaner", desc: "A 2nd cleaner for the full time booked, so more gets done in the same visit." },
+    /* Round 66b: the crew is already on site and already paid by the hour,
+       so a car in the driveway is another block of the same labour. */
+    cardetail: { icon: "car", label: "Interior Car Detailing", desc: "Vacuum, shampoo, wipe-down. Done while we're at the house." }
   };
   function summaryFor(key) {
     if (key === "carpet") { const enz = rpState.addonCarpetPetEnzyme ? rpState.addonCarpetRooms * RP_PET_ENZYME_RATE : 0; return `${rpState.addonCarpetRooms} room${rpState.addonCarpetRooms === 1 ? "" : "s"}${enz ? " + enzyme" : ""} · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice + enz}`; }
     if (key === "windows") return `${rpWindowsSummary()} · $${rpWindowsPrice()}`;
+    if (key === "cardetail") return `${rpCarDetailSummary()} · $${rpCarDetailPrice()}`;
     if (key === "garage") return `$${rpAddonCatalog.garage.price}`;
     if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
@@ -4798,17 +4854,45 @@ function rpAddonsScreen(eyebrow) {
          most common place it's actually needed — had no way to buy it.
          Same $25/room rate, shown only once rooms are picked so the
          price it quotes is a real number. */
+      /* ROUND 66b — PET ENZYME IS ONE TAP, AND IT SAYS WHY.
+
+         Direct instruction: "make pet enzymes super simple to add and that
+         most rental properties require it."
+
+         It was a two-button Add/Not-Needed pair under the heading "Pet odor
+         or stains?", which asks the customer to self-diagnose a smell they
+         have lived with and stopped noticing. That is the wrong question,
+         and it is why this sold badly: the people who most need it are
+         exactly the people who cannot smell it any more.
+
+         The reframe is the instruction's own: for a rental, this is not
+         about whether YOU think it smells, it is about what a landlord's
+         carpet inspection looks for. That is a fact the customer can act on
+         without conceding anything about their own house.
+
+         Mechanically it is now one checkbox instead of a forced pair -- no
+         "Not Needed" button to click to say no, because not ticking a box
+         already says no. Pre-ticking it was considered and rejected: a
+         charge the customer did not choose is exactly the add-on-creep this
+         funnel is built against, however well the up-sell would perform. */
+      const enzRooms = rpState.addonCarpetRooms;
+      const enzPrice = enzRooms * RP_PET_ENZYME_RATE;
+      const renting = rpState.service === "moveout";
       return `
         <p class="rp-tap-note">How many rooms? <span style="color:var(--muted)">· $${rpAddonCatalog.carpet.bundlePrice} per room</span></p>
         <div class="rp-pill-grid">
           ${[1,2,3,4,5,6].map(n => `<button class="rp-pill ${rpState.addonCarpetRooms === n ? "is-selected" : ""}" onclick="rpSelectAddonCarpetRooms(${n})">${n}${n===6?"+":""}</button>`).join("")}
         </div>
-        ${rpState.addonCarpetRooms ? `
-        <p class="rp-tap-note" style="margin-top:12px">Pet odor or stains? <span style="color:var(--muted)">· $${RP_PET_ENZYME_RATE} per room</span></p>
-        <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(true)">Add Enzyme<br><small>$${rpState.addonCarpetRooms * RP_PET_ENZYME_RATE}</small></button>
-          <button class="rp-pill ${!rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(false)">Not Needed</button>
-        </div>` : ""}`;
+        ${enzRooms ? `
+        <label class="rp-enzyme-card ${rpState.addonCarpetPetEnzyme ? "is-on" : ""}">
+          <input type="checkbox" ${rpState.addonCarpetPetEnzyme ? "checked" : ""} onchange="rpSelectAddonCarpetPetEnzyme(this.checked)">
+          <span class="rp-enzyme-body">
+            <strong>Add pet enzyme treatment <em>+$${enzPrice}</em></strong>
+            <small>${renting
+              ? "Most rentals require it if a pet ever lived there — landlords check for odor, and a carpet that smells is a deduction even when it looks clean."
+              : "Breaks down pet odor at the source instead of covering it. Worth it if a pet has ever lived on these carpets."}</small>
+          </span>
+        </label>` : ""}`;
     }
     /* ROUND 66 — THE WINDOW SHEET ASKS THREE THINGS INSTEAD OF OFFERING TWO
        MYSTERIES. It used to be "Basic" or "Premium", two words that told a
@@ -4844,6 +4928,30 @@ function rpAddonsScreen(eyebrow) {
         </div>
         <p class="rp-addon-running"><span>${rpWindowsSummary()}</span><strong>$${rpWindowsPrice()}</strong></p>` : ""}`;
     }
+    /* Round 66b: two tiers, not an hours picker -- a customer knows whether
+       their car needs a clean or a rescue, and does not know whether that is
+       four hours or five. The hours are shown because they justify the
+       price, not because they are the choice. Pet hair is separate because
+       it is the one thing that reliably blows up the time. */
+    if (key === "cardetail") {
+      const cd = rpAddonCatalog.cardetail;
+      return `
+        <p class="rp-tap-note">Done in your driveway while the crew is at the house. <span style="color:var(--muted)">· $${RP_HOURLY_LABOUR_RATE}/hour, same as our cleaning</span></p>
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${rpState.carDetail === "standard" ? "is-selected" : ""}" onclick="rpSelectCarDetail('standard')">Standard<br><small>${cd.standardHours} hrs · $${cd.standard}</small></button>
+          <button class="rp-pill ${rpState.carDetail === "deep" ? "is-selected" : ""}" onclick="rpSelectCarDetail('deep')">Deep clean<br><small>${cd.deepHours} hrs · $${cd.deep}</small></button>
+        </div>
+        <p class="rp-tap-note" style="margin-top:11px">Standard is vacuum, wipe-down and glass. Deep adds shampooed seats and carpets, door jambs and vents.</p>
+        ${rpCarDetailSelected() ? `
+        <label class="rp-enzyme-card ${rpState.carDetailPetHair ? "is-on" : ""}">
+          <input type="checkbox" ${rpState.carDetailPetHair ? "checked" : ""} onchange="rpToggleCarDetailPetHair(this.checked)">
+          <span class="rp-enzyme-body">
+            <strong>Pet hair removal <em>+$${cd.petHair}</em></strong>
+            <small>Embedded hair in upholstery and carpet is slow, manual work — a vacuum will not lift it. Add it if a dog rides in this car.</small>
+          </span>
+        </label>
+        <p class="rp-addon-running"><span>${rpCarDetailSummary()}</span><strong>$${rpCarDetailPrice()}</strong></p>` : ""}`;
+    }
     if (key === "garage") {
       return `
         <p class="rp-tap-note"><strong>Garage must be completely empty before service.</strong></p>
@@ -4875,11 +4983,21 @@ function rpAddonsScreen(eyebrow) {
     }
     if (key === "extraHours") {
       const svcName = rpServices[rpState.service] ? rpServices[rpState.service].name : "clean";
-      const anchor = rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
+      /* ROUND 66 BUG FIX: was `rpState.service === "deep" ? DEEP : BASIC`,
+         a two-way ternary that silently answered "3" for any service that
+         was not Deep. On the Whole-Home Reset that told the customer their
+         six-hour booking "includes 3 hours".
+
+         The rate was wrong too, and worse: an extra hour on the Reset buys
+         two cleaners, so it costs $80, not the $40 printed here. Both now
+         come from the same functions the total uses. */
+      const anchor = rpTimedBaseHours() || RP_BASIC_ANCHOR_HOURS;
+      const crew = rpExtraHoursBillableCrew();
+      const rate = RP_EXTRA_HOUR_RATE * crew;
       return `
-        <p class="rp-tap-note">Your ${svcName} includes ${anchor} hours. How many extra? <span style="color:var(--muted)">· $${RP_EXTRA_HOUR_RATE} per hour</span></p>
+        <p class="rp-tap-note">Your ${svcName} includes ${anchor} hours. How many extra? <span style="color:var(--muted)">· $${rate} per hour${crew > 1 ? ` (${crew} cleaners)` : ""}</span></p>
         <div class="rp-pill-grid">
-          ${[1,2,3,4].map(n => `<button class="rp-pill ${rpState.addonExtraHours === n ? "is-selected" : ""}" onclick="rpSelectExtraHours(${n})">+${n}<br><small>hour${n===1?"":"s"}</small></button>`).join("")}
+          ${[1,2,3,4].map(n => `<button class="rp-pill ${rpState.addonExtraHours === n ? "is-selected" : ""}" onclick="rpSelectExtraHours(${n})">+${n}<br><small>hour${n===1?"":"s"} · $${n * rate}</small></button>`).join("")}
         </div>`;
     }
     return "";
@@ -4913,9 +5031,13 @@ function rpAddonsScreen(eyebrow) {
          ever cost, with "and up" doing the honest work. */
       case "windows":       return { val: `$${rpAddonCatalog.windows.minimum}`, note: "and up" };
       case "garage":        return { val: `$${rpAddonCatalog.garage.price}`, note: "" };
+      case "cardetail":     return { val: `$${rpAddonCatalog.cardetail.standard}`, note: "and up" };
       case "laundry":       return { val: `$${rpAddonCatalog.laundry.pricePerLoad}`, note: "/load" };
       case "fridge":        return { val: `$${rpAddonCatalog.fridge.price}`, note: "" };
-      case "extraHours":    return { val: `$${RP_EXTRA_HOUR_RATE}`, note: "/hour" };
+      /* Round 66: the rate depends on the service's crew -- $80/hour on the
+         two-cleaner Reset. Was a flat RP_EXTRA_HOUR_RATE, which advertised
+         $40 on a card that charges $80. */
+      case "extraHours":    return { val: `$${RP_EXTRA_HOUR_RATE * rpExtraHoursBillableCrew()}`, note: "/hour" };
       case "secondCleaner": return { val: `$${rpSecondCleanerPrice()}`, note: `${rpSecondCleanerHours()} hrs` };
       default: return null;
     }
@@ -5079,11 +5201,20 @@ function rpEstimateSpecLine() {
     if (crew) sbits.push(`${crew} cleaner${crew === 1 ? "" : "s"}`);
     if (hrs) sbits.push(`${hrs} on site`);
     sub = sbits.join(" · ");
-  } else if (rpState.service === "deep" || rpState.service === "maintenance") {
-    const anchor = rpState.service === "deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
-    const extra = Number(rpState.addonExtraHours || 0);
+  } else if (rpIsTimedService()) {
+    /* ROUND 66 BUG FIX: this branch named Deep and Basic, so the
+       Whole-Home Reset fell past every case and the estimate screen showed
+       NO spec line at all -- just "$480" and the service name, with nothing
+       saying what the $480 buys. The bedrooms/bathrooms line does that job
+       for a move-out; on a timed service the hours and crew are the entire
+       justification for the number, so their absence is the whole argument
+       missing.
+
+       Reads RP_TIMED_SERVICES now, same as everything else that used to
+       enumerate these three by hand. */
+    const hrs  = rpTimedBookedHours();
     const crew = rpTimedServiceCrew();
-    bits.push(`${anchor + extra} hour${anchor + extra === 1 ? "" : "s"}`);
+    bits.push(`${hrs} hour${hrs === 1 ? "" : "s"}`);
     bits.push(`${crew} cleaner${crew === 1 ? "" : "s"}`);
   } else if (rpState.service === "hourly") {
     if (rpState.cleanerCount) bits.push(`${rpState.cleanerCount} cleaner${rpState.cleanerCount === 1 ? "" : "s"}`);
@@ -5136,7 +5267,10 @@ function rpEstimateScreen(eyebrow) {
       ${spec.sub ? `<p class="rp-est-spec-sub">${spec.sub}</p>` : ""}
       ${rpState.service === "moveout" && !noGuaranteedPrice
         ? `<p class="rp-est-what">Inspection-ready — every room inside, cleaned to pass the walkthrough.</p>` : ""}
-      ${["deep","maintenance"].includes(rpState.service) && !noGuaranteedPrice
+      ${/* Round 66: rpIsTimedService() rather than naming two of the three.
+           The Reset was falling through, so its estimate carried no "what
+           this is" line at all. */""}
+      ${rpIsTimedService() && !noGuaranteedPrice
         ? `<p class="rp-est-what">Time, not a finished checklist. We work your priorities for the hours booked.</p>` : ""}
 
       ${/* ROUND 57 — THE CAVEAT MOVED ABOVE THE PROMISE.
@@ -6035,6 +6169,8 @@ function rpResetServiceState() {
   rpState.windowCount = null;
   rpState.windowScreens = false;
   rpState.windowTwoStory = false;
+  rpState.carDetail = null;
+  rpState.carDetailPetHair = false;
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
@@ -6243,6 +6379,7 @@ function rpClearAddon(key) {
   else if (key === "junk") rpState.junkSize = null;
   else if (key === "windows") { rpState.windowsTier = null; rpState.windowCount = null; rpState.windowScreens = false; rpState.windowTwoStory = false; }
   else if (key === "garage") rpState.garageWash = false;
+  else if (key === "cardetail") { rpState.carDetail = null; rpState.carDetailPetHair = false; }
   else if (key === "laundry") rpState.laundryLoads = 0;
   else if (key === "fridge") rpState.fridgeAddon = false;
   else if (key === "secondCleaner") rpState.addonSecondCleaner = false;
@@ -6252,7 +6389,12 @@ function rpClearAddon(key) {
   rpRefresh();
 }
 function rpSelectAddonCarpetRooms(n) { rpTrackAddon("carpet", n > 0, { rooms: n }); rpState.addonCarpetRooms = n; if (!n) rpState.addonCarpetPetEnzyme = false; rpRefresh(); }
-function rpSelectAddonCarpetPetEnzyme(yes) { rpTrackAddon("carpetPetEnzyme", yes, { rooms: rpState.addonCarpetRooms }); rpState.addonCarpetPetEnzyme = yes; rpState.expandedAddon = null; rpRefresh(); }
+/* Round 66b: takes a boolean from a checkbox now rather than being called
+   with a hardcoded true/false from a button pair. It also no longer closes
+   the sheet (`expandedAddon = null`): ticking the box is a refinement of a
+   choice already made, and slamming the sheet shut on it hid the running
+   total the customer had just changed. */
+function rpSelectAddonCarpetPetEnzyme(yes) { rpTrackAddon("carpetPetEnzyme", !!yes, { rooms: rpState.addonCarpetRooms }); rpState.addonCarpetPetEnzyme = !!yes; rpRefresh(); }
 /* Round 24: junk haul is a single checkbox now (see "Have Trash or Junk
    to Haul Away?" on the addons screen), not an expandable pill card, so
    this no longer touches rpState.expandedAddon. Still tracked the same
@@ -6280,6 +6422,19 @@ function rpSelectWindowScreens(yes) {
 function rpSelectWindowTwoStory(yes) {
   rpState.windowTwoStory = !!yes;
   rpTrackAddon("windows", true, { twoStory: !!yes, price: rpWindowsPrice() });
+  rpRefresh();
+}
+/* Round 66b. Tapping the selected tier again clears the add-on, the same
+   gesture every other tier row in this funnel uses. */
+function rpSelectCarDetail(tier) {
+  rpState.carDetail = (rpState.carDetail === tier) ? null : tier;
+  if (!rpState.carDetail) rpState.carDetailPetHair = false;
+  rpTrackAddon("cardetail", !!rpState.carDetail, { tier: rpState.carDetail, price: rpCarDetailPrice() });
+  rpRefresh();
+}
+function rpToggleCarDetailPetHair(on) {
+  rpState.carDetailPetHair = !!on;
+  rpTrackAddon("cardetail", true, { petHair: !!on, price: rpCarDetailPrice() });
   rpRefresh();
 }
 function rpSelectGarageWash(yes) { rpTrackAddon("garage", yes); rpState.garageWash = yes; rpState.expandedAddon = null; rpRefresh(); }
@@ -6350,7 +6505,14 @@ function rpGetEstimatePayload() {
     rpState.moldConcern ? "Mold/musty smell reported" : "",
     rpState.petWasteConcern ? "Pets present/pet odor/animal waste" : "",
     rpState.hazardConcern ? "Excessive trash/hoarding, pest infestation, or smoke damage reported" : "",
-    ["moveout", "deep"].includes(rpState.service) && conditionMultiplier > 0 ? `Condition tagged as ${rpState.condition} — +${Math.round(conditionMultiplier * 100)}% already applied to price, confirm on arrival` : "",
+    /* ROUND 66: this read rpState.condition, the legacy STRING that /book
+       has never set -- it only writes the moveoutHeavyCondition boolean. So
+       the crew sheet said "Condition tagged as undefined" when it fired at
+       all, and with the multiplier previously stuck at 0 it never fired.
+       Now that heavy costs 25%, the crew genuinely needs this line: it is
+       how they know the job was quoted long and does NOT need re-pricing on
+       arrival. Reads the same helpers the price does. */
+    rpHasConditionSurcharge() ? `Condition: HEAVY BUILDUP — +${RP_HEAVY_SURCHARGE_PCT}% already in the price. Quoted long on purpose; do NOT re-quote on arrival.` : "",
     isSpecialtyCondition ? "Customer flagged Specialty/Unsafe condition — booking proceeds, but confirm custom quote with customer before the cleaning date" : ""
   ].filter(Boolean);
   const propertyConditionsSummary = propertyConditionFlags.length
@@ -6359,7 +6521,11 @@ function rpGetEstimatePayload() {
   /* Round 21: one shared list (rpAddonSummaryText) instead of a
      hand-maintained copy that carried names without prices. */
   const addonsList = rpAddonSummaryText();
-  const isConditionPriced = ["moveout", "deep", "maintenance"].includes(rpState.service) && !rpIsCustomQuoteOnly();
+  /* Round 66: "has a base service price worth reporting to the office".
+     Named three services and so reported "N/A" as the base price on every
+     Whole-Home Reset booking. rpIsTimedService() covers Basic, Deep and
+     Reset; move-out is the other priced case. */
+  const isConditionPriced = (rpState.service === "moveout" || rpIsTimedService()) && !rpIsCustomQuoteOnly();
   const baseServicePrice = rpDisplayBasePrice();
   /* Pricing status shown to the office: "Confirmed" for a normal instant
      estimate, "Custom Quote" for Airbnb, over 3,400 sq ft on Move-Out or
@@ -6767,7 +6933,13 @@ function rpAttributionSummary() {
    still rides along to GHL via rpTrack's preselected_service, and it
    still skips the intro splash below so the list is the first thing on
    screen. */
-const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", hourly: "hourly" };
+/* Round 66: "reset" added. Without it a ?service=reset deep link resolved
+   to nothing and dropped the visitor on the service picker -- which is what
+   every ad, landing-page button or text-message link pointing at the new
+   product would have done. "basic" and "whole-home-reset" are accepted as
+   aliases too, since those are the words a human writing a link will reach
+   for before they reach for the internal key. */
+const rpServiceAliases = { moveout: "moveout", movein: "moveout", deep: "deep", carpet: "carpet", maintenance: "maintenance", basic: "maintenance", hourly: "hourly", reset: "reset", "whole-home-reset": "reset", wholehomereset: "reset" };
 const rpSuggestedService = (function rpReadServiceHint() {
   const params = new URLSearchParams(window.location.search);
   const requested = (params.get("service") || "").trim().toLowerCase();

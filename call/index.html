@@ -1023,8 +1023,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   <button class="sheet-done" type="button" onclick="closeSheet('endSheet')">Never mind — back to the call</button>
 </section>
 
-<script src="../js/rp-messages.js?v=c4aad015"></script>
-<script src="../js/rp-pricing-engine.js?v=b6b59e9a"></script>
+<script src="../js/rp-messages.js?v=307bfa17"></script>
+<script src="../js/rp-pricing-engine.js?v=29cb2743"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -1043,6 +1043,8 @@ const rpState = {
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
   /* Round 66: per-window exterior pricing. See rpWindowsPrice in the engine. */
   windowCount:null, windowScreens:false, windowTwoStory:false,
+  /* Round 66b: interior car detailing. */
+  carDetail:null, carDetailPetHair:false,
   garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null, handymanInterest:false,
   /* Round 40: add-ons stopped being a step you walk through and became a
      section that is either done or not. This is what "done" means for it. */
@@ -1766,7 +1768,18 @@ function sectionBody(s){
     const items = Object.entries(rpServices).map(([k,v])=>
       opt(k==="moveout" ? "Move-Out Cleaning" : v.name, `pickService('${k}')`,
         rpState.service===k,
-        k==="moveout" ? "Both tiers. You'll show two real prices in a moment."
+        /* ROUND 66: the move-out hint said "Both tiers. You'll show two real
+           prices in a moment." Round 52 deleted the Inspection Ready /
+           Express split and the comparison screen with it, so for the last
+           fourteen rounds this had been instructing Liz to do something the
+           console cannot do, on the first screen of every move-out call.
+
+           The Reset gets a hint for the same reason Hourly has one: it is
+           the service where the caller asks a question the CSR can get
+           wrong. "Why is this more than the move-out" is answered by the
+           empty house, never by scope -- see SERVICE_ANGLES.reset. */
+        k==="moveout" ? "Empty house. One price for the whole interior, by bedroom count."
+        : k==="reset" ? "Same checklist, but they still live there. Two cleaners, six hours."
         : k==="hourly" ? "Only certain areas. 3-hr minimum. Ask first: moving out, or living in it?" : null)
     ).join("");
     return `<div class="opts">${items}${opt("Something Else / Custom Quote","pickService('custom')",rpState.service==="custom","Commercial or one-of-a-kind — no price on this call.")}</div>`;
@@ -1885,7 +1898,14 @@ function sectionBody(s){
     let h="";
     if(list.includes("carpet")) h+=`<div class="grp"><div class="grp-h">Carpet cleaning <em>— +$${rpAddonCatalog.carpet.bundlePrice}/room</em></div>
       <div class="opts five">${[0,1,2,3,4,5].map(n=>opt(n===0?"None":`${n}`,`pick('addonCarpetRooms',${n})`,Number(rpState.addonCarpetRooms)===n)).join("")}</div>
-      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt("Pet enzyme treatment",`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme,null,`+$${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE}`)}</div>`:""}</div>`;
+      ${Number(rpState.addonCarpetRooms)>0?`<div class="opts" style="margin-top:7px">${opt("Pet enzyme treatment",`toggle('addonCarpetPetEnzyme')`,rpState.addonCarpetPetEnzyme,
+        /* Round 66b: the prompt tells Liz WHY to raise it, because "pet
+           enzyme treatment?" invites a no from anyone who cannot smell
+           their own house. On a move-out the landlord is the reason. */
+        rpState.service==="moveout"
+          ? "ASK: has a pet ever lived here? Most rentals require it — odor is a deduction even on clean carpet"
+          : "Ask if a pet has ever lived on these carpets — it breaks odor down at the source",
+        `+$${Number(rpState.addonCarpetRooms)*RP_PET_ENZYME_RATE}`)}</div>`:""}</div>`;
     if(list.includes("laundry")) h+=`<div class="grp"><div class="grp-h">Laundry <em>— +$${rpAddonCatalog.laundry.pricePerLoad}/load</em></div>
       <div class="opts five">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
     if(list.includes("extraHours")){
@@ -1917,6 +1937,15 @@ function sectionBody(s){
       }
     }
     if(list.includes("garage")) rows.push(opt("Garage floor wash",`toggle('garageWash')`,rpState.garageWash,"Garage must be empty",`+$${rpAddonCatalog.garage.price}`));
+    /* Round 66b. Worth prompting by name like carpet and the garage -- it is
+       the same crew, already on site, and nobody thinks to ask whether a
+       cleaning company will do the car. */
+    if(list.includes("cardetail")){
+      rows.push(`<div class="grp-h" style="margin-top:9px">Interior car detailing <em>— same $${RP_HOURLY_LABOUR_RATE}/hr as the house</em></div>`);
+      rows.push(opt(`Standard — ${rpAddonCatalog.cardetail.standardHours} hrs`,`pick('carDetail', rpState.carDetail==='standard'?null:'standard')`,rpState.carDetail==="standard","Vacuum, wipe-down, glass",`+$${rpAddonCatalog.cardetail.standard}`));
+      rows.push(opt(`Deep clean — ${rpAddonCatalog.cardetail.deepHours} hrs`,`pick('carDetail', rpState.carDetail==='deep'?null:'deep')`,rpState.carDetail==="deep","Adds shampooed seats and carpets, jambs, vents",`+$${rpAddonCatalog.cardetail.deep}`));
+      if(rpCarDetailSelected()) rows.push(opt("…pet hair removal",`toggle('carDetailPetHair')`,rpState.carDetailPetHair,"Embedded hair is slow manual work — ask if a dog rides in it",`+$${rpAddonCatalog.cardetail.petHair}`));
+    }
     if(list.includes("fridge")) rows.push(opt("Refrigerator interior",`toggle('fridgeAddon')`,rpState.fridgeAddon,null,`+$${rpAddonCatalog.fridge.price}`));
     if(list.includes("secondCleaner")) rows.push(opt("Additional cleaner",`toggle('addonSecondCleaner')`,rpState.addonSecondCleaner,`For the full ${rpSecondCleanerHours()}hrs booked`,`+$${rpSecondCleanerPrice()}`));
     if(rows.length) h+=`<div class="grp"><div class="grp-h">Also available</div><div class="opts">${rows.join("")}</div></div>`;
