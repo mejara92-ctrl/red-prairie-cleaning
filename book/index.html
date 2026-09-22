@@ -357,6 +357,10 @@ window.__rpScheduleDeferred(function(){
   --sage: #6f806f;
   --green: #2f7448;
   --header-h: 62px;
+  /* Round 66: the single width every questionnaire row and answer-pill grid
+     is sized to. See the note on .rp-quest-pills — content used to set this
+     per row, which is why one screen had four button widths. */
+  --rp-quest-width: 320px;
   --radius-lg: 26px;
   --radius-md: 18px;
   --shadow-lg: 0 28px 80px rgba(48, 32, 19, .18);
@@ -740,6 +744,18 @@ h2 { font-size: clamp(31px, 7.2vw, 39px); line-height: 1.04; letter-spacing: -.0
 
 /* ============ OPTION ROWS ============ */
 .rp-rows { display: grid; gap: 10px; }
+/* Round 66: the group heading above each set of service rows ("Cleaning your
+   home" / "Moving out, or carpets only"). Small caps, muted, tight to the
+   rows below it -- it is a signpost, not a headline, and it must not compete
+   with .rp-start-service-q above it or the row titles below. Deliberately
+   not an <h3>: these label two halves of one question, and a heading level
+   here would put two sub-headings under a question that has no heading. */
+.rp-rows-group {
+  font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted);
+  margin: 16px 2px 7px;
+}
+.rp-rows-group:first-of-type { margin-top: 0; }
 .rp-row {
   width: 100%;
   min-height: 66px;
@@ -886,12 +902,45 @@ quiet treatment — bordered, centred {
    secondary action and it looked like an empty text input -- see the note
    on .rp-text-link, which replaced it. Nothing else used it. */
 .rp-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-/* Round 58: the condition question's two answers are phrases, not words, so
-   they get full width and stack. The 260px two-up that suits Yes/No would
-   wrap "Heavy buildup, or things left behind" to three lines a piece. */
-.rp-quest-pills.is-stacked { grid-template-columns: 1fr; max-width: 100%; }
+/* ROUND 66 — THE FOUR-DIFFERENT-BUTTON-WIDTHS BUG.
+
+   Direct feedback, on a screenshot of this screen: "all kind of different
+   sized buttons." Every Yes/No pair on the questionnaire rendered at its
+   own width -- "Is the water on?" narrow, "Is the home free of mold or
+   pest issues?" wide -- and the condition row wider still.
+
+   One property caused all of it. .rp-quest-list was `align-items: center`
+   on a column flexbox, so each .rp-quest-row shrank to fit its widest
+   child -- which is the QUESTION LABEL, not the buttons. The pill grid
+   then inherited whatever width the sentence above it happened to need.
+   `max-width: 260px` on .rp-quest-pills only capped that; it never set it,
+   so it did nothing on the short questions where the row was already
+   narrower than 260px.
+
+   The fix is to stop letting content set the width. RP_QUEST_WIDTH is the
+   one measurement for the whole screen: the list stretches its rows to it,
+   and every pill grid inside -- two-up or stacked -- fills it exactly. Add
+   a fifth question tomorrow and it lines up without thinking about it.
+
+   Why a variable rather than a number in four places: this width has to
+   match on .rp-quest-list, .rp-quest-row and both pill variants at once,
+   and the previous version drifted precisely because those lived apart. */
+.rp-quest-pills.is-stacked { grid-template-columns: 1fr; }
 .rp-quest-pills.is-stacked .rp-pill { padding: 12px 14px; }
 .rp-quest-row.is-wide { margin-top: 2px; }
+/* Round 66: the condition question is the only priced answer on this screen,
+   so it gets a rule above it and a small red eyebrow. Enough to say "this
+   one is different" without a second screen -- see the note in the
+   questionnaire markup for why an extra screen was rejected. */
+.rp-quest-row.is-priced {
+  margin-top: 6px; padding-top: 15px;
+  border-top: 1px solid var(--line);
+}
+.rp-quest-priced-label {
+  display: block; margin-bottom: 5px;
+  font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--red);
+}
 .rp-pill {
   background: rgba(255,255,255,.90);
   border: 1px solid var(--line);
@@ -911,7 +960,15 @@ quiet treatment — bordered, centred {
 /* Move-out hard-stop questionnaire — each row is one fact, one Yes/No
    pair. Reuses .rp-choice-grid/.rp-pill so it matches the visual
    language already used for every other yes/no choice in the funnel. */
-.rp-quest-list { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 18px; }
+/* Round 66: was `align-items: center`, which is what made every row a
+   different width (see the note on .rp-quest-pills above). `stretch` plus
+   an explicit width on the list gives all four rows one edge-to-edge
+   measurement, and the rows centre as a block via margin auto. */
+.rp-quest-list {
+  display: flex; flex-direction: column; align-items: stretch;
+  gap: 14px; margin-top: 18px;
+  width: 100%; max-width: var(--rp-quest-width); margin-left: auto; margin-right: auto;
+}
 /* Round 54: shown when someone tells us the home is heavier than a
    standard clean. Amber, not red -- they did the right thing by saying so,
    and the screen should read as "noted, here's how that works" rather than
@@ -942,9 +999,12 @@ quiet treatment — bordered, centred {
 .rp-quest-note strong { color: var(--ink); font-weight: 800; }
 .rp-quest-note em { font-style: normal; font-weight: 800; }
 
-.rp-quest-row { text-align: center; }
+.rp-quest-row { text-align: center; width: 100%; }
 .rp-quest-label { display: block; font-weight: 800; font-size: 15px; margin-bottom: 8px; color: var(--ink); }
-.rp-quest-pills { max-width: 260px; margin: 0 auto; }
+/* Round 66: `width: 100%` where it used to be `max-width: 260px`. The grid
+   now fills the row the list sized, so a one-word question and a
+   twelve-word question produce identical buttons. */
+.rp-quest-pills { width: 100%; margin: 0 auto; }
 .rp-moveout-tagline { font-weight: 800; font-size: 15px; color: var(--ink); margin: 0 0 6px; text-align: center; }
 
 .rp-pill.is-selected { border-color: var(--red); background: linear-gradient(145deg, var(--red-bright), var(--red-dark)); color: #fff; }
@@ -1720,6 +1780,15 @@ details.rp-animated-details:not([open]) > .rp-details-animate-wrap { display: gr
   .rp-sheet .rp-row { min-height: 51px; }
   .rp-sheet .rp-row-desc { display: none; }
   .rp-sheet .rp-fineprint { display: none; }
+  /* Round 66: the two-group picker adds two group labels and a second rate
+     note to this sheet. On a short screen the rows are what matter -- the
+     explanatory prose is the first thing to give up, exactly as
+     .rp-row-desc and .rp-fineprint already do above. The labels shrink
+     rather than vanish, because with the descriptions hidden they are the
+     only thing left distinguishing the two groups. */
+  .rp-sheet .rp-rate-note { display: none; }
+  .rp-sheet .rp-rows-group { font-size: 10.5px; margin: 11px 2px 5px; }
+  .rp-sheet .rp-rows-group:first-of-type { margin-top: 0; }
   .rp-primary { min-height: 50px; padding-top: 12px; padding-bottom: 12px; }
   .rp-live-chip { margin-bottom: 7px; }
   .rp-footer-note { display: none; }
@@ -1943,6 +2012,160 @@ details.rp-includes li::before {
 .rp-highlight-chip .rp-ic { color: var(--red); width: 14px; height: 14px; flex-shrink: 0; }
 @media (max-width: 390px) {
   .rp-highlight-chip { font-size: 12.5px; padding: 7px 11px; }
+}
+
+/* =========================================================================
+   ROUND 66 — THE TIMED-SERVICE SCREEN (Basic / Deep / Whole-Home Reset)
+   =========================================================================
+   Everything below styles rpTimedServiceScreen(). It reuses the funnel's
+   existing tokens -- the same --line borders, --radius-md corners, warm
+   translucent surfaces and .rp-pill selected state used everywhere else --
+   rather than introducing a second visual language for one screen. The only
+   genuinely new component is the stepper, and it is built to match
+   .rp-pill's dimensions so it sits level with the toggles around it.
+   ========================================================================= */
+
+/* The live price card. Deliberately the heaviest element on the screen:
+   it is the answer to the question the customer arrived with, and it is
+   what visibly changes when they touch the stepper. */
+.rp-timed-card {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  margin: 16px 0 0; padding: 18px 16px 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(255,250,243,.86));
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 10px 26px rgba(48,32,19,.08);
+}
+.rp-timed-price {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 46px; font-weight: 400; line-height: 1; letter-spacing: -.02em;
+  color: var(--ink);
+  /* Tabular figures so stepping 3 -> 4 hours doesn't shift the number's
+     width and jog the card. */
+  font-variant-numeric: tabular-nums;
+}
+.rp-timed-price small {
+  font-family: inherit; font-size: 18px; color: var(--muted); margin-left: 2px;
+}
+.rp-timed-spec {
+  font-size: 13.5px; font-weight: 700; color: var(--muted); text-align: center;
+}
+.rp-timed-first {
+  margin-top: 3px; padding: 7px 12px; border-radius: 11px;
+  background: rgba(70,52,37,.045);
+  font-size: 12.5px; font-weight: 600; line-height: 1.45; color: var(--ink-soft);
+  text-align: center; max-width: 330px;
+}
+.rp-timed-guarantee {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 4px;
+  font-size: 12.5px; font-weight: 800; color: var(--green);
+}
+.rp-timed-guarantee .rp-ic-sm { color: var(--green); flex-shrink: 0; }
+
+/* The scope list. Two columns, because six to eight short items in one
+   column pushes the controls below the fold on a phone -- and the controls
+   are the point of this screen. */
+.rp-timed-lead {
+  margin: 18px 3px 8px; text-align: left;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted);
+}
+.rp-timed-scope {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 7px 12px;
+  margin: 0; padding: 0; list-style: none; text-align: left;
+}
+.rp-timed-scope li {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--ink-soft);
+}
+.rp-timed-scope .rp-ic-sm { color: var(--green); flex-shrink: 0; margin-top: 2px; }
+@media (max-width: 380px) {
+  /* One column below this width: two columns of wrapped three-line items
+     is harder to read than a single clean list. */
+  .rp-timed-scope { grid-template-columns: 1fr; }
+}
+
+/* The controls block. One card per control, same border and radius as
+   .rp-checkbox-card so this reads as the funnel's existing input language. */
+.rp-timed-controls { display: grid; gap: 9px; margin: 18px 0 0; }
+.rp-timed-ctl {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 62px; padding: 11px 14px;
+  background: rgba(255,255,255,.90);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+  text-align: left;
+}
+.rp-timed-ctl.is-toggle { cursor: pointer; }
+.rp-timed-ctl.is-toggle:active { border-color: var(--red); transform: scale(.99); }
+.rp-timed-ctl input[type="checkbox"] {
+  width: 21px; height: 21px; margin: 0; accent-color: var(--red); flex-shrink: 0;
+}
+.rp-timed-ctl-label { flex: 1 1 auto; min-width: 0; }
+.rp-timed-ctl-label strong { display: block; font-size: 15.5px; font-weight: 800; line-height: 1.3; color: var(--ink); }
+.rp-timed-ctl-label small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--muted); }
+
+/* The stepper. 44px targets on both buttons -- these are the controls the
+   round-66 brief singled out as needing to be easy, and a 44px minimum is
+   the same floor round 55 applied to the questionnaire pills. */
+.rp-stepper {
+  display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0;
+  background: rgba(70,52,37,.05);
+  border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px;
+}
+.rp-step-btn {
+  width: 44px; height: 44px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-strong); border: 1px solid var(--line);
+  font-size: 21px; font-weight: 800; line-height: 1; color: var(--ink);
+  box-shadow: 0 1px 3px rgba(48,32,19,.10);
+  transition: transform .12s ease, border-color .12s ease, opacity .12s ease;
+}
+.rp-step-btn:active:not(:disabled) { transform: scale(.92); border-color: var(--red); }
+.rp-step-btn:disabled { opacity: .34; box-shadow: none; }
+.rp-step-val {
+  min-width: 34px; text-align: center;
+  font-size: 19px; font-weight: 800; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The three cadence pills, shown only once "repeating visit" is checked. */
+.rp-timed-freq { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: -2px 0 0; }
+.rp-timed-freq .rp-pill { min-height: 44px; font-size: 13px; padding: 9px 6px; }
+
+/* Inline explanatory note inside the controls block -- the cap warning, and
+   the Reset's "already comes with two cleaners" line. Same neutral panel as
+   .rp-quest-note: informational, never alarming. */
+.rp-timed-hint {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: -1px 0 0; padding: 11px 13px;
+  text-align: left;
+  background: rgba(70,52,37,.035);
+  border: 1px solid rgba(70,52,37,.14);
+  border-radius: 13px;
+  font-size: 12.5px; line-height: 1.45; font-weight: 600; color: var(--ink-soft);
+}
+.rp-timed-hint .rp-ic-sm { color: var(--ink-soft); flex-shrink: 0; margin-top: 1px; }
+.rp-timed-hint a { color: var(--red); font-weight: 800; }
+
+/* The single caveat. Same size and weight as .rp-included-body so it reads
+   as body copy rather than a warning -- it is an honest description of what
+   the customer is buying, not a disclaimer, and styling it as an alert was
+   part of what made the old screen feel defensive. */
+.rp-timed-caveat {
+  margin: 18px 3px 0; text-align: left;
+  font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--ink-soft);
+  max-width: 440px;
+}
+@media (max-height: 760px) {
+  .rp-timed-card { margin-top: 12px; padding: 14px 14px 12px; }
+  .rp-timed-price { font-size: 38px; }
+  .rp-timed-lead { margin: 14px 3px 6px; }
+  .rp-timed-controls { margin-top: 14px; gap: 8px; }
+  .rp-timed-ctl { min-height: 56px; }
+  .rp-timed-caveat { margin-top: 14px; font-size: 14px; }
 }
 @media (max-width: 390px) {
   .rp-included-list li { padding: 12px 14px; font-size: 15px; gap: 11px; }
@@ -2331,6 +2554,29 @@ details.rp-includes,
 .rp-addon-sheet-body .rp-pill { min-height: 58px; padding: 9px 7px; font-size: 15px; }
 .rp-addon-sheet-body .rp-pill small { font-size: 11.5px; }
 .rp-addon-sheet-body .rp-tap-note { margin: 0 0 10px; color: #4a3f37; font-weight: 500; font-size: 13.5px; line-height: 1.42; }
+/* Round 66: the window sheet asks three questions in sequence, so each
+   group needs a label. Small, muted, tight to the pills below it -- the same
+   treatment .rp-size-label gets on the bedrooms/bathrooms screen, which is
+   the other place in this funnel that stacks labelled pill groups. */
+.rp-addon-sheet-body .rp-addon-sub {
+  margin: 14px 0 7px; text-align: left;
+  font-size: 11.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--muted);
+}
+.rp-addon-sheet-body .rp-addon-sub:first-of-type { margin-top: 4px; }
+/* The running total under the three questions. It is the answer to "what
+   did I just build", and it is why the questions can be asked at all --
+   without it the customer is answering three questions blind. */
+.rp-addon-running {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin: 14px 0 2px; padding: 12px 14px;
+  background: rgba(70,52,37,.05);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  text-align: left;
+}
+.rp-addon-running span { font-size: 12.5px; font-weight: 700; color: var(--muted); line-height: 1.35; }
+.rp-addon-running strong { font-size: 20px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
 .rp-addon-remove {
   width: 100%;
   min-height: 42px;
@@ -3314,8 +3560,8 @@ body.rp-keyboard-open .step-lead .rp-screen-scroll { padding-top: 10px; padding-
   </section>
 </div>
 
-<script src="../js/rp-messages.js?v=f7beae0a"></script>
-<script src="../js/rp-pricing-engine.js?v=4569118c"></script>
+<script src="../js/rp-messages.js?v=c4aad015"></script>
+<script src="../js/rp-pricing-engine.js?v=b6b59e9a"></script>
 <script>
 /* =========================================================================
    BOOKING STATE & UI — customer-facing (/book). Pricing math itself now
@@ -3358,7 +3604,13 @@ const rpState = {
   addonPetEnzyme: false,
   expandedAddon: null,
   showMoreAddons: false,
+  /* Round 66: exterior windows are priced per window now. windowsTier is
+     kept so a session saved under the old basic/premium model still resolves
+     to a price (see rpWindowsSelected in the engine); nothing writes it. */
   windowsTier: null,
+  windowCount: null,
+  windowScreens: false,
+  windowTwoStory: false,
   garageWash: false,
   laundryLoads: 0,
   fridgeAddon: false,
@@ -3431,7 +3683,13 @@ const rpIconPaths = {
   chev:    '<path d="m9.5 6 6 6-6 6"/>',
   lock:    '<rect x="5.5" y="10.5" width="13" height="9.5" rx="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
   alert:   '<path d="M12 3.8 21 19.2H3Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.1" r=".25" fill="currentColor" stroke="none"/>',
-  info:    '<circle cx="12" cy="12" r="8.4"/><path d="M12 11.2v5"/><circle cx="12" cy="8.1" r=".25" fill="currentColor" stroke="none"/>'
+  info:    '<circle cx="12" cy="12" r="8.4"/><path d="M12 11.2v5"/><circle cx="12" cy="8.1" r=".25" fill="currentColor" stroke="none"/>',
+  /* Round 66: the Whole-Home Reset's row icon. A four-point sparkle plus two
+     small ones -- drawn at the same 1.8 stroke weight and 24-box as every
+     icon above so it sits in the picker without looking imported. Reads as
+     "the most thorough option" without the broom/bucket literalism the rest
+     of this set avoids. */
+  sparkle: '<path d="M12 3.6l1.9 4.9 4.9 1.9-4.9 1.9L12 17.2l-1.9-4.9L5.2 10.4l4.9-1.9Z"/><path d="M18.4 15.6l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"/><path d="M6 17.4l.5 1.3 1.3.5-1.3.5L6 21l-.5-1.3-1.3-.5 1.3-.5Z"/>'
 };
 function rpIcon(name, cls = "rp-ic") {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${rpIconPaths[name] || ""}</svg>`;
@@ -3602,7 +3860,7 @@ const RP_STORAGE_MAX_AGE_MS = 3 * 60 * 60 * 1000; /* 3 hours */
 const RP_PERSISTED_FIELDS = [
   "service", "step", "sqft", "bedrooms", "bathrooms", "condition", "frequency",
   "cleanerCount", "hourCount",
-  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutHeavyCondition", "addonPetEnzyme", "windowsTier", "garageWash",
+  "carpetRooms", "addonCarpetRooms", "addonCarpetPetEnzyme", "addonExtraHours", "addonSecondCleaner", "moveoutWaterOn", "moveoutAcOn", "moveoutMoldPests", "moveoutHeavyCondition", "addonPetEnzyme", "windowsTier", "windowCount", "windowScreens", "windowTwoStory", "garageWash",
   "laundryLoads", "fridgeAddon", "junkSize", "heavySoil", "petOdor",
   "airbnbLaundry", "airbnbRestocking", "airbnbSameDay", "handymanInterest",
   "noAC", "moldConcern", "petWasteConcern", "hazardConcern",
@@ -3726,6 +3984,171 @@ function rpRowBtn({ onclick, icon, title, desc, val, valNote, featured, badge, s
     </button>`;
 }
 
+/* =========================================================================
+   ROUND 66 — THE TIMED-SERVICE SCREEN (Basic, Deep, Whole-Home Reset)
+   =========================================================================
+   One renderer for all three rungs. Everything that differs between them is
+   read from RP_TIMED_SERVICES and rpIncludes, so this function has no
+   service names in it at all -- adding a fourth rung needs a table row and
+   nothing here.
+
+   Reading order is deliberate, and it is the opposite of the screen it
+   replaces: what you get, what it costs, what's in it, what you can change,
+   and only then the one caveat. The old screen led with caveats.
+   ========================================================================= */
+const RP_MAX_EXTRA_HOURS = 5;
+
+function rpTimedServiceScreen(eyebrow) {
+  const t        = rpTimedService();
+  const inc      = rpIncludes[rpState.service] || {};
+  const extra    = Number(rpState.addonExtraHours || 0);
+  const hours    = rpTimedBookedHours();
+  const crew     = rpTimedServiceCrew();
+  const canCrew  = rpAddonAvailable("secondCleaner");
+  const isBasic  = rpState.service === "maintenance";
+  const money    = n => `$${Number(n).toLocaleString("en-US")}`;
+  /* The live total. rpFinalPrice() is the same function the estimate screen
+     and the webhook read, so the number here cannot drift from the number
+     they are charged -- that is the whole reason this screen computes
+     nothing of its own. */
+  const total    = rpFinalPrice();
+  const hourWord = n => `${n} hour${n === 1 ? "" : "s"}`;
+  const crewWord = n => `${n} cleaner${n === 1 ? "" : "s"}`;
+  const recurring  = rpIsRecurringBooking();
+  /* What they are actually charged on booking day. Equals `total` for a
+     one-off; on a recurring plan it is the required first Deep plus add-ons
+     (rpFirstVisitTotal). Read, never recomputed here. */
+  const firstVisit = rpFirstVisitTotal();
+
+  /* The guarantee comes from rpGuaranteeType() rather than a hardcoded chip
+     in rpIncludes. Round 66 fixed carpet's guarantee by changing that
+     function; a chip string would have quietly kept saying the old thing. */
+  const guarantee = rpGuaranteeType() === "deposit"
+    ? "Defend Your Deposit guarantee"
+    : "Satisfaction guaranteed";
+
+  return { scroll: `<div class="rp-center">
+    ${eyebrow}
+    ${/* The heading is the thing bought, in the customer's own units. The
+         old one was "Here's what you're booking", which is a label for the
+         screen rather than an answer to the question the screen asks. */""}
+    <h2>${hourWord(hours)} of cleaning</h2>
+    <p class="rp-sub">${inc.intro || ""}</p>
+
+    ${/* THE LIVE CARD. One number, big, and the two facts that produce it.
+         It updates on every tap of the controls below, which is what makes
+         the stepper legible without a word of explanation: the customer
+         sees the price move. */""}
+    <div class="rp-timed-card">
+      <strong class="rp-timed-price">${money(total)}${recurring ? `<small>/visit</small>` : ""}</strong>
+      ${/* "each" only when there is more than one cleaner -- "$40/hour each"
+           against "1 cleaner" is the kind of small wrongness that makes a
+           price look machine-generated. */""}
+      <span class="rp-timed-spec">${hourWord(hours)} · ${crewWord(crew)} · ${money(RP_HOURLY_LABOUR_RATE)}/hour${crew > 1 ? " each" : ""}</span>
+      ${/* ROUND 66 — THE FIRST VISIT IS NOT THE PER-VISIT PRICE, AND THIS
+           CARD HAS TO SAY SO.
+
+           A recurring Basic's first visit is a required Deep Clean
+           (rpRecurringNeedsDeepFirst), so the customer pays $240 on booking
+           day and $120 from visit two. Showing one live $120 above a
+           "Continue with $120" button while charging $240 is the precise
+           shape of surprise this whole funnel is built to avoid -- and the
+           old frequency screen only mentioned it in fine print under a
+           button. It is on the price card now, in the same block as the
+           number it corrects. */""}
+      ${recurring && firstVisit > total ? `
+      <span class="rp-timed-first">First visit ${money(firstVisit)} — a full Deep Clean, so every visit after it stays ${money(total)}.</span>` : ""}
+      <span class="rp-timed-guarantee">${rpIcon("shield","rp-ic rp-ic-sm")}${guarantee}</span>
+    </div>
+
+    ${/* THE SCOPE, VISIBLE. Answers "is the bathroom included" on the screen
+         instead of on the phone. Two columns so six to eight items cost
+         four lines rather than eight. */""}
+    ${(inc.items || []).length ? `
+    <p class="rp-timed-lead">${inc.itemsLead || "Where the time usually goes:"}</p>
+    <ul class="rp-timed-scope">
+      ${inc.items.map(i => `<li>${rpIcon("check","rp-ic rp-ic-sm")}<span>${i}</span></li>`).join("")}
+    </ul>` : ""}
+
+    ${/* THE CONTROLS. The instruction was that adding hours be easy, so the
+         stepper is a first-class control on this screen rather than a
+         tap-through on the add-ons sheet. It still writes the same
+         rpState.addonExtraHours the add-ons screen does -- one field, two
+         places to set it, no second source of truth. */""}
+    <div class="rp-timed-controls">
+      <div class="rp-timed-ctl">
+        <span class="rp-timed-ctl-label">
+          <strong>Hours of cleaning</strong>
+          <small>${extra > 0 ? `${t.hours} included + ${hourWord(extra)} added` : `${t.hours} included`}</small>
+        </span>
+        <span class="rp-stepper">
+          <button type="button" class="rp-step-btn" ${extra <= 0 ? "disabled" : ""}
+            aria-label="Remove an hour" onclick="rpStepExtraHours(-1)">&minus;</button>
+          <output class="rp-step-val" aria-live="polite">${hours}</output>
+          <button type="button" class="rp-step-btn" ${extra >= RP_MAX_EXTRA_HOURS ? "disabled" : ""}
+            aria-label="Add an hour" onclick="rpStepExtraHours(1)">+</button>
+        </span>
+      </div>
+      ${extra >= RP_MAX_EXTRA_HOURS ? `
+      <p class="rp-timed-hint">${rpIcon("info","rp-ic rp-ic-sm")}<span>That's a long day for ${crew === 1 ? "one cleaner" : "this crew"}. Past this we'd rather talk it through — <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'timed_hours_cap'})">text us</a> and we'll size it properly.</span></p>` : ""}
+
+      ${canCrew ? `
+      <label class="rp-timed-ctl is-toggle">
+        <input type="checkbox" ${rpState.addonSecondCleaner ? "checked" : ""} onchange="rpToggleSecondCleanerHere(this.checked)">
+        <span class="rp-timed-ctl-label">
+          <strong>Add a second cleaner</strong>
+          <small>Same hours, twice the hands &middot; +${money(rpSecondCleanerPrice())}</small>
+        </span>
+      </label>` : `
+      <p class="rp-timed-hint">${rpIcon("info","rp-ic rp-ic-sm")}<span>This one already comes with ${crewWord(t.crew)}. Need more done? Add hours above.</span></p>`}
+
+      ${/* ROUND 66 — THE FREQUENCY SCREEN, AS A CHECKBOX.
+
+             Direct instruction: "cleaning frequency is kind of redundant
+             because it's all the same price... probably just remove the
+             screen." The screen is gone (see rpFlows.maintenance), but the
+             SELECTION is what drives visitsPerMonth and the required first
+             Deep, so it lives here instead of being defaulted away. Off by
+             default: a one-off booking is the common case and should cost
+             no taps. */""}
+      ${isBasic ? `
+      <label class="rp-timed-ctl is-toggle">
+        <input type="checkbox" ${recurring ? "checked" : ""} onchange="rpToggleRecurringHere(this.checked)">
+        <span class="rp-timed-ctl-label">
+          <strong>Make this a repeating visit</strong>
+          <small>${money(total)} every visit, whichever cadence &middot; cancel anytime, no contract</small>
+        </span>
+      </label>
+      ${recurring ? `
+      <div class="rp-timed-freq" role="group" aria-label="How often">
+        ${["Weekly","Biweekly","Monthly"].map(f => `
+          <button type="button" class="rp-pill ${rpState.frequency === f ? "is-selected" : ""}"
+            aria-pressed="${rpState.frequency === f ? "true" : "false"}"
+            onclick="rpSetRecurringFrequency('${f}')">${f === "Biweekly" ? "Every 2 weeks" : f}</button>`).join("")}
+      </div>` : ""}` : ""}
+    </div>
+
+    ${/* THE ONE CAVEAT. Stated once, at full strength -- see the round-52
+         note on HOURLY_RATE_PER_CLEANER for why this framing is what keeps
+         a timed booking from becoming a "you missed things" review. It is
+         not softened here, it is just not said four times. */""}
+    ${inc.outcome ? `<p class="rp-timed-caveat">${inc.outcome}</p>` : ""}
+    ${inc.fineprint ? `<p class="rp-included-note">${inc.fineprint}</p>` : ""}
+  </div>`,
+  /* Round 66: the CTA carries the number, so the price is visible without
+     scrolling back to the card on a short screen -- and so a tap of the
+     stepper visibly changes the button, not just a figure above the fold.
+     On a recurring plan it deliberately does NOT name a number: the
+     per-visit rate and the first-visit charge are different, and a button
+     asserting one of them would assert the wrong one. */
+  /* No chevron here: .rp-primary already appends its own "→" via ::after,
+     so adding one rendered "Continue with $200 › →". Caught by looking at a
+     screenshot; nothing in the test suite reads button glyphs. */
+  footer: `<button class="rp-primary rp-included-cta" onclick="rpAdvance()">${
+    recurring ? "Continue" : `Continue with ${money(total)}`
+  }</button>` };
+}
+
 function rpScreenHtml() {
   const eyebrow = "";   /* see rpStepLabel() — the progress bar replaced it */
 
@@ -3747,26 +4170,113 @@ function rpScreenHtml() {
       <div class="rp-sheet ${introActive ? "is-intro-hidden" : ""}" id="rpServiceSheet">
         <div class="rp-sheet-handle"></div>
         <p class="rp-start-service-q">What do you need cleaned?</p>
+        ${/* =================================================================
+             ROUND 66 — TWO GROUPS, AND AN ASCENDING LADDER INSIDE THE FIRST
+             =================================================================
+             Direct instruction: basic 3 hours, then deep 6 hours, then a
+             higher option, then Move-Out, then carpet.
+
+             Shipped as two labelled groups rather than one list of five,
+             because the flat list was asking the customer to compare "3
+             hours" against "your whole house passes inspection" as though
+             those were the same kind of purchase. They are not even priced
+             the same way -- the first group is $40 per cleaner-hour, the
+             second is a flat price for the building -- so a single column
+             of five rows offered no basis on which to choose.
+
+             The grouping also solves what the re-order costs. Move-Out is
+             the best product this business sells: $199-$499 at 27-39%
+             margin against Basic's 21.9%, it carries the deposit guarantee,
+             and every landing page and PCS search funnels into it. Dropping
+             it to fourth in a flat list buries it. As the sole headline of
+             its own group it reads FIRST within that group, so the ladder
+             the instruction asked for and the prominence the P&L wants stop
+             competing.
+
+             Hourly is absent -- see RP_HOURLY_PUBLIC in the engine. The
+             `rpServiceIsPublic` guard is kept rather than deleting the row,
+             so flipping that flag back restores it where it belongs.
+             ================================================================= */""}
+        <p class="rp-rows-group">Cleaning your home</p>
         <div class="rp-rows">
-          ${rpRowBtn(rpRowHint('moveout',{ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Inspection-ready. The whole interior, in one price.", featured:true, badge:"Most Popular", val:`$${RP_MOVEOUT_BEDROOM_TIERS[0].base}`, valNote:"and up" }))}
-          ${rpRowBtn(rpRowHint('deep',{ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"When it's been a while, or nobody's deep-cleaned it yet.", val:`$${RP_DEEP_ANCHOR_PRICE}`, valNote:`${RP_DEEP_ANCHOR_HOURS} hrs` }))}
-          ${rpRowBtn(rpRowHint('maintenance',{ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"Upkeep for a home that's already tidy.", val:`$${RP_BASIC_ANCHOR_PRICE}`, valNote:`${RP_BASIC_ANCHOR_HOURS} hrs` }))}
-          ${rpRowBtn(rpRowHint('carpet',{ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction. Two-room minimum.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" }))}
+          ${rpRowBtn(rpRowHint('maintenance',{ onclick:"rpSelectService('maintenance', this)", icon:"repeat", title:"Basic Cleaning", desc:"Kitchen, bathrooms and floors. Upkeep for a tidy home.", val:`$${RP_BASIC_ANCHOR_PRICE}`, valNote:`${RP_BASIC_ANCHOR_HOURS} hrs · 1 cleaner` }))}
+          ${/* Round 66: `featured` for visual weight, but deliberately NO
+               "Most Popular" badge. Deep is the sensible default in this
+               group and the styling can say so, but Move-Out is the
+               genuinely most-booked product in the business -- putting that
+               specific claim on this row to balance the two groups
+               visually would be a false one. The badge stays where it is
+               true. */""}
+          ${rpRowBtn(rpRowHint('deep',{ onclick:"rpSelectService('deep', this)", icon:"droplet", title:"Deep Cleaning", desc:"When it's been a while, or nobody's deep-cleaned it yet.", featured:true, val:`$${RP_DEEP_ANCHOR_PRICE}`, valNote:`${RP_DEEP_ANCHOR_HOURS} hrs · 1 cleaner` }))}
+          ${rpRowBtn(rpRowHint('reset',{ onclick:"rpSelectService('reset', this)", icon:"sparkle", title:"Whole-Home Reset", desc:"The full checklist, done around your furniture.", val:`$${RP_RESET_ANCHOR_PRICE}`, valNote:`${RP_RESET_ANCHOR_HOURS} hrs · ${RP_RESET_ANCHOR_CREW} cleaners` }))}
           ${rpServiceIsPublic('hourly') ? rpRowBtn(rpRowHint('hourly',{ onclick:"rpSelectService('hourly', this)", icon:"clock", title:"Hourly Cleaning", desc:"You pick the hours and the areas.", val:`$${HOURLY_RATE_PER_CLEANER}`, valNote:"/hr" })) : ""}
         </div>
-        ${/* Round 55: the three timed services all bill at the same rate,
-             and round 54 said so by repeating "at $40/hr" inside each card
-             -- which made every description wrap to four lines and turned
-             the picker into a wall of text. The relationship is one fact;
-             it belongs in one sentence, under the list, where it explains
-             all three at once. */""}
-        <p class="rp-rate-note">Deep, Basic and Hourly are all $${HOURLY_RATE_PER_CLEANER} an hour with one cleaner — you're choosing how many hours. Move-Out is priced for the whole home instead.</p>
+        ${/* Round 66: the shared-rate sentence sits under the group it
+             describes instead of under all five rows, and no longer names
+             Hourly, which is off the public menu. It explains the whole
+             group at once rather than repeating "$40/hr" in three cards --
+             the round-55 reasoning, applied to the new grouping. */""}
+        <p class="rp-rate-note">All three are $${HOURLY_RATE_PER_CLEANER} an hour per cleaner — you're choosing how much time. Add hours to any of them while you book.</p>
+        <p class="rp-rows-group">Moving out, or carpets only</p>
+        <div class="rp-rows">
+          ${rpRowBtn(rpRowHint('moveout',{ onclick:"rpSelectService('moveout', this)", icon:"home", title:"Move-Out Cleaning", desc:"Inspection-ready. The whole empty interior, in one price.", featured:true, badge:"Most Popular", val:`$${RP_MOVEOUT_BEDROOM_TIERS[0].base}`, valNote:"and up" }))}
+          ${rpRowBtn(rpRowHint('carpet',{ onclick:"rpSelectService('carpet', this)", icon:"layers", title:"Carpet Cleaning", desc:"Hot-water extraction. Two-room minimum.", val:`$${rpAddonCatalog.carpet.bundlePrice}`, valNote:"/room" }))}
+        </div>
+        <p class="rp-rate-note">Move-Out is priced for the whole home rather than by the hour, and it's the one backed by our Defend Your Deposit guarantee.</p>
         <p class="rp-fineprint">Need a custom combination? <a href="sms:5802150915" onclick="rpTrack('text_tap',{placement:'service_screen'})">Text us</a>, or <button class="rp-inline-link" type="button" onclick="rpOpenFaq('service')">view FAQs</button>.</p>
       </div>
     `,
       footer: introActive ? `<button type="button" class="rp-hero-cta" id="rpServiceIntroBtn" onclick="rpRevealServiceSheet()">Get My 60-Second Price ${rpIcon("chev","rp-ic rp-ic-sm")}</button>` : null
     };
   }
+
+  /* =========================================================================
+     ROUND 66 — THE BASIC / DEEP / RESET SCREEN, REBUILT
+     =========================================================================
+     Direct feedback, on a screenshot of the Basic version of this screen:
+     "some of the captions are just really kind of weird", "it should be 3
+     hours of cleaning to include bathroom, kitchen, floors etc", and "it
+     should be easily allowed to add extra hours".
+
+     THREE THINGS WERE WRONG, AND THEY COMPOUNDED.
+
+     (1) THE SCREEN HEDGED FOUR TIMES AND DESCRIBED ONCE. `intro` said
+         "priced by the hour -- the same way our hourly service works",
+         `outcome` said "It's time, not a finished checklist", a hardcoded
+         panel said "This is hourly cleaning, not a move-out", and then
+         `fineprint` said it again while re-explaining Deep AND Move-Out. A
+         customer arriving at the screen that is supposed to tell them what
+         they are buying read four consecutive disclaimers. The copy fix is
+         in rpIncludes (engine); what is left here is ONE caveat line.
+
+     (2) "ADD HOURS OR A SECOND CLEANER" WAS NOT A BUTTON. It was a static
+         chip sitting in the same row as "3 hours, 1 cleaner" and "$40 per
+         hour" -- two facts and one thing that looks tappable, is not, and
+         whose real control lived two screens later on the add-ons step.
+         That is the single worst interaction in the funnel: it advertises
+         the exact affordance the customer wants, in the place they want it,
+         and does nothing. The stepper below IS that control, here.
+
+     (3) THE SCOPE WAS INVISIBLE. `items` has been carried in rpIncludes
+         since round 16 and rendered on /book for nobody -- only /call's CSR
+         rail read it. So the answer to "does this include the bathroom" was
+         in the data, on the phone, and not on the screen. It renders now.
+
+     WHY THE PRICE MOVES BEFORE THE CONTACT GATE. This screen now shows a
+     live total that the customer can change, and it sits ahead of
+     "contactgate". That looks like it undoes round 24's reason for the
+     gate -- don't reveal a price to an anonymous visitor. It does not: the
+     service picker one screen earlier already prints "$120 · 3 hrs" on the
+     card they tapped. The number is public for these three services no
+     matter what; the gate's real work is on Move-Out, where the price
+     depends on answers only the funnel can collect. What this screen adds
+     is the ability to change a number they have already seen.
+
+     FREQUENCY LIVES HERE NOW, for Basic only -- see the note on
+     rpFlows.maintenance in the engine for why the standalone screen went
+     away and why the selection had to survive it.
+     ========================================================================= */
+  if (rpState.step === "included" && rpIsTimedService()) return rpTimedServiceScreen(eyebrow);
 
   if (rpState.step === "included") {
     const inc = rpIncludes[rpState.service];
@@ -3940,8 +4450,12 @@ function rpScreenHtml() {
       ${/* Round 54: this used to say "Doesn't affect your price." Three of
            these four answers still don't -- but the condition question can,
            and saying otherwise two taps before we ask it would be the exact
-           bait the arrival surcharge gets accused of being. */""}
-      <p class="rp-sub">So the crew arrives ready for the job, with the right number.</p>
+           bait the arrival surcharge gets accused of being.
+
+           Round 66: sharpened now that the last question carries a real
+           surcharge. "The right number" was doing the honest work quietly;
+           it says which question moves it. */""}
+      <p class="rp-sub">The first three tell the crew what to bring. The last one affects your price.</p>
       <div class="rp-quest-list">
         ${q("moveoutWaterOn", "Is the water on?")}
         ${q("moveoutAcOn", "Is the air conditioning working?")}
@@ -3952,33 +4466,71 @@ function rpScreenHtml() {
              built-up grime", which is a sentence people answer Yes to out of
              pride rather than accuracy. Two plain descriptions instead, both
              of which a person can pick without conceding anything. */""}
-        <div class="rp-quest-row is-wide">
-          ${/* ROUND 65, DIRECT INSTRUCTION: "How's the condition of the home,
-               standard or heavy build up." Names the thing plainly instead of
-               reaching for an idiom. "Standard" is also the word the price
-               promise uses everywhere else on this site -- "standard home in
-               standard condition" -- so the answer the customer picks here is
-               the same word they read on the estimate, the landing pages and
-               the fine print. The idiom was friendlier; this is clearer, and
-               it lines up the whole vocabulary. */""}
+        ${/* ROUND 66 — THIS QUESTION IS SET APART, BECAUSE IT IS NOW THE ONE
+             THAT COSTS MONEY.
+
+             The three above are logistics: the water is on or it isn't, and
+             the answer decides whether the job can happen, not what it
+             costs. This one adds 25% (see rpConditionKey in the engine), and
+             until this round it looked exactly like its neighbours -- a
+             priced choice wearing the clothes of a yes/no about plumbing.
+
+             The considered alternative was giving it its own screen. It did
+             not win: the instruction for this round was that the site be
+             simpler, and buying clarity with an extra tap is the trade this
+             funnel keeps making and regretting (round 31 merged two size
+             screens, round 52 deleted the tier screen, round 66 deleted the
+             frequency screen). A rule and a label do the same work for
+             free. What it gets is a divider, a heading that says out loud
+             that it affects price, and the explanatory panel below -- which
+             now renders for BOTH answers, so the customer is never guessing
+             what the other one would have meant. */""}
+        <div class="rp-quest-row is-wide is-priced">
+          <span class="rp-quest-priced-label">This one affects your price</span>
           <span class="rp-quest-label">How's the condition of the home?</span>
           <div class="rp-choice-grid rp-quest-pills is-stacked">
             <button class="rp-pill ${rpState.moveoutHeavyCondition === false ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', false)">Standard<small>Just needs a good clean</small></button>
-            <button class="rp-pill ${rpState.moveoutHeavyCondition === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', true)">Heavy build up<small>Or things being left behind</small></button>
+            <button class="rp-pill ${rpState.moveoutHeavyCondition === true ? "is-selected" : ""}" onclick="rpSetMoveoutAnswer('moveoutHeavyCondition', true)">Heavy build up<small>Takes longer &middot; adds ${RP_HEAVY_SURCHARGE_PCT}%</small></button>
           </div>
         </div>
       </div>
+      ${/* =================================================================
+           ROUND 66 — THIS NOTE HAD TO BE REWRITTEN, NOT ADJUSTED
+           =================================================================
+           It used to open "Your price still stands for a standard clean."
+           That was true for exactly as long as Heavy cost nothing. As of
+           this round it adds 25%, so the old sentence would have sat two
+           taps above a line item contradicting it -- the worst sentence on
+           the site, in the worst possible place.
+
+           The replacement states the actual bargain, and the bargain is the
+           point. A percentage surcharge on a self-reported question gives
+           people a reason to lie; the only durable answer is to make
+           honesty the cheaper option and say so out loud. Declare Heavy and
+           the number you are about to see is FIRM -- no walkthrough, no
+           arrival adjustment, done. Say Standard on a home that is not and
+           the crew re-prices before starting, which is slower and less
+           certain for them.
+
+           It also thanks them, and keeps the round-57 lesson intact: never
+           let a disclosure feel like it costs them the booking. The panel
+           is neutral, not amber -- amber in this funnel means "we cannot
+           price this, call us", and this is the opposite of that.
+
+           NOTE FOR WHOEVER SHIPS THE WALKTHROUGH SOP: the second half of
+           this promise is a thing people have to DO. "Firm, no surprises"
+           is only true if a crew arriving at a declared-heavy home does not
+           re-quote it. That is the whole trade this copy makes.
+           ================================================================= */""}
       ${rpState.moveoutHeavyCondition === true ? `
       <div class="rp-quest-note">
         ${rpIcon("info","rp-ic rp-ic-sm")}
-        ${/* ROUND 57: "You can say yes, or reschedule" made declining sound
-             like losing the booking. It is not -- they get the standard
-             clean at the quoted price. Saying so here, where they first
-             admit the home is rough, is what stops them abandoning two
-             screens before the price. Same clause as the estimate panel,
-             which is deliberate: this is the promise, that is the
-             confirmation. */""}
-        <span><strong>Good to know — and thanks for telling us.</strong> Your price still stands for a standard clean. On a home like this the crew walks it on arrival and prices anything extra with you <em>before</em> they start — say yes and they carry on, say no and they do the standard clean at the quoted price. Nothing gets added to your bill afterward.</span>
+        <span><strong>Thanks for telling us — that's the useful answer.</strong> A home like this takes longer, so the price you'll see includes ${RP_HEAVY_SURCHARGE_PCT}% for the extra time. In exchange it's <em>firm</em>: the crew won't re-price anything on arrival and nothing gets added to your bill afterward.</span>
+      </div>` : ""}
+      ${rpState.moveoutHeavyCondition === false ? `
+      <div class="rp-quest-note">
+        ${rpIcon("info","rp-ic rp-ic-sm")}
+        <span>If the home turns out heavier than expected, the crew walks it with you on arrival and prices the difference <em>before</em> they start — never after. Not sure which one you are? Pick heavy buildup and your price is locked either way.</span>
       </div>` : ""}
     </div>`, footer: `<button class="rp-primary" ${rpMoveoutQuestionnaireAnswered() ? "" : "disabled"} onclick="rpAdvance()">Continue</button>` };
   }
@@ -4087,27 +4639,27 @@ function rpScreenHtml() {
     </div>` };
   }
 
-  if (rpState.step === "frequency") {
-    return { scroll: `<div class="rp-center">
-      ${eyebrow}
-      <h2>How often would you like cleanings?</h2>
-      ${/* Round 52: the three "Save 20% / 15% / 10%" value chips are gone
-           along with the discounts themselves. Leaving a chip that says
-           "Save 20%" next to a price that doesn't move is the worst
-           version of this screen -- worse than no chip at all. The rows
-           show the per-visit price instead, which is the same number on
-           every one of them, and the subheading says so plainly rather
-           than letting the customer discover it at the estimate. */""}
-      <p class="rp-sub">Same price every visit, whichever you pick. Cancel or reschedule anytime, no contract.</p>
-      <div class="rp-rows">
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Weekly', this)", title:"Weekly", desc:"Our most popular recurring plan.", val:`$${RP_BASIC_ANCHOR_PRICE}`, valNote:"/visit", selected: rpState.frequency === "Weekly" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Biweekly', this)", title:"Biweekly", desc:"Every two weeks.", val:`$${RP_BASIC_ANCHOR_PRICE}`, valNote:"/visit", selected: rpState.frequency === "Biweekly" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('Monthly', this)", title:"Monthly", desc:"Once-a-month upkeep.", val:`$${RP_BASIC_ANCHOR_PRICE}`, valNote:"/visit", selected: rpState.frequency === "Monthly" })}
-        ${rpRowBtn({ onclick:"rpSelectFrequency('One-Time', this)", title:"One-Time", desc:"A single visit, no recurring plan.", val:`$${RP_BASIC_ANCHOR_PRICE}`, selected: rpState.frequency === "One-Time" })}
-      </div>
-      <p class="rp-fineprint">Recurring plans are billed per visit, and the first visit is a Deep Clean so every visit after it stays predictable.</p>
-    </div>` };
-  }
+  /* ROUND 66: THE "frequency" SCREEN IS DELETED.
+
+     It rendered four full-width rows showing an identical $120 under a
+     subheading that said, in so many words, that the choice did not matter.
+     Round 52 had already removed the discounts that once made it a price
+     decision; what was left was a screen asking the customer to choose
+     between four things that were the same.
+
+     The selection survives as a checkbox and three pills on the timed
+     service screen (rpTimedServiceScreen) -- it still has to exist, because
+     visitsPerMonth and the required first Deep both read it. What is gone
+     is the screen, the tap, and the fake choice.
+
+     Deleted rather than left unreachable: "frequency" is out of
+     rpFlows.maintenance, so this branch could only ever have been entered by
+     a stale saved session, and the resume check (rpLoadPersistedState)
+     rejects a step name that is not in the allowlist. A renderer for a step
+     nothing can reach is the kind of dead code that gets copied forward.
+     Same reasoning as round 52's deletion of the tier-comparison screen.
+
+     rpSelectFrequency() is deleted with it -- see the handlers section. */
 
   if (rpState.step === "rooms") {
     return { scroll: `<div class="rp-center">
@@ -4197,7 +4749,7 @@ function rpAddonsScreen(eyebrow) {
   const junkAvailable = (rpServiceAddons[rpState.service] || []).includes("junk");
   const isSelected = {
     carpet: rpState.addonCarpetRooms > 0,
-    windows: !!rpState.windowsTier,
+    windows: rpWindowsSelected(),
     garage: rpState.garageWash,
     laundry: rpState.laundryLoads > 0,
     fridge: rpState.fridgeAddon,
@@ -4215,7 +4767,7 @@ function rpAddonsScreen(eyebrow) {
       desc: rpState.service === "moveout"
         ? "The most common deposit deduction. Two-room minimum."
         : "Hot-water extraction. Two-room minimum." },
-    windows: { icon: "window", label: "Exterior Windows", desc: "Outside glass. Screens extra." },
+    windows: { icon: "window", label: "Exterior Windows", desc: "Priced per window. Screens and upstairs cost extra." },
     garage:  { icon: "car",    label: "Garage Floor Wash", desc: "Oils lifted, concrete scrubbed. Garage must be empty." },
     laundry: { icon: "washer", label: "Laundry Service", desc: "Wash, dry, and fold laundry by the load." },
     fridge:  { icon: "fridge", label: "Refrigerator Interior", desc: "Clean shelves, drawers, walls, and interior spills." },
@@ -4226,13 +4778,16 @@ function rpAddonsScreen(eyebrow) {
   };
   function summaryFor(key) {
     if (key === "carpet") { const enz = rpState.addonCarpetPetEnzyme ? rpState.addonCarpetRooms * RP_PET_ENZYME_RATE : 0; return `${rpState.addonCarpetRooms} room${rpState.addonCarpetRooms === 1 ? "" : "s"}${enz ? " + enzyme" : ""} · $${rpState.addonCarpetRooms * rpAddonCatalog.carpet.bundlePrice + enz}`; }
-    if (key === "windows") return rpState.windowsTier === "basic" ? `Basic Wash · $${rpAddonCatalog.windows.basic}` : `Premium Wash · $${rpAddonCatalog.windows.premium}`;
+    if (key === "windows") return `${rpWindowsSummary()} · $${rpWindowsPrice()}`;
     if (key === "garage") return `$${rpAddonCatalog.garage.price}`;
     if (key === "laundry") return `${rpState.laundryLoads} load${rpState.laundryLoads === 1 ? "" : "s"} · $${rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad}`;
     if (key === "fridge") return `$${rpAddonCatalog.fridge.price}`;
     if (key === "oven") return `$${rpAddonCatalog.oven.price}`;
     if (key === "cabinets") return `$${rpAddonCatalog.cabinets.price}`;
-    if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour}`;
+    /* Round 66: reads rpExtraHoursPrice() rather than re-doing the
+       multiplication, which is how this line would have kept showing the
+       one-cleaner rate on a two-cleaner service. */
+    if (key === "extraHours") return `+${rpState.addonExtraHours} hour${rpState.addonExtraHours === 1 ? "" : "s"} · $${rpExtraHoursPrice()}`;
     if (key === "secondCleaner") return `${rpSecondCleanerHours()} hour${rpSecondCleanerHours() === 1 ? "" : "s"} · $${rpSecondCleanerPrice()}`;
     return "";
   }
@@ -4255,13 +4810,39 @@ function rpAddonsScreen(eyebrow) {
           <button class="rp-pill ${!rpState.addonCarpetPetEnzyme ? "is-selected" : ""}" onclick="rpSelectAddonCarpetPetEnzyme(false)">Not Needed</button>
         </div>` : ""}`;
     }
+    /* ROUND 66 — THE WINDOW SHEET ASKS THREE THINGS INSTEAD OF OFFERING TWO
+       MYSTERIES. It used to be "Basic" or "Premium", two words that told a
+       customer nothing about which one was theirs, at a price that ignored
+       the size of their house entirely. See rpAddonCatalog.windows.
+
+       Order is deliberate: size first (it is the biggest lever and the
+       easiest question), then screens, then storeys. The running price
+       updates under all three, so the customer watches their own answers
+       build the number rather than being handed one. */
     if (key === "windows") {
+      const w = rpAddonCatalog.windows;
+      const chosen = rpWindowsSelected();
       return `
-        <p class="rp-tap-note">Premium adds screen removal for a fuller clean.</p>
+        <p class="rp-tap-note">$${w.perWindow} a window, $${w.minimum} minimum. Roughly is fine — the crew confirms on arrival before anything starts.</p>
+        <p class="rp-addon-sub">How many windows?</p>
+        <div class="rp-pill-grid">
+          ${RP_WINDOW_BRACKETS.map(b => `<button type="button" class="rp-pill ${rpState.windowCount === b.key ? "is-selected" : ""}" aria-pressed="${rpState.windowCount === b.key}" onclick="rpSelectWindowCount('${b.key}')">${b.label}</button>`).join("")}
+        </div>
+        ${chosen ? `
+        <p class="rp-addon-sub">Screens too?</p>
         <div class="rp-choice-grid">
-          <button class="rp-pill ${rpState.windowsTier === "basic" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('basic')">Basic<br><small>Exterior wash · $${rpAddonCatalog.windows.basic}</small></button>
-          <button class="rp-pill ${rpState.windowsTier === "premium" ? "is-selected" : ""}" onclick="rpSelectAddonWindows('premium')">Premium<br><small>+ screens · $${rpAddonCatalog.windows.premium}</small></button>
-        </div>`;
+          <button class="rp-pill ${rpWindowsHasScreens() ? "is-selected" : ""}" onclick="rpSelectWindowScreens(true)">Yes<br><small>Removed, washed &amp; rehung · +$${w.screensPerWindow}/window</small></button>
+          <button class="rp-pill ${!rpWindowsHasScreens() ? "is-selected" : ""}" onclick="rpSelectWindowScreens(false)">Glass only<br><small>Leave the screens up</small></button>
+        </div>
+        ${/* The storey question is here for the crew as much as the price.
+             Second-floor exteriors mean ladder work, and the crew needs to
+             know that before they load the van, not when they arrive. */""}
+        <p class="rp-addon-sub">Any upstairs windows?</p>
+        <div class="rp-choice-grid">
+          <button class="rp-pill ${!rpState.windowTwoStory ? "is-selected" : ""}" onclick="rpSelectWindowTwoStory(false)">Single storey<br><small>All reachable from the ground</small></button>
+          <button class="rp-pill ${rpState.windowTwoStory ? "is-selected" : ""}" onclick="rpSelectWindowTwoStory(true)">Two storey<br><small>Ladder work · +${Math.round(w.twoStoryUplift * 100)}%</small></button>
+        </div>
+        <p class="rp-addon-running"><span>${rpWindowsSummary()}</span><strong>$${rpWindowsPrice()}</strong></p>` : ""}`;
     }
     if (key === "garage") {
       return `
@@ -4326,7 +4907,11 @@ function rpAddonsScreen(eyebrow) {
   function addonPrice(key) {
     switch (key) {
       case "carpet":        return { val: `$${rpAddonCatalog.carpet.bundlePrice}`, note: "/room" };
-      case "windows":       return { val: `$${rpAddonCatalog.windows.basic}`, note: "and up" };
+      /* Round 66: was `rpAddonCatalog.windows.basic`, a key that no longer
+         exists since windows went per-window -- the card rendered the string
+         "$undefined". Shows the floor, which is the lowest a window job can
+         ever cost, with "and up" doing the honest work. */
+      case "windows":       return { val: `$${rpAddonCatalog.windows.minimum}`, note: "and up" };
       case "garage":        return { val: `$${rpAddonCatalog.garage.price}`, note: "" };
       case "laundry":       return { val: `$${rpAddonCatalog.laundry.pricePerLoad}`, note: "/load" };
       case "fridge":        return { val: `$${rpAddonCatalog.fridge.price}`, note: "" };
@@ -4530,7 +5115,13 @@ function rpEstimateScreen(eyebrow) {
   /* Show a breakdown only when there is something to break down. A single
      "Base Service $399" row under a $399 headline is a restatement, not
      information. */
-  const showBreakdown = !noGuaranteedPrice && (addonRows.length > 0 || firstVisitDeep || rpIsRecurringPlan());
+  /* Round 66: a heavy-condition surcharge forces the breakdown open even
+     with no add-ons. It is the one line item on this screen the customer did
+     not explicitly add to their own cart, so it is the one that must never
+     be folded silently into a headline number -- they get to see the
+     standard price and the surcharge as two rows. */
+  const conditionSurcharge = rpHasConditionSurcharge() ? rpConditionSurcharge(rpServiceBasePrice()) : 0;
+  const showBreakdown = !noGuaranteedPrice && (addonRows.length > 0 || firstVisitDeep || rpIsRecurringPlan() || conditionSurcharge > 0);
 
   const depositLine = (rpState.service === "moveout" && !noGuaranteedPrice)
     ? RP_MSG.deposit.line(rpState.bedrooms, rpFinalPrice()) : "";
@@ -4588,6 +5179,12 @@ function rpEstimateScreen(eyebrow) {
         ` : `
           <div class="rp-est-line"><span>${service.name}</span><strong>${rpFormatMoneyDisplay(rpToCents(rpDisplayBasePrice() || rpCentsToDollars(rpNetServiceCents())))}</strong></div>
         `}
+        ${/* Round 66: the heavy-condition surcharge, as its own row, directly
+             under the standard price it is a percentage of. Labelled with
+             the percentage AND the dollars, because "Heavy condition +$100"
+             alone invites the question this row exists to pre-empt. */""}
+        ${conditionSurcharge > 0 ? `
+          <div class="rp-est-line"><span>Heavy buildup<em>${RP_HEAVY_SURCHARGE_PCT}% for the extra time it takes</em></span><strong>+$${conditionSurcharge}</strong></div>` : ""}
         ${addonRows.map(r => `<div class="rp-est-line"><span>${r.label}${r.detail ? `<em>${r.detail}</em>` : ""}</span><strong>${r.quoted ? "Quoted" : "+$" + r.price}</strong></div>`).join("")}
         ${rpIsRecurringPlan() ? `<div class="rp-est-line"><span>${rpFrequencyPlan().visitsPerMonth} visits a month</span><strong>${rpFormatMoneyDisplay(rpToCents(rpMonthlyTotal()))}/mo</strong></div>` : ""}
         <div class="rp-est-line is-total"><span>Total</span><strong>${firstVisitDeep ? rpFormatMoneyDisplay(rpFirstVisitTotalCents()) : rpPriceLabel()}</strong></div>
@@ -4830,13 +5427,36 @@ function rpGatePricePreview() {
        depending on which of the two you pick") because the comparison
        screen came next. One product, one number, and that number is final
        rather than a range still to be resolved. */
-    const price = rpServiceBasePrice();
-    if (!(price > 0)) return null;
+    /* ROUND 66 — THIS HAD TO ADD THE CONDITION SURCHARGE, AND DID NOT.
+
+       Caught by walking the funnel in a browser, not by a unit test: a
+       four-bedroom answered "heavy build up" was shown "$399" on this
+       screen and $499 two screens later. The surcharge is applied in
+       rpPreDiscountSubtotalCents, not in rpServiceBasePrice (see the note
+       there on why they are kept separate), and this function was reading
+       the base.
+
+       That is the worst possible place for that gap. This screen exists to
+       hand over a number in exchange for a phone number; a figure here that
+       grows by $100 after the customer has given up their details is the
+       exact bait-and-switch the whole funnel is built to avoid, and it
+       would have been the first thing a heavy-condition customer
+       experienced.
+
+       It reads the real total now. The surcharge is named rather than just
+       included, because a customer who sees $499 where they expected $399
+       should find the reason in the same sentence. */
+    const base = rpServiceBasePrice();
+    if (!(base > 0)) return null;
+    const surcharge = rpConditionSurcharge(base);
+    const price = base + surcharge;
     const beds = Number(rpState.bedrooms);
     const home = beds >= 5 ? "home this size" : `${beds}-bedroom`;
     return {
       figure: `$${price}`,
-      line: `Your ${home} move-out comes to <b>$${price}</b>, with everything inside the home included.`,
+      line: surcharge > 0
+        ? `Your ${home} move-out comes to <b>$${price}</b> — $${base} plus ${RP_HEAVY_SURCHARGE_PCT}% for the heavy buildup you told us about.`
+        : `Your ${home} move-out comes to <b>$${price}</b>, with everything inside the home included.`,
       after: "Add-ons and the full total are on the next screen."
     };
   }
@@ -5412,6 +6032,9 @@ function rpResetServiceState() {
   rpState.addonCarpetPetEnzyme = false;
   rpState.expandedAddon = null;
   rpState.windowsTier = null;
+  rpState.windowCount = null;
+  rpState.windowScreens = false;
+  rpState.windowTwoStory = false;
   rpState.garageWash = false;
   rpState.laundryLoads = 0;
   rpState.fridgeAddon = false;
@@ -5588,7 +6211,13 @@ function rpSubmitMoveoutBlockedLead(opts) {
   if (!silent) rpGoToStep("moveoutblockedconfirmed", "forward");
 }
 function rpSelectCondition(label, element) { rpCommitChoice(element, () => { rpState.condition = label; rpAdvance(); }); }
-function rpSelectFrequency(label, element) { rpCommitChoice(element, () => { rpState.frequency = label; rpAdvance(); }); }
+/* Round 66: rpSelectFrequency() is deleted. It was the tap-and-advance
+   handler for the frequency SCREEN, and advancing is precisely what the
+   replacement must not do -- the checkbox and pills live on a screen the
+   customer is still reading. rpToggleRecurringHere / rpSetRecurringFrequency
+   (below) set the same rpState.frequency without navigating. Deleted rather
+   than kept as an alias: a stale caller that still advances would skip the
+   contact gate. */
 function rpSelectCarpetOnlyRooms(n, element) { rpCommitChoice(element, () => { rpState.carpetRooms = n; rpAdvance(); }); }
 function rpToggleHeavySoil(checked) { rpState.heavySoil = checked; rpRefresh(); }
 function rpTogglePetOdor(checked) { rpState.petOdor = checked; if (!checked) rpState.addonPetEnzyme = false; rpRefresh(); }
@@ -5612,7 +6241,7 @@ function rpToggleMoreAddons() { rpState.showMoreAddons = !rpState.showMoreAddons
 function rpClearAddon(key) {
   if (key === "carpet") { rpState.addonCarpetRooms = 0; rpState.addonCarpetPetEnzyme = false; }
   else if (key === "junk") rpState.junkSize = null;
-  else if (key === "windows") rpState.windowsTier = null;
+  else if (key === "windows") { rpState.windowsTier = null; rpState.windowCount = null; rpState.windowScreens = false; rpState.windowTwoStory = false; }
   else if (key === "garage") rpState.garageWash = false;
   else if (key === "laundry") rpState.laundryLoads = 0;
   else if (key === "fridge") rpState.fridgeAddon = false;
@@ -5629,13 +6258,78 @@ function rpSelectAddonCarpetPetEnzyme(yes) { rpTrackAddon("carpetPetEnzyme", yes
    this no longer touches rpState.expandedAddon. Still tracked the same
    way every other add-on toggle is, so attach-rate data keeps flowing. */
 function rpToggleJunkHaul(checked) { rpTrackAddon("junk", checked); rpState.junkSize = checked ? "yes" : null; rpRefresh(); }
-function rpSelectAddonWindows(tier) { rpTrackAddon("windows", !!tier, { tier }); rpState.windowsTier = tier; rpState.expandedAddon = null; rpRefresh(); }
+/* Round 66: three handlers where there was one tier-setter. None of them
+   closes the sheet -- unlike the old basic/premium pick, these are three
+   questions the customer answers in sequence, and collapsing the sheet on
+   the first would hide the other two. The sheet's own Done/backdrop closes
+   it, same as the carpet sheet which already worked this way. */
+function rpSelectWindowCount(key) {
+  rpState.windowCount = key;
+  /* Clear the legacy field once a real bracket is chosen, so a migrated
+     session stops being described by both models at once. */
+  rpState.windowsTier = null;
+  rpTrackAddon("windows", !!key, { bracket: key, price: rpWindowsPrice() });
+  rpRefresh();
+}
+function rpSelectWindowScreens(yes) {
+  rpState.windowScreens = !!yes;
+  if (rpState.windowsTier) { rpState.windowCount = rpState.windowCount || "m"; rpState.windowsTier = null; }
+  rpTrackAddon("windows", true, { screens: !!yes, price: rpWindowsPrice() });
+  rpRefresh();
+}
+function rpSelectWindowTwoStory(yes) {
+  rpState.windowTwoStory = !!yes;
+  rpTrackAddon("windows", true, { twoStory: !!yes, price: rpWindowsPrice() });
+  rpRefresh();
+}
 function rpSelectGarageWash(yes) { rpTrackAddon("garage", yes); rpState.garageWash = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundryLoads(n) { rpTrackAddon("laundry", n > 0, { loads: n }); rpState.laundryLoads = n; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectLaundry(yes) { rpSelectLaundryLoads(yes ? 1 : 0); }
 function rpSelectFridge(yes) { rpTrackAddon("fridge", yes); rpState.fridgeAddon = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectSecondCleaner(yes) { rpTrackAddon("secondCleaner", yes); rpState.addonSecondCleaner = yes; rpState.expandedAddon = null; rpRefresh(); }
 function rpSelectExtraHours(n) { rpTrackAddon("extraHours", n > 0, { hours: n }); rpState.addonExtraHours = n; rpState.expandedAddon = null; rpRefresh(); }
+
+/* =========================================================================
+   ROUND 66 — HANDLERS FOR THE TIMED-SERVICE SCREEN
+   =========================================================================
+   Every one of these writes the SAME rpState field its add-ons-screen
+   equivalent writes, and routes through the same rpTrackAddon call, so a
+   booking made with the stepper and a booking made on the add-ons sheet are
+   indistinguishable downstream -- same price, same webhook, same analytics
+   event. Two places to set a value is fine; two sources of truth is not.
+   ========================================================================= */
+
+/* Relative stepping rather than an absolute setter, because the control is a
+   plus/minus pair. Clamped at both ends: never below the service's included
+   hours, never past RP_MAX_EXTRA_HOURS. The cap is not arbitrary -- at five
+   extra hours a one-cleaner Basic is an eight-hour solo day, which is the
+   shape of job the wage-floor note on RP_MOVEOUT_BEDROOM_TIERS warns about,
+   and it wants a conversation rather than a checkout. */
+function rpStepExtraHours(delta) {
+  const next = Math.min(RP_MAX_EXTRA_HOURS, Math.max(0, Number(rpState.addonExtraHours || 0) + delta));
+  if (next === Number(rpState.addonExtraHours || 0)) return;
+  rpSelectExtraHours(next);
+}
+function rpToggleSecondCleanerHere(checked) { rpSelectSecondCleaner(!!checked); }
+
+/* The frequency screen's replacement. Checking the box picks Biweekly as the
+   opening position rather than leaving frequency null: null would leave the
+   three pills below with nothing selected and the booking in a state that
+   says "recurring" but cannot answer how often. Biweekly rather than Weekly
+   because it is the middle option and the most commonly booked cadence in
+   residential cleaning -- the customer adjusts from a sensible default
+   instead of from an arbitrary one. Unchecking returns to One-Time, which is
+   what every non-recurring booking in the engine already is. */
+function rpToggleRecurringHere(checked) {
+  rpState.frequency = checked ? "Biweekly" : "One-Time";
+  rpTrack("frequency_set", { frequency: rpState.frequency, via: "timed_screen" });
+  rpRefresh();
+}
+function rpSetRecurringFrequency(label) {
+  rpState.frequency = label;
+  rpTrack("frequency_set", { frequency: label, via: "timed_screen" });
+  rpRefresh();
+}
 
 /* =========================================================================
    PAYLOAD + CALENDAR HANDOFF — verbatim from the homepage estimator.
@@ -5731,7 +6425,7 @@ function rpGetEstimatePayload() {
     square_footage: rpSqftTier() ? rpSqftTier().label : "N/A",
     bedrooms: rpState.bedrooms || "N/A", bathrooms: rpState.bathrooms || "N/A",
     carpet_rooms: rpState.carpetRooms || rpState.addonCarpetRooms || "0",
-    exterior_windows: rpState.windowsTier ? "Yes" : "No",
+    exterior_windows: rpWindowsSelected() ? "Yes" : "No",
     junk_size: rpState.junkSize || "N/A",
     laundry_loads: rpState.laundryLoads || "0",
     helpers_count: rpState.cleanerCount || "N/A", hours_count: rpState.hourCount || "N/A",
@@ -5754,7 +6448,15 @@ function rpGetEstimatePayload() {
     no_ac: rpState.noAC ? "Yes" : "No", mold_concern: rpState.moldConcern ? "Yes" : "No", pet_waste_concern: rpState.petWasteConcern ? "Yes" : "No", hazard_concern: rpState.hazardConcern ? "Yes" : "No",
     property_conditions_summary: propertyConditionsSummary,
     airbnb_laundry: rpState.airbnbLaundry ? "Yes" : "No", airbnb_restocking: rpState.airbnbRestocking ? "Yes" : "No", airbnb_same_day: rpState.airbnbSameDay ? "Yes" : "No",
-    exterior_windows_tier: rpState.windowsTier || "N/A",
+    /* Round 66: the tier field is retained as a GHL column but now carries
+       the human summary ("19-28 windows · screens in · two storey") rather
+       than "basic"/"premium". Keeping the field name means no GHL mapping,
+       webhook doc or automation has to be migrated -- only the value got
+       more useful. The three raw answers follow it for filtering. */
+    exterior_windows_tier: rpWindowsSelected() ? rpWindowsSummary() : "N/A",
+    exterior_windows_count: rpWindowsSelected() ? String(rpWindowCount()) : "N/A",
+    exterior_windows_screens: rpWindowsSelected() ? (rpWindowsHasScreens() ? "Yes" : "No") : "N/A",
+    exterior_windows_two_story: rpWindowsSelected() ? (rpState.windowTwoStory ? "Yes" : "No") : "N/A",
     handyman_interest: rpState.handymanInterest ? "Yes" : "No",
     special_instructions: notes, customer_notes: notes, estimate_notes: jobDetails, job_details: jobDetails, cleaner_notes: jobDetails,
     submitted_at: new Date().toISOString(), page_url: window.location.href

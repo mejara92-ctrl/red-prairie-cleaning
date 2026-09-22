@@ -101,8 +101,23 @@ def engine_prices():
     out["fridge"] = int(re.search(r"fridge:\s*\{[^}]*price:\s*(\d+)", src).group(1))
     out["garage"] = int(re.search(r"garage:\s*\{[^}]*price:\s*(\d+)", src).group(1))
     out["laundry"] = int(re.search(r"laundry:\s*\{[^}]*pricePerLoad:\s*(\d+)", src).group(1))
-    w = re.search(r"windows:\s*\{[^}]*basic:\s*(\d+),\s*premium:\s*(\d+)", src)
-    out["windows_basic"], out["windows_premium"] = int(w.group(1)), int(w.group(2))
+    # Round 66: exterior windows moved from a flat basic/premium pair to
+    # per-window pricing with a floor. The old keys are gone from the engine,
+    # so reading them here would sys.exit() on every run.
+    w = re.search(r"windows:\s*\{[^}]*perWindow:\s*(\d+),\s*screensPerWindow:\s*(\d+),\s*minimum:\s*(\d+)", src)
+    out["windows_per"], out["windows_screens"], out["windows_min"] = (
+        int(w.group(1)), int(w.group(2)), int(w.group(3)))
+    # Round 66: the Whole-Home Reset, and the heavy-condition ladder.
+    out["reset"] = scalar("RP_RESET_ANCHOR_PRICE")
+    heavy = float(re.search(r"heavy:\s*([0-9.]+)", src).group(1))
+    out["heavy_pct"] = int(round(heavy * 100))
+    # The heavy prices are DERIVED here, using the same round-to-the-dollar
+    # rule as rpConditionSurchargeCents() in the engine, rather than being
+    # typed in. That is the whole point: /pricing publishes a heavy column,
+    # and this is what proves those four numbers are the ones a customer is
+    # actually charged. Change the multiplier in the engine and this check
+    # starts demanding the published table be updated to match.
+    out["moveout_heavy"] = [b + int(round(b * heavy)) for b in out["moveout"]]
     return out
 
 
@@ -205,11 +220,14 @@ def main():
     ]
     # Numbers that are legitimately current elsewhere and must not be flagged
     # just because they collide with a retired price.
-    current = set(p["moveout"] + [
+    current = set(p["moveout"] + p["moveout_heavy"] + [
         p["deep"], p["basic"], p["carpet"], p["fridge"],
-        p["garage"], p["laundry"], p["windows_basic"], p["windows_premium"],
+        p["garage"], p["laundry"], p["windows_min"],
         p["one_time_min"], p["recurring_min"], p["extra_hour"], p["pet_enzyme"],
         p["hourly_rate"],
+        # Round 66: the Reset, and the doubled extra-hour rate it bills
+        # (two cleaners x $40). Both are real published numbers now.
+        p["reset"], p["extra_hour"] * 2,
     ])
 
     problems = []
@@ -248,7 +266,12 @@ def main():
     # but the check is still worth keeping on its own merits — it just
     # guards against a stale number now rather than against a broken
     # promise.
-    ceiling = p["moveout"][-1]
+    # Round 66: the ceiling is the top of the HEAVY ladder, not the standard
+    # one. A five-bedroom in heavy condition is a real, published $624, so
+    # pinning this at $499 would flag the correct number on /pricing as
+    # drift. The rule still does its job -- anything above the heaviest
+    # priced job we sell did not come from the engine.
+    ceiling = max(p["moveout"][-1], p["moveout_heavy"][-1])
     for f in html_files():
         rel = os.path.relpath(f, ROOT)
         text = strip_comments(read(f))
@@ -260,6 +283,39 @@ def main():
                     problems.append(
                         "%s:%d  publishes $%d on a move-out line, above the $%d ceiling\n      %s"
                         % (rel, line_no, amount, ceiling, line.strip()[:140]))
+
+    # =====================================================================
+    # ROUND 66 — THE HEAVY COLUMN ON /pricing MUST BE THE REAL LADDER
+    # =====================================================================
+    # Every other check in this file is negative: it looks for numbers that
+    # should NOT appear. This one is positive, because a published surcharge
+    # column is a promise about arithmetic and the failure mode is a number
+    # that is merely plausible. $374 and $384 both look fine on a page; only
+    # one of them is 25% above $299.
+    #
+    # Matches the standard price in a row and asserts the heavy price beside
+    # it, so the two columns can never drift apart or fall out of order.
+    pricing_path = os.path.join(ROOT, "pricing", "index.html")
+    if os.path.exists(pricing_path):
+        ladder = dict(zip(p["moveout"], p["moveout_heavy"]))
+        seen = set()
+        for line_no, line in enumerate(strip_comments(read(pricing_path)).splitlines(), 1):
+            amounts = [int(x) for x in re.findall(r"\$(\d{3,4})\b", line)]
+            if len(amounts) != 2:
+                continue
+            std, heavy_shown = amounts
+            if std not in ladder:
+                continue
+            seen.add(std)
+            if heavy_shown != ladder[std]:
+                problems.append(
+                    "pricing/index.html:%d  heavy price for the $%d tier is $%d, engine says $%d (+%d%%)\n      %s"
+                    % (line_no, std, heavy_shown, ladder[std], p["heavy_pct"], line.strip()[:140]))
+        missing = [b for b in p["moveout"] if b not in seen]
+        if missing:
+            problems.append(
+                "pricing/index.html  publishes a heavy column but is missing the %s tier(s)"
+                % ", ".join("$%d" % b for b in missing))
 
     # Round 32: claims the business makes about itself now live in
     # js/rp-messages.js. A page that hardcodes a different review count is

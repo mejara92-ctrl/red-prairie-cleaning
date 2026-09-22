@@ -1,0 +1,337 @@
+ROUND 66 — THE MENU, THE BASIC SCREEN, AND THE SURCHARGE THAT WASN'T CHARGING
+===============================================================================
+Direct instructions, in the order they were given:
+
+  "re-order the menu... basic 3 hours clean, deep 6 hours clean, and then some
+   kind of higher option like whole-home reset. Then Move-Out clean, then
+   carpet clean."
+  "when you go to basic clean it really needs to just say three hours of
+   cleaning and then underneath have like a super easy button to add more
+   hours or another crew member."
+  "Lets remove organizing clean from the main menu."
+  "This page is ugly, with all kind of different sized buttons."
+  "Heavy should just be a 25% upcharge."
+  "Give me feedback on how I'm selling exterior window cleaning."
+  "Change garage floor wash to $100."
+  "cleaning frequency is kind of redundant because it's all the same price...
+   probably just remove the screen."
+
+
+THE HEADLINE: THE HEAVY SURCHARGE WAS NEVER CHARGING ANYTHING
+-------------------------------------------------------------------------------
+This was meant to be a rate change from 20% to 25%. It turned out to be
+switching the mechanism on for the first time.
+
+RP_CONDITION_PRICED_SERVICES was an empty array, so rpConditionMultiplier()
+returned 0 for every service and the 0.20/0.50 entries in
+RP_CONDITION_MULTIPLIER were dead constants. Worse, there were two fields
+describing condition that never met: /book wrote a BOOLEAN
+(moveoutHeavyCondition) from the questionnaire, and rpConditionKey() read a
+STRING (rpState.condition) that only /call's old step ever set. So even if
+the list had been populated, /book's answer would still have priced at zero.
+
+A customer who told us the home had heavy buildup got the standard price, and
+the crew was expected to renegotiate on arrival -- against an SOP the engine's
+own comments call "the single biggest open risk against this ladder" and
+"still unbuilt".
+
+    size      standard   heavy    delta
+    1-2 bed   $199       $249     +$50
+    3   bed   $299       $374     +$75
+    4   bed   $399       $499     +$100
+    5   bed   $499       $624     +$125
+
+Margin percentage is unchanged by construction (labour is 40% of the ticket
+and the guarantee reserve 8% of it, so both scale). What the surcharge buys is
+the extra crew-hours a heavy home takes, which previously came out of margin.
+
+The surcharge rounds to the whole dollar. 25% of the ladder is $49.75/$74.75/
+$99.75/$124.75, and a stray 75 cents on the one line item a customer is
+already primed to be suspicious of reads as a formula applied to them.
+
+TWO PIECES OF COPY HAD TO GO, not be adjusted. /book's questionnaire note
+opened "Your price still stands for a standard clean", and /call's script said
+the quote "covers a standard clean" and the crew might ask for more on
+arrival. Both were true while Heavy cost nothing. Left in place they would
+have sat directly above a line item contradicting them -- and /call's version
+would have described charging the caller twice.
+
+THE TRADE THE NEW COPY MAKES, which the business now has to keep: declare
+Heavy and the price is FIRM, no arrival re-quote. Declare Standard on a home
+that isn't and the crew re-prices before starting. A percentage surcharge on a
+self-reported question gives people a reason to lie; making honesty the
+cheaper option is the only durable answer. That means the arrival-walkthrough
+SOP is now load-bearing, not optional.
+
+
+THE MENU: TWO GROUPS, NOT ONE LIST OF FIVE
+-------------------------------------------------------------------------------
+    CLEANING YOUR HOME          MOVING OUT, OR CARPETS ONLY
+      Basic Cleaning   $120       Move-Out Cleaning  $199+  [Most Popular]
+      Deep Cleaning    $240       Carpet Cleaning    $50/room
+      Whole-Home Reset $480
+
+The flat list asked the customer to compare "3 hours" against "your whole
+house passes inspection" as though those were the same kind of purchase. They
+are not even priced the same way.
+
+The grouping also solves what the re-order costs. Move-Out is the best product
+this business sells -- $199-$499 at 27-39% margin against Basic's 21.9%, it
+carries the deposit guarantee, and every landing page and PCS search funnels
+into it. Dropping it to fourth in a flat list buries it. As the sole headline
+of its own group it reads first within that group, so the ladder that was
+asked for and the prominence the P&L wants stop competing.
+
+"Most Popular" stayed on Move-Out and was NOT moved to Deep. Deep is featured
+(visual weight, no claim); Move-Out is genuinely the most-booked product, and
+balancing the two groups visually is not worth a false badge.
+
+HOURLY CLEANING IS OFF THE PUBLIC MENU (RP_HOURLY_PUBLIC = false). There is no
+service called "organizing clean" -- the only place this site says "Organizing,
+decluttering & light tidying" is rpIncludes.hourly's item list, so that row was
+the instruction's target. It should have gone anyway: since round 52 dropped
+Hourly to $40/hr it has been Basic with the scope removed at an identical
+price, and nobody should pick it. Not deleted -- Liz can still book it on
+/call, so a caller who wants to direct their own scope still gets it.
+
+
+THE WHOLE-HOME RESET: $480, 2 CLEANERS x 6 HOURS
+-------------------------------------------------------------------------------
+Priced as a time block at $40/hr, which is exactly what a Deep with the
+second-cleaner add-on already cost. That is why it was safe to add: it
+introduces no new price, only a name and a menu row for a configuration the
+engine could already produce. 46.9% margin, and the minimum-wage floor does not
+trip until 26.5 crew-hours against the 12 it is budgeted at.
+
+IT COSTS MORE THAN THE $399 FOUR-BEDROOM MOVE-OUT, which covers the same rooms.
+This was flagged before it was built and shipped anyway, with a separator that
+makes it work: a MOVE-OUT REQUIRES AN EMPTY HOUSE. Someone still living in
+their home cannot buy the move-out product, so the two never compete. Every
+customer-facing line -- the menu card, rpIncludes.reset, /pricing, and Liz's
+objection script -- leads with the occupied home, not with scope. Scope is an
+argument against the move-out that cannot be won.
+
+Named "reset" rather than "extreme" because rpConditionOrder already uses
+"Extreme Buildup" as a CONDITION label, and a customer with a normally-dirty
+house reads "extreme" as "not me".
+
+
+ONE TABLE FOR EVERY SERVICE THAT SELLS TIME
+-------------------------------------------------------------------------------
+Basic, Deep and Reset are the same product in three sizes: N hours x C cleaners
+at $40/hr. That shape used to be two parallel pairs of constants and an
+`if (deep) ... if (maintenance) ...` branch in SIX functions. Adding a third
+rung that way means a third branch in all six, and one missed is a wrong price
+on a live booking -- which is not hypothetical, the round-52 note on
+rpSecondCleanerAnchorHours records exactly that bug.
+
+RP_TIMED_SERVICES is now the one description. The published RP_*_ANCHOR_*
+constants stay literal (tools/check-prices.py greps for them), and
+rpTimedServicesAgree() asserts the two match.
+
+A BUG THIS INTRODUCED AND THE TEST SUITE THEN CAUGHT: Extra Time was
+`hours * $40` flat, correct only while every timed service had one cleaner.
+On the two-cleaner Reset that sold an hour of a two-person crew for one
+person's price -- $560 for 16 crew-hours, an effective $35/crew-hour. It now
+bills the service's base crew. The test asserts the RATIO ($40 per crew-hour in
+every configuration) rather than three expected totals, because $560 is a
+perfectly plausible number and no total-based check would have called it wrong.
+
+
+THE BASIC / DEEP / RESET SCREEN, REBUILT
+-------------------------------------------------------------------------------
+THREE THINGS WERE WRONG AND THEY COMPOUNDED:
+
+(1) IT HEDGED FOUR TIMES AND DESCRIBED ONCE. The intro hedged ("the same way
+    our hourly service works"), the outcome hedged ("time, not a finished
+    checklist"), a hardcoded panel hedged ("this is hourly cleaning, not a
+    move-out"), and the fine print hedged again while re-explaining two other
+    services. Four consecutive disclaimers on the screen whose job is to say
+    what you are buying. One caveat now, at full strength -- the round-52
+    reasoning for that framing still holds, it just stopped being said four
+    times.
+
+(2) "ADD HOURS OR A SECOND CLEANER" WAS NOT A BUTTON. It was a static chip in
+    the same row as two facts, and the real control was two screens later
+    behind the contact gate. The worst interaction in the funnel: it
+    advertised the exact affordance the customer wanted, where they wanted it,
+    and did nothing. It is a live stepper now, on this screen.
+
+(3) THE SCOPE WAS INVISIBLE. rpIncludes.items has been carried since round 16
+    and rendered on /book for nobody -- only /call's CSR rail read it. So "does
+    this include the bathroom" was answerable on the phone and not on the page.
+
+    NOW:   5 hours of cleaning
+           Kitchen, bathrooms, floors and the everyday surfaces.
+           [ $200 ]  5 hours · 1 cleaner · $40/hour
+           WHERE THE TIME USUALLY GOES: (the five items, two columns)
+           Hours of cleaning   3 included + 2 added    [-] 5 [+]
+           [ ] Add a second cleaner      Same hours, twice the hands · +$200
+           [ ] Make this a repeating visit
+           Continue with $200
+
+
+THE FREQUENCY SCREEN IS GONE, THE SELECTION IS NOT
+-------------------------------------------------------------------------------
+Four full-width rows showing an identical $120 under a subheading that said, in
+so many words, that the choice did not matter. Round 52 removed the discounts
+and left the screen standing.
+
+But visitsPerMonth and the required first Deep both read it, so defaulting
+everyone to One-Time would have silently dropped the recurring signal -- the
+highest-LTV thing this funnel captures -- to save a tap. It is a checkbox plus
+three pills on the timed screen now. Nine screens became eight.
+
+Checking it opens on Biweekly rather than leaving frequency null, so the
+booking is never in a state that says "recurring" but cannot say how often.
+
+ALSO FIXED HERE: a recurring Basic's first visit is a required Deep, so the
+customer pays $240 on booking day and $120 after. The old screen mentioned that
+in fine print under a button. The price card states it.
+
+ON PREPAY, WHICH WAS RAISED AND IS THE RIGHT INSTINCT: a recurring discount
+buys nothing (they can cancel next week); prepay is real commitment. But the
+math does not work on Basic -- 10% off a prepaid 4-pack is $432, dropping
+per-visit profit to $14.24, a 12% margin against a 20% target. If it ships, it
+ships on Deep, or on Basic at no discount sold on convenience. Not built.
+
+
+THE UGLY BUTTONS: ONE CSS PROPERTY
+-------------------------------------------------------------------------------
+.rp-quest-list was `align-items: center` on a column flexbox, so each row
+shrank to fit its widest child -- the QUESTION LABEL, not the buttons. The pill
+grid then inherited whatever width the sentence above it happened to need.
+"Is the water on?" got a narrow pair; "Is the home free of mold or pest
+issues?" got a wide one. `max-width: 260px` only capped that; it never set it.
+
+Now --rp-quest-width (320px) sizes the list, the rows stretch to it, and both
+pill variants fill it. Measured in a browser after the fix: 312, 312, 312, 312.
+
+The condition question also gets a rule above it and a red "THIS ONE AFFECTS
+YOUR PRICE" eyebrow, because it is now the only priced answer on a screen of
+logistics questions. An extra screen was considered and rejected -- the
+instruction for this round was that the site be simpler, and this funnel has
+regretted buying clarity with a tap three times (rounds 31, 52, and the
+frequency screen above).
+
+
+EXTERIOR WINDOWS: THE NUMBERS WERE FINE, THE MODEL WASN'T
+-------------------------------------------------------------------------------
+It was one flat price per HOUSE with no size input anywhere. An 8-window duplex
+and a 30-window two-storey both paid $100. On the small one that is excellent
+money; on the large one it is a loss, and this business publishes prices for
+homes up to 3,400+ sq ft.
+
+Basic/Premium was also the wrong axis: "Premium = + screens" valued screen
+removal at $100, and nobody can tell from the words which one is theirs.
+
+    NOW:  $6 per window, $100 minimum
+          screens +$3 per window
+          two storey +40%
+
+          10 windows, glass only            $100  (floor)
+          24 windows, glass only            $144
+          24 windows + screens              $216
+          32 + screens, two storey          $403
+
+The floor protects the drive-out -- eight windows at $6 is $48 and nobody
+should drive out for that. It applies BEFORE the two-storey uplift, or a small
+two-storey job would get its ladder work free.
+
+THE TWO-STOREY QUESTION MATTERS MORE THAN THE SURCHARGE. Second-floor exteriors
+mean ladder work, which is a different safety and insurance conversation. The
+question exists so the crew knows before the van is loaded; it is flagged in
+capitals on /call's add-on row. If ladder work should ever stop being offered,
+that field is where it gets turned off.
+
+Windows also came OFF Basic's add-on list. A $100-and-up exterior job attached
+to a $120 interior cleaning was the most lopsided pairing on the screen -- the
+add-on could cost more than the service.
+
+The webhook keeps the field name exterior_windows_tier (no GHL migration) but
+its value is now the human summary, e.g. "19-28 windows · screens in · two
+storey", with three raw fields added beside it for filtering.
+
+
+GARAGE FLOOR WASH: $150 -> $100
+-------------------------------------------------------------------------------
+As instructed. $60 left after the 40% labour share covers degreaser on a normal
+floor, and there is no separate drive-out. What it does not cover is a garage
+with things still in it, which turns 45 minutes into two hours -- which is why
+"garage must be completely empty" is on the card, the sheet and /pricing, and
+should stay there.
+
+
+THREE THINGS NOBODY ASKED ABOUT
+-------------------------------------------------------------------------------
+* js/rp-canonical-estimator.js DELETED (and tools/apply-canonical-estimator.py
+  with it). 524 lines containing Deep $249, Basic $149, carpet $75/room and
+  "Factory Reset(TM) Move-Out Cleaning". Nothing loaded it -- it had been
+  dereferenced for several rounds and noted as "harmless" -- but a file named
+  "canonical" full of wrong prices is a landmine for whoever reads it next.
+
+* CARPET-ONLY BOOKINGS WERE PROMISED A LANDLORD GUARANTEE. rpGuaranteeType()
+  fell past every branch to `return "deposit"`, so a carpet job with no
+  landlord and no inspection anywhere near it showed "if your landlord flags
+  something we missed, we come back free". The round log had carried this as a
+  known oddity for fourteen rounds. It is "satisfaction" now, and the default
+  for an unknown service key is the promise we can always keep.
+
+* /pricing's structured data said lowPrice "150", stale from the old $149
+  Basic. The real floor is $50. That is the number Google reads.
+
+
+CAUGHT BY LOOKING AT THE PAGE, NOT BY A TEST
+-------------------------------------------------------------------------------
+Three defects survived a green test suite and were found by driving /book in a
+headless browser and reading screenshots. Worth recording, because the pattern
+is the same each time: the tests check numbers, and these were not numbers.
+
+* THE CONTACT GATE UNDERSOLD A HEAVY HOME. It read rpServiceBasePrice(), which
+  is the price BEFORE the surcharge, so a heavy four-bedroom was shown "$399",
+  asked for a name and phone number, and then showed $499. The single worst
+  place in the funnel for that gap. Now reads the real total and names the
+  surcharge in the same sentence. A test was added -- it greps /book's source,
+  which is ugly and better than trusting the next person to remember.
+
+* THE INTRO CONTRADICTED THE HEADING. The first version of the rebuilt screen
+  put hours and crew in rpIncludes.intro too, so tapping [+] twice produced
+  "5 hours of cleaning" as a heading with "Three hours with one cleaner"
+  underneath it. `intro` describes SCOPE only now. Same rule that deleted
+  `highlights`, arrived at twice: a hardcoded string restating a computed
+  value will eventually contradict it.
+
+* "$undefined" ON THE WINDOWS CARD. The add-on card's teaser still read
+  rpAddonCatalog.windows.basic, a key that no longer exists.
+
+Also fixed: a duplicate arrow on the new CTA (.rp-primary already appends one
+via ::after), and "$40/hour each" printed against "1 cleaner".
+
+
+WHAT THE TEST SUITE COVERS NOW
+-------------------------------------------------------------------------------
+tools/funnel-test.js gained: the Reset in every existing loop; carpet's
+guarantee; $40-per-crew-hour across every timed configuration; the heavy ladder
+with margin and wage-floor assertions for each tier; heavy being ignored by the
+timed services and by an unanswered questionnaire; window pricing including
+both floor cases and legacy-session migration; the gate-teaser check above.
+
+tools/check-prices.py derives the heavy ladder from the engine using the same
+rounding rule and asserts /pricing's heavy column against it, so those four
+published numbers are provably the ones a customer is charged. Verified by
+breaking one on purpose ($374 -> $384) and confirming it fails.
+
+
+STILL OPEN
+-------------------------------------------------------------------------------
+* THE ARRIVAL WALKTHROUGH SOP. It was already the biggest risk against the
+  move-out ladder. It is now load-bearing in a second way: "declare Heavy and
+  your price is firm" is only true if a crew arriving at a declared-heavy home
+  does not re-price it. That promise is now in /book's questionnaire, /book's
+  estimate panel, /call's quote line and /pricing.
+
+* LOGGING REAL HOURS. Open since round 34, unchanged. Under FLSA a piece-rate
+  W2 employee's hours must be tracked to prove the minimum-wage floor was met.
+
+* PREPAY, if wanted -- see the note under the frequency section for why it does
+  not work on Basic at a discount.

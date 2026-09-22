@@ -133,8 +133,24 @@ const RP_MSG = {
     /* Round 58: echoes the answer they gave in their words. They picked
        "heavy build up"; saying it back is what makes the panel read
        as a reply rather than a system notice. */
-    flaggedLead: "You told us there's heavy build up — good, that helps.",
-    flaggedBody: "The price above covers a standard clean. The crew walks the home on arrival and, if it needs more, prices the extra with you on the spot — say yes and they carry on, say no and they do the standard clean at the price above. Nothing is ever added afterward."
+    /* ROUND 66 — REWRITTEN, because the old body described a mechanism that
+       no longer runs.
+
+       It said "the price above covers a standard clean" and then explained
+       an arrival re-quote. As of round 66 a declared-heavy move-out is
+       priced at +25% up front (see rpConditionKey in the engine), and that
+       surcharge is an itemised row on this very screen. Telling the
+       customer the number above them is a standard-clean price, directly
+       underneath a breakdown showing a heavy-buildup line, would read as
+       either a mistake or a trick.
+
+       The new body confirms what the breakdown already shows and then makes
+       the promise that is now the point: it is firm. That is what the
+       customer gets in exchange for having answered honestly, and it is the
+       reason the surcharge does not simply teach people to click
+       "Standard". Both halves have to stay true together. */
+    flaggedLead: "You told us there's heavy build up — that's priced in above.",
+    flaggedBody: "Homes like this take longer, so the total includes 25% for the extra time. What you see is what you pay: the crew won't re-price anything on arrival, and nothing is ever added afterward."
     /* Round 37 (direct instruction): the price-ceiling claim is gone. The
        top of the move-out ladder is still the top of the ladder — we just
        don't make a promise out of it any more. Deleted rather than left

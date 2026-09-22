@@ -1023,8 +1023,8 @@ button.cmp-h:hover{color:var(--ink-2)}
   <button class="sheet-done" type="button" onclick="closeSheet('endSheet')">Never mind — back to the call</button>
 </section>
 
-<script src="../js/rp-messages.js?v=f7beae0a"></script>
-<script src="../js/rp-pricing-engine.js?v=4569118c"></script>
+<script src="../js/rp-messages.js?v=c4aad015"></script>
+<script src="../js/rp-pricing-engine.js?v=b6b59e9a"></script>
 <script>
 /* =========================================================================
    CSR CALL CONSOLE
@@ -1041,6 +1041,8 @@ const rpState = {
   sqft:null, bedrooms:null, bathrooms:null, condition:null, frequency:null,
   cleanerCount:null, hourCount:null,
   carpetRooms:0, addonCarpetRooms:0, addonCarpetPetEnzyme:false, windowsTier:null,
+  /* Round 66: per-window exterior pricing. See rpWindowsPrice in the engine. */
+  windowCount:null, windowScreens:false, windowTwoStory:false,
   garageWash:false, laundryLoads:0, fridgeAddon:false, junkSize:null, handymanInterest:false,
   /* Round 40: add-ons stopped being a step you walk through and became a
      section that is either done or not. This is what "done" means for it. */
@@ -1101,6 +1103,17 @@ const FLOWS = {
   moveout:        ["service","caller","home","addons","quote","contact","calendar","done"],
   deep:           ["service","caller","addons","quote","contact","calendar","done"],
   maintenance:    ["service","caller","frequency","addons","quote","contact","calendar","done"],
+  /* Round 66: the Whole-Home Reset. Same shape as deep -- it is a block of
+     time with a fixed crew, so there is nothing to size and nothing to
+     schedule beyond the date.
+
+     NOTE that /call KEEPS its "frequency" step on maintenance while /book
+     dropped that screen. That is deliberate, not drift: on the phone the
+     cadence is a question Liz asks in conversation and records, and a step
+     she can land on is how she records it. /book removed a SCREEN the
+     customer had to tap through for no price difference; the selection
+     itself is alive in both places and writes the same rpState.frequency. */
+  reset:          ["service","caller","addons","quote","contact","calendar","done"],
   carpet:         ["service","caller","rooms","quote","contact","calendar","done"],
   hourly:         ["service","caller","hourly","addons","quote","contact","calendar","done"],
   airbnb:         ["service","caller","home","quote","contact","calendar","done"],
@@ -1152,6 +1165,19 @@ const SERVICE_ANGLES = {
     objection: "A deep clean is meant to reset the whole house at once \u2014 that's the difference between this and a regular cleaning.",
     urgencyNoun: "openings this week",
     seasonNote: "a busy stretch for deep cleans"
+  },
+  /* Round 66. The angle here is NOT "it's more thorough than a deep clean"
+     -- Liz will be asked why it costs more than the $399 move-out, and scope
+     is an argument she cannot win, because the move-out covers the same
+     rooms. The answer is that a move-out needs an empty house and this one
+     doesn't. Every line below is built on that, so she always has the true
+     reason to hand instead of improvising a comparison. */
+  reset: {
+    value: "that's two cleaners for a full six hours \u2014 the same checklist we do on a move-out, except we're working around your furniture instead of an empty house",
+    addon: "Two people are already on site for the day, so carpets or the garage floor in the same visit costs a lot less hassle than booking it separately.",
+    objection: "The move-out price is for an empty house \u2014 no furniture to move around, no one living there. This is that same full checklist in a home you're still living in, which takes two people and a full day. If the house will be empty, I can absolutely book you the move-out instead.",
+    urgencyNoun: "two-cleaner days",
+    seasonNote: "a busy stretch"
   },
   maintenance: {
     value: "that keeps the whole house consistently handled \u2014 kitchens, bathrooms, floors \u2014 on whatever schedule works for you",
@@ -1232,8 +1258,20 @@ function quoteSayLine(){
      price. /book's estimate panel now says exactly this, and so does this
      line, in the same order, because a caller who books by phone and a
      customer who books online must not be told two different policies. */
+  /* ROUND 66 \u2014 THIS LINE NOW DESCRIBES A PRICE, NOT A PROCEDURE.
+     The heavy surcharge is charged at booking (+25%, see rpConditionKey in
+     the engine) and shows as its own row on the quote Liz is reading from.
+     The old script told the caller the number covers a standard clean and
+     that the crew might ask for more on arrival -- which, said over a quote
+     that already includes the surcharge, describes charging them twice.
+
+     What she says instead is the trade: the extra time is already in the
+     number, and because they told us, the number is final. Same words as
+     /book's estimate panel, deliberately -- round 57's rule that a caller
+     and a web customer must never be told two different policies is exactly
+     as binding now that the policy has changed. */
   const heavy = (rpState.service === "moveout" && rpState.moveoutHeavyCondition === true && !rpIsCustomQuoteOnly())
-    ? " And just so it's said up front \u2014 that covers a standard clean. With the heavy build up you mentioned, the crew walks it when they arrive and, if it needs more, they'll tell you the number right then. Say yes and they carry on; say no and they do the standard clean at the price I just gave you. Either way nothing gets added to your bill after."
+    ? " And that already accounts for the heavy build up you mentioned \u2014 there's 25% in there for the extra time it takes. Because you told me up front, that number's firm: the crew won't re-price anything when they arrive, and nothing gets added to your bill after."
     : "";
   return `\u201cSo ${desc}, your total is ${price} \u2014 ${val}.${heavy}\u201d`;
 }
@@ -1407,7 +1445,7 @@ function objectionPriceAnswer(){
 function removableAddonLabel(){
   if(rpAddonAvailable("carpet") && Number(rpState.addonCarpetRooms)>0) return "the carpet cleaning";
   if(rpAddonAvailable("junk") && rpState.junkSize) return "the junk haul";
-  if(rpAddonAvailable("windows") && rpState.windowsTier) return "the exterior windows";
+  if(rpAddonAvailable("windows") && rpWindowsSelected()) return "the exterior windows";
   if(rpAddonAvailable("garage") && rpState.garageWash) return "the garage floor wash";
   if(rpAddonAvailable("fridge") && rpState.fridgeAddon) return "the refrigerator interior";
   if(rpAddonAvailable("laundry") && Number(rpState.laundryLoads)>0) return "the laundry service";
@@ -1474,8 +1512,8 @@ const OBJECTIONS = [
    },
    n:"Round 52: this used to compare Express's hours against Inspection Ready's. It reads the real crew and hours off the tier row for THIS home now, so it can't drift from what the crew sheet says. If bedrooms aren't entered yet it falls back to the shape of the ladder rather than naming one size's hours as if they applied to all of them."},
   {q:"\u201cSo the price could go up when you get here?\u201d",
-   a:"\u201cOnly if the home's a long way from a standard clean \u2014 heavy trash, heavy grease, that kind of thing. And it's never a surprise on the bill: the crew looks it over before they start, tells you the number, and you decide then. If you'd rather not, they do the standard clean at the price I gave you. Most homes are exactly that price anyway.\u201d",
-   n:"Round 54. Don't dodge this and don't over-promise \u2014 the honest answer sells better than a flat 'no'. The thing they're afraid of is a bigger bill AFTER the work, and we never do that. Lead with 'never a surprise on the bill', then the mechanism, then 'most homes are the price I gave you'. If they already told you it's heavy, you should have said this on the home screen; this is the version for when they raise it themselves. ROUND 57 added the sentence about declining: 'you decide then' left the caller to guess what happens if they decide no, and the answer they guess is that we walk. Say the real one \u2014 they keep the clean at the quoted price. That is what makes the disclosure build trust instead of costing the booking."},
+   a:"\u201cNot if you've told me what I need to know. If you've said the home has heavy build up, that's already in the price and the number's firm. The only time a crew re-prices on arrival is when they turn up to something a lot rougher than what was described \u2014 and even then it's never a surprise on the bill: they look it over before they start, tell you the number, and you decide. Say no and they do the standard clean at the price I gave you.\u201d",
+   n:"ROUND 66 REWRITE \u2014 read this one carefully, the policy changed under it. Heavy build up is now a 25% surcharge charged at booking, not something the crew sorts out on arrival. So the answer to this question is now mostly NO, and that is a better answer than the one you had. The trade to communicate: tell us up front and your price is locked; don't, and the crew re-quotes on site. Honesty is the cheaper option for them, and saying that plainly is what stops people clicking 'standard' on a house that isn't. The round-57 lesson still holds for the re-quote case \u2014 always finish with what happens if they decline, or they assume we walk. Do NOT tell a caller who declared heavy that the price covers a standard clean; it doesn't, it covers theirs, and the quote screen itemises it."},
   {q:"\u201cIs there a cheaper option? / What's the basic version?\u201d",
    a:"\u201cThere isn't a lighter move-out any more \u2014 there's one Move-Out Cleaning and it's the whole interior: inside the oven, the fridge, cabinets and closets, baseboards, interior windows, the lot. That's the price you're hearing, and nothing on that list gets billed separately when we show up.\u201d",
    n:"Round 52 retired Move-Out Express. If a caller is quoting a lower number they saw before, they saw the old Express tier \u2014 don't apologise for it, just say the product changed and everything Express charged extra for is included now. If they genuinely want a light clean with no inspection behind it, an Hourly booking is the honest alternative, and say plainly that it has no deposit guarantee."},
@@ -1851,14 +1889,32 @@ function sectionBody(s){
     if(list.includes("laundry")) h+=`<div class="grp"><div class="grp-h">Laundry <em>— +$${rpAddonCatalog.laundry.pricePerLoad}/load</em></div>
       <div class="opts five">${[0,1,2,3,4].map(n=>opt(n===0?"None":`${n}`,`pick('laundryLoads',${n})`,Number(rpState.laundryLoads)===n)).join("")}</div></div>`;
     if(list.includes("extraHours")){
-      const anchorHrs = rpState.service==="deep" ? RP_DEEP_ANCHOR_HOURS : RP_BASIC_ANCHOR_HOURS;
-      h+=`<div class="grp"><div class="grp-h">Extra time <em>— includes ${anchorHrs}hrs, +$${RP_EXTRA_HOUR_RATE}/hr beyond</em></div>
+      /* Round 66: reads RP_TIMED_SERVICES via rpTimedBaseHours() instead of
+         a deep-or-else ternary, which would have quoted the Reset's caller
+         a three-hour inclusion on a six-hour job. Crew is named too, since
+         on the Reset an extra hour buys two people, not one. */
+      const anchorHrs = rpTimedBaseHours() || RP_BASIC_ANCHOR_HOURS;
+      const anchorCrew = (rpTimedService()||{}).crew || 1;
+      h+=`<div class="grp"><div class="grp-h">Extra time <em>— includes ${anchorHrs}hrs${anchorCrew>1?` x ${anchorCrew} cleaners`:""}, +$${RP_EXTRA_HOUR_RATE}/hr per cleaner beyond</em></div>
         <div class="opts five">${[0,1,2,3,4].map(n=>opt(n===0?"None":`+${n}`,`pick('addonExtraHours',${n})`,Number(rpState.addonExtraHours)===n)).join("")}</div></div>`;
     }
     const rows=[];
+    /* ROUND 66 — WINDOWS ARE THREE QUESTIONS NOW, NOT A TWO-WAY PICK.
+       Liz asks how many, screens or not, and whether anything is upstairs.
+       The bracket rows double as the on/off switch: tapping the selected one
+       clears the add-on, same gesture the old tier rows used. The storey
+       question matters most -- it is a crew-safety fact, not just +40%, and
+       it has to reach the crew sheet before the van is loaded. */
     if(list.includes("windows")){
-      rows.push(opt("Exterior windows — basic",`pick('windowsTier', rpState.windowsTier==='basic'?null:'basic')`,rpState.windowsTier==="basic",null,`+$${rpAddonCatalog.windows.basic}`));
-      rows.push(opt("Exterior windows — premium",`pick('windowsTier', rpState.windowsTier==='premium'?null:'premium')`,rpState.windowsTier==="premium","Screens included",`+$${rpAddonCatalog.windows.premium}`));
+      rows.push(`<div class="grp-h" style="margin-top:9px">Exterior windows <em>— $${rpAddonCatalog.windows.perWindow}/window, $${rpAddonCatalog.windows.minimum} min</em></div>`);
+      RP_WINDOW_BRACKETS.forEach(function(b){
+        rows.push(opt(`${b.label} windows`,`pick('windowCount', rpState.windowCount==='${b.key}'?null:'${b.key}')`,rpState.windowCount===b.key,null,
+          rpState.windowCount===b.key?`+$${rpWindowsPrice()}`:null));
+      });
+      if(rpWindowsSelected()){
+        rows.push(opt("…screens too",`toggle('windowScreens')`,rpWindowsHasScreens(),`Removed, washed and rehung — +$${rpAddonCatalog.windows.screensPerWindow}/window`,null));
+        rows.push(opt("…two storey",`toggle('windowTwoStory')`,rpState.windowTwoStory,`LADDER WORK — tell the crew. +${Math.round(rpAddonCatalog.windows.twoStoryUplift*100)}%`,null));
+      }
     }
     if(list.includes("garage")) rows.push(opt("Garage floor wash",`toggle('garageWash')`,rpState.garageWash,"Garage must be empty",`+$${rpAddonCatalog.garage.price}`));
     if(list.includes("fridge")) rows.push(opt("Refrigerator interior",`toggle('fridgeAddon')`,rpState.fridgeAddon,null,`+$${rpAddonCatalog.fridge.price}`));
@@ -3216,7 +3272,10 @@ function lookupIndex(){
     answer:`All included in the Move-Out price — there is no add-on for any of them. Fridge interior is ${money(rpAddonCatalog.fridge.price)} on an Hourly booking only.`,
     why:"This used to be the Express buy-back list at $50 a piece plus a Detail Pass. If a caller has an old quote or has read an old page naming those prices, the answer is that they're included now."});
   out.push({kind:"Price", title:"Exterior windows · garage floor · laundry",
-    answer:`Windows ${money(rpAddonCatalog.windows.basic)} basic or ${money(rpAddonCatalog.windows.premium)} premium (screens included). Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
+    /* Round 66: windows are per-window now, so this crib line gives Liz the
+       rate, the floor and the two things that change it, rather than two
+       flat numbers that no longer exist. */
+    answer:`Windows ${money(rpAddonCatalog.windows.perWindow)} each, ${money(rpAddonCatalog.windows.minimum)} minimum \u2014 +${money(rpAddonCatalog.windows.screensPerWindow)} each for screens, +${Math.round(rpAddonCatalog.windows.twoStoryUplift*100)}% if it's two storey. Garage floor ${money(rpAddonCatalog.garage.price)}, must be empty. Laundry ${money(rpAddonCatalog.laundry.pricePerLoad)} a load.`});
   out.push({kind:"Price", title:"Junk hauling", answer:"Quoted separately — volume varies too much for a flat number. Never goes in the booked total without their say-so."});
   out.push({kind:"Price", title:"Minimum charge", answer:`${money(RP_ONE_TIME_MIN)} per visit, one-time or recurring.`});
 

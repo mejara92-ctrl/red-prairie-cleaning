@@ -50,6 +50,16 @@ const rpServices = {
   moveout:     { name: "Move-Out Cleaning",                emoji: "🏠" },
   deep:        { name: "Deep Cleaning",                    emoji: "🧼" },
   maintenance: { name: "Basic Cleaning",             emoji: "✨" },
+  /* ROUND 66 — WHOLE-HOME RESET. The rung above Deep, by direct
+     instruction ("some kind of higher option like whole-home reset").
+
+     Named "reset" rather than "extreme": the engine already uses "Extreme
+     Buildup" as a CONDITION label (rpConditionOrder), so "Extreme Clean"
+     would have given one word two meanings in the same funnel -- and a
+     customer with a normally-dirty house reads "extreme" as "not me".
+     "Reset" describes the outcome and scales up from Basic and Deep
+     without implying anything about how bad the home is. */
+  reset:       { name: "Whole-Home Reset",                 emoji: "🌀" },
   carpet:      { name: "Carpet Cleaning",                  emoji: "🧽" },
   hourly:      { name: "Hourly Cleaning",                  emoji: "⏱" },
   airbnb:      { name: "Airbnb Turnover Cleaning",         emoji: "🛏" }
@@ -216,9 +226,11 @@ function rpBudgetedCrewHours(service = rpState.service) {
      booking rather than a constant to guess at. This is what feeds the
      minimum-wage floor check, so guessing high was hiding the thin case
      rather than being conservative about it. */
-  const timedCrew = rpTimedServiceCrew();
-  if (service === "deep")        return (RP_DEEP_ANCHOR_HOURS  + Number(rpState.addonExtraHours || 0)) * timedCrew;
-  if (service === "maintenance") return (RP_BASIC_ANCHOR_HOURS + Number(rpState.addonExtraHours || 0)) * timedCrew;
+  /* Round 66: one line for all three timed services, reading
+     RP_TIMED_SERVICES. Was a branch per service, which is how a third rung
+     would have been missed here -- and being missed HERE specifically means
+     the minimum-wage floor check silently stops covering it. */
+  if (rpIsTimedService(service)) return rpTimedBookedHours(service) * rpTimedServiceCrew(service);
   if (service === "hourly")      return Number(rpState.hourCount || HOURLY_MIN_HOURS) * Number(rpState.cleanerCount || 1);
   if (service === "carpet")      return RP_BASIC_ANCHOR_HOURS;
   return 0;
@@ -489,18 +501,41 @@ const HOURLY_MIN_HOURS = 3;
 const HOURLY_MAX_HOURS = 8;
 const HOURLY_MAX_CLEANERS = 4;
 
-/* PEAK-SEASON KILL SWITCH — flip to false to pull Hourly Cleaning off the
-   public /book service list in one line (e.g. during peak PCS weeks when
-   a $120 3-hour booking would otherwise eat a Friday slot a $399 move-out
-   wanted). /call is unaffected: CSRs can always book it by phone, so
+/* Flip to false to pull Hourly Cleaning off the public /book service list
+   in one line. /call is unaffected: CSRs can always book it by phone, so
    turning this off routes the demand through the office instead of
-   killing it. */
-const RP_HOURLY_PUBLIC = true;
+   killing it.
+
+   ROUND 66 — IT IS OFF, AND NOT FOR THE SEASONAL REASON IT WAS BUILT FOR.
+
+   This switch existed for peak PCS weeks, when a $120 three-hour booking
+   would eat a Friday slot a $399 move-out wanted. That is not why it is
+   false now. Round 52 brought Hourly down to $40/hr to match Basic, and at
+   that point Hourly became Basic with the scope removed, at an identical
+   price: same one cleaner, same three-hour minimum, same $120. There is no
+   customer who should pick it, and having it on the menu made Basic look
+   arbitrary -- five rows where the fourth and fifth are the same purchase.
+
+   The direct instruction this round was to take "organizing clean" off the
+   main menu. There is no service by that name; the only place this site
+   says "Organizing, decluttering & light tidying" is rpIncludes.hourly's
+   item list, so this row is the one that instruction is pointing at. It
+   goes for both reasons at once.
+
+   IT IS NOT DELETED, and that is the point of doing it with this flag: the
+   product still works, /call can still book it, and a customer who phones
+   in wanting to direct their own scope gets exactly what they want from
+   Liz. What changes is that the public funnel stops offering a choice that
+   cannot be made well. */
+const RP_HOURLY_PUBLIC = false;
 
 const RP_BASIC_ANCHOR_HOURS = 3;
 const RP_BASIC_ANCHOR_PRICE = 120;
 const RP_DEEP_ANCHOR_HOURS = 6;
 const RP_DEEP_ANCHOR_PRICE = 240;
+const RP_RESET_ANCHOR_HOURS = 6;
+const RP_RESET_ANCHOR_CREW = 2;
+const RP_RESET_ANCHOR_PRICE = 480;
 const RP_EXTRA_HOUR_RATE = 40;
 /* The single rate the four lines above are all derived from. Asserted
    against them in the round-52 test rather than used to compute them, so
@@ -508,12 +543,95 @@ const RP_EXTRA_HOUR_RATE = 40;
    to be a decision someone makes, not a drift someone misses. */
 const RP_HOURLY_LABOUR_RATE = 40;
 
-/* Crew size on a service that sells an anchored block of time. One
-   cleaner, or two when the second-cleaner add-on is on the booking. Used
-   by the minimum-wage floor check and the crew sheet; the PRICE of that
-   second cleaner is rpSecondCleanerPrice(). */
-function rpTimedServiceCrew() {
-  return rpState.addonSecondCleaner ? 2 : 1;
+/* =========================================================================
+   ROUND 66 — ONE TABLE FOR EVERY SERVICE THAT SELLS A BLOCK OF TIME
+   =========================================================================
+   Basic, Deep and the new Whole-Home Reset are the same product in three
+   sizes: N hours x C cleaners at $40/hr, with Extra Time on top. Before
+   this round that shape was expressed as two parallel pairs of constants
+   (RP_BASIC_* and RP_DEEP_*) and an `if (deep) ... if (maintenance) ...`
+   branch in six different functions -- rpBudgetedCrewHours,
+   rpPreDiscountSubtotalCents, rpDisplayBasePrice, rpSecondCleanerAnchorHours,
+   rpTimedServiceCrew and /book's spec line. Adding a third rung that way
+   meant a third branch in all six, and any one of them missed is a wrong
+   price on a live booking. (That is not hypothetical: the round-52 note on
+   rpSecondCleanerAnchorHours records exactly this bug, where a hardcoded
+   Deep anchor billed six hours of second cleaner on a three-hour Basic.)
+
+   So the shape moves into data. Every one of those functions now reads this
+   table, and a fourth rung is one row here and nothing else.
+
+   WHY THE PRICE IS COMPUTED AND THE CONSTANTS ABOVE ARE LITERAL. The
+   RP_*_ANCHOR_PRICE constants are what tools/check-prices.py greps for when
+   it verifies that all 20 published pages quote the same numbers as the
+   engine, so they have to stay literal digits in the source. They are the
+   PUBLISHED price; this table is the DERIVATION. rpTimedServicesAgree()
+   below asserts the two match, and the round-66 test calls it -- so a rate
+   change that updates one and not the other fails a test instead of
+   shipping.
+
+   THE RESET IS 2 CLEANERS x 6 HOURS = $480, which is exactly what a Deep
+   with the second-cleaner add-on already costs. That is deliberate and it
+   is the reason this rung is safe to add: it introduces no new price, only
+   a name and a menu row for a configuration the engine could already
+   produce. Margin is 46.9% ($215.04 labour + $40 fixed against $480), and
+   the minimum-wage floor does not trip until 26.5 crew-hours against the 12
+   it is budgeted at -- the widest headroom of anything on the price list.
+
+   WHAT IT IS, AS A PRODUCT: the move-out checklist performed in a home
+   someone still lives in. It costs more than the $399 four-bedroom move-out
+   that covers the same rooms, and the honest reason is furniture -- an
+   occupied home is slower, and a move-out REQUIRES an empty one, so the two
+   never actually compete for the same customer. Sell it on occupied-vs-empty
+   and the price difference explains itself; try to sell it on scope against
+   the move-out and it cannot be won. That is why every line of copy in
+   rpIncludes.reset leads with "around your furniture". */
+const RP_TIMED_SERVICES = {
+  maintenance: { hours: RP_BASIC_ANCHOR_HOURS, crew: 1,                     price: RP_BASIC_ANCHOR_PRICE },
+  deep:        { hours: RP_DEEP_ANCHOR_HOURS,  crew: 1,                     price: RP_DEEP_ANCHOR_PRICE  },
+  reset:       { hours: RP_RESET_ANCHOR_HOURS, crew: RP_RESET_ANCHOR_CREW,  price: RP_RESET_ANCHOR_PRICE }
+};
+/* The row for a timed service, or null for anything else (move-out, carpet,
+   hourly, airbnb). Every caller branches on the null rather than on a list
+   of service names, so "is this sold as a block of time" is asked in one
+   place. */
+function rpTimedService(service = rpState.service) {
+  return RP_TIMED_SERVICES[service] || null;
+}
+function rpIsTimedService(service = rpState.service) { return !!rpTimedService(service); }
+/* Base hours before Extra Time. */
+function rpTimedBaseHours(service = rpState.service) {
+  const t = rpTimedService(service);
+  return t ? t.hours : 0;
+}
+/* Hours actually booked, Extra Time included. This is the number the
+   customer is quoted and the number the crew sheet shows. */
+function rpTimedBookedHours(service = rpState.service) {
+  return rpTimedBaseHours(service) + Number(rpState.addonExtraHours || 0);
+}
+/* Verifies the published constants against the $40/hr derivation. Called by
+   the round-66 test, not at parse time -- a deliberate off-rate price stays
+   possible, it just has to be a decision someone records here. */
+function rpTimedServicesAgree() {
+  return Object.keys(RP_TIMED_SERVICES).every(function (k) {
+    const t = RP_TIMED_SERVICES[k];
+    return t.price === t.hours * t.crew * RP_HOURLY_LABOUR_RATE;
+  });
+}
+
+/* Crew size on a service that sells an anchored block of time: the crew the
+   service ships with, plus one if the second-cleaner add-on is on the
+   booking. Used by the minimum-wage floor check and the crew sheet; the
+   PRICE of that second cleaner is rpSecondCleanerPrice().
+
+   Round 66: was hardcoded `addonSecondCleaner ? 2 : 1`, which silently
+   assumed every timed service is a one-cleaner job. The Reset ships with
+   two, so that assumption would have budgeted it at half its real
+   crew-hours and hidden it from the floor check entirely. */
+function rpTimedServiceCrew(service = rpState.service) {
+  const t = rpTimedService(service);
+  if (!t) return 0;
+  return t.crew + (rpState.addonSecondCleaner ? 1 : 0);
 }
 
 /* Services hidden from the PUBLIC /book service picker. /call ignores
@@ -544,12 +662,17 @@ function rpServiceIsPublic(key) {
                      priority list, in their order), so neither guarantee
                      applies — unchanged from the original hourly carve-out.
 
-   Carpet is not covered by this function and still falls through to the
-   old rpGuaranteeApplies()-style "true" behavior at the call site (shows
-   the Defend Your Deposit line). That's a pre-existing oddity — a
-   carpet-only booking has no deposit/inspection outcome either — flagged
-   in the round log as unresolved, not silently changed here since it
-   wasn't part of what was asked. */
+   ROUND 66 — CARPET IS RESOLVED. It used to fall past every branch to the
+   `return "deposit"` default, so a carpet-only booking was promised "if
+   your landlord flags something we missed, we come back free" -- on a job
+   with no landlord and no inspection anywhere near it. The round log had
+   carried it as a known oddity for fourteen rounds.
+
+   It is "satisfaction" now, the same as Deep and Basic: we stand behind the
+   extraction work we did, which is a promise this service can actually
+   keep. Carpet extraction added to a MOVE-OUT is unaffected -- that
+   booking's service is "moveout", so it reads the deposit branch above and
+   the guarantee covers the whole job including the carpet. */
 function rpGuaranteeType() {
   /* Round 52: every move-out gets the deposit guarantee now. The
      "satisfaction" carve-out here was Move-Out Express's -- a lighter scope
@@ -563,9 +686,13 @@ function rpGuaranteeType() {
      to be the un-guaranteed one at the same price. That is priced in --
      see the cost table on RP_MOVEOUT_BEDROOM_TIERS. */
   if (rpState.service === "moveout") return "deposit";
-  if (rpState.service === "deep" || rpState.service === "maintenance") return "satisfaction";
+  if (rpState.service === "deep" || rpState.service === "maintenance" || rpState.service === "reset") return "satisfaction";
+  if (rpState.service === "carpet") return "satisfaction";
   if (rpState.service === "hourly") return "none";
-  return "deposit";
+  /* Round 66: the default was "deposit", which is how carpet got promised a
+     landlord guarantee for fourteen rounds. An unknown service key is a bug,
+     and the safe failure is the promise we can always keep. */
+  return "satisfaction";
 }
 /* Kept for any other caller still checking a boolean — true for anything
    that shows SOME guarantee line (deposit or satisfaction), false only
@@ -594,7 +721,49 @@ const rpConditionCopy = {
   "Extreme Buildup": "Requires significant extra time and labor. Heavy grease, trash in multiple rooms, noticeable pet odor, or visible mold.",
   "Specialty or Unsafe Conditions": "Biohazards, hoarding-level clutter, active pests, or anything requiring PPE. Still bookable online, we'll confirm a custom quote before your cleaning date."
 };
-const RP_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.20, extreme: 0.50, specialty: null };
+/* Round 66: heavy 0.20 -> 0.25, by direct instruction. See the note on
+   rpConditionKey() for why this is the round these numbers started being
+   applied at all. `extreme` is unreachable from /book, whose question is a
+   two-way Standard/Heavy split; it stays defined for /call's older
+   condition step and for the day the public question grows a third option. */
+const RP_CONDITION_MULTIPLIER = { standard: 0, heavy: 0.25, extreme: 0.50, specialty: null };
+/* The published surcharge, as a percentage, for copy that has to name it.
+   Derived rather than typed into a sentence, so the number on the
+   questionnaire, the estimate panel and /pricing cannot drift from the
+   number actually charged. */
+const RP_HEAVY_SURCHARGE_PCT = Math.round(RP_CONDITION_MULTIPLIER.heavy * 100);
+
+/* The surcharge in cents for a given base price. One function so the
+   invoice line, the total and /call's summary are guaranteed to be the same
+   number -- rounded once, here, rather than three times in three places.
+
+   ROUNDED TO THE WHOLE DOLLAR, and that is a pricing decision, not a
+   formatting one. 25% of the ladder is $49.75 / $74.75 / $99.75 / $124.75,
+   which would quote a heavy four-bedroom at $498.75. Every other number
+   this business publishes is a whole dollar; a stray 75 cents on the one
+   line item a customer is already primed to be suspicious of reads as a
+   formula applied to them rather than a price. Rounding up to the dollar
+   gives $50 / $75 / $100 / $125 -- the same ladder, legible, and it lands
+   the heavy tiers on $249 / $374 / $499 / $624.
+
+   Math.round, not ceil: the rounding should not always favour the house.
+   On this ladder every row rounds up anyway (all four are x.75), but a
+   future base price ending in x.20 should round DOWN, and a surcharge rule
+   that only ever rounds toward us is the kind of detail that is impossible
+   to defend when someone notices it. */
+function rpConditionSurchargeCents(baseDollars) {
+  const m = rpConditionMultiplier();
+  if (!(m > 0)) return 0;
+  return rpToCents(Math.round(Number(baseDollars || 0) * m));
+}
+function rpConditionSurcharge(baseDollars) {
+  return rpCentsToDollars(rpConditionSurchargeCents(baseDollars));
+}
+/* True when this booking is carrying a condition surcharge worth showing.
+   Every surface asks this rather than re-deriving it from the raw fields. */
+function rpHasConditionSurcharge() {
+  return rpConditionSurchargeCents(rpServiceBasePrice()) > 0;
+}
 
 
 /* Recurring maintenance plans. Round 52, direct instruction: "remove any
@@ -645,8 +814,57 @@ const rpAddonCatalog = {
      null (not selected) or "yes" (selected, quoted separately) instead
      of "half"/"full"/"custom". */
   junk:    { label: "Junk Haul" },
-  windows: { label: "Exterior Windows",    basic: 100, premium: 200 },
-  garage:  { label: "Garage Floor Wash",   price: 150 },
+  /* =======================================================================
+     ROUND 66 — EXTERIOR WINDOWS ARE PRICED PER WINDOW
+     =======================================================================
+     Asked directly: "give me feedback on how I'm selling exterior window
+     cleaning idk if 100 or 200 is a good business model."
+
+     THE NUMBERS WERE NOT THE PROBLEM. THE MODEL WAS. It was one flat price
+     per HOUSE with no size input anywhere in the funnel. An 8-window duplex
+     and a 30-window two-storey both paid $100. On the small one that is
+     excellent money; on the large one it is a loss, and this business
+     publishes prices for homes up to 3,400+ sq ft, so the large one is not
+     a hypothetical.
+
+     THE BASIC/PREMIUM SPLIT WAS ALSO THE WRONG AXIS. "Premium = + screens"
+     at double the price valued screen removal at $100 -- real work, but not
+     equal to the entire wash -- and a customer could not tell from the
+     words "Basic" and "Premium" which one they wanted.
+
+     THE NEW MODEL:
+         $6 per window, $100 minimum
+         screens +$3 per window
+         two-storey +40%
+
+     The minimum protects the drive-out, which is the real risk on a small
+     job: eight windows at $6 is $48, and nobody should drive out for $48.
+     Above about 17 windows the per-window rate takes over from the floor
+     and the price starts tracking the actual work. Worked examples:
+
+         8 windows,  single storey, no screens   $100  (floor)
+        16 windows,  single storey, no screens   $100  (floor, $96 raw)
+        24 windows,  single storey, no screens   $144
+        24 windows,  single storey, + screens    $216
+        30 windows,  two storey,    + screens    $378
+
+     TWO STOREYS IS THE PART THAT MATTERS MOST, AND IT IS NOT REALLY ABOUT
+     PRICE. Second-storey exteriors mean ladder work, which is a different
+     safety and insurance conversation than standing on the ground. The
+     surcharge is there so the job pays for the extra time and care; the
+     QUESTION is there so the crew knows before they arrive. If the answer
+     is ever that ladder work should not be done at all, this is the field
+     that turns it off. */
+  windows: { label: "Exterior Windows",
+             perWindow: 6, screensPerWindow: 3, minimum: 100, twoStoryUplift: 0.40 },
+  /* Round 66, direct instruction: "Change garage floor wash to $100."
+     It is a bolt-on to a trip the crew is already making, so there is no
+     drive-out to amortise -- the $60 left after the 40% labour share covers
+     degreaser on a normal floor. What it does NOT cover is a garage with
+     things still in it, which turns a 45-minute job into two hours. That is
+     why "garage must be completely empty" is stated on the add-on card, the
+     tap-through sheet and /pricing, and why it should stay stated. */
+  garage:  { label: "Garage Floor Wash",   price: 100 },
   laundry: { label: "Laundry Service",     pricePerLoad: 35 },
   fridge:  { label: "Refrigerator Interior", price: 50 },
   /* Round 52: the oven, cabinets and detailPass SKUs are deleted. They
@@ -684,8 +902,19 @@ const rpServiceAddons = {
   deep:        ["extraHours", "secondCleaner", "carpet", "windows", "garage"],
   /* Round 52: Basic gains the second-cleaner add-on. It was Deep-only, for
      no reason anyone recorded, and the instruction this round was that
-     either service can add one. */
-  maintenance: ["extraHours", "secondCleaner", "windows"],
+     either service can add one.
+
+     Round 66: "windows" removed. A $100-and-up exterior window job attached
+     to a $120 interior cleaning was the most lopsided pairing on the
+     add-ons screen -- the add-on could cost more than the service. It stays
+     on Deep, Reset and Move-Out, where the ticket can carry it. */
+  maintenance: ["extraHours", "secondCleaner"],
+  /* Round 66: the Reset takes Extra Time but NOT a second cleaner -- it
+     already ships with two (RP_TIMED_SERVICES.reset.crew), and a third
+     person in a house this size stops adding throughput and starts getting
+     in the way. Extra hours are the honest way to buy more work here.
+     Carpet and the garage floor are genuinely separate jobs and stay. */
+  reset:       ["extraHours", "carpet", "windows", "garage"],
   hourly:      ["fridge", "laundry", "windows", "garage"]
   /* Yard Refresh removed sitewide (direct instruction) -- it's gone from
      the catalog above too. Every service that offered it now just offers
@@ -736,7 +965,7 @@ function rpAddonAvailable(key, service = rpState.service) {
 const RP_ADDON_STATE_DEFAULTS = {
   carpet:        { addonCarpetRooms: 0, addonCarpetPetEnzyme: false },
   junk:          { junkSize: null },
-  windows:       { windowsTier: null },
+  windows:       { windowCount: null, windowScreens: false, windowTwoStory: false, windowsTier: null },
   garage:        { garageWash: false },
   laundry:       { laundryLoads: 0 },
   fridge:        { fridgeAddon: false },
@@ -808,8 +1037,10 @@ function rpAddonLineItems() {
      was included at $0; it's explicitly quoted instead, and every
      consumer (summary text, webhook, crew sheet, /call) says so. */
   if (rpState.junkSize === "yes") add("junk", "Junk Haul", "", 0, true);
-  if (rpState.windowsTier === "basic") add("windows", "Exterior Windows", "Basic wash", rpAddonCatalog.windows.basic);
-  if (rpState.windowsTier === "premium") add("windows", "Exterior Windows", "Premium wash, screens removed", rpAddonCatalog.windows.premium);
+  /* Round 66: one row, whatever was chosen. The detail string carries the
+     bracket, screens and storey count, so the invoice explains its own
+     number instead of showing a bare "Exterior Windows $378". */
+  if (rpWindowsSelected()) add("windows", "Exterior Windows", rpWindowsSummary(), rpWindowsPrice());
   if (rpState.garageWash) add("garage", "Garage Floor Wash", "Garage must be empty", rpAddonCatalog.garage.price);
   if (rpState.laundryLoads > 0) {
     const loads = Number(rpState.laundryLoads);
@@ -817,8 +1048,16 @@ function rpAddonLineItems() {
   }
   if (rpState.fridgeAddon) add("fridge", "Refrigerator Interior", "", rpAddonCatalog.fridge.price);
   if (rpState.addonExtraHours > 0) {
-    const hrs = Number(rpState.addonExtraHours);
-    add("extraHours", "Extra Time", `+${hrs} hour${hrs === 1 ? "" : "s"}`, hrs * rpAddonCatalog.extraHours.pricePerHour);
+    const hrs  = Number(rpState.addonExtraHours);
+    const crew = rpExtraHoursBillableCrew();
+    /* Round 66: the qualifier names the crew when there is more than one,
+       so the invoice explains its own number -- "+2 hours · 2 cleaners"
+       against $160 reads correctly where a bare "+2 hours" against $160
+       looks like an $80 hourly rate. Price comes from rpExtraHoursPrice()
+       so this line cannot drift from the total. */
+    add("extraHours", "Extra Time",
+        `+${hrs} hour${hrs === 1 ? "" : "s"}${crew > 1 ? ` · ${crew} cleaners` : ""}`,
+        rpExtraHoursPrice());
   }
   if (rpState.addonSecondCleaner) add("secondCleaner", "Additional Cleaner", `${rpSecondCleanerHours()} hours`, rpSecondCleanerPrice());
   /* Carpet-as-a-SERVICE keeps its own enzyme field (rpState.addonPetEnzyme)
@@ -852,15 +1091,58 @@ function rpHasQuotedAddon() { return rpAddonLineItems().some(r => r.quoted); }
    three-hour Basic would have billed six hours, $240 on top of a $120 job.
    With this reading the right anchor, the add-on doubles either service
    exactly: Basic $120 -> $240, Deep $240 -> $480. */
+/* Round 66: reads RP_TIMED_SERVICES instead of naming services. Falls back
+   to the Deep anchor for a non-timed caller, same as before. */
 function rpSecondCleanerAnchorHours() {
-  if (rpState.service === "maintenance") return RP_BASIC_ANCHOR_HOURS;
-  return RP_DEEP_ANCHOR_HOURS;
+  return rpTimedBaseHours() || RP_DEEP_ANCHOR_HOURS;
 }
 function rpSecondCleanerHours() {
   return rpSecondCleanerAnchorHours() + Number(rpState.addonExtraHours || 0);
 }
 function rpSecondCleanerPrice() {
   return rpSecondCleanerHours() * rpAddonCatalog.secondCleaner.pricePerHour;
+}
+
+/* =========================================================================
+   ROUND 66 — EXTRA TIME IS PRICED PER CLEANER, NOT PER HOUR
+   =========================================================================
+   This was `addonExtraHours * $40` everywhere, flat. That was correct for
+   as long as every service offering Extra Time shipped with exactly ONE
+   cleaner, which was true until the Whole-Home Reset. It ships with two, so
+   the flat version sold an hour of a two-person crew for the price of one
+   person: a Reset with two extra hours would have been $560 for 16
+   crew-hours, an effective $35/crew-hour against the $40 every other line
+   on the price list charges. Not catastrophic -- it still cleared the
+   margin target -- but it is exactly the silent drift this file exists to
+   prevent, and it would have been invisible on the invoice.
+
+   Extra Time now bills the service's BASE crew. Note carefully that it is
+   the base crew and not rpTimedServiceCrew(): when the second-cleaner
+   add-on is on the booking, rpSecondCleanerPrice() already charges that
+   person for the anchor hours PLUS the extra ones (see
+   rpSecondCleanerHours), so multiplying here by the full crew would bill
+   the second cleaner's extra hours twice.
+
+   Worked through, so the invariant is checkable by hand:
+
+     Basic + 2 extra                $120 + (2 x 1 x $40)                 = $200
+                                    5 crew-hrs, $40.00/crew-hr
+     Deep + 2 extra + 2nd cleaner   $240 + (2 x 1 x $40) + (8 x $40)     = $640
+                                    16 crew-hrs, $40.00/crew-hr
+     Reset + 2 extra                $480 + (2 x 2 x $40)                 = $640
+                                    16 crew-hrs, $40.00/crew-hr
+
+   Every timed configuration lands on $40 per crew-hour. The round-66 test
+   asserts that ratio directly rather than asserting the three totals, so a
+   future rung cannot quietly break it. */
+function rpExtraHoursBillableCrew(service = rpState.service) {
+  const t = rpTimedService(service);
+  return t ? t.crew : 1;
+}
+function rpExtraHoursPrice() {
+  return Number(rpState.addonExtraHours || 0)
+    * rpAddonCatalog.extraHours.pricePerHour
+    * rpExtraHoursBillableCrew();
 }
 
 const rpIncludes = {
@@ -923,28 +1205,78 @@ const rpIncludes = {
      reads them as Liz's on-call reference -- but they are framed as where
      the time goes rather than as a checklist that gets completed. */
   deep: {
-    intro: "Six hours of cleaning, priced by the hour — the same way our hourly service works.",
-    highlights: [
-      ["clock", "6 hours, 1 cleaner"],
-      [null, "$40 per hour"],
-      ["zap", "Add hours or a second cleaner"]
-    ],
+    intro: "Kitchen and bathrooms in detail, plus baseboards, doors, fixtures and floors.",
     outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
-    fineprint: "Most homes this size get a full reset in six hours. If yours needs more, add time or a second cleaner while you book — or we'll tell you on the day what another visit would take. Moving out? A Move-Out Cleaning is priced for the whole interior instead.",
+    fineprint: "Most homes get a full reset in six hours. Need the whole checklist in one visit? A Whole-Home Reset sends two cleaners for six hours instead.",
     itemsLead: "Where the time usually goes:",
     items: ["Kitchen, detailed clean", "Bathrooms, scrubbed top to bottom", "Inside oven & microwave", "Baseboards, doors & fixtures", "Floors throughout", "All reachable surfaces"]
   },
+  /* ROUND 66 — BASIC AND DEEP'S COPY IS CUT ROUGHLY IN HALF.
+
+     Direct feedback on a screenshot of the Basic screen: "some of the
+     captions are just really kind of weird", and "it should be 3 hours of
+     cleaning to include bathroom, kitchen, floors etc."
+
+     The old screen said the same thing four times. `intro` hedged ("priced
+     by the hour — the same way our hourly service works"), `outcome` hedged
+     ("It's time, not a finished checklist"), a hardcoded info panel in
+     /book hedged ("This is hourly cleaning, not a move-out"), and then
+     `fineprint` hedged again while re-explaining two OTHER services. Four
+     blocks defending the product and one line describing it, on the screen
+     whose whole job is to describe it.
+
+     So: `intro` now says what you get, in the words the instruction used.
+     `outcome` is the one honest caveat, stated once. `fineprint` is a
+     single short redirect. The "same way our hourly service works"
+     comparison is gone from both -- round 54 added it to stop Hourly
+     reading as a different product, and Hourly is off the public menu as of
+     this round (RP_HOURLY_PUBLIC), so it now compares the product the
+     customer is buying to one they cannot see.
+
+     A LATER FIX, FOUND BY RENDERING THE PAGE RATHER THAN BY A TEST: the
+     first version of this copy put the hours and crew in `intro` too --
+     "Three hours with one cleaner - kitchen, bathrooms, floors". Then the
+     customer taps + twice and the screen reads "5 hours of cleaning" as a
+     heading with "Three hours with one cleaner" directly underneath it.
+     Every test passed, because the price was right; it just said two
+     different things on one screen.
+
+     So `intro` describes the SCOPE and nothing else. Hours and crew are
+     live facts and belong only where they are computed -- the heading and
+     the price card. This is the same rule that deleted `highlights` below,
+     arrived at twice: a hardcoded string that restates a computed value
+     will eventually contradict it.
+
+     WHAT IS NOT SOFTENED: "It's time, not a finished checklist." The
+     round-52 note on HOURLY_RATE_PER_CLEANER is right that this framing is
+     what keeps a three-hour booking from becoming a "you missed things"
+     review. It stays, at full strength. It just stops being said four
+     times. */
+  /* Round 66: `highlights` is gone from the three timed services. Those
+     chips said "3 hours, 1 cleaner", "$40 per hour" and "Add hours or a
+     second cleaner" -- the first two are now the live price card's spec
+     line, computed from RP_TIMED_SERVICES rather than typed here, and the
+     third was the static label masquerading as a button that this round
+     exists to fix. A hardcoded chip that restates a computed fact is how the
+     two drift apart. Move-Out and Carpet keep theirs: they still render
+     through the original `included` branch. */
   maintenance: {
-    intro: "Three hours of cleaning, priced by the hour — the same way our hourly service works.",
-    highlights: [
-      ["clock", "3 hours, 1 cleaner"],
-      [null, "$40 per hour"],
-      ["zap", "Add hours or a second cleaner"]
-    ],
+    intro: "Kitchen, bathrooms, floors and the everyday surfaces.",
     outcome: "You tell us what matters most and we work down that list for the hours booked. It's time, not a finished checklist.",
-    fineprint: "Three hours suits a home that's already tidy and needs keeping that way. If it's been a while, Deep Cleaning buys six hours instead — or add hours here. Moving out? A Move-Out Cleaning is priced for the whole interior.",
+    fineprint: "If it's been a while, Deep Cleaning buys six hours instead. Moving out? A Move-Out Cleaning is priced for the whole interior.",
     itemsLead: "Where the time usually goes:",
     items: ["Kitchen, wiped down & tidied", "Bathrooms, cleaned & sanitized", "Dusting throughout", "Floors throughout", "Everyday surfaces refreshed"]
+  },
+  /* Round 66: the Reset. Note that every customer-facing line here leads
+     with the occupied home, not with the scope -- see the product note on
+     RP_TIMED_SERVICES for why that is the only framing that survives being
+     compared to the $399 move-out. */
+  reset: {
+    intro: "The full move-out checklist, done around your furniture.",
+    outcome: "Two people for a full day's work: appliances inside and out, cabinets, baseboards, fans and vents, every room. It's the deepest clean we sell for a home you're still living in.",
+    fineprint: "This is the same checklist as our Move-Out Cleaning, which needs an empty house. If yours is empty, book that instead — it's priced for the whole interior and backed by our deposit guarantee.",
+    itemsLead: "Where the time usually goes:",
+    items: ["Kitchen, detailed clean", "Inside oven, fridge & microwave", "Cabinet & drawer fronts, inside where reachable", "Bathrooms, scrubbed top to bottom", "Baseboards, doors, trim & fixtures", "Ceiling fans, vents & light fixtures", "Interior windows, sills & tracks", "All floors throughout"]
   },
   carpet: {
     /* "Not a rental machine" removed per direct feedback: nobody was
@@ -1039,7 +1371,33 @@ const rpFlows = {
      in this allowlist, whether it is hardcoded in the array or inserted at
      runtime. */
   deep:        ["included", "contactgate", "addons", "estimate", "lead", "calendar"],
-  maintenance: ["included", "frequency", "contactgate", "addons", "estimate", "lead", "calendar"],
+  /* ROUND 66 — THE "frequency" STEP IS GONE FROM THIS FLOW.
+
+     Direct instruction: "cleaning frequency is kind of redundant because
+     it's all the same price... probably just remove the screen."
+
+     It was a whole screen showing four rows at an identical $120 with a
+     subheading that said, in so many words, that the choice did not matter.
+     Round 52 removed the discounts that used to make it a price decision
+     and left the screen standing.
+
+     BUT THE SELECTION ITSELF IS NOT REMOVED, because two live things read
+     it: visitsPerMonth drives the monthly commitment figure on the
+     estimate, and rpRecurringNeedsDeepFirst decides whether a recurring
+     plan's first visit has to be a Deep. Defaulting everyone to One-Time
+     would have silently dropped the recurring signal -- the highest-LTV
+     thing the funnel captures -- to save a tap.
+
+     So it moves INTO the "included" screen as a checkbox plus three pills
+     (see rpTimedServiceScreen in /book). Nine screens become eight, the
+     fake price choice is gone, and the signal survives.
+
+     The step name is deliberately NOT kept in this allowlist: a session
+     saved mid-funnel on the frequency screen should restart cleanly rather
+     than resume onto a screen that no longer renders -- same reasoning as
+     the round-31 bedrooms/bathrooms merge and the round-52 tier screen. */
+  maintenance: ["included", "contactgate", "addons", "estimate", "lead", "calendar"],
+  reset:       ["included", "contactgate", "addons", "estimate", "lead", "calendar"],
   carpet:      ["included", "rooms", "carpetdetails", "contactgate", "estimate", "lead", "calendar"],
   hourly:      ["included", "cleaners", "hours", "contactgate", "addons", "estimate", "lead", "calendar"],
   airbnb:      ["included", "size", "airbnbdetails", "contactgate", "estimate", "lead", "calendar"]
@@ -1190,13 +1548,13 @@ function rpTimeEstimate() {
     const table = rpMoveoutTierTable(rpState.service);
     return `${table[0].onSiteHours}\u2013${table[table.length - 1].onSiteHours} hours depending on size`;
   }
-  if (rpState.service === "deep") {
+  /* Round 66: one branch for Basic, Deep and Reset via RP_TIMED_SERVICES.
+     Was two copies of the same three lines differing only in which anchor
+     constant they named. */
+  if (rpIsTimedService()) {
+    const base  = rpTimedBaseHours();
     const extra = Number(rpState.addonExtraHours || 0);
-    return extra > 0 ? `${RP_DEEP_ANCHOR_HOURS + extra} hours (${RP_DEEP_ANCHOR_HOURS} + ${extra} extra)` : `${RP_DEEP_ANCHOR_HOURS} hours`;
-  }
-  if (rpState.service === "maintenance") {
-    const extra = Number(rpState.addonExtraHours || 0);
-    return extra > 0 ? `${RP_BASIC_ANCHOR_HOURS + extra} hours (${RP_BASIC_ANCHOR_HOURS} + ${extra} extra)` : `${RP_BASIC_ANCHOR_HOURS} hours`;
+    return extra > 0 ? `${base + extra} hours (${base} + ${extra} extra)` : `${base} hours`;
   }
   if (rpState.service === "hourly") return rpState.hourCount ? `${rpState.hourCount} hour${rpState.hourCount === 1 ? "" : "s"}` : `${HOURLY_MIN_HOURS}+ hours`;
   if (rpState.service === "airbnb") return "Varies by property size";
@@ -1214,8 +1572,12 @@ function rpTeamSize() {
      second-cleaner add-on is on the booking -- it is offered on both
      services now, and it doubles the price. Was hardcoded to "1 cleaner",
      which put the wrong crew size on the confirmation and the crew sheet
-     for anyone who had paid for a second person. */
-  if (rpState.service === "deep" || rpState.service === "maintenance") {
+     for anyone who had paid for a second person.
+
+     Round 66: reads RP_TIMED_SERVICES, so the Reset correctly reports the
+     two cleaners it ships with. Naming the services here would have given
+     the crew sheet a blank crew size for it. */
+  if (rpIsTimedService()) {
     const n = rpTimedServiceCrew();
     return `${n} cleaner${n === 1 ? "" : "s"}`;
   }
@@ -1229,7 +1591,74 @@ function rpTeamSize() {
    a custom quote — Airbnb Turnover always, and Deep Cleaning at 5+
    bedrooms. Booking still proceeds normally (calendar + confirmation);
    only the price display and crew notes change. */
+/* =========================================================================
+   ROUND 66 — THE HEAVY-CONDITION SURCHARGE IS WIRED UP AND LIVE
+   =========================================================================
+   Direct instruction: "Heavy should just be a 25% upcharge."
+
+   WHAT IT WAS DOING BEFORE, WHICH IS WORTH STATING PLAINLY: nothing.
+   RP_CONDITION_PRICED_SERVICES was an empty array, so rpConditionMultiplier()
+   returned 0 for every service, and the 0.20 / 0.50 entries in
+   RP_CONDITION_MULTIPLIER were dead constants. A customer who told us the
+   home had heavy buildup got the standard price, and the crew was expected
+   to renegotiate on arrival -- against an SOP the note on
+   RP_MOVEOUT_BEDROOM_TIERS calls "the single biggest open risk against this
+   ladder" and "still unbuilt". So this was not a rate change from 20% to
+   25%. It was switching the mechanism on for the first time.
+
+   THE FIELD MISMATCH THAT KEPT IT OFF. Two different fields describe
+   condition and they never met:
+
+       rpState.condition             a STRING  ("Heavy Buildup"), which
+                                     rpConditionKeys maps to a key. Only
+                                     /call's old condition step ever set it.
+       rpState.moveoutHeavyCondition a BOOLEAN, set by the two-button
+                                     question on /book's questionnaire and
+                                     /call's script, and read by nothing
+                                     that prices.
+
+   rpConditionKey() read the first. /book only ever wrote the second. So
+   even if the priced-services list had been populated, /book's answer would
+   still have priced at zero. The function below now resolves the boolean
+   first, which makes the questionnaire answer the authoritative one on both
+   surfaces without either page having to learn the other's field.
+
+   WHAT IT DOES TO THE LADDER, at 25%:
+
+       size      standard   heavy    extra
+       1-2 bed   $199       $249     +$50
+       3   bed   $299       $374     +$75
+       4   bed   $399       $499     +$100
+       5   bed   $499       $624     +$125
+
+   Margin percentage is unchanged by construction -- labour is 40% of the
+   ticket and the guarantee reserve is 8% of it, so both scale with the
+   price and the fixed $40 amortises slightly better. The heavy 4-bedroom
+   returns $195.53 at 39.2%. What the surcharge actually buys is the extra
+   crew-hours a heavy home takes, which previously came out of margin or out
+   of an overrun nobody was paid for.
+
+   THE HONEST PROBLEM WITH THIS, WHICH THE COPY HAS TO CARRY. A 25%
+   surcharge on a self-reported question gives a customer a reason to answer
+   "Standard" on a home that is not. That is not an argument against the
+   surcharge -- it is the reason the arrival walkthrough finally has to
+   exist. The deal the copy now states, and which the business has to keep:
+   declare Heavy and your price is FIRM at the quoted number, no arrival
+   surprise. Declare Standard on a home that is not standard and the crew
+   re-quotes before they start. Honesty is the cheaper path for the
+   customer, which is the only durable way to make a self-report reliable.
+
+   THE "your price still stands for a standard clean" COPY IS GONE from
+   /book's questionnaire note and /call's script. It was true when Heavy
+   cost nothing. Leaving it in place next to a 25% line item would have been
+   the single most damaging sentence on the site.
+   ========================================================================= */
 function rpConditionKey() {
+  /* The boolean wins when it has been answered, because it is the field the
+     customer actually touched. Falls through to the legacy string so /call's
+     older condition step and any saved session keep working. */
+  if (rpState.moveoutHeavyCondition === true)  return "heavy";
+  if (rpState.moveoutHeavyCondition === false) return "standard";
   return rpConditionKeys[rpState.condition] || null;
 }
 /* Move-Out is the only condition-priced service now. Deep and Basic used
@@ -1238,8 +1667,16 @@ function rpConditionKey() {
    all), but both moved to flat time-anchored pricing with an Extra Time
    add-on instead — see RP_DEEP_ANCHOR_PRICE / RP_BASIC_ANCHOR_PRICE above.
    Extra hours now do the job condition multipliers used to do for those
-   two services, so this list shrank rather than grew. */
-const RP_CONDITION_PRICED_SERVICES = [];
+   two services, so this list shrank rather than grew.
+
+   Round 66: Move-Out is back on this list, and it is the ONLY entry. The
+   reasoning for keeping Basic, Deep and the Reset off it is unchanged and
+   still right: they sell a block of time, so a heavier home is answered by
+   buying more hours, which the customer can do themselves on the stepper.
+   Move-Out is the one product that quotes a flat price for an entire home
+   sight-unseen, so it is the only one where "how bad is it" has to move the
+   number. See the long note on rpConditionKey() above. */
+const RP_CONDITION_PRICED_SERVICES = ["moveout"];
 /* ^ Empty now that Move-Out dropped condition-based pricing (see
    rpServiceBasePrice's comment above). This safely makes
    rpConditionMultiplier() and rpIsSpecialtyCondition() no-ops everywhere
@@ -1391,8 +1828,9 @@ function rpServiceBasePrice() {
    two never drift apart. */
 function rpDisplayBasePrice() {
   if (rpState.service === "moveout") return rpServiceBasePrice();
-  if (rpState.service === "deep") return RP_DEEP_ANCHOR_PRICE;
-  if (rpState.service === "maintenance") return RP_BASIC_ANCHOR_PRICE;
+  /* Round 66: one lookup for Basic, Deep and Reset. */
+  const timed = rpTimedService();
+  if (timed) return timed.price;
   return 0;
 }
 
@@ -1419,27 +1857,45 @@ function rpPreDiscountSubtotalCents() {
        single-room trip. */
     return rpState.carpetRooms ? rpToCents(rooms * rpAddonCatalog.carpet.bundlePrice) : 0;
   }
-  if (rpState.service === "deep") {
-    /* Flat anchor — see RP_DEEP_ANCHOR_PRICE block above for the reasoning.
-       No sqft/bedroom/condition inputs anymore; size and buildup variance
-       is absorbed by the Extra Time add-on instead. */
-    return rpToCents(RP_DEEP_ANCHOR_PRICE);
-  }
-  if (rpState.service === "maintenance") {
-    /* Flat anchor, same reasoning as Deep. Condition multiplier no longer
-       applies here (RP_CONDITION_PRICED_SERVICES is Move-Out only now),
-       so rpConditionMultiplier() naturally returns 0 for this service —
-       the line below is left in place rather than special-cased so a
-       future change to that list doesn't silently stop applying here. */
-    const base = RP_BASIC_ANCHOR_PRICE;
-    const conditioned = rpCentsToDollars(Math.round(rpToCents(base) * (1 + rpConditionMultiplier())));
+  /* ROUND 66: Basic, Deep and Reset share one branch, reading their anchor
+     price from RP_TIMED_SERVICES. They had two near-identical branches
+     before -- Deep returned its anchor raw, Basic ran the same anchor
+     through the condition multiplier and the frequency plan. Neither of
+     those two adjustments does anything today (RP_CONDITION_PRICED_SERVICES
+     is move-out only, and every frequency discount is 0), so the branches
+     were behaviourally identical and differed only in which future change
+     would reach them. Both adjustments are kept here, for all three, for
+     the reason the round-52 comment gave: a later change to either list
+     should apply on its own rather than needing this function edited to
+     notice. No sqft or bedroom input for any of them -- size and buildup
+     variance is absorbed by Extra Time, not by a bracket. */
+  const timed = rpTimedService();
+  if (timed) {
+    const conditioned = rpCentsToDollars(Math.round(rpToCents(timed.price) * (1 + rpConditionMultiplier())));
     const plan = rpFrequencyPlan();
     const discountedBase = plan ? Math.round(conditioned * (1 - plan.discount)) : conditioned;
     return rpToCents(discountedBase);
   }
   if (rpState.service === "moveout") {
     if (!rpState.bedrooms) return 0;
-    return rpToCents(rpServiceBasePrice());
+    /* ROUND 66: the condition multiplier is applied HERE, not inside
+       rpServiceBasePrice().
+
+       That split is deliberate and it matters. rpServiceBasePrice() is what
+       the estimate screen's "Base Service" row and /call's summary print,
+       and what rpDisplayBasePrice() returns -- it answers "what does a home
+       this size cost". The surcharge is a separate fact about THIS home and
+       belongs on its own invoice line (rpConditionLineItem below), not
+       folded invisibly into the base. A customer who is paying 25% more
+       should be able to see the 25%, and see the standard price it is 25%
+       of. Burying it in the base price is how a surcharge becomes the thing
+       people feel cheated by.
+
+       rpConditionMultiplier() returns 0 unless the service is in
+       RP_CONDITION_PRICED_SERVICES and the answer is Heavy, so every
+       standard-condition move-out takes the identical path it always did. */
+    const base = rpServiceBasePrice();
+    return rpToCents(base) + rpConditionSurchargeCents(base);
   }
   if (rpState.service === "hourly") {
     if (!rpState.cleanerCount || !rpState.hourCount) return 0;
@@ -1470,6 +1926,78 @@ function rpPetEnzymePrice() {
   return Math.max(1, Number(rpState.carpetRooms || 0)) * RP_PET_ENZYME_RATE;
 }
 
+/* =========================================================================
+   ROUND 66 — EXTERIOR WINDOW PRICING
+   =========================================================================
+   See the long note on rpAddonCatalog.windows for why this replaced a flat
+   $100/$200. Three inputs, all collected on the add-on sheet:
+
+       rpState.windowCount    how many windows (a bracket, not a count the
+                              customer has to be exact about)
+       rpState.windowScreens  boolean, screens in or out
+       rpState.windowTwoStory boolean, ladder work or not
+
+   The legacy rpState.windowsTier ("basic"/"premium") is migrated on read by
+   rpWindowsSelected/rpWindowCount below, so a saved session from before
+   this round still prices rather than throwing or silently costing $0.
+   ========================================================================= */
+/* The brackets the customer picks from. Counting windows exactly is a thing
+   nobody wants to do standing in their kitchen, and the midpoint of a
+   bracket is close enough at $6 a window -- the floor absorbs the error at
+   the small end, and at the large end the crew confirms on arrival before
+   any ladder comes off the van. `count` is what gets priced. */
+const RP_WINDOW_BRACKETS = [
+  { key: "s",  label: "Up to 10",  count: 10 },
+  { key: "m",  label: "11–18",     count: 15 },
+  { key: "l",  label: "19–28",     count: 24 },
+  { key: "xl", label: "29+",       count: 32 }
+];
+function rpWindowBracket(key = rpState.windowCount) {
+  return RP_WINDOW_BRACKETS.find(b => b.key === key) || null;
+}
+/* Migration: a session saved under the old two-tier model carries
+   windowsTier instead. "basic" and "premium" both meant a whole house at an
+   unspecified size, so they map to the middle bracket -- premium keeps its
+   screens. Deliberately not left to resolve as "nothing selected": a
+   customer resuming a session should not silently lose an add-on they
+   chose. */
+function rpWindowsSelected() {
+  return !!rpState.windowCount || !!rpState.windowsTier;
+}
+function rpWindowCount() {
+  const b = rpWindowBracket();
+  if (b) return b.count;
+  if (rpState.windowsTier) return rpWindowBracket("m").count;
+  return 0;
+}
+function rpWindowsHasScreens() {
+  if (rpState.windowCount) return !!rpState.windowScreens;
+  return rpState.windowsTier === "premium";
+}
+/* The price, in whole dollars. Floor applies to the wash-and-screens
+   subtotal BEFORE the two-storey uplift, so a small two-storey job pays the
+   minimum plus the uplift rather than the minimum flat -- the ladder is the
+   expensive part and it does not get cheaper because there are few windows. */
+function rpWindowsPrice() {
+  const w = rpAddonCatalog.windows;
+  const n = rpWindowCount();
+  if (!n) return 0;
+  const perWindow = w.perWindow + (rpWindowsHasScreens() ? w.screensPerWindow : 0);
+  const base = Math.max(w.minimum, n * perWindow);
+  const withStory = rpState.windowTwoStory ? base * (1 + w.twoStoryUplift) : base;
+  return Math.round(withStory);
+}
+/* The human-readable version of what was chosen, for the invoice row and
+   the add-on card. One function so /book and /call cannot phrase it
+   differently. */
+function rpWindowsSummary() {
+  const b = rpWindowBracket();
+  const bits = [b ? `${b.label} windows` : "Whole house"];
+  if (rpWindowsHasScreens()) bits.push("screens in");
+  if (rpState.windowTwoStory) bits.push("two storey");
+  return bits.join(" · ");
+}
+
 /* Round 20: every line below is gated on rpAddonAvailable() — see the
    ADD-ON AVAILABILITY block above rpSecondCleanerPrice() for why. A
    selection the current service doesn't offer must never reach a total. */
@@ -1484,12 +2012,11 @@ function rpAddonsTotal() {
   /* Round 24: junk haul is quoted-only now (see rpAddonCatalog.junk) --
      it never adds to the total regardless of selection, so there's no
      line for it here anymore. */
-  if (rpAddonAvailable("windows") && rpState.windowsTier === "basic") total += rpAddonCatalog.windows.basic;
-  if (rpAddonAvailable("windows") && rpState.windowsTier === "premium") total += rpAddonCatalog.windows.premium;
+  if (rpAddonAvailable("windows") && rpWindowsSelected()) total += rpWindowsPrice();
   if (rpAddonAvailable("garage") && rpState.garageWash) total += rpAddonCatalog.garage.price;
   if (rpAddonAvailable("laundry") && rpState.laundryLoads > 0) total += rpState.laundryLoads * rpAddonCatalog.laundry.pricePerLoad;
   if (rpAddonAvailable("fridge") && rpState.fridgeAddon) total += rpAddonCatalog.fridge.price;
-  if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpState.addonExtraHours * rpAddonCatalog.extraHours.pricePerHour;
+  if (rpAddonAvailable("extraHours") && rpState.addonExtraHours > 0) total += rpExtraHoursPrice();
   if (rpAddonAvailable("secondCleaner") && rpState.addonSecondCleaner) total += rpSecondCleanerPrice();
   /* Gated to carpet specifically — pet enzyme only makes sense for the
      standalone Carpet Cleaning service, and stacking it here (rather than
