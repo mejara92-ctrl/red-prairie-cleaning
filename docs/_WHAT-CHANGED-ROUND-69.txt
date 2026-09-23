@@ -73,7 +73,7 @@ DEPLOY CHECKLIST
 ----------------
 1. Upload this whole folder (GitHub -> Cloudflare Pages as usual).
 2. Cloudflare -> Workers -> rpc-booking-api -> Edit code -> paste
-   workers/red-prairie-booking-worker-v31.js -> Deploy. No variable changes.
+   workers/red-prairie-booking-worker-v32.js -> Deploy. No variable changes.
 3. Book one test Deep Cleaning on /book. In HighLevel: contact tagged
    recurring-clean, appointment note in sections. Delete the test.
 4. GHL: rebook/remarketing campaign on recurring-clean (exclude people on a

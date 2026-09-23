@@ -6152,6 +6152,10 @@ function rpCalendarScreen(eyebrow) {
       <div class="rp-calendar-key"><span><i class="available"></i>Available</span><span><i class="today"></i>Today</span></div>
       ${rpPreferredTimeMessage("date")}
       ${!monthDates.length && !rpState.slotsLoading ? `<p class="rp-booking-error is-visible">No online openings are showing in this month. Try the next month or call/text us.</p>` : ""}
+      ${/* Round 72: errors raised while this view is showing (e.g. a time
+           taken at the last second, which clears the time and can land
+           back here) had nowhere to render. */""}
+      ${rpState.bookingError ? `<p class="rp-booking-error is-visible">${rpState.bookingError}</p>` : ""}
     </div>`;
   } else {
     const timeButtons = slots.map((slot) => `<button class="rp-time-btn ${rpState.selectedStartTime === slot ? "is-selected" : ""}" onclick="rpSelectBookingTime('${slot}')">${rpFormatTime(slot)}</button>`).join("");
@@ -6857,14 +6861,17 @@ function rpCurrentMonthRequestRange() {
     end: month.last > booking.end ? booking.end : month.last
   };
 }
-async function rpLoadNativeSlots(force = false) {
+async function rpLoadNativeSlots(force = false, keepError = false) {
   if (rpState.slotsLoading) return;
   rpState.calendarMonth = rpClampCalendarMonth(rpState.calendarMonth || rpMonthKeyFromDateKey(rpCentralDateKey()));
   const range = rpCurrentMonthRequestRange();
   if (!force && rpState.loadedMonths?.[range.monthKey]) return;
   rpState.slotsLoading = true;
   rpState.slotsError = "";
-  rpState.bookingError = "";
+  /* Round 72: the "time was just taken" path reloads slots to show what's
+     left -- and this line erased its own explanation 150ms later, so the
+     customer's chosen time silently vanished. keepError leaves it up. */
+  if (!keepError) rpState.bookingError = "";
   rpRefresh();
   try {
     const url = `${RP_BOOKING_API}/slots?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`;
@@ -6988,7 +6995,7 @@ async function rpConfirmNativeBooking() {
     if (/no longer available/i.test(rpState.bookingError)) {
       rpState.selectedStartTime = "";
       rpState.availableSlots = {};
-      setTimeout(() => rpLoadNativeSlots(true), 150);
+      setTimeout(() => rpLoadNativeSlots(true, true), 150);
     }
     rpState.bookingSubmitting = false;
     if (rpState.step === "calendar") rpRefresh();

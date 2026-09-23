@@ -1,4 +1,4 @@
->>> CURRENT WORKER: workers/red-prairie-booking-worker-v31.js (Round 68).
+>>> CURRENT WORKER: workers/red-prairie-booking-worker-v32.js (Round 68).
 >>> v30 = v28 + marketing tags (recurring-clean / move-out) on confirmed
 >>> bookings + readable appointment notes. /lead unchanged. See
 >>> workers/TAGS-AND-CAMPAIGNS.md. The v28 notes below still apply.

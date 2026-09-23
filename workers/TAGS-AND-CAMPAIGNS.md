@@ -18,7 +18,7 @@ retired. They never reached any contact because the Worker never applied them.
 ## Why nobody was tagged: the Worker ignored `tags`
 
 The site put the tags inside `body.details.tags` on every booking, but the
-Worker never read them. **Fixed in `red-prairie-booking-worker-v31.js`**, a
+Worker never read them. **Fixed in `red-prairie-booking-worker-v32.js`**, a
 drop-in replacement for v28:
 
 - **Tags:** after the appointment is created (so only confirmed bookings get
@@ -45,7 +45,7 @@ drop-in replacement for v28:
 ### Deploy
 
 Cloudflare dashboard → Workers → `rpc-booking-api` → Edit code → select all,
-paste v31, Deploy. No variables change. Then book one test Deep Cleaning and
+paste v32, Deploy. No variables change. Then book one test Deep Cleaning and
 check that the contact has `recurring-clean` and the appointment note is
 tidy. Delete the test afterwards.
 

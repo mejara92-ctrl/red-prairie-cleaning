@@ -1,0 +1,37 @@
+ROUND 72 — QUALITY-CONTROL MEGA-PASS
+===============================================================================
+"Do a mega-pass quality control expert pass on everything."
+
+BUGS FOUND AND FIXED
+1. Worker backfill could not finish a batch with "also remove didn't-book
+   tags" on. Cloudflare's free plan allows 50 outbound calls per page load;
+   reading 2+ years of appointments in 30-day windows used ~31, so a
+   12-contact batch that also removed tags (~24 calls) failed midway every
+   time. Now: 60-day windows (auto-falls back to 30 if HighLevel refuses),
+   contact paging stops if HighLevel ignores "page", and each batch is
+   sized to the calls left (max 48, BACKFILL_MAX_CALLS to raise on a paid
+   plan). Worker v32 = v31 + this.
+2. /book: when the chosen time was taken at the last second, the "That
+   time is no longer available" message was erased 150ms later by the slot
+   reload, and the date view had no place to show errors -- the customer's
+   time silently vanished. The message now stays up on both views.
+
+VERIFIED (all passing)
+- Repo tools: funnel-test, r52-test, undefined-refs, check-prices; inline
+  script parse on /book and /call; every js/ file.
+- Worker: /book with no details object (old cached page), string tags,
+  retired tags, no estimate, custom quote, 9,000-char notes, HTML in fields,
+  honeypot, slot taken, tag add/remove failures, dry run; /lead byte-for-
+  byte identical to v28; backfill key off -> 404.
+- Backfill stress test under an enforced 50-call limit: 250 contacts / 160
+  booked, plus "HighLevel rejects 60-day windows" and "HighLevel ignores
+  paging" -- every tag correct, didn't-book tags cleared, quote-only leads
+  untouched, never over the limit.
+- /book in a real browser: all 9 bookable options end to end through the
+  Worker; the three lead paths send no tags; reload mid-funnel resumes;
+  back button through every step; double-tap Book sends one booking; slot
+  taken shows the message; Worker unreachable shows the message.
+- /call: phone bookings (move-out heavy, recurring Basic, carpet) end to
+  end through the Worker with correct tags and readable notes.
+- 22 public pages load with no script errors; JSON-LD parses; no broken
+  internal links.

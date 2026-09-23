@@ -10,7 +10,7 @@ confirm" -- confirmed as: cleans + move-outs)
    Whole-Home Reset. move-out = confirmed Move-Out. basic-clean, deep-clean,
    basic-detail, deep-detail retired. Carpet/car-detail/hourly: no tag.
 2. ROOT CAUSE of "nobody is tagged": the Worker never read details.tags.
-   Fixed in workers/red-prairie-booking-worker-v31.js (Add Tags endpoint,
+   Fixed in workers/red-prairie-booking-worker-v32.js (Add Tags endpoint,
    after the appointment is confirmed, /book route only).
 2b. READABLE NOTES (v29 Worker): sectioned appointment note + booking_details
    field, N/A filler removed, warnings on top. Works for /book and /call.
@@ -51,7 +51,7 @@ and /call, stamp-assets.py re-run (engine hash changed).
 
 NEEDS YOU (GHL / Worker side)
 -----------------------------
-- Deploy workers/red-prairie-booking-worker-v31.js (paste over v28).
+- Deploy workers/red-prairie-booking-worker-v32.js (paste over v28).
 - Backfill past customers by bulk-tagging in GHL (see TAGS doc).
 
 FINAL VERIFICATION PASS (same round)
