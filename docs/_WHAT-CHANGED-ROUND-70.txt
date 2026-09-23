@@ -1,0 +1,17 @@
+ROUND 70 — BOOKED CUSTOMERS WERE KEEPING THE "DIDN'T BOOK" TAGS
+===============================================================================
+Reported: "I booked a test and got the tag price-viewed-no-booking."
+
+Cause: /book's name/phone screen posts a partial lead to /lead before the
+booking exists (so a walk-away is still callable). /lead tags it
+website-partial-lead + price-viewed-no-booking. The later booking never
+removed them, so every web customer also looked like a walk-away.
+
+Fix (Worker v30 = v29 + this): after the appointment is created, the /book
+route calls HighLevel's Remove Tags endpoint for website-partial-lead,
+price-viewed-no-booking and call-no-booking. Never fails a booking; failed
+bookings and dry runs don't touch tags; /lead unchanged (tested against v28).
+
+Cleanup for past bookings: in GHL, filter contacts with an appointment AND
+tag price-viewed-no-booking, bulk-remove website-partial-lead and
+price-viewed-no-booking.

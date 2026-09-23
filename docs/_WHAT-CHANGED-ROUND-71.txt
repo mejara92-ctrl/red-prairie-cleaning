@@ -1,0 +1,20 @@
+ROUND 71 — ONE-TIME TAG BACKFILL FOR ~250 PAST CONTACTS
+===============================================================================
+"I have like 250 contacts who I can't easily see who ordered what."
+
+Worker v31 = v30 + GET /backfill-tags (key-protected, off unless the
+BACKFILL_KEY secret is set). Reads every calendar appointment since
+&since=, skips cancelled/no-show, works out the service from the
+appointment notes ("Service: ..." line, or the first line of the v30+
+readable note), falls back to the contact's Service Needed / Service Type
+field, and shows a preview table. &apply=1 tags the next &limit= (default
+12, small enough for Cloudflare's free-plan per-request call limit) and is
+safe to repeat. &untag=1 also strips the "didn't book" tags from booked
+customers. Uses HighLevel's add/remove tag endpoints, so existing tags are
+never replaced.
+
+Tested against a mocked HighLevel: old and new note formats, contact-field
+fallback, cancelled + no-show skipped, quote-only lead untouched, car
+detail "deep" add-on not mistaken for Deep Cleaning, batching, repeat runs,
+mid-batch failure, wrong/missing key → 404. /book and /lead unchanged
+(booking suite + /lead byte-compare vs v28).
