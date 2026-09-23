@@ -1,0 +1,82 @@
+ROUND 69 — /BOOK COPY AND EXPERIENCE PASS (same design)
+===============================================================================
+Ask: "optimize the language, optimize experience, remove redundancy and make
+this website go hard" -- scoped to /book, same Prairie Glass design.
+
+RECURRING BASIC = BASIC ON A SCHEDULE (direct instruction: "Just keep them
+separate as services.")
+- RP_RECURRING_REQUIRES_DEEP_FIRST set to false in the engine. No required
+  first-visit Deep: recurring Basic is $120 every visit from visit one, on
+  /book, in the payload/crew note, and on /call (which never charged it).
+  The first-visit-Deep copy below still exists in code but only renders if
+  that flag is turned back on.
+- Recurring estimate total row reads "Per visit" (sat under a $/mo line).
+
+EXPERIENCE FIXES (things that read as errors to a customer)
+- (Only if the flag above is on) Recurring Basic: the name/phone screen said "Basic Cleaning starts at $120"
+  and the estimate then jumped to "$240 due on your first visit" under a
+  "3 hours · 1 cleaner" spec. Now: the recurring toggle says "First visit is
+  a Deep Clean, then $120 every visit" before it's ticked; the gate says
+  "Your first visit is a Deep Clean at $240, then $120 every 2 weeks"; the
+  estimate spec reads "First visit: 6-hour Deep Clean / Then 3 hours · 1
+  cleaner every visit"; the total row reads "Due at first visit".
+- Whole-Home Reset was described as "the full MOVE-OUT checklist". Now
+  "the full top-to-bottom checklist". (engine rpIncludes.reset.intro)
+- Carpet said "$50 per room · 2-room minimum" then priced 2 rooms at $120.
+  Now "$50 per room · $120 minimum" (screen + service card).
+- Carpet estimate fine print warned about a 25% heavy surcharge that carpet
+  can't incur. Carpet now: "Priced by the room. Nothing gets added after."
+- Car detail fine print ("Pet hair is the only thing that changes it, and
+  you've already chosen") -> "That's the full price. Nothing gets added after."
+
+REDUNDANCY CUT
+- Heavy-buildup explanation appeared three times as long paragraphs
+  (questionnaire, gate, estimate). Questionnaire and estimate notes are now
+  one sentence each; the itemised +25% row carries the detail.
+- Questionnaire subtitle no longer repeats the "this one affects your price"
+  label: "Four taps and your price is ready."
+- Estimate "Time, not a finished checklist..." duplicated the included
+  screen: now "We work your priority list, in your order, for the hours booked."
+- Timed-service fine print cut from 3 sentences to 2.
+
+SHARPER LANGUAGE
+- Hero: "Your exact price, right now. Booked in two minutes." /
+  "Veteran-owned, W-2 crews, and nothing is due until the clean is done."
+- Picker notes tightened; add-ons header "Anything else while we're there?";
+  gate fine print "We only use this to follow up on your quote. No spam, no
+  pressure."; heavy-estimate link "Rather talk it through? Call ...".
+
+UNCHANGED: every price, the flow order, all webhook fields, the design.
+
+VERIFIED: funnel-test, r52-test, undefined-refs, check-prices (no drift),
+inline script parse; headless-browser end-to-end on all 9 bookable options
+through the v29 Worker; lead paths still send no tags; /call loads clean.
+
+
+FINAL SITE-WIDE PASS
+--------------------
+- Carpet minimum was stated as "two-room minimum" everywhere, implying
+  $100, while /book charges $120 for carpet on its own and $50/room from
+  one room as an add-on. Now: "$120 minimum when booked on its own" on the
+  homepage FAQ, carpet page (meta, FAQ and its FAQPage schema), /pricing,
+  /call (4 prompts + FAQ answer); dropped from the 7 move-out pages' add-on
+  line and /book's add-on cards, where it wasn't true.
+- Checked and already consistent: heavy-buildup 25% policy on all public
+  pages, recurring page (Deep is only "recommended", matches "separate
+  services"), Whole-Home Reset descriptions, review counts (check-prices).
+- 23 pages: JSON-LD parses, no broken internal links, no unbalanced tags.
+- sitemap.xml lastmod bumped to 2026-09-22 for the 11 public pages that
+  changed (not /call, which is disallowed).
+- WEBHOOK-MAPPING-V28.txt now points to the v29 Worker.
+
+DEPLOY CHECKLIST
+----------------
+1. Upload this whole folder (GitHub -> Cloudflare Pages as usual).
+2. Cloudflare -> Workers -> rpc-booking-api -> Edit code -> paste
+   workers/red-prairie-booking-worker-v29.js -> Deploy. No variable changes.
+3. Book one test Deep Cleaning on /book. In HighLevel: contact tagged
+   recurring-clean, appointment note in sections. Delete the test.
+4. GHL: rebook/remarketing campaign on recurring-clean (exclude people on a
+   plan with the frequency field); move-out as the suppression list.
+5. Optional: bulk-tag past customers by service_key.
+Rollback: paste v28 back into the Worker; re-deploy the previous site zip.

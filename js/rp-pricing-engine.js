@@ -814,8 +814,19 @@ const rpFrequencyPlans = {
   "Monthly":  { discount: 0, visitsPerMonth: 1 },
   "One-Time": { discount: 0, visitsPerMonth: 1 }
 };
+/* Round 68: /call's picker wrote "Bi-Weekly" while this table (and /book)
+   use "Biweekly", so every phone-booked biweekly plan looked up null: no
+   visits_per_month, no monthly_total, rpIsRecurringPlan() false, and the
+   comparison rail never highlighted the choice. /call now writes "Biweekly";
+   this also folds any legacy spelling left in a saved session. */
+function rpNormalizeFrequency(f) {
+  if (!f) return f;
+  const k = String(f).trim().toLowerCase().replace(/[^a-z]/g, "");
+  return ({ weekly: "Weekly", biweekly: "Biweekly", everyotherweek: "Biweekly",
+            monthly: "Monthly", onetime: "One-Time" })[k] || f;
+}
 function rpFrequencyPlan() {
-  return rpFrequencyPlans[rpState.frequency] || null;
+  return rpFrequencyPlans[rpNormalizeFrequency(rpState.frequency)] || null;
 }
 
 function rpMaintenancePrice(bedrooms, bathrooms) {
@@ -1409,7 +1420,7 @@ const rpIncludes = {
      RP_TIMED_SERVICES for why that is the only framing that survives being
      compared to the $399 move-out. */
   reset: {
-    intro: "The full move-out checklist, done around your furniture.",
+    intro: "The full top-to-bottom checklist, done around your furniture.",
     outcome: "Two people working the whole house at once, which is what makes a full checklist finishable in a single day rather than spread across two visits.",
     fineprint: "A Move-Out Cleaning covers the same list for less, but it needs an empty house. If yours will be empty, book that one instead.",
     itemsLead: "Where the time usually goes:",
@@ -2302,7 +2313,7 @@ const RP_RECURRING_MIN_PER_VISIT = 120;
 function rpIsRecurringBooking() {
   return rpState.service === "maintenance"
     && !!rpState.frequency
-    && rpState.frequency !== "One-Time";
+    && rpNormalizeFrequency(rpState.frequency) !== "One-Time";
 }
 function rpServiceFloorCents() {
   if (rpIsCustomQuoteOnly()) return 0;
@@ -2374,7 +2385,11 @@ function rpIsRecurringPlan() {
 
    Set false to sell recurring with no required first Deep.
    --------------------------------------------------------------------- */
-const RP_RECURRING_REQUIRES_DEEP_FIRST = true;
+/* Round 69, direct instruction: "Just keep them separate as services."
+   Recurring Basic is Basic on a schedule -- no required first Deep. Every
+   first-visit-Deep message on /book, the payload and the crew note is
+   gated on this flag, so they all switch off together. */
+const RP_RECURRING_REQUIRES_DEEP_FIRST = false;
 
 function rpRecurringNeedsDeepFirst() {
   return RP_RECURRING_REQUIRES_DEEP_FIRST
@@ -2542,35 +2557,35 @@ function rpFrequencySummary() {
    filters ON: without it there is no way to exclude move-out contacts from a
    campaign aimed at everyone else.
    ========================================================================= */
+/* ROUND 68 -- TWO TAGS. Direct instruction, after round 67's five-tag set
+   was found to be applying nothing in HighLevel ("Nobody on my contacts is
+   tagged as basic-clean"):
+
+     recurring-clean  any confirmed home clean -- Basic (one-time or on a
+                      schedule), Deep, Whole-Home Reset. The remarketing
+                      target: everyone who let us clean their house is a
+                      prospect for a recurring plan.
+     move-out         any confirmed Move-Out. The suppression list -- they
+                      have left the address.
+
+   basic-clean, deep-clean, basic-detail and deep-detail are retired. Carpet-
+   only, car-detail-only and hourly bookings carry no tag. Which service,
+   cadence and add-ons they bought all still ship as custom fields.
+
+   Tags are for CONFIRMED BOOKINGS ONLY. Partial leads and lost calls use
+   rpBuildLeadDetails(), which blanks them. */
 const RP_TAGS = {
-  BASIC_CLEAN:  "basic-clean",
-  DEEP_CLEAN:   "deep-clean",
-  MOVE_OUT:     "move-out",
-  BASIC_DETAIL: "basic-detail",
-  DEEP_DETAIL:  "deep-detail"
+  RECURRING_CLEAN: "recurring-clean",
+  MOVE_OUT:        "move-out"
 };
+const RP_RECURRING_CLEAN_SERVICES = ["maintenance", "deep", "reset"];
 
 function rpMarketingTags() {
-  const t = [];
-  const push = v => { if (v && t.indexOf(v) === -1) t.push(v); };
   const svc = rpState.service;
-  if (!svc) return t;
-
-  /* The clean they bought. "reset" maps to deep-clean -- see the note above. */
-  if (svc === "maintenance") push(RP_TAGS.BASIC_CLEAN);
-  else if (svc === "deep" || svc === "reset") push(RP_TAGS.DEEP_CLEAN);
-  else if (svc === "moveout") push(RP_TAGS.MOVE_OUT);
-
-  /* The car detail, whether booked on its own or added to a cleaning. The
-     availability gate matters: a stale carDetail left in state by a service
-     switch must not tag a booking that is not selling one, exactly as it
-     must not reach the price. */
-  const detailSold = svc === "cardetailing"
-    || (rpAddonAvailable("cardetail") && typeof rpCarDetailSelected === "function" && rpCarDetailSelected());
-  if (detailSold) {
-    push(rpState.carDetail === "deep" ? RP_TAGS.DEEP_DETAIL : RP_TAGS.BASIC_DETAIL);
-  }
-  return t;
+  if (!svc) return [];
+  if (RP_RECURRING_CLEAN_SERVICES.indexOf(svc) !== -1) return [RP_TAGS.RECURRING_CLEAN];
+  if (svc === "moveout") return [RP_TAGS.MOVE_OUT];
+  return [];
 }
 /* Comma-joined, because a HighLevel workflow filter and most CSV imports
    want a string. Both shapes go on the payload; the Worker can use either. */
@@ -2689,6 +2704,24 @@ function rpBuildSharedDetails() {
     frequency: rpState.frequency || "N/A",
     monthly_total: rpIsRecurringPlan() ? rpMonthlyTotal().toFixed(2) : "N/A"
   };
+}
+
+/* Round 68: the payload for anything that is NOT a booking -- /book's
+   contact-gate partial, saved quote and blocked move-out; /call's lost-call
+   log and mid-call partial. Those all spread rpBuildSharedDetails(), which
+   meant a person who SAW a move-out price and left was sent to HighLevel
+   carrying tags:["move-out"] -- landing them on the move-out suppression
+   list, and a Basic browser landing on "book your next clean" as if they
+   had bought one. Purchase tags on non-buyers poison every segment.
+
+   The interest is still worth having for the callback list, so it ships as
+   a plain field (interest_tags_csv), not a tag. */
+function rpBuildLeadDetails() {
+  const d = rpBuildSharedDetails();
+  d.interest_tags_csv = d.tags_csv || "";
+  d.tags = [];
+  d.tags_csv = "";
+  return d;
 }
 
 /* =========================================================================

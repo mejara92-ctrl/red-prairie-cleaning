@@ -143,13 +143,14 @@ const RP_MSG = {
       /* Round 66c: car detailing is not a house, so neither the heavy
          surcharge nor "the home you described" applies to it. */
       if (service === "cardetailing") {
-        return "This is the full price for the tier you picked. Pet hair is the only thing that changes it, and you've already chosen. Nothing is added afterward.";
+        return "That's the full price. Nothing gets added after.";
       }
       const timed = ["maintenance", "deep", "reset"].includes(service);
       if (timed) {
-        return "This is the price for the hours you picked. If the home needs more than that, the crew will say so on the day rather than working faster — you can add time then or book a second visit. Nothing is ever added to your bill without your say-so.";
+        return "You're booking hours. If the home needs more, the crew tells you on the day and you decide: add time or book a second visit. Nothing is added without your OK.";
       }
-      return "This is the price for the home you described. If it turns out to be heavier than that, the crew prices the difference with you before they start — never after. Heavy buildup you tell us about up front is a flat 25%, and that number is firm.";
+      if (service === "carpet") return "Priced by the room. Nothing gets added after the clean.";
+      return "This price covers the home you described. If the crew finds it much heavier, they agree any difference with you before starting, never after.";
     },
     conditionFull: "Tell us at booking that the home has heavy buildup and we add a flat 25% for the extra time — that price is then firm, and the crew will not re-price it on arrival. If instead the crew arrives to heavy trash, heavy grease, pet mess or anything well outside what was described, they stop and quote the difference with you before any work starts — you can approve it or keep the standard clean at your quoted price. Nothing is ever added to your bill afterward.",
     /* ROUND 57 — WHAT THE FLAGGED CUSTOMER IS ACTUALLY AFRAID OF.
@@ -186,8 +187,8 @@ const RP_MSG = {
        customer gets in exchange for having answered honestly, and it is the
        reason the surcharge does not simply teach people to click
        "Standard". Both halves have to stay true together. */
-    flaggedLead: "You told us there's heavy build up — that's priced in above.",
-    flaggedBody: "Homes like this take longer, so the total includes 25% for the extra time. What you see is what you pay: the crew won't re-price anything on arrival, and nothing is ever added afterward."
+    flaggedLead: "Heavy build up is priced in.",
+    flaggedBody: "That's the 25% line below, and it's firm: no re-pricing on arrival, nothing added after."
     /* Round 37 (direct instruction): the price-ceiling claim is gone. The
        top of the move-out ladder is still the top of the ladder — we just
        don't make a promise out of it any more. Deleted rather than left

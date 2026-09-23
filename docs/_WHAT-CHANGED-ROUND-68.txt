@@ -1,0 +1,80 @@
+ROUND 68 — RECURRING-CLEAN TAG, AND TAGS THAT WERE LANDING ON THE WRONG PEOPLE
+===============================================================================
+Ask: "Analyze for improvements, make sure services are getting tagged with
+recurring-clean or move-out for remarketing."
+
+TAGGING (revised same round, direct instruction: "Nobody on my contacts is
+tagged as basic-clean, only use recurring-clean to auto tag people that
+confirm" -- confirmed as: cleans + move-outs)
+1. TWO TAGS ONLY. recurring-clean = confirmed Basic (any cadence), Deep,
+   Whole-Home Reset. move-out = confirmed Move-Out. basic-clean, deep-clean,
+   basic-detail, deep-detail retired. Carpet/car-detail/hourly: no tag.
+2. ROOT CAUSE of "nobody is tagged": the Worker never read details.tags.
+   Fixed in workers/red-prairie-booking-worker-v29.js (Add Tags endpoint,
+   after the appointment is confirmed, /book route only).
+2b. READABLE NOTES (v29 Worker): sectioned appointment note + booking_details
+   field, N/A filler removed, warnings on top. Works for /book and /call.
+3. FIXED: purchase tags were riding on NON-bookings. Five lead posts spread
+   rpBuildSharedDetails(), which includes tags -- /book contact gate, saved
+   quote, blocked move-out; /call lost-call log. A person who only viewed a
+   move-out price was sent tags:["move-out"]. New rpBuildLeadDetails() blanks
+   tags on those and keeps the interest as a field: interest_tags_csv.
+4. FIXED: /book's "save quote" lead sent lead_type "website_quote_requested",
+   which the Worker does not know, so it defaulted to phone_csr and was
+   tagged call-no-booking / sourced as a CSR phone call. Now
+   lead_type "website_partial" + lead_subtype "quote_saved".
+
+OTHER BUGS FOUND
+----------------
+5. /call wrote frequency "Bi-Weekly"; the engine's plan table key is
+   "Biweekly". Every phone-booked biweekly plan resolved to no plan:
+   visits_per_month "N/A", monthly_total "N/A", rpIsRecurringPlan() false,
+   comparison rail never highlighted. /call now writes "Biweekly" and the
+   engine normalises any legacy spelling (rpNormalizeFrequency).
+6. /call's crew sheet still said "Heavy condition YES -- crew to re-quote on
+   arrival". Since Round 66 heavy is +25% at booking and the price is FIRM;
+   /book's crew sheet says "do NOT re-quote". A crew reading the /call sheet
+   would re-price a customer who was promised no re-quote. Fixed to match.
+6b. /call's crew-sheet CREW PREP flag read rpState.condition (never set on
+   move-out, printed "Condition null") and said "confirm on arrival". Now
+   matches /book: "+25% already in the price. Do NOT re-quote on arrival".
+7. /call's move-out "home" step coaching still said the condition question
+   "never changes the quote" and scripted the old "price covers a standard
+   clean" line -- the exact copy Round 66 retired elsewhere. Rewritten.
+
+VERIFIED
+--------
+funnel-test.js (new checks: two-tag closed set, every service, legacy
+"Bi-Weekly", lead payloads carry no tags but keep interest), r52-test.js,
+undefined-refs.js, check-prices.py (no drift), inline-script syntax on /book
+and /call, stamp-assets.py re-run (engine hash changed).
+
+NEEDS YOU (GHL / Worker side)
+-----------------------------
+- Deploy workers/red-prairie-booking-worker-v29.js (paste over v28).
+- Backfill past customers by bulk-tagging in GHL (see TAGS doc).
+
+FINAL VERIFICATION PASS (same round)
+------------------------------------
+8. /book recurring Basic sent HighLevel the per-visit price ($120) while the
+   customer was shown "$240 due on your first visit" (required first Deep),
+   and the job details never mentioned the Deep. The office and crew would
+   plan a 3-hour Basic. /book now sends rpFirstVisitTotal() (identical to
+   the old value on every other booking) and adds a
+   "FIRST VISIT IS A DEEP CLEAN ($240), then <cadence> Basic at $120" line.
+9. /book "Condition flag" text said the +25% was "included in Base service
+   price" next to a base price that excludes it. Reworded.
+10. Worker v29: custom-quote bookings keep their Estimate line in the note;
+    the appointment description keeps a full safety copy (as v28 did), now
+    in the readable format.
+
+Browser end-to-end (headless Chromium, real /book clicks, real v29 Worker,
+HighLevel mocked): Move-Out standard, Move-Out heavy + carpet, Basic
+one-time, Basic biweekly, Basic weekly + 2nd cleaner, Deep, Reset, Carpet,
+Car detail -- all booked, correct tags applied, no page errors, no real
+detail dropped from the note. Saved-quote, contact-gate and blocked
+move-out leads all send tags [] with the right lead_type.
+
+OPEN (decision, not changed): /call quotes a recurring Basic caller the
+$120 per-visit price and never mentions the required first Deep that /book
+charges. Phone and web customers are currently told two different things.
