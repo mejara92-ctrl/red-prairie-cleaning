@@ -19,27 +19,23 @@
 /*
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Content-Security-Policy: frame-ancestors 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
 
 # NOTE (round 49): /css/* and /js/* are served immutable for a year, which
 # means a browser will NOT revalidate them -- not on reload, not on hard
 # reload. Every reference in the HTML therefore carries a ?v=<content-hash>
-# query string. After editing ANYTHING in /css or /js, run:
+# query string. After editing ANYTHING in /css or /js, run this from the
+# website folder:
 #
-#     python3 tools/stamp-assets.py
+#     python3 ../red-prairie-internal/tools/stamp-assets.py
 #
 # or returning visitors keep the old file. For rp-pricing-engine.js that
 # means they keep being quoted the old prices.
-
-# Round 49: repo-only files that the static host serves anyway. noindex so
-# they stay out of search results; move them out of the deploy to really
-# fix it.
-/tools/*
-  X-Robots-Tag: noindex
-/workers/*
-  X-Robots-Tag: noindex
-/WEBHOOK-MAPPING-V28.txt
-  X-Robots-Tag: noindex
-/docs/*
-  X-Robots-Tag: noindex
+#
+# The Content-Security-Policy above deliberately does not restrict scripts:
+# the site loads Google Analytics/Ads, Clarity, Soro and HighLevel widgets,
+# and a script allow-list that misses one silently breaks tracking or chat.
+# It only blocks framing (clickjacking), plugins and <base> hijacking.
